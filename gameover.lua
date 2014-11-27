@@ -36,7 +36,7 @@ music=nil
 bobby=nil
 
 audio.stop( )            
-music = audio.loadStream( 'anthems/mexico.mp3' ) 
+music = audio.loadStream( 'anthems/mcgee-gameover.mp3' ) 
 bobby = audio.play(music,{loops=-1})
 
 local flagHeights = {24, -18, -46}
