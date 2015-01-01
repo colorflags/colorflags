@@ -102,4 +102,4 @@ end
   -- composer.removeScene("main",false)  
 --composer.gotoScene("menu")
 
-composer.gotoScene( "game", {effect = defaultTransition} )
+composer.gotoScene( "menu", {effect = defaultTransition} )
