@@ -8,10 +8,7 @@ local scene = composer.newScene()
 --local physics = require("physics")
 --physics.start()
 
-require("countries")
-
 --media.playSound('Brazil.mid')
-
 
 local gotoDeath=true
 local state=1
@@ -2453,7 +2450,7 @@ local function newFlag()
                 thisRoll=e
             end
 
-          countries(1)
+          countries(0)
 
           if infoMode == true then
             infoPic = display.newImage(info,165,77)
