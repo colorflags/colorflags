@@ -1,3 +1,6 @@
+-- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
+-- http://docs.coronalabs.com/api/library/display/newSprite.html 
+
 --game.lua
 local composer = require("composer")
 local scene = composer.newScene()
@@ -88,7 +91,77 @@ audio.stop( )
 
 --composer.recycleOnSceneChange = true
 
+local boycha = 1 -- FOR TESTING PURPOSES.
+local nationalFlags1Coords = require("lua-sheets.national-flags1")
+local nationalFlags1Sheet = graphics.newImageSheet( "images/national-flags1.png", nationalFlags1Coords:getSheet() )
 
+local nationalFlags2Coords = require("lua-sheets.national-flags2")
+local nationalFlags2Sheet = graphics.newImageSheet( "images/national-flags2.png", nationalFlags2Coords:getSheet() )
+
+local nationalFlags3Coords = require("lua-sheets.national-flags3")
+local nationalFlags3Sheet = graphics.newImageSheet( "images/national-flags3.png", nationalFlags3Coords:getSheet() )
+
+
+local nationalFlagsSeq = {
+    { name="andorra", sheet=nationalFlags1Sheet, frames={1} },
+    { name="argentina", sheet=nationalFlags1Sheet, frames={2} },
+    { name="australia", sheet=nationalFlags1Sheet, frames={3} },
+    { name="austria", sheet=nationalFlags1Sheet, frames={4} },
+    { name="belgium", sheet=nationalFlags1Sheet, frames={5} },
+    { name="brazil", sheet=nationalFlags1Sheet, frames={6} },
+    { name="canada", sheet=nationalFlags1Sheet, frames={7} },
+    { name="chile", sheet=nationalFlags1Sheet, frames={8} },
+    { name="china", sheet=nationalFlags1Sheet, frames={9} },
+    { name="croatia", sheet=nationalFlags1Sheet, frames={10} },
+    { name="cyprus", sheet=nationalFlags1Sheet, frames={11} },
+    { name="czech_republic", sheet=nationalFlags1Sheet, frames={12} },
+    { name="denmark", sheet=nationalFlags1Sheet, frames={13} },
+    { name="egypt", sheet=nationalFlags1Sheet, frames={14} },
+    { name="estonia", sheet=nationalFlags1Sheet, frames={15} },
+    { name="finland", sheet=nationalFlags1Sheet, frames={16} },
+    { name="france", sheet=nationalFlags1Sheet, frames={17} },
+    { name="germany", sheet=nationalFlags1Sheet, frames={18} },
+    { name="greece", sheet=nationalFlags1Sheet, frames={19} },
+    { name="hungary", sheet=nationalFlags1Sheet, frames={20} },
+    { name="iceland", sheet=nationalFlags1Sheet, frames={21} },
+    { name="india", sheet=nationalFlags1Sheet, frames={22} },
+    { name="indonesia", sheet=nationalFlags1Sheet, frames={23} },
+    { name="ireland", sheet=nationalFlags1Sheet, frames={24} },
+
+    { name="isreal", sheet=nationalFlags2Sheet, frames={1} },  
+    { name="italy", sheet=nationalFlags2Sheet, frames={2} },
+    { name="japan", sheet=nationalFlags2Sheet, frames={3} },
+    { name="lithuania", sheet=nationalFlags2Sheet, frames={4} },
+    { name="luxembourg", sheet=nationalFlags2Sheet, frames={5} },   
+    { name="malaysia", sheet=nationalFlags2Sheet, frames={6} },   
+    { name="malta", sheet=nationalFlags2Sheet, frames={7} },   
+    { name="mexico", sheet=nationalFlags2Sheet, frames={8} }, 
+    { name="netherlands", sheet=nationalFlags2Sheet, frames={9} }, 
+    { name="new_zealand", sheet=nationalFlags2Sheet, frames={10} },
+    { name="norway", sheet=nationalFlags2Sheet, frames={11} },
+    { name="philippines", sheet=nationalFlags2Sheet, frames={12} },
+    { name="poland", sheet=nationalFlags2Sheet, frames={13} },
+    { name="portugal", sheet=nationalFlags2Sheet, frames={14} },
+    { name="republic_of_china", sheet=nationalFlags2Sheet, frames={15} },    
+    { name="russia", sheet=nationalFlags2Sheet, frames={16} },    
+    { name="san_marino", sheet=nationalFlags2Sheet, frames={17} },    
+    { name="singapore", sheet=nationalFlags2Sheet, frames={18} },    
+    { name="slovakia", sheet=nationalFlags2Sheet, frames={19} },    
+    { name="slovenia", sheet=nationalFlags2Sheet, frames={20} },        
+    { name="south_africa", sheet=nationalFlags2Sheet, frames={21} },    
+    { name="south_korea", sheet=nationalFlags2Sheet, frames={22} },    
+    { name="spain", sheet=nationalFlags2Sheet, frames={23} },    
+    { name="sri_lanka", sheet=nationalFlags2Sheet, frames={24} },    
+    { name="sweden", sheet=nationalFlags3Sheet, frames={1} }, 
+    { name="switzerland", sheet=nationalFlags3Sheet, frames={2} }, 
+    { name="thailand", sheet=nationalFlags3Sheet, frames={3} }, 
+    { name="turkey", sheet=nationalFlags3Sheet, frames={4} }, 
+    { name="united_arab_emirates", sheet=nationalFlags3Sheet, frames={5} }, 
+    { name="united_kingdom", sheet=nationalFlags3Sheet, frames={6} }, 
+    { name="united_states", sheet=nationalFlags3Sheet, frames={7} }, 
+              
+    -- { name="argentina", sheet=nationalFlags1Sheet, frames={2} }
+}
 
 local bonusShatterSpriteCoords = require("bonus-shatter")
 local bonusShatterSheet = graphics.newImageSheet( "images/bonus-shatter.png", bonusShatterSpriteCoords:getSheet() )
@@ -99,7 +172,7 @@ local bonusShatterSeq={
     {name="5x", frames={19,19,19,19,20,21,22,23,24},time=800, loopCount=1},
     {name="6x", frames={25,25,25,25,26,27,28,29,30},time=800, loopCount=1},
     {name="7x", frames={31,31,31,31,32,33,34,35,36},time=800, loopCount=1},
-    {name="8x", frames={37,37,37,37,38,39,40,41,42},time=800, loopCount=1},
+    {name="8x", frames={37,37,37,37,38,9,40,41,42},time=800, loopCount=1},
     {name="9x", frames={43,43,43,43,44,45,46,47,48},time=800, loopCount=1}
 }
 
@@ -977,8 +1050,20 @@ local function newFlag()
     -- audio.play(music,{channel=1})
 
     -- Andorra
+
+    flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq)
+
+    -- if boycha~=0 then
+    --     e=boycha
+    --     boycha=0
+    -- end
+
+    e=1
     if e==1 then
-        flag = display.newImageRect( "images/andorra.png", 200,100)
+        -- flag = display.newImageRect( "images/andorra.png", 200,100)
+        -- flag = display.newSprite( nationalFlagsSheet , {frames={nationalFlags1Coords:getFrameIndex("andorra")}} )
+
+        flag:setSequence("andorra")
         flag.anchorX=0.5
         flag.anchorY=0.5
         code=1
@@ -994,9 +1079,9 @@ local function newFlag()
         --   end
 
         -- if check.. when first flag appear. there will be no music. !!!
-        -- audio.stop( bobby )
-        -- music = audio.loadStream( 'anthems/andorra.mp3' )
-        -- bobby = audio.play(music,{loops=-1})
+        audio.stop( bobby )
+        music = audio.loadStream( 'anthems/andorra.mp3' )
+        bobby = audio.play(music,{loops=-1})
         piece = display.newImage( "images/andorra104x102.png", 529,229)
 
         -- Argentina
@@ -1107,12 +1192,12 @@ local function newFlag()
         -- if music == nil and soundOn==true then
         --   music="anthems/Brazil.mp3"
         --   audio.play(music, {loops = -1})
-        --   end
+        -- end
 
         -- if check.. when first flag appear. there will be no music. !!!
-        -- audio.stop( bobby )
-        -- music = audio.loadStream( 'anthems/brazil.mp3' )
-        -- bobby = audio.play(music,{loops=-1})
+        audio.stop( bobby )
+        music = audio.loadStream( 'anthems/brazil.mp3' )
+        bobby = audio.play(music,{loops=-1})
         piece = display.newImage( "images/andorra104x102.png", 529,229)
 
         -- Canada
