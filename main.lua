@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------------
 --
 -- main.lua
---TESTING GIT
+--
 -----------------------------------------------------------------------------------------
 
 --local storyboard = require "storyboard"
@@ -27,7 +27,7 @@ local fontFace
 local backgrounImage=nil
 local backgroundColor={255,255,255}
 
-local splash = display.newImageRect( "images/MMG.png", 580, 320 )
+
     splash.anchorX=0.5
     splash.anchorY=0.5
     splash.x = _W/2
@@ -96,7 +96,7 @@ end
 
 
 
-      timer.performWithDelay(10,eraseSplash,1)
+      timer.performWithDelay(300,eraseSplash,1)
 
 
   -- composer.removeScene("main",false)  
