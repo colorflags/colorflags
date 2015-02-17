@@ -27,7 +27,11 @@ local fontFace
 local backgrounImage=nil
 local backgroundColor={255,255,255}
 
+ heightModeTop=35
+ heightModeLow=_H-35
+ infoMode=true
 
+local    splash = display.newImageRect( "images/MMG.png", 580, 320 )
     splash.anchorX=0.5
     splash.anchorY=0.5
     splash.x = _W/2
