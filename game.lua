@@ -972,9 +972,13 @@ function returnFunction()
      paceRect:toFront()
 end
 
+local function deleteText()
+display.remove(CountryText)
+ end 
 
 local function countryScale()
    countryTimer=transition.to( countryText, { time=500, alpha=0 }) 
+   timer.performWithDelay(500,deleteText,1)
 end  
 
 local function infoAppear()
