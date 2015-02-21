@@ -885,7 +885,7 @@ end
 
     
 local function finishScale()
- topBar=display.newImage("images/sidebar1.png",580,100)
+ topBar=display.newImage("images/sidebar.png",580,100)
             topBar:setFillColor(0,0,0)
             topBar.yScale=-1
             topBar.anchorY=0.5
@@ -896,8 +896,8 @@ local function finishScale()
             topBar.alpha=0
             topBar:toFront()
             topBar1=transition.to(topBar,{time=1300, yScale=-.8})       
-            topBar2=transition.to(topBar,{time=1300, alpha=.8})
- lowBar=display.newImage("images/sidebar1.png",580,100)
+            topBar2=transition.to(topBar,{time=1300, alpha=.72})
+ lowBar=display.newImage("images/sidebar.png",580,100)
             lowBar:setFillColor(0,0,0)
             lowBar.anchorY=0.5
             lowBar.anchorX=0.5
@@ -907,7 +907,7 @@ local function finishScale()
             lowBar.alpha=0
             topBar:toFront()
             lowBar1=transition.to(lowBar,{time=1300, yScale=0.8})          
-            lowBar2=transition.to(lowBar,{time=1300,alpha=.8}) 
+            lowBar2=transition.to(lowBar,{time=1300,alpha=.72}) 
             flag2Timer=transition.to( flag, { time=1000, xScale=1, yScale=1})
       --      if state ~= 3 then
               timerSpeed=timer.performWithDelay(9500,speedUp,1)
