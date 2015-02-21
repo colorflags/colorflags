@@ -20,6 +20,18 @@ local scene = composer.newScene()
   local font
   local musicOff
   local phaseGroup=display.newGroup()
+  
+  local arialFont = "Arial Rounded MT Bold"
+
+function createText(text, x, y, font, size)                        
+  local offset = size / (size / 2) 
+  local label = display.newText(text, x, y, (font), size)
+  local shadow = display.newText(text, x+offset, y+offset, (font), size)
+  shadow:setFillColor( 189/255, 177/255, 255/255 )                                           
+  label:setFillColor( 47/255, 44/255, 64/255)                                           
+  -- self:insert(shadow)                                                           
+  -- self:insert(label)                                                            
+end
 
 -- phase2 and phase 3 are used for button click animation
   local function phase3(e)
@@ -61,19 +73,19 @@ local scene = composer.newScene()
         display.remove(playBtn)  
         if e.target==playBtn then 
 -- play        	
-          stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), native.systemFonts, 35 ) 
-          jamBtn = display.newText("MuSic",_W*(1/4)-15, _H*(4/5) , native.systemFonts, 35 )                      
+          stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 35 ) 
+          jamBtn = display.newText("Music",_W*(1/4)-15, _H*(4/5) , arialFont, 35 )                      
           if soundOn==false then
             media.playSound(music)
             soundOn=true
             print("music")
           end
-          playBtn = display.newText("AntheM", _W/2-10, _H*(4/5), native.systemFonts, 35 )          
+          playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )          
           transition.to(playBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})        
         elseif e.target==stopBtn then
 -- stop        	
-          playBtn = display.newText("AntheM", _W/2-10, _H*(4/5), native.systemFonts, 35 )         
-          jamBtn = display.newText("MuSic", _W*(1/4)-15, _H*(4/5), native.systemFonts, 35 )
+          playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )         
+          jamBtn = display.newText("Music", _W*(1/4)-15, _H*(4/5), arialFont, 35 )
  
           if soundOn==true then
             media.stopSound(music)
@@ -81,15 +93,15 @@ local scene = composer.newScene()
             soundOn=false
             print("stop")
           end
-          stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), native.systemFonts, 35 )          
+          stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 35 )          
           transition.to(stopBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})       
         elseif e.target==jamBtn then
 -- anthem        	
-          stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), native.systemFonts, 35 )      
-          playBtn = display.newText("AntheM", _W/2-10, _H*(4/5), native.systemFonts, 35 )
-          jamBtn = display.newText("MuSic", _W*(1/4)-15, _H*(4/5), native.systemFonts, 35 )
-          ffBtn = display.newText(">>", (_W*(1/6))+60, _H*(2/3), native.systemFonts, 35 )      
-          rwBtn = display.newText("<<", _W*(1/6), _H*(2/3), native.systemFonts, 35 )
+          stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 35 )      
+          playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )
+          jamBtn = display.newText("Music", _W*(1/4)-15, _H*(4/5), arialFont, 35 )
+          ffBtn = display.newText(">>", (_W*(1/6))+60, _H*(2/3), arialFont, 35 )      
+          rwBtn = display.newText("<<", _W*(1/6), _H*(2/3), arialFont, 35 )
           ffBtn:setFillColor( 0,0,0 )
           rwBtn:setFillColor( 0,0,0 )
           transition.to(ffBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2}) 
@@ -125,16 +137,16 @@ local scene = composer.newScene()
             phasePic = display.newImage("images/widePic.png", 585,337)
             heightModeTop=35
             heightModeLow=_H-35     
-            phaseNarrowBtn = display.newText("nArrow", _W*(3/4) ,_H*(1/6), native.systemFonts, 35 ) 
-            phaseWideBtn = display.newText("wide", _W*(1/5), _H*(1/6) , native.systemFonts, 35 )
+            phaseNarrowBtn = display.newText("Narrow", _W*(3/4) ,_H*(1/6), arialFont, 35 ) 
+            phaseWideBtn = display.newText("Wide", _W*(1/5), _H*(1/6) , arialFont, 35 )
             transition.to(phaseWideBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})
         elseif e.target==phaseNarrowBtn then
 -- narrow        	
             phasePic = display.newImage("images/narrowPic.png", 585,337)
             heightModeTop=70
             heightModeLow=_H-70  
-            phaseWideBtn = display.newText("wide", _W*(1/5) ,_H*(1/6) , native.systemFonts, 35 )  
-            phaseNarrowBtn = display.newText("nArrow",_W*(3/4) ,_H*(1/6), native.systemFonts, 35 )
+            phaseWideBtn = display.newText("Wide", _W*(1/5) ,_H*(1/6) , arialFont, 35 )  
+            phaseNarrowBtn = display.newText("Narrow",_W*(3/4) ,_H*(1/6), arialFont, 35 )
             transition.to(phaseNarrowBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})
         end
 
@@ -203,7 +215,7 @@ function scene:show( event )
   local group = self.view
   if event.phase == "will" then
 
-   phaseNarrowBtn = display.newText("nArrow", _W*(3/4), _H*(1/6), native.systemFonts, 35 )
+   phaseNarrowBtn = display.newText("Narrow", _W*(3/4), _H*(1/6), arialFont, 35 )
 
    if heightModeTop == 35 then
      phasePic = display.newImage("images/widePic.png", 585,337)
@@ -215,9 +227,9 @@ function scene:show( event )
    phasePic.xScale = .2
    phasePic.yScale = .2   
 
-   phaseWideBtn = display.newText("wide", _W*(1/5), _H*(1/6), native.systemFonts, 35 )
+   phaseWideBtn = display.newText("Wide", _W*(1/5), _H*(1/6), arialFont, 35 )
 
-   infoYesBtn = display.newText("Yes", _W*(1/5),_H*(1/2), native.systemFonts, 35)
+   infoYesBtn = display.newText("Yes", _W*(1/5),_H*(1/2), arialFont, 35)
 
 
    if infoMode == true then
@@ -230,11 +242,14 @@ function scene:show( event )
    infoIcon.xScale = .4
    infoIcon.yScale = .4
 
-   infoNoBtn = display.newText("No", _W*(3/4),_H*(1/2), native.systemFonts, 35)
+   infoNoBtn = display.newText("No", _W*(3/4),_H*(1/2), arialFont, 35)
 
-   playBtn = display.newText("AntheM", _W/2-10, _H*(4/5), native.systemFonts, 35 )
-   stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), native.systemFonts, 35 )
-   jamBtn = display.newText("MuSic", _W*(1/4)-15, _H*(4/5), native.systemFonts, 35 )
+   playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )
+
+   -- createText("style will be this", _W*(1/2), _H*(1/2)+52, arialFont, 38)
+
+   stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 35 )
+   jamBtn = display.newText("Music", _W*(1/4)-15, _H*(4/5), arialFont, 35 )
 
 
 
@@ -242,23 +257,23 @@ function scene:show( event )
    infoYesBtn.type="info"
    infoNoBtn:setFillColor(0,0,0)
    infoNoBtn.type="info"   
-   --playBtn = display.newText("AntheM", _W/2, _H/2, native.systemFonts, 35 )
+   --playBtn = display.newText("AntheM", _W/2, _H/2, arialFont, 35 )
    playBtn:setFillColor(0,0,0) 
   --    playBtn:setFillColor(224/225,96/225,224/225) 
    playBtn.type="music"   
-  -- stopBtn = display.newText("Mute", _W/2, _H/2, native.systemFonts, 35 )
+  -- stopBtn = display.newText("Mute", _W/2, _H/2, arialFont, 35 )
  -- stopBtn:setFillColor(224/225,96/225,224/225)  
    stopBtn:setFillColor(0,0,0)  
    stopBtn.type="music"
-  -- jamBtn = display.newText("MuSic", _W/2, _H/2, native.systemFonts, 35 )
+  -- jamBtn = display.newText("MuSic", _W/2, _H/2, arialFont, 35 )
  --  jamBtn:setFillColor(224/225,96/225,224/225) 
    jamBtn:setFillColor(0,0,0) 
    jamBtn.type="music"
-  -- phaseNarrowBtn = display.newText("nArrow", _W/2, _H/2, native.systemFonts, 35 )
+  -- phaseNarrowBtn = display.newText("nArrow", _W/2, _H/2, arialFont, 35 )
  --  phaseNarrowBtn:setFillColor(224/225,96/225,224/225)  
    phaseNarrowBtn:setFillColor(0,0,0) 
    phaseNarrowBtn.type="phase"
-  -- phaseWideBtn = display.newText("wide", _W/2, _H/2, native.systemFonts, 35 )
+  -- phaseWideBtn = display.newText("wide", _W/2, _H/2, arialFont, 35 )
  --  phaseWideBtn:setFillColor(224/225,96/225,224/225) 
      phaseWideBtn:setFillColor(0,0,0) 
    phaseWideBtn.type="phase"
