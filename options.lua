@@ -76,39 +76,40 @@ local function buttonHit(e)
         display.remove(rwBtn)
         
         if e.target.type=="music" then
-            display.remove(stopBtn)
-            display.remove(jamBtn)
-            display.remove(playBtn)  
+            -- display.remove(stopBtn)
+            -- display.remove(jamBtn)
+            -- display.remove(playBtn)  
             
             if e.target==playBtn then 
                 -- play        	
-                stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 120 ) 
-                jamBtn = display.newText("Music",_W*(1/4)-15, _H*(4/5) , arialFont, 35 )                      
+                -- stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 30 ) 
+                -- jamBtn = display.newText("Music",_W*(1/4)-15, _H*(4/5) , arialFont, 35 )                      
                 if soundOn==false then
                     media.playSound(music)
                     soundOn=true
                     print("music")
                 end
-            playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )          
-            transition.to(playBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})        
+            -- playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )          
+            -- transition.to(playBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})        
             
             elseif e.target==stopBtn then
                 -- stop        	
-                playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )         
-                jamBtn = display.newText("Music", _W*(1/4)-15, _H*(4/5), arialFont, 35 )
+                -- playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )         
+                -- jamBtn = display.newText("Music", _W*(1/4)-15, _H*(4/5), arialFont, 35 )
                 if soundOn==true then
                     media.stopSound(music)
                     music=nil
                     soundOn=false
                     print("stop")
                 end
-                stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 35 )          
-                transition.to(stopBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})       
+                -- stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 35 )          
+                transition.to(stopBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})  
+                phase2(stopBtn)     
             elseif e.target==jamBtn then
                 -- anthem        	
-                stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 35 )      
-                playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )
-                jamBtn = display.newText("Music", _W*(1/4)-15, _H*(4/5), arialFont, 35 )
+                -- stopBtn = display.newText("Mute", _W*(3/4)+10, _H*(4/5), arialFont, 35 )      
+                -- playBtn = display.newText("Anthem", _W/2-10, _H*(4/5), arialFont, 35 )
+                -- jamBtn = display.newText("Music", _W*(1/4)-15, _H*(4/5), arialFont, 35 )
                 ffBtn = display.newText(">>", (_W*(1/6))+60, _H*(2/3), arialFont, 35 )      
                 rwBtn = display.newText("<<", _W*(1/6), _H*(2/3), arialFont, 35 )
                 ffBtn:setFillColor( 0,0,0 )
@@ -122,18 +123,18 @@ local function buttonHit(e)
                 rwBtn:addEventListener("tap",buttonHit) 
             end
  
-            playBtn:setFillColor(0,0,0) 
-            jamBtn:setFillColor(0,0,0)  
-            stopBtn:setFillColor(0,0,0)
-            jamBtn.type="music"
-            stopBtn.type="music"
-            playBtn.type="music"
-            phaseGroup:insert(jamBtn)
-            phaseGroup:insert(stopBtn)
-            phaseGroup:insert(playBtn)
-            jamBtn:addEventListener("tap",buttonHit) 
-            stopBtn:addEventListener("tap",buttonHit) 
-            playBtn:addEventListener("tap",buttonHit)
+            -- playBtn:setFillColor(0,0,0) 
+            -- jamBtn:setFillColor(0,0,0)  
+            -- stopBtn:setFillColor(0,0,0)
+            -- jamBtn.type="music"
+            -- -- stopBtn.type="music"
+            -- playBtn.type="music"
+            -- phaseGroup:insert(jamBtn)
+            -- phaseGroup:insert(stopBtn)
+            -- phaseGroup:insert(playBtn)
+            -- jamBtn:addEventListener("tap",buttonHit) 
+            -- stopBtn:addEventListener("tap",buttonHit) 
+            -- playBtn:addEventListener("tap",buttonHit)
 
         elseif e.target.type=="phase" then
             display.remove(phaseWideBtn)

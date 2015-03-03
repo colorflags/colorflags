@@ -27,16 +27,16 @@ local colorFlagsSeq = {
 }
 
 local startBtnSeq = {
-    { name = "playgame", frames={3,4}, time=500 },
+    { name = "playgame", frames={8,9}, time=500 },
     { name = "tutorial", frames={5,6}, time=500 },
     { name = "about", frames={1,2}, time=500 }
 }
 
-local startBtnsSpriteCoords = require("lua-sheets.btns-menu")
+local startBtnsSpriteCoords = require("lua-sheets.menu-btns")
 
-local startBtnsPlayGameSheet = graphics.newImageSheet( "images/btns-menu.png", startBtnsSpriteCoords:getSheet() )
-local startBtnsOptionsSheet = graphics.newImageSheet( "images/btns-menu.png", startBtnsSpriteCoords:getSheet() )
-local startBtnsAboutSheet = graphics.newImageSheet( "images/btns-menu.png", startBtnsSpriteCoords:getSheet() )
+local startBtnsPlayGameSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
+local startBtnsOptionsSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
+local startBtnsAboutSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
 
 
 local currentObject
