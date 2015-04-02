@@ -277,17 +277,24 @@ function scene:show( event )
 
         -- Add these insert() into the createText() function?
         phaseGroup:insert(phaseNarrowBtn[1]) 
+        phaseGroup:insert(phaseNarrowBtn[2]) 
         phaseGroup:insert(phaseWideBtn[1])
+        phaseGroup:insert(phaseWideBtn[2])
 
         phaseGroup:insert(phasePic) 
         phaseGroup:insert(infoIcon)              
 
         phaseGroup:insert(infoYesBtn[1])
-        phaseGroup:insert(infoNoBtn[1])   
+        phaseGroup:insert(infoYesBtn[2])
+        phaseGroup:insert(infoNoBtn[1])
+        phaseGroup:insert(infoNoBtn[2])   
 
         phaseGroup:insert(jamBtn[1])
+        phaseGroup:insert(jamBtn[2])
         phaseGroup:insert(playBtn[1])
-        phaseGroup:insert(stopBtn[1]) 
+        phaseGroup:insert(playBtn[2])
+        phaseGroup:insert(stopBtn[1])
+        phaseGroup:insert(stopBtn[2]) 
 
         phaseNarrowBtn[1]:addEventListener("tap",buttonHit) 
         phaseWideBtn[1]:addEventListener("tap",buttonHit) 
