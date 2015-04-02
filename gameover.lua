@@ -36,7 +36,12 @@ local randomFlag8
 local flagHeights = {24, 23, -46}
 local flagX = {20, 98, 44, 515, 525, 100, 480, 534}
 
+music=nil
+bobby=nil
 
+audio.stop( )            
+music = audio.loadStream( 'anthems/magee-gameover.mp3' ) 
+bobby = audio.play(music,{loops=-1})
 
 local menuSeq = {
     { name = "normalRun", start=1, count=2, time=800 },

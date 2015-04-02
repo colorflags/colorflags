@@ -1,3 +1,6 @@
+-- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
+-- http://docs.coronalabs.com/api/library/display/newSprite.html 
+
 --game.lua
 local composer = require("composer")
 local scene = composer.newScene()
@@ -5,10 +8,7 @@ local scene = composer.newScene()
 --local physics = require("physics")
 --physics.start()
 
-
-
 --media.playSound('Brazil.mid')
-
 
 local gotoDeath=true
 local state=1
@@ -81,7 +81,77 @@ local country
 
 --composer.recycleOnSceneChange = true
 
+local boycha = 1 -- FOR TESTING PURPOSES.
+local nationalFlags1Coords = require("lua-sheets.national-flags1")
+local nationalFlags1Sheet = graphics.newImageSheet( "images/national-flags1.png", nationalFlags1Coords:getSheet() )
 
+local nationalFlags2Coords = require("lua-sheets.national-flags2")
+local nationalFlags2Sheet = graphics.newImageSheet( "images/national-flags2.png", nationalFlags2Coords:getSheet() )
+
+local nationalFlags3Coords = require("lua-sheets.national-flags3")
+local nationalFlags3Sheet = graphics.newImageSheet( "images/national-flags3.png", nationalFlags3Coords:getSheet() )
+
+
+local nationalFlagsSeq = {
+    { name="andorra", sheet=nationalFlags1Sheet, frames={1} },
+    { name="argentina", sheet=nationalFlags1Sheet, frames={2} },
+    { name="australia", sheet=nationalFlags1Sheet, frames={3} },
+    { name="austria", sheet=nationalFlags1Sheet, frames={4} },
+    { name="belgium", sheet=nationalFlags1Sheet, frames={5} },
+    { name="brazil", sheet=nationalFlags1Sheet, frames={6} },
+    { name="canada", sheet=nationalFlags1Sheet, frames={7} },
+    { name="chile", sheet=nationalFlags1Sheet, frames={8} },
+    { name="china", sheet=nationalFlags1Sheet, frames={9} },
+    { name="croatia", sheet=nationalFlags1Sheet, frames={10} },
+    { name="cyprus", sheet=nationalFlags1Sheet, frames={11} },
+    { name="czech_republic", sheet=nationalFlags1Sheet, frames={12} },
+    { name="denmark", sheet=nationalFlags1Sheet, frames={13} },
+    { name="egypt", sheet=nationalFlags1Sheet, frames={14} },
+    { name="estonia", sheet=nationalFlags1Sheet, frames={15} },
+    { name="finland", sheet=nationalFlags1Sheet, frames={16} },
+    { name="france", sheet=nationalFlags1Sheet, frames={17} },
+    { name="germany", sheet=nationalFlags1Sheet, frames={18} },
+    { name="greece", sheet=nationalFlags1Sheet, frames={19} },
+    { name="hungary", sheet=nationalFlags1Sheet, frames={20} },
+    { name="iceland", sheet=nationalFlags1Sheet, frames={21} },
+    { name="india", sheet=nationalFlags1Sheet, frames={22} },
+    { name="indonesia", sheet=nationalFlags1Sheet, frames={23} },
+    { name="ireland", sheet=nationalFlags1Sheet, frames={24} },
+
+    { name="isreal", sheet=nationalFlags2Sheet, frames={1} },  
+    { name="italy", sheet=nationalFlags2Sheet, frames={2} },
+    { name="japan", sheet=nationalFlags2Sheet, frames={3} },
+    { name="lithuania", sheet=nationalFlags2Sheet, frames={4} },
+    { name="luxembourg", sheet=nationalFlags2Sheet, frames={5} },   
+    { name="malaysia", sheet=nationalFlags2Sheet, frames={6} },   
+    { name="malta", sheet=nationalFlags2Sheet, frames={7} },   
+    { name="mexico", sheet=nationalFlags2Sheet, frames={8} }, 
+    { name="netherlands", sheet=nationalFlags2Sheet, frames={9} }, 
+    { name="new_zealand", sheet=nationalFlags2Sheet, frames={10} },
+    { name="norway", sheet=nationalFlags2Sheet, frames={11} },
+    { name="philippines", sheet=nationalFlags2Sheet, frames={12} },
+    { name="poland", sheet=nationalFlags2Sheet, frames={13} },
+    { name="portugal", sheet=nationalFlags2Sheet, frames={14} },
+    { name="republic_of_china", sheet=nationalFlags2Sheet, frames={15} },    
+    { name="russia", sheet=nationalFlags2Sheet, frames={16} },    
+    { name="san_marino", sheet=nationalFlags2Sheet, frames={17} },    
+    { name="singapore", sheet=nationalFlags2Sheet, frames={18} },    
+    { name="slovakia", sheet=nationalFlags2Sheet, frames={19} },    
+    { name="slovenia", sheet=nationalFlags2Sheet, frames={20} },        
+    { name="south_africa", sheet=nationalFlags2Sheet, frames={21} },    
+    { name="south_korea", sheet=nationalFlags2Sheet, frames={22} },    
+    { name="spain", sheet=nationalFlags2Sheet, frames={23} },    
+    { name="sri_lanka", sheet=nationalFlags2Sheet, frames={24} },    
+    { name="sweden", sheet=nationalFlags3Sheet, frames={1} }, 
+    { name="switzerland", sheet=nationalFlags3Sheet, frames={2} }, 
+    { name="thailand", sheet=nationalFlags3Sheet, frames={3} }, 
+    { name="turkey", sheet=nationalFlags3Sheet, frames={4} }, 
+    { name="united_arab_emirates", sheet=nationalFlags3Sheet, frames={5} }, 
+    { name="united_kingdom", sheet=nationalFlags3Sheet, frames={6} }, 
+    { name="united_states", sheet=nationalFlags3Sheet, frames={7} }, 
+              
+    -- { name="argentina", sheet=nationalFlags1Sheet, frames={2} }
+}
 
 local bonusShatterSpriteCoords = require("bonus-shatter")
 local bonusShatterSheet = graphics.newImageSheet( "images/bonus-shatter.png", bonusShatterSpriteCoords:getSheet() )
@@ -92,7 +162,7 @@ local bonusShatterSeq={
     {name="5x", frames={19,19,19,19,20,21,22,23,24},time=800, loopCount=1},
     {name="6x", frames={25,25,25,25,26,27,28,29,30},time=800, loopCount=1},
     {name="7x", frames={31,31,31,31,32,33,34,35,36},time=800, loopCount=1},
-    {name="8x", frames={37,37,37,37,38,39,40,41,42},time=800, loopCount=1},
+    {name="8x", frames={37,37,37,37,38,9,40,41,42},time=800, loopCount=1},
     {name="9x", frames={43,43,43,43,44,45,46,47,48},time=800, loopCount=1}
 }
 
@@ -815,7 +885,7 @@ end
 
     
 local function finishScale()
- topBar=display.newImage("images/side.png",580,100)
+ topBar=display.newImage("images/sidebar.png",580,100)
             topBar:setFillColor(0,0,0)
             topBar.yScale=-1
             topBar.anchorY=0.5
@@ -826,8 +896,8 @@ local function finishScale()
             topBar.alpha=0
             topBar:toFront()
             topBar1=transition.to(topBar,{time=1300, yScale=-.8})       
-            topBar2=transition.to(topBar,{time=1300, alpha=.6})
- lowBar=display.newImage("images/side.png",580,100)
+            topBar2=transition.to(topBar,{time=1300, alpha=.72})
+ lowBar=display.newImage("images/sidebar.png",580,100)
             lowBar:setFillColor(0,0,0)
             lowBar.anchorY=0.5
             lowBar.anchorX=0.5
@@ -837,7 +907,7 @@ local function finishScale()
             lowBar.alpha=0
             topBar:toFront()
             lowBar1=transition.to(lowBar,{time=1300, yScale=0.8})          
-            lowBar2=transition.to(lowBar,{time=1300,alpha=.6}) 
+            lowBar2=transition.to(lowBar,{time=1300,alpha=.72}) 
             flag2Timer=transition.to( flag, { time=1000, xScale=1, yScale=1})
       --      if state ~= 3 then
               timerSpeed=timer.performWithDelay(9500,speedUp,1)
@@ -972,6 +1042,12 @@ function returnFunction()
      paceRect:toFront()
 end
 
+
+
+local function infoAppear()
+   transition.to(infoPic, {time=500, alpha=1})
+end  
+
 local function deleteText()
 display.remove(CountryText)
  end 
@@ -979,15 +1055,1390 @@ display.remove(CountryText)
 local function countryScale()
    countryTimer=transition.to( countryText, { time=500, alpha=0 }) 
    timer.performWithDelay(500,deleteText,1)
-end  
+end 
 
-local function infoAppear()
-   transition.to(infoPic, {time=500, alpha=1})
-end  
+local function countries(test)
+    if test==0 then
+        if e==1 then        
+            flag = display.newImageRect( "images/andorra.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            if music == nil and soundOn==true then
+                music="music/andorra.mid"
+                media.playSound(music)
+            end
+
+            music="music/andorra.mid"    
+            country="ANDORRA,\n   Europe"        
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+        elseif e==2 then
+            flag = display.newImageRect( "images/australia.png", 200,100)  
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=2
+            flag.x=_W/2 ;flag.y=_H/2
+            w1=1;w2=1;w3=1
+            r1=1;r2=0;r3=0
+            b1=0;b2=0;b3=.545
+            xCoord=-415
+            yCoord=-10
+            if music == nil and soundOn==true then
+                music="music/australia.mid"
+                media.playSound(music)
+            end  
+            music="music/australia.mid" 
+   
+            country="AUSTRALIA"                        
+            piece = display.newImage( "images/australia259x229.png", 529,229)
+        elseif e==3 then
+            flag = display.newImageRect( "images/brazil.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5 
+            code=3
+            flag.x=_W/2 ;flag.y=_H/2
+            w1=1;w2=1;w3=1
+            y1=.996;y2=.875;y3=0
+            g1=0;g2=.608;g3=.227
+            b1=0;b2=.153;b3=.463
+            xCoord=650
+            yCoord=68   
+            if music == nil and soundOn==true then
+                music="music/brazil.mid"
+                media.playSound(music)
+            end
+        
+            music="music/brazil.mid"  
+            country="    BRAZIL,\nSouth America"          
+            piece = display.newImage( "images/brazil243x277.png", 243,277)
+        elseif e==4 then
+            flag = display.newImageRect( "images/canada.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=4
+            flag.x=_W/2 ;flag.y=_H/2
+            w1=1;w2=1;w3=1 
+            r1=1;r2=0;r3=0
+            xCoord=899
+            yCoord=546
+            if music == nil and soundOn==true then
+                music="music/canada.mid"
+                media.playSound(music)
+            end
+     
+            music="music/canada.mid"     
+            country="    CANADA,\nNorth America"       
+            piece = display.newImage( "images/canada485x215.png", 485,215)
+        elseif e==5 then
+            flag = display.newImageRect( "images/mexico.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=5
+            flag.x=_W/2 ;flag.y=_H/2
+            w1=1;w2=1;w3=1
+            r1=.808;r2=.067;r3=.149
+            g1=0;g2=.408;g3=.278
+            xCoord=920
+            yCoord=312
+            if music == nil and soundOn==true then
+                music="music/mexico.mid"
+                media.playSound(music)
+            end
+          
+            music="music/mexico.mid"    
+            country="     MEXICO,\nCentral America"        
+            piece = display.newImage( "images/mexico172x126.png", 172,126)
+        end
+
+
+       info="images/infoBrazil.png"
 
 
 
+    elseif test==1 then
+        info="images/infoBrazil.png"
+        music="music/brazil.mid"  
+        country="    BRAZIL,\nSouth America"   
+        flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
+        e=1
+        if e==1 then
+            -- flag = display.newImageRect( "images/andorra.png", 200,100)
+            -- flag = display.newSprite( nationalFlagsSheet , {frames={nationalFlags1Coords:getFrameIndex("andorra")}} )
 
+            flag:setSequence("andorra")
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/andorra.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+        -- Argentina
+        elseif e==2 then
+            flag = display.newImageRect( "images/argentina.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            -- audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/argentina.mp3' )
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+        -- Australia
+        elseif e==3 then
+            flag = display.newImageRect( "images/australia.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            -- audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/australia.mp3' )
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+        -- Austria
+        elseif e==4 then
+            flag = display.newImageRect( "images/austria.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            -- audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/austria.mp3' )
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+        -- Belgium
+        elseif e==5 then
+            flag = display.newImageRect( "images/belgium.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            -- audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/belgium.mp3' )
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+        -- Brazil
+        elseif e==6 then
+            flag = display.newImageRect( "images/brazil.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            -- end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/brazil.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+        -- Canada
+        elseif e==7 then
+            flag = display.newImageRect( "images/canada.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            -- audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/canada.mp3' )
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+        -- Philippines
+        elseif e==8 then
+            flag = display.newImageRect( "images/philippines.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            -- audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/philippines.mp3' )
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+        -- China
+        elseif e==9 then
+            flag = display.newImageRect( "images/china.png", 200,100)
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            -- audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/china.mp3' )
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+        -- Croatia
+        elseif e==10 then        
+            flag = display.newImageRect( "images/croatia.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/croatia.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+            -- Cypress
+            elseif e==11 then        
+            flag = display.newImageRect( "images/cypress.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/cypress.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Czech Republic
+        elseif e==12 then        
+            flag = display.newImageRect( "images/czech_republic.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/czech_republic.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Denmark
+        elseif e==13 then        
+            flag = display.newImageRect( "images/denmark.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/denmark.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Egypt
+        elseif e==14 then        
+            flag = display.newImageRect( "images/egypt.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/egypt.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Estonia
+        elseif e==15 then        
+            flag = display.newImageRect( "images/estonia.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/estonia.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Finland
+        elseif e==16 then        
+            flag = display.newImageRect( "images/finland.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/finland.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- France
+        elseif e==18 then        
+            flag = display.newImageRect( "images/france.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/france.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Germany
+        elseif e==19 then        
+            flag = display.newImageRect( "images/germany.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/germany.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Greece
+        elseif e==20 then        
+            flag = display.newImageRect( "images/greece.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/greece.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Hungary
+        elseif e==21 then        
+            flag = display.newImageRect( "images/hungary.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/Brazil.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Iceland
+        elseif e==22 then        
+            flag = display.newImageRect( "images/iceland.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/iceland.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- India
+        elseif e==23 then        
+            flag = display.newImageRect( "images/india.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/india.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Indonesia
+        elseif e==24 then        
+            flag = display.newImageRect( "images/indonesia.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/indonesia.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Ireland
+        elseif e==25 then        
+            flag = display.newImageRect( "images/ireland.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/ireland.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Isreal
+        elseif e==26 then        
+            flag = display.newImageRect( "images/israel.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/israel.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Italy
+        elseif e==27 then        
+            flag = display.newImageRect( "images/italy.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/italy.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Japan
+        elseif e==28 then        
+            flag = display.newImageRect( "images/japan.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/japan.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Lithuania
+        elseif e==29 then        
+            flag = display.newImageRect( "images/lithuania.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/lithuania.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Luxembourg
+        elseif e==30 then        
+            flag = display.newImageRect( "images/luxembourg.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/luxembourg.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Malaysia
+        elseif e==31 then        
+            flag = display.newImageRect( "images/malaysia.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/malaysia.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Malta
+        elseif e==32 then        
+            flag = display.newImageRect( "images/malta.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/malta.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Mexico
+        elseif e==33 then        
+            flag = display.newImageRect( "images/mexico.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/mexico.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Netherland
+        elseif e==34 then        
+            flag = display.newImageRect( "images/netherland.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/netherland.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- New Zeland
+        elseif e==35 then        
+            flag = display.newImageRect( "images/new_zealand.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/new_zealand.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Norway
+        elseif e==36 then        
+            flag = display.newImageRect( "images/norway.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/norway.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Philippines
+        elseif e==37 then        
+            flag = display.newImageRect( "images/philippines.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/philippines.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Poland
+        elseif e==38 then        
+            flag = display.newImageRect( "images/poland.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/poland.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Portugal
+        elseif e==39 then        
+            flag = display.newImageRect( "images/portugal.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/portugal.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Russia
+        elseif e==40 then        
+            flag = display.newImageRect( "images/russia.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/russia.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- San Marino
+        elseif e==41 then        
+            flag = display.newImageRect( "images/san_marino.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/san_marino.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Singapore
+        elseif e==42 then        
+            flag = display.newImageRect( "images/singapore.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/singapore.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Slovakia
+        elseif e==43 then        
+            flag = display.newImageRect( "images/slovakia.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/slovakia.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Slovenia
+        elseif e==44 then        
+            flag = display.newImageRect( "images/slovenia.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/slovenia.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- South Africa
+        elseif e==45 then        
+            flag = display.newImageRect( "images/south_africa.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/south_africa.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- South Korea
+        elseif e==46 then        
+            flag = display.newImageRect( "images/south_korea.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/south_korea.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Spain
+        elseif e==47 then        
+            flag = display.newImageRect( "images/spain.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/spain.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Sri Lanka
+        elseif e==48 then        
+            flag = display.newImageRect( "images/sri_lanka.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/sri_lanka.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Sweden
+        elseif e==49 then        
+            flag = display.newImageRect( "images/sweden.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/sweden.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Switzerland
+        elseif e==50 then        
+            flag = display.newImageRect( "images/switzerland.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/switzerland.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Taiwan (Republic of China)
+        elseif e==51 then        
+            flag = display.newImageRect( "images/taiwan.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/taiwan.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Thailand
+        elseif e==52 then        
+            flag = display.newImageRect( "images/thailand.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/thailand.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- Turkey
+        elseif e==53 then        
+            flag = display.newImageRect( "images/turkey.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/turkey.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- United Arab Emirates
+        elseif e==54 then        
+            flag = display.newImageRect( "images/united_arab_emirates.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/united_arab_emirates.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- United Kingdom
+        elseif e==55 then        
+            flag = display.newImageRect( "images/united_kingdom.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/united_kingdom.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+
+        -- United States
+        elseif e==56 then        
+            flag = display.newImageRect( "images/united_states.png", 200,100) 
+            flag.anchorX=0.5
+            flag.anchorY=0.5
+            code=1
+            flag.x=_W/2 ;flag.y=_H/2
+            r1=.816;r2=.063;r3=.227;
+            y1=.996;y2=.914;y3=0
+            b1=0;b2=.094;b3=.659
+            xCoord=350
+            yCoord=442
+            -- if music == nil and soundOn==true then
+            --   music="anthems/Brazil.mp3"
+            --   audio.play(music, {loops = -1})
+            --   end
+
+            -- if check.. when first flag appear. there will be no music. !!!
+            --   audio.stop( bobby )
+            -- music = audio.loadStream( 'anthems/united_states.mp3' ) 
+            -- bobby = audio.play(music,{loops=-1})
+            piece = display.newImage( "images/andorra104x102.png", 529,229)              
+        end
+
+        flag.width=200
+        flag.height=100
+    end
+end
 
 local function newFlag() 
             music=nil
@@ -1001,113 +2452,13 @@ local function newFlag()
                currState=nil
               end
           end
-          lastRoll=e
-          while thisRoll==lastRoll do
-          e = math.random(1,5)
-          thisRoll=e
-         end
-
-
-
-
-
-
-          if e==1 then        
-              flag = display.newImageRect( "images/andorra.png", 200,100) 
-              flag.anchorX=0.5
-              flag.anchorY=0.5
-              code=1
-              flag.x=_W/2 ;flag.y=_H/2
-              r1=.816;r2=.063;r3=.227;
-              y1=.996;y2=.914;y3=0
-              b1=0;b2=.094;b3=.659
-              xCoord=350
-              yCoord=442
-            if music == nil and soundOn==true then
-              music="music/andorra.mid"
-              media.playSound(music)
+            lastRoll=e
+            while thisRoll==lastRoll do
+                e = math.random(1,6)
+                thisRoll=e
             end
-            info="images/infoBrazil.png"
-            music="music/andorra.mid"    
-            country="ANDORRA,\n   Europe"        
-            piece = display.newImage( "images/andorra104x102.png", 529,229)
-          elseif e==2 then
-              flag = display.newImageRect( "images/australia.png", 200,100)  
-              flag.anchorX=0.5
-              flag.anchorY=0.5
-              code=2
-              flag.x=_W/2 ;flag.y=_H/2
-              w1=1;w2=1;w3=1
-              r1=1;r2=0;r3=0
-              b1=0;b2=0;b3=.545
-              xCoord=-415
-              yCoord=-10
-          if music == nil and soundOn==true then
-            music="music/australia.mid"
-            media.playSound(music)
-            end  
-            music="music/australia.mid" 
-            info="images/infoBrazil.png"
-            country="AUSTRALIA"                        
-              piece = display.newImage( "images/australia259x229.png", 529,229)
-          elseif e==3 then
-            flag = display.newImageRect( "images/brazil.png", 200,100)
-            flag.anchorX=0.5
-            flag.anchorY=0.5 
-            code=3
-            flag.x=_W/2 ;flag.y=_H/2
-            w1=1;w2=1;w3=1
-            y1=.996;y2=.875;y3=0
-            g1=0;g2=.608;g3=.227
-            b1=0;b2=.153;b3=.463
-            xCoord=650
-            yCoord=68   
-            if music == nil and soundOn==true then
-              music="music/brazil.mid"
-              media.playSound(music)
-            end
-            info="images/infoBrazil.png"
-            music="music/brazil.mid"  
-            country="    BRAZIL,\nSouth America"          
-            piece = display.newImage( "images/brazil243x277.png", 243,277)
-          elseif e==4 then
-            flag = display.newImageRect( "images/canada.png", 200,100)
-            flag.anchorX=0.5
-            flag.anchorY=0.5
-            code=4
-            flag.x=_W/2 ;flag.y=_H/2
-            w1=1;w2=1;w3=1 
-            r1=1;r2=0;r3=0
-            xCoord=899
-            yCoord=546
-          if music == nil and soundOn==true then
-            music="music/canada.mid"
-            media.playSound(music)
-            end
-           info="images/infoBrazil.png"    
-            music="music/canada.mid"     
-            country="    CANADA,\nNorth America"       
-            piece = display.newImage( "images/canada485x215.png", 485,215)
-          elseif e==5 then
-            flag = display.newImageRect( "images/mexico.png", 200,100)
-            flag.anchorX=0.5
-            flag.anchorY=0.5
-            code=5
-            flag.x=_W/2 ;flag.y=_H/2
-            w1=1;w2=1;w3=1
-            r1=.808;r2=.067;r3=.149
-            g1=0;g2=.408;g3=.278
-            xCoord=920
-            yCoord=312
-            if music == nil and soundOn==true then
-            music="music/mexico.mid"
-            media.playSound(music)
-            end
-            info="images/infoBrazil.png"
-            music="music/mexico.mid"    
-            country="     MEXICO,\nCentral America"        
-            piece = display.newImage( "images/mexico172x126.png", 172,126)
-          end
+
+          countries(0)
 
           if infoMode == true then
             infoPic = display.newImage(info,165,77)
