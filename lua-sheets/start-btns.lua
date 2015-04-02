@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:994ad83f734e2607314989d6657e15c6:5e5ead75fb31a9c040ff46cc9111820d:4ed63d0f64a54708c3b227d1a1ea119b$
+-- $TexturePacker:SmartUpdate:189f9a1d8d409593a6519deed1d6d7b4:9ff589d3786746f34cd99a8ce4995601:4ed63d0f64a54708c3b227d1a1ea119b$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -17,90 +17,66 @@ SheetInfo.sheet =
         {
             -- about-off
             x=2,
-            y=67,
-            width=168, -- 338
-            height=55,
+            y=2,
+            width=198,
+            height=58,
 
-            -- sourceX = 4,
-            -- sourceY = 0,
-            -- sourceWidth = 342,
-            -- sourceHeight = 55
         },
         {
             -- about-on
-            x=2,
-            y=235,
-            width=338,
-            height=55,
+            x=202,
+            y=2,
+            width=198,
+            height=58,
 
-            -- sourceX = 4,
-            -- sourceY = 0,
-            -- sourceWidth = 342,
-            -- sourceHeight = 55
-        },        
+        },
         {
             -- options-off
-            x=570,
+            x=402,
             y=2,
-            width=216, -- 432
-            height=63,
+            width=252,
+            height=66,
 
-            -- sourceX = 4,
-            -- sourceY = 0,
-            -- sourceWidth = 436,
-            -- sourceHeight = 63
         },
         {
             -- options-on
-            x=786,
+            x=656,
             y=2,
-            width=216, -- 432
-            height=63,
+            width=252,
+            height=66,
 
-            -- sourceX = 4,
-            -- sourceY = 0,
-            -- sourceWidth = 436,
-            -- sourceHeight = 63
         },
         {
             -- playgame-off
-            x=2,
+            x=910,
             y=2,
-            width=283, --566
-            height=63,
+            width=330,
+            height=66,
 
-            -- sourceX = 4,
-            -- sourceY = 0,
-            -- sourceWidth = 570,
-            -- sourceHeight = 63
         },
         {
             -- playgame-on
-            x=2,
-            y=285,
-            width=283,
-            height=63,
+            x=1242,
+            y=2,
+            width=330,
+            height=66,
 
-            -- sourceX = 4,
-            -- sourceY = 0,
-            -- sourceWidth = 570,
-            -- sourceHeight = 63
-        },        
+        },
     },
     
-    sheetContentWidth = 1004,
-    sheetContentHeight = 124
+    sheetContentWidth = 1574,
+    sheetContentHeight = 70
 }
 
 SheetInfo.frameIndex =
 {
 
     ["about-off"] = 1,
-    ["about-on"] = 2,    
+    ["about-on"] = 2,
     ["options-off"] = 3,
     ["options-on"] = 4,
     ["playgame-off"] = 5,
-    ["playgame-on"] = 6,    
+    ["playgame-on"] = 6,
 }
 
 function SheetInfo:getSheet()
