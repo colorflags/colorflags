@@ -2454,7 +2454,7 @@ local function newFlag()
           end
             lastRoll=e
             while thisRoll==lastRoll do
-                e = math.random(1,6)
+                e = math.random(1,5)
                 thisRoll=e
             end
 
