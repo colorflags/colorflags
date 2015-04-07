@@ -1042,6 +1042,8 @@ function returnFunction()
      paceRect:toFront()
 end
 
+
+
 local function infoAppear()
    transition.to(infoPic, {time=500, alpha=1})
 end  
@@ -1054,7 +1056,8 @@ local function countryScale()
    countryTimer=transition.to( countryText, { time=500, alpha=0 }) 
    timer.performWithDelay(500,deleteText,1)
 end 
-function countries(test)
+
+local function countries(test)
     if test==0 then
         if e==1 then        
             flag = display.newImageRect( "images/andorra.png", 200,100) 
@@ -1071,7 +1074,7 @@ function countries(test)
                 music="music/andorra.mid"
                 media.playSound(music)
             end
-            info="images/infoBrazil.png"
+
             music="music/andorra.mid"    
             country="ANDORRA,\n   Europe"        
             piece = display.newImage( "images/andorra104x102.png", 529,229)
@@ -1091,7 +1094,7 @@ function countries(test)
                 media.playSound(music)
             end  
             music="music/australia.mid" 
-            info="images/infoBrazil.png"
+   
             country="AUSTRALIA"                        
             piece = display.newImage( "images/australia259x229.png", 529,229)
         elseif e==3 then
@@ -1110,7 +1113,7 @@ function countries(test)
                 music="music/brazil.mid"
                 media.playSound(music)
             end
-            info="images/infoBrazil.png"
+        
             music="music/brazil.mid"  
             country="    BRAZIL,\nSouth America"          
             piece = display.newImage( "images/brazil243x277.png", 243,277)
@@ -1128,7 +1131,7 @@ function countries(test)
                 music="music/canada.mid"
                 media.playSound(music)
             end
-            info="images/infoBrazil.png"    
+     
             music="music/canada.mid"     
             country="    CANADA,\nNorth America"       
             piece = display.newImage( "images/canada485x215.png", 485,215)
@@ -1147,11 +1150,16 @@ function countries(test)
                 music="music/mexico.mid"
                 media.playSound(music)
             end
-            info="images/infoBrazil.png"
+          
             music="music/mexico.mid"    
             country="     MEXICO,\nCentral America"        
             piece = display.newImage( "images/mexico172x126.png", 172,126)
         end
+
+
+       info="images/infoBrazil.png"
+
+
 
     elseif test==1 then
         info="images/infoBrazil.png"
@@ -2450,7 +2458,11 @@ local function newFlag()
           end
             lastRoll=e
             while thisRoll==lastRoll do
+
+               -- e = math.random(1,5)
+
                 e = math.random(1,56)
+
                 thisRoll=e
             end
 
@@ -2606,7 +2618,7 @@ local function setupVariables()
       map.anchorX=0.5
       map.anchorY=0.5
       map.name="map"
-      map.x=0 ;map.y=0
+      map.x=0 ;map.y=0;
 
 
    levels = {
