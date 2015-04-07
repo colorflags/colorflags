@@ -1159,10 +1159,10 @@ function countries(test)
         country="    BRAZIL,\nSouth America"   
         flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
         audio.stop( bobby )
-        music = audio.loadStream( 'anthems/andorra.mp3' )
+        music = audio.loadStream( 'anthems/canada.mp3' )
         bobby = audio.play(music,{loops=-1})
             
-        -- e=1
+        e=1
         if e==1 then
             -- flag = display.newImageRect( "images/andorra.png", 200,100)
             -- flag = display.newSprite( nationalFlagsSheet , {frames={nationalFlags1Coords:getFrameIndex("andorra")}} )
