@@ -124,18 +124,18 @@ local function buttonHit(e)
                 rwBtn:addEventListener("tap",buttonHit) 
             end
  
-            -- playBtn:setFillColor(0,0,0) 
-            -- jamBtn:setFillColor(0,0,0)  
-            -- stopBtn:setFillColor(0,0,0)
-            -- jamBtn.type="music"
-            -- -- stopBtn.type="music"
-            -- playBtn.type="music"
-            -- phaseGroup:insert(jamBtn)
-            -- phaseGroup:insert(stopBtn)
-            -- phaseGroup:insert(playBtn)
-            -- jamBtn:addEventListener("tap",buttonHit) 
-            -- stopBtn:addEventListener("tap",buttonHit) 
-            -- playBtn:addEventListener("tap",buttonHit)
+             playBtn:setFillColor(0,0,0) 
+             jamBtn:setFillColor(0,0,0)  
+             stopBtn:setFillColor(0,0,0)
+             jamBtn.type="music"
+             stopBtn.type="music"
+             playBtn.type="music"
+             phaseGroup:insert(jamBtn)
+             phaseGroup:insert(stopBtn)
+             phaseGroup:insert(playBtn)
+             jamBtn:addEventListener("tap",buttonHit) 
+             stopBtn:addEventListener("tap",buttonHit) 
+             playBtn:addEventListener("tap",buttonHit)
 
         elseif e.target.type=="phase" then
             -- display.remove(phaseWideBtn)
@@ -229,6 +229,7 @@ function scene:show( event )
             phasePic = display.newImage("images/widePic.png", 585,337)
         else
             phasePic = display.newImage("images/narrowPic.png", 585,337)
+            
         end
         
         phasePic.x = _W/2
@@ -264,7 +265,7 @@ function scene:show( event )
         stopBtn[1].type="music"
         jamBtn[1].type="music"
 
-        -- transition.to(phaseNarrowBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})   
+       -- transition.to(phaseNarrowBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})   
         -- transition.to(phaseWideBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})           
         -- transition.to(infoYesBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})           
         -- transition.to(infoNoBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})        
