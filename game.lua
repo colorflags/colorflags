@@ -391,8 +391,79 @@ end
 end         
 
 local function lookupCode(code,spawn)
-
-  if code == 1 then
+  if code == "bw" then
+    if spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "rw" then
+    if spawn.type == "red" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "ry" then
+    if spawn.type == "red" or spawn.type == "yellow" then
+        return 1
+    end
+  elseif code == "rg" then
+    if spawn.type == "red" or spawn.type == "orange" then
+        return 1
+    end
+  elseif code == "yb" then
+    if spawn.type == "yellow" or spawn.type == "blue" then
+        return 1
+    end
+  elseif code == "ryb" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "blue" then
+        return 1
+    end
+  elseif code == "rbw" then
+     if spawn.type == "red" or spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "ryk" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "black" then
+        return 1
+    end
+  elseif code == "ogw" then
+    if spawn.type == "orange" or spawn.type == "green" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "rgw" then
+    if spawn.type == "red" or spawn.type == "green" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "ryg" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "green" then
+        return 1
+    end
+  elseif code == "ygbw" then
+    if spawn.type == "red" or spawn.type == "green" or spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "ogbw" then
+    if spawn.type == "orange" or spawn.type == "green" or spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "rybw" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "rbwk" then
+    if spawn.type == "red" or spawn.type == "blue" or spawn.type == "white" or spawn.type == "black" then
+        return 1
+    end
+  elseif code == "royg" then
+    if spawn.type == "red" or spawn.type == "orange" or spawn.type == "yellow" or spawn.type == "green" then 
+        return 1
+    end
+  elseif code == "rgwk" then 
+    if spawn.type == "red" or spawn.type == "green" or spawn.type == "white" or spawn.type == "black" then
+        return 1
+    end
+  elseif code == "rygbwk" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "green" or spawn.type == "blue" or spawn.type == "white" or spawn.type == "black" then
+        return 1
+    end
+  elseif code == 1 then
     if spawn.type=="red" or spawn.type=="yellow" or spawn.type=="blue" then
       return 1
     end
@@ -414,7 +485,6 @@ local function lookupCode(code,spawn)
     end
   end
   return 0
-
 end
 
 
@@ -1161,7 +1231,7 @@ local function countries(test)
        info="images/infoBrazil.png"
 
 
-
+    -- TESTING FOR SAM
     elseif test==1 then
         info="images/infoBrazil.png"
         music="music/brazil.mid"  
@@ -1171,7 +1241,9 @@ local function countries(test)
         music = audio.loadStream( 'anthems/canada.mp3' )
         bobby = audio.play(music,{loops=-1})
             
-        e=1
+        -- Set e here to pick a specific flag to go to. Otherwise, e=random
+        -- e=55
+        
         if e==1 then
             -- flag = display.newImageRect( "images/andorra.png", 200,100)
             -- flag = display.newSprite( nationalFlagsSheet , {frames={nationalFlags1Coords:getFrameIndex("andorra")}} )
@@ -1179,11 +1251,20 @@ local function countries(test)
             flag:setSequence("andorra")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ryb"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            r1=208/255;
+            r2=16/255;
+            r3=58/255;
+            
+            y1=254/255;
+            y2=223/255;
+            y3=0/255
+            
+            b1=0/255;
+            b2=24/255;
+            b3=168/255;
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1202,11 +1283,17 @@ local function countries(test)
             flag:setSequence("argentina")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
+            b1=116/255
+            b2=172/225
+            b3=223/225
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1225,11 +1312,21 @@ local function countries(test)
             flag:setSequence("australia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=255/255
+            r2=0/255
+            r3=0/255
+            
+            b1=0/255
+            b2=04/255
+            b3=139/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1248,11 +1345,17 @@ local function countries(test)
             flag:setSequence("austria")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=237/255
+            r2=41/255
+            r3=57/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255     
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1271,11 +1374,21 @@ local function countries(test)
             flag:setSequence("belgium")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ryk"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=237/255
+            r2=41/255
+            r3=57/255
+
+            y1=250/255
+            y2=224/255
+            y3=66/255
+
+            k1=0/255
+            k2=0/255
+            k3=0/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1294,11 +1407,25 @@ local function countries(test)
             flag:setSequence("brazil")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ygbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            y1=254/255
+            y2=233/255
+            y3=0/255
+
+            g1=0/255
+            g2=155/255
+            g3=58/255
+
+            b1=0/255
+            b2=39/255
+            b3=118/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1317,11 +1444,17 @@ local function countries(test)
             flag:setSequence("canada")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+
+            r1=255/255
+            r2=0/255
+            r3=0/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1340,11 +1473,20 @@ local function countries(test)
             flag:setSequence("chile")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
-            flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            code="rbw"
+            
+            r1=213/255
+            r2=43/255
+            r3=30/255
+
+            b1=0/255
+            b2=57/255
+            b3=166/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1363,11 +1505,17 @@ local function countries(test)
             flag:setSequence("china")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ry"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=213/255
+            r2=43/255
+            r3=30/255
+            
+            y1=255/255
+            y2=222/255
+            y3=0/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1386,11 +1534,21 @@ local function countries(test)
             flag:setSequence("croatia") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=255/255
+            r2=0/255
+            r3=0/255
+
+            b1=23/255
+            b2=23/255
+            b3=150/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1409,11 +1567,21 @@ local function countries(test)
             flag:setSequence("cypress")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ogw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            o1=216
+            o2=217
+            o3=3
+
+            g1=47
+            g2=71
+            g3=18
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1432,11 +1600,17 @@ local function countries(test)
             flag:setSequence("czech_republic")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            b1=17/255
+            b2=69/255
+            b3=126/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1455,11 +1629,17 @@ local function countries(test)
             flag:setSequence("denmark")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=215/255
+            r2=20/255
+            r3=26/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1478,11 +1658,17 @@ local function countries(test)
             flag:setSequence("egypt")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=206/255
+            r2=17/255
+            r3=38/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1501,11 +1687,17 @@ local function countries(test)
             flag:setSequence("estonia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            b1=72/255
+            b2=145/255
+            b3=217/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1524,11 +1716,17 @@ local function countries(test)
             flag:setSequence("finland")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            b1=0/255
+            b2=53/255
+            b3=128/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1542,16 +1740,26 @@ local function countries(test)
             -- bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
-        -- France
+            -- France
         elseif e==18 then        
             flag:setSequence("france")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+
+            r1=237/255
+            r2=41/255
+            r3=57/255
+
+            b1=0/255
+            b2=35/255
+            b3=149/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1570,11 +1778,22 @@ local function countries(test)
             flag:setSequence("germany") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ryk"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=221/255
+            r2=0/255
+            r3=0/255
+
+            y1=255/255
+            y2=206/255
+            y3=0/255
+
+            k1=0/255
+            k2=0/255
+            k3=0/255
+
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1593,11 +1812,17 @@ local function countries(test)
             flag:setSequence("greece")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            b1=13/255
+            b2=94/255
+            b3=175/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1616,11 +1841,22 @@ local function countries(test)
             flag:setSequence("hungary")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rgw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=205/255
+            r2=42/255
+            r3=62/255
+
+            y1=67/255
+            y2=111/255
+            y3=77/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1639,11 +1875,21 @@ local function countries(test)
             flag:setSequence("iceland") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=215/255
+            r2=40/255
+            r3=40/255
+
+            b1=0/255
+            b2=56/255
+            b3=151/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1662,11 +1908,25 @@ local function countries(test)
             flag:setSequence("india")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ogbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            o1=255/255
+            o2=153/255
+            o3=51/255
+
+            g1=18/255
+            g2=136/255
+            g3=7/255
+
+            b1=0/255
+            b2=0/255
+            b3=0/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+ 
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1685,11 +1945,17 @@ local function countries(test)
             flag:setSequence("indonesia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+           
+            r1=206/255
+            r2=17/255
+            r3=38/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1708,11 +1974,21 @@ local function countries(test)
             flag:setSequence("ireland")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ogw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            o1=255/255
+            o2=121/255
+            o3=0/255
+
+            g1=0/255
+            g2=155/255
+            g3=72/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1731,11 +2007,17 @@ local function countries(test)
             flag:setSequence("isreal")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            b1=0/255
+            b2=56/255
+            b3=184/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1754,11 +2036,21 @@ local function countries(test)
             flag:setSequence("italy")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rgw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=206/255
+            r2=43/255
+            r3=55/255
+           
+            g1=0/255
+            g2=146/255
+            g3=70/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1777,11 +2069,17 @@ local function countries(test)
             flag:setSequence("japan")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=188/255
+            r2=0/255
+            r3=45/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1800,11 +2098,21 @@ local function countries(test)
             flag:setSequence("lithuania")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ryg"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=139/255
+            r2=39/255
+            r3=45/255
+
+            y1=253/255
+            y2=185/255
+            y3=19/255
+
+            g1=0/255
+            g2=106/255
+            g3=68/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1823,11 +2131,21 @@ local function countries(test)
             flag:setSequence("luxembourg")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=237/255
+            r2=41/255
+            r3=57/255
+
+            b1=0/255
+            b2=161/255
+            b3=222/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1846,11 +2164,25 @@ local function countries(test)
             flag:setSequence("malaysia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rybw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=204/255
+            r2=0/255
+            r3=1/255
+
+            y1=255/255
+            y2=204/255
+            y3=0/255
+
+            b1=1/255
+            b2=0/255
+            b3=102/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1869,11 +2201,17 @@ local function countries(test)
             flag:setSequence("malta")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=207/255
+            r2=20/255
+            r3=43/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1892,11 +2230,21 @@ local function countries(test)
             flag:setSequence("mexico")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rgw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=206/255
+            r2=17/255
+            r3=38/255
+
+            g1=0/255
+            g2=104/255
+            g3=71/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1915,11 +2263,21 @@ local function countries(test)
             flag:setSequence("netherland")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=174/255
+            r2=28/255
+            r3=40/255
+
+            b1=33/255
+            b2=70/255
+            b3=139/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1938,11 +2296,21 @@ local function countries(test)
             flag:setSequence("new_zealand")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=204/255
+            r2=20/255
+            r3=43/255
+
+            b1=0/255
+            b2=36/255
+            b3=125/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1961,11 +2329,21 @@ local function countries(test)
             flag:setSequence("norway")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=239/255
+            r2=43/255
+            r3=45/255
+
+            b1=0/255
+            b2=40/255
+            b3=104/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -1984,11 +2362,25 @@ local function countries(test)
             flag:setSequence("philippines")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rybw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=206/255
+            r2=17/255
+            r3=38/255
+
+            y1=252/255
+            y2=209/255
+            y3=22/255
+
+            b1=0/255
+            b2=56/255
+            b3=168/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2007,11 +2399,17 @@ local function countries(test)
             flag:setSequence("poland") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=220/255
+            r2=20/255
+            r3=60/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2030,11 +2428,17 @@ local function countries(test)
             flag:setSequence("portugal")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rg"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=255/255
+            r2=0/255
+            r3=0/255
+            
+            g1=0/255
+            g2=102/255
+            g3=0/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2053,11 +2457,21 @@ local function countries(test)
             flag:setSequence("russia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+           
+            r1=213/255
+            r2=43/255
+            r3=30/255
+            
+            b1=0/255
+            b2=57/255
+            b3=166/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2076,11 +2490,17 @@ local function countries(test)
             flag:setSequence("san_marino") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            b1=94/255
+            b2=182/255
+            b3=228/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2099,11 +2519,17 @@ local function countries(test)
             flag:setSequence("singapore")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+
+            w1=237/255
+            w2=41/255
+            w3=57/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2122,11 +2548,21 @@ local function countries(test)
             flag:setSequence("slovakia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=238/255
+            r2=28/255
+            r3=37/255
+            
+            b1=11/255
+            b2=78/255
+            b3=162/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2145,11 +2581,21 @@ local function countries(test)
             flag:setSequence("slovenia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=237/255
+            r2=28/255
+            r3=36/255
+            
+            b1=0/255
+            b2=93/255
+            b3=164/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2168,11 +2614,33 @@ local function countries(test)
             flag:setSequence("south_africa")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rygbwk"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=222/255
+            r2=56/255
+            r3=49/255
+
+            y1=255/255
+            y2=182/255
+            y3=18/255
+            
+            g1=0/255
+            g2=122/255
+            g3=77/255
+
+            b1=0/255
+            b2=35/255
+            b3=149/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
+            k1=0/255
+            k2=0/255
+            k3=0/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2191,11 +2659,25 @@ local function countries(test)
             flag:setSequence("south_korea")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbwk"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+           r1=198/255
+           r2=12/255
+           r3=48/255
+
+           b1=0/255
+           b2=52/255
+           b3=120/255
+           
+           w1=255/255
+           w2=255/255
+           w3=255/255
+           
+           k1=0/255
+           k2=0/255
+           k3=0/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2214,11 +2696,17 @@ local function countries(test)
             flag:setSequence("spain")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ry"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+
+            r1=198/255
+            r2=11/255
+            r3=30/255
+
+            y1=255/255
+            y2=196/255
+            y3=0/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2237,11 +2725,25 @@ local function countries(test)
             flag:setSequence("sri_lanka")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="royg"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=141/255
+            r2=32/255
+            r3=41/255
+
+            o1=255/255
+            o2=91/255
+            o3=0/255
+
+            y1=255/255
+            y2=183/255
+            y3=0/255
+            
+            g1=0/255
+            g2=86/255
+            g3=65/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2260,11 +2762,17 @@ local function countries(test)
             flag:setSequence("sweden")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="yb"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            y1=255/255
+            y2=183/255
+            y3=0/255
+            
+            b1=0/255
+            b2=106/255
+            b3=167/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2283,11 +2791,16 @@ local function countries(test)
             flag:setSequence("switzerland")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=213/255
+            r2=43/255
+            r3=30/255
+
+            w1=255/255
+            w2=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2306,11 +2819,21 @@ local function countries(test)
             flag:setSequence("taiwan")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=254/255
+            r2=0/255
+            r3=0/255
+
+            b1=0/255
+            b2=0/255
+            b3=149/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2329,11 +2852,21 @@ local function countries(test)
             flag:setSequence("thailand")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=237/255
+            r2=28/255
+            r3=36/255
+
+            b1=36/255
+            b2=29/255
+            b3=79/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2352,11 +2885,17 @@ local function countries(test)
             flag:setSequence("turkey")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=227/255
+            r2=10/255
+            r3=23/255
+            
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2375,11 +2914,25 @@ local function countries(test)
             flag:setSequence("united_arab_emirates")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rgwk"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=255/255
+            r2=0/255
+            r3=0/255
+
+            g1=0/255
+            g2=115/255
+            g3=47/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
+            k1=0/255
+            k2=0/255
+            k3=0/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2398,11 +2951,21 @@ local function countries(test)
             flag:setSequence("united_kingdom")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=207/255
+            r2=20/255
+            r3=43/255
+
+            b1=0/255
+            b2=36/255
+            b3=125/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+            
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
@@ -2421,11 +2984,21 @@ local function countries(test)
             flag:setSequence("united_states")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
+            
+            r1=178/255
+            r2=34/255
+            r3=52/255
+
+            b1=60/255
+            b2=59/255
+            b3=110/255
+
+            w1=255/255
+            w2=255/255
+            w3=255/255
+
             xCoord=350
             yCoord=442
             -- if music == nil and soundOn==true then
