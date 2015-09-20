@@ -391,8 +391,79 @@ end
 end         
 
 local function lookupCode(code,spawn)
-
-  if code == 1 then
+  if code == "bw" then
+    if spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "rw" then
+    if spawn.type == "red" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "ry" then
+    if spawn.type == "red" or spawn.type == "yellow" then
+        return 1
+    end
+  elseif code == "rg" then
+    if spawn.type == "red" or spawn.type == "orange" then
+        return 1
+    end
+  elseif code == "yb" then
+    if spawn.type == "yellow" or spawn.type == "blue" then
+        return 1
+    end
+  elseif code == "ryb" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "blue" then
+        return 1
+    end
+  elseif code == "rbw" then
+     if spawn.type == "red" or spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "ryk" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "black" then
+        return 1
+    end
+  elseif code == "ogw" then
+    if spawn.type == "orange" or spawn.type == "green" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "rgw" then
+    if spawn.type == "red" or spawn.type == "green" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "ryg" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "green" then
+        return 1
+    end
+  elseif code == "ygbw" then
+    if spawn.type == "red" or spawn.type == "green" or spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "ogbw" then
+    if spawn.type == "orange" or spawn.type == "green" or spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "rybw" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "blue" or spawn.type == "white" then
+        return 1
+    end
+  elseif code == "rbwk" then
+    if spawn.type == "red" or spawn.type == "blue" or spawn.type == "white" or spawn.type == "black" then
+        return 1
+    end
+  elseif code == "royg" then
+    if spawn.type == "red" or spawn.type == "orange" or spawn.type == "yellow" or spawn.type == "green" then 
+        return 1
+    end
+  elseif code == "rgwk" then 
+    if spawn.type == "red" or spawn.type == "green" or spawn.type == "white" or spawn.type == "black" then
+        return 1
+    end
+  elseif code == "rygbwk" then
+    if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "green" or spawn.type == "blue" or spawn.type == "white" or spawn.type == "black" then
+        return 1
+    end
+  elseif code == 1 then
     if spawn.type=="red" or spawn.type=="yellow" or spawn.type=="blue" then
       return 1
     end
@@ -414,7 +485,6 @@ local function lookupCode(code,spawn)
     end
   end
   return 0
-
 end
 
 
@@ -1160,7 +1230,7 @@ local function countries(test)
        info="images/infoBrazil.png"
 
 
-
+    -- TESTING FOR SAM
     elseif test==1 then
         info="images/infoBrazil.png"
         music="music/brazil.mid"  
@@ -1171,7 +1241,8 @@ local function countries(test)
         bobby = audio.play(music,{loops=-1})
             
         -- Set e here to pick a specific flag to go to. Otherwise, e=random
-        -- e=1
+        -- e=55
+        
         if e==1 then
             -- flag = display.newImageRect( "images/andorra.png", 200,100)
             -- flag = display.newSprite( nationalFlagsSheet , {frames={nationalFlags1Coords:getFrameIndex("andorra")}} )
@@ -1179,7 +1250,7 @@ local function countries(test)
             flag:setSequence("andorra")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ryb"
             flag.x=_W/2 ;flag.y=_H/2
             r1=208/255;
             r2=16/255;
@@ -1211,7 +1282,7 @@ local function countries(test)
             flag:setSequence("argentina")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
             
             w1=255/255
@@ -1240,7 +1311,7 @@ local function countries(test)
             flag:setSequence("australia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=255/255
@@ -1273,7 +1344,7 @@ local function countries(test)
             flag:setSequence("austria")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=237/255
@@ -1302,7 +1373,7 @@ local function countries(test)
             flag:setSequence("belgium")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ryk"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=237/255
@@ -1335,7 +1406,7 @@ local function countries(test)
             flag:setSequence("brazil")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ygbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             y1=254/255
@@ -1372,7 +1443,7 @@ local function countries(test)
             flag:setSequence("canada")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
 
             r1=255/255
@@ -1401,7 +1472,7 @@ local function countries(test)
             flag:setSequence("chile")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             
             r1=213/255
             r2=43/255
@@ -1433,7 +1504,7 @@ local function countries(test)
             flag:setSequence("china")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ry"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=213/255
@@ -1462,7 +1533,7 @@ local function countries(test)
             flag:setSequence("croatia") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=255/255
@@ -1495,9 +1566,17 @@ local function countries(test)
             flag:setSequence("cypress")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ogw"
             flag.x=_W/2 ;flag.y=_H/2
             
+            o1=216
+            o2=217
+            o3=3
+
+            g1=47
+            g2=71
+            g3=18
+
             w1=255/255
             w2=255/255
             w3=255/255
@@ -1520,7 +1599,7 @@ local function countries(test)
             flag:setSequence("czech_republic")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
             
             b1=17/255
@@ -1549,7 +1628,7 @@ local function countries(test)
             flag:setSequence("denmark")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=215/255
@@ -1578,7 +1657,7 @@ local function countries(test)
             flag:setSequence("egypt")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=206/255
@@ -1607,7 +1686,7 @@ local function countries(test)
             flag:setSequence("estonia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
             
             b1=72/255
@@ -1636,7 +1715,7 @@ local function countries(test)
             flag:setSequence("finland")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
             
             b1=0/255
@@ -1665,7 +1744,7 @@ local function countries(test)
             flag:setSequence("france")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
 
             r1=237/255
@@ -1698,7 +1777,7 @@ local function countries(test)
             flag:setSequence("germany") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ryk"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=221/255
@@ -1732,7 +1811,7 @@ local function countries(test)
             flag:setSequence("greece")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
             
             b1=13/255
@@ -1761,7 +1840,7 @@ local function countries(test)
             flag:setSequence("hungary")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rgw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=205/255
@@ -1795,7 +1874,7 @@ local function countries(test)
             flag:setSequence("iceland") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=215/255
@@ -1828,7 +1907,7 @@ local function countries(test)
             flag:setSequence("india")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ogbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             o1=255/255
@@ -1865,7 +1944,7 @@ local function countries(test)
             flag:setSequence("indonesia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
            
             r1=206/255
@@ -1894,7 +1973,7 @@ local function countries(test)
             flag:setSequence("ireland")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ogw"
             flag.x=_W/2 ;flag.y=_H/2
             
             o1=255/255
@@ -1927,7 +2006,7 @@ local function countries(test)
             flag:setSequence("isreal")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
             
             b1=0/255
@@ -1956,7 +2035,7 @@ local function countries(test)
             flag:setSequence("italy")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rgw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=206/255
@@ -1989,7 +2068,7 @@ local function countries(test)
             flag:setSequence("japan")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=188/255
@@ -2018,7 +2097,7 @@ local function countries(test)
             flag:setSequence("lithuania")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ryg"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=139/255
@@ -2051,7 +2130,7 @@ local function countries(test)
             flag:setSequence("luxembourg")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=237/255
@@ -2084,7 +2163,7 @@ local function countries(test)
             flag:setSequence("malaysia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rybw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=204/255
@@ -2121,7 +2200,7 @@ local function countries(test)
             flag:setSequence("malta")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=207/255
@@ -2150,7 +2229,7 @@ local function countries(test)
             flag:setSequence("mexico")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rgw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=206/255
@@ -2183,7 +2262,7 @@ local function countries(test)
             flag:setSequence("netherland")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=174/255
@@ -2216,7 +2295,7 @@ local function countries(test)
             flag:setSequence("new_zealand")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=204/255
@@ -2249,7 +2328,7 @@ local function countries(test)
             flag:setSequence("norway")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=239/255
@@ -2282,7 +2361,7 @@ local function countries(test)
             flag:setSequence("philippines")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rybw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=206/255
@@ -2319,7 +2398,7 @@ local function countries(test)
             flag:setSequence("poland") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=220/255
@@ -2348,7 +2427,7 @@ local function countries(test)
             flag:setSequence("portugal")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rg"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=255/255
@@ -2377,7 +2456,7 @@ local function countries(test)
             flag:setSequence("russia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
            
             r1=213/255
@@ -2410,7 +2489,7 @@ local function countries(test)
             flag:setSequence("san_marino") 
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="bw"
             flag.x=_W/2 ;flag.y=_H/2
             
             b1=94/255
@@ -2439,7 +2518,7 @@ local function countries(test)
             flag:setSequence("singapore")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
 
             w1=237/255
@@ -2468,7 +2547,7 @@ local function countries(test)
             flag:setSequence("slovakia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=238/255
@@ -2501,7 +2580,7 @@ local function countries(test)
             flag:setSequence("slovenia")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=237/255
@@ -2534,7 +2613,7 @@ local function countries(test)
             flag:setSequence("south_africa")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rygbwk"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=222/255
@@ -2579,7 +2658,7 @@ local function countries(test)
             flag:setSequence("south_korea")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbwk"
             flag.x=_W/2 ;flag.y=_H/2
             
            r1=198/255
@@ -2616,7 +2695,7 @@ local function countries(test)
             flag:setSequence("spain")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="ry"
             flag.x=_W/2 ;flag.y=_H/2
 
             r1=198/255
@@ -2645,7 +2724,7 @@ local function countries(test)
             flag:setSequence("sri_lanka")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="royg"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=141/255
@@ -2682,7 +2761,7 @@ local function countries(test)
             flag:setSequence("sweden")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="yb"
             flag.x=_W/2 ;flag.y=_H/2
             
             y1=255/255
@@ -2711,7 +2790,7 @@ local function countries(test)
             flag:setSequence("switzerland")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=213/255
@@ -2739,7 +2818,7 @@ local function countries(test)
             flag:setSequence("taiwan")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=254/255
@@ -2772,7 +2851,7 @@ local function countries(test)
             flag:setSequence("thailand")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=237/255
@@ -2805,7 +2884,7 @@ local function countries(test)
             flag:setSequence("turkey")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=227/255
@@ -2834,7 +2913,7 @@ local function countries(test)
             flag:setSequence("united_arab_emirates")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rgwk"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=255/255
@@ -2871,7 +2950,7 @@ local function countries(test)
             flag:setSequence("united_kingdom")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=207/255
@@ -2882,9 +2961,9 @@ local function countries(test)
             b2=36/255
             b3=125/255
 
-            w1=0/255
-            w2=0/255
-            w3=0/255
+            w1=255/255
+            w2=255/255
+            w3=255/255
             
             xCoord=350
             yCoord=442
@@ -2904,7 +2983,7 @@ local function countries(test)
             flag:setSequence("united_states")
             flag.anchorX=0.5
             flag.anchorY=0.5
-            code=1
+            code="rbw"
             flag.x=_W/2 ;flag.y=_H/2
             
             r1=178/255
