@@ -972,6 +972,7 @@ function returnFunction()
       Runtime:addEventListener("enterFrame", moveObject)  
        flag:addEventListener( "tap", gotoPause ) 
 
+
 --flag:toFront()
   --flag:addEventListener("tap",gotoPause)
 --if piece ~= nil then
