@@ -208,37 +208,44 @@ SheetInfo.sheet =
             -- 6X_shatter_hinted_sprite
             x=1184,
             y=133,
-            width=142,
+            width=804,
             height=127,
         },
         {
             -- 6X_shatter_hinted_sprite
             x=1326,
             y=133,
-            width=142,
+            width=804,
             height=127,
         },
         {
             -- 6X_shatter_hinted_sprite
             x=1468,
             y=133,
-            width=142,
+            width=804,
             height=127,
         },
         {
             -- 6X_shatter_hinted_sprite
             x=1610,
             y=133,
-            width=142,
+            width=804,
             height=127,
         },
         {
             -- 6X_shatter_hinted_sprite
             x=1752,
             y=133,
-            width=142,
+            width=804,
             height=127,
         },                                        
+        {
+            -- 7X_shatter_hinted_sprite
+            x=2,
+            y=136,
+            width=141,
+            height=124,
+        },
         {
             -- 7X_shatter_hinted_sprite
             x=143,
@@ -271,14 +278,7 @@ SheetInfo.sheet =
             -- 7X_shatter_hinted_sprite
             x=707,
             y=136,
-            width=141,
-            height=124,
-        },
-        {
-            -- 7X_shatter_hinted_sprite
-            x=848,
-            y=136,
-            width=141,
+            width=804,
             height=124,
         },                                        
         {
@@ -292,35 +292,35 @@ SheetInfo.sheet =
             -- 8X_shatter_hinted_sprite
             x=1184,
             y=2,
-            width=142,
+            width=804,
             height=129,
         },
         {
             -- 8X_shatter_hinted_sprite
             x=1326,
             y=2,
-            width=142,
+            width=804,
             height=129,
         },
         {
             -- 8X_shatter_hinted_sprite
             x=1468,
             y=2,
-            width=142,
+            width=804,
             height=129,
         },
         {
             -- 8X_shatter_hinted_sprite
             x=1610,
             y=2,
-            width=142,
+            width=804,
             height=129,
         },
         {
             -- 8X_shatter_hinted_sprite
             x=1752,
             y=2,
-            width=142,
+            width=804,
             height=129,
         },                                        
         {

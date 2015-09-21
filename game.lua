@@ -162,19 +162,19 @@ local bonusShatterSeq={
     {name="5x", frames={19,19,19,19,20,21,22,23,24},time=800, loopCount=1},
     {name="6x", frames={25,25,25,25,26,27,28,29,30},time=800, loopCount=1},
     {name="7x", frames={31,31,31,31,32,33,34,35,36},time=800, loopCount=1},
-    {name="8x", frames={37,37,37,37,38,9,40,41,42},time=800, loopCount=1},
+    {name="8x", frames={37,37,37,37,38,39,40,41,42},time=800, loopCount=1},
     {name="9x", frames={43,43,43,43,44,45,46,47,48},time=800, loopCount=1}
 }
 
 local bonusShatter=display.newSprite(bonusShatterSheet,bonusShatterSeq)
 bonusShatter:setSequence("2x")
-bonusShatter.alpha=0
--- bonusShatter:toFront()
+--bonusShatter.alpha=1
+bonusShatter:toFront()
 bonusShatter.anchorX=0.5
 bonusShatter.anchorY=0.5
 bonusShatter.x=_W/2
 bonusShatter.y=_H/2
--- bonusShatter:play()
+--bonusShatter:play()
 
 -- BONUS SHATTER TESTING PURPOSES
 local function mySpriteListener( event )
@@ -436,7 +436,7 @@ local function lookupCode(code,spawn)
         return 1
     end
   elseif code == "ygbw" then
-    if spawn.type == "red" or spawn.type == "green" or spawn.type == "blue" or spawn.type == "white" then
+    if spawn.type == "yellow" or spawn.type == "green" or spawn.type == "blue" or spawn.type == "white" then
         return 1
     end
   elseif code == "ogbw" then
@@ -1128,110 +1128,7 @@ local function countryScale()
 end 
 
 local function countries(test)
-    if test==0 then
-        if e==1 then        
-            flag = display.newImageRect( "images/andorra.png", 200,100) 
-            flag.anchorX=0.5
-            flag.anchorY=0.5
-            code=1
-            flag.x=_W/2 ;flag.y=_H/2
-            r1=.816;r2=.063;r3=.227;
-            y1=.996;y2=.914;y3=0
-            b1=0;b2=.094;b3=.659
-            xCoord=350
-            yCoord=442
-            if music == nil and soundOn==true then
-                music="music/andorra.mid"
-                media.playSound(music)
-            end
-
-            music="music/andorra.mid"    
-            country="ANDORRA,\n   Europe"        
-            piece = display.newImage( "images/andorra104x102.png", 529,229)
-        elseif e==2 then
-            flag = display.newImageRect( "images/australia.png", 200,100)  
-            flag.anchorX=0.5
-            flag.anchorY=0.5
-            code=2
-            flag.x=_W/2 ;flag.y=_H/2
-            w1=1;w2=1;w3=1
-            r1=1;r2=0;r3=0
-            b1=0;b2=0;b3=.545
-            xCoord=-415
-            yCoord=-10
-            if music == nil and soundOn==true then
-                music="music/australia.mid"
-                media.playSound(music)
-            end  
-            music="music/australia.mid" 
-   
-            country="AUSTRALIA"                        
-            piece = display.newImage( "images/australia259x229.png", 529,229)
-        elseif e==3 then
-            flag = display.newImageRect( "images/brazil.png", 200,100)
-            flag.anchorX=0.5
-            flag.anchorY=0.5 
-            code=3
-            flag.x=_W/2 ;flag.y=_H/2
-            w1=1;w2=1;w3=1
-            y1=.996;y2=.875;y3=0
-            g1=0;g2=.608;g3=.227
-            b1=0;b2=.153;b3=.463
-            xCoord=650
-            yCoord=68   
-            if music == nil and soundOn==true then
-                music="music/brazil.mid"
-                media.playSound(music)
-            end
-        
-            music="music/brazil.mid"  
-            country="    BRAZIL,\nSouth America"          
-            piece = display.newImage( "images/brazil243x277.png", 243,277)
-        elseif e==4 then
-            flag = display.newImageRect( "images/canada.png", 200,100)
-            flag.anchorX=0.5
-            flag.anchorY=0.5
-            code=4
-            flag.x=_W/2 ;flag.y=_H/2
-            w1=1;w2=1;w3=1 
-            r1=1;r2=0;r3=0
-            xCoord=899
-            yCoord=546
-            if music == nil and soundOn==true then
-                music="music/canada.mid"
-                media.playSound(music)
-            end
-     
-            music="music/canada.mid"     
-            country="    CANADA,\nNorth America"       
-            piece = display.newImage( "images/canada485x215.png", 485,215)
-        elseif e==5 then
-            flag = display.newImageRect( "images/mexico.png", 200,100)
-            flag.anchorX=0.5
-            flag.anchorY=0.5
-            code=5
-            flag.x=_W/2 ;flag.y=_H/2
-            w1=1;w2=1;w3=1
-            r1=.808;r2=.067;r3=.149
-            g1=0;g2=.408;g3=.278
-            xCoord=920
-            yCoord=312
-            if music == nil and soundOn==true then
-                music="music/mexico.mid"
-                media.playSound(music)
-            end
-          
-            music="music/mexico.mid"    
-            country="     MEXICO,\nCentral America"        
-            piece = display.newImage( "images/mexico172x126.png", 172,126)
-        end
-
-
-       info="images/infoBrazil.png"
-
-
-    -- TESTING FOR SAM
-    elseif test==1 then
+        -- TESTING FOR SAM
         info="images/infoBrazil.png"
         music="music/brazil.mid"  
         country="    BRAZIL,\nSouth America"   
@@ -1241,7 +1138,7 @@ local function countries(test)
         bobby = audio.play(music,{loops=-1})
             
         -- Set e here to pick a specific flag to go to. Otherwise, e=random
-        -- e=55
+        e=9
         
         if e==1 then
             -- flag = display.newImageRect( "images/andorra.png", 200,100)
@@ -1473,7 +1370,7 @@ local function countries(test)
             flag.anchorX=0.5
             flag.anchorY=0.5
             code="rbw"
-            
+            flag.x=_W/2; flag.y=_H/2 
             r1=213/255
             r2=43/255
             r3=30/255
@@ -3014,7 +2911,6 @@ local function countries(test)
 
         flag.width=200
         flag.height=100
-    end
 end
 
 local function newFlag() 
@@ -3035,7 +2931,6 @@ local function newFlag()
                -- e = math.random(1,5)
 
                 e = math.random(1,56)
-
                 thisRoll=e
             end
 
