@@ -56,15 +56,21 @@ local function myTouchListener( event )
         print("end phase")
         -- event.target.alpha = 1
         
+        -- BOUNDRY CHECK
         if boundaryCheck == true then 
             local goto = event.target.gotoScene
-            composer.gotoScene ( goto, { effect = defaultTransition } )
 
+            if goto == "start" and event.target == startBtnsPlayGame then
+              composer.showOverlay( goto, { isModal= true})
+            else
+              composer.gotoScene ( goto, { effect = defaultTransition } )
+            end  
         end
-
-        currentObject:setFrame(1)
-        currentObject = nil
         
+        if currentObject ~= nil then
+          currentObject:setFrame(1)
+          currentObject = nil
+        end 
         -- Can't remember what this was for?
         display.getCurrentStage():setFocus(nil) 
 
@@ -73,6 +79,7 @@ end
 
 
 local function doFunction(e)
+     print("doFunction")
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
             e.x > currentObject.contentBounds.xMax or
@@ -100,14 +107,33 @@ local function eraseSplash()
       -- startBtnsAbout:addEventListener("tap",tapBtn)
       -- startBtnsPlayGame:addEventListener("tap",tapBtn)
       -- startBtnsOptions:addEventListener("tap",tapBtn)       
-      startBtnsAbout:addEventListener("touch",doFunction)
-      startBtnsPlayGame:addEventListener("touch",doFunction)
-      startBtnsOptions:addEventListener("touch",doFunction)  
+
 
   --   startBtnsAbout.alpha=0
 --  startBtnsOptions.alpha=0
  -- startBtnsPlayGame.alpha=0
           
+end
+
+
+function addFunction()
+
+  startBtnsAbout.alpha=1
+    startBtnsPlayGame.alpha=1
+      startBtnsOptions.alpha=1
+
+ ---       startBtnsAbout:addEventListener("touch",doFunction)
+  --    startBtnsPlayGame:addEventListener("touch",doFunction)
+   --   startBtnsOptions:addEventListener("touch",doFunction)  
+end
+
+function removeFunction()
+  startBtnsAbout.alpha=0
+    startBtnsPlayGame.alpha=0
+      startBtnsOptions.alpha=0
+     -- startBtnsAbout:removeEventListener("touch",doFunction)
+   --   startBtnsPlayGame:removeEventListener("touch",doFunction)
+   --   startBtnsOptions:removeEventListener("touch",doFunction)  
 end
 
 local function checkMemory(e)
@@ -116,7 +142,21 @@ local function checkMemory(e)
   print("Texture memory usage " .. system.getInfo("textureMemoryUsed")/1024/1024 .. "MB")
 end
 
+
+function animationPop(event)
+    local thisAnimation = event.target
+    if (thisAnimation.frame == 1) then
+      thisAnimation.alpha = .9
+    elseif (thisAnimation.frame == 3) then
+      thisAnimation.alpha=1
+    elseif ( event.phase == "loop" ) then
+      thisAnimation.alpha = .3
+    end
+end
+
 function scene:create( event )
+  local sceneGroup=self.view
+  print("a")
   titleLogo = display.newImageRect( "images/start-menuWTF.png", 568, 320 )
   titleLogo.anchorX=0.5
   titleLogo.anchorY=0.5
@@ -132,16 +172,6 @@ function scene:create( event )
   menuColorFlags.alpha = 0.88
   menuColorFlags:play()
 
-  function animationPop(event)
-      local thisAnimation = event.target
-      if (thisAnimation.frame == 1) then
-        thisAnimation.alpha = .9
-      elseif (thisAnimation.frame == 3) then
-        thisAnimation.alpha=1
-      elseif ( event.phase == "loop" ) then
-        thisAnimation.alpha = .3
-      end
-  end
   menuColorFlags:addEventListener("sprite", animationPop)
 
   local offsetStartBtns = 20
@@ -152,7 +182,8 @@ function scene:create( event )
   startBtnsPlayGame:setSequence( "playgame" )
   startBtnsPlayGame:setFrame( 1 )
   startBtnsPlayGame.alpha=0
-  startBtnsPlayGame.gotoScene="game"
+  startBtnsPlayGame.gotoScene="start"
+
 
 
   startBtnsOptions= display.newSprite( startBtnsOptionsSheet, startBtnSeq )
@@ -171,41 +202,49 @@ function scene:create( event )
   startBtnsAbout.alpha=0
   startBtnsAbout.gotoScene="about"
 
-  self.view:insert(titleLogo) -- BACKGROUND NOT TITLE !!! CHANGE NAME
-  self.view:insert(menuColorFlags) 
-  self.view:insert(startBtnsPlayGame)
-  self.view:insert(startBtnsOptions)
-  self.view:insert(startBtnsAbout)  
+  sceneGroup:insert(titleLogo) -- BACKGROUND NOT TITLE !!! CHANGE NAME
+  sceneGroup:insert(menuColorFlags) 
+  sceneGroup:insert(startBtnsPlayGame)
+  sceneGroup:insert(startBtnsOptions)
+  sceneGroup:insert(startBtnsAbout)  
+
+
+   startBtnsAbout:addEventListener("touch",doFunction)
+   startBtnsPlayGame:addEventListener("touch",doFunction)
+   startBtnsOptions:addEventListener("touch",doFunction) 
 end
 
 function scene:show( event )
+    local sceneGroup=self.view
+    local phase = event.phase
   if event.phase == "will" then
+    print("b")
       --Runtime:addEventListener("enterFrame", checkMemory)
     elseif event.phase == "did" then
+      print("c")
     timer.performWithDelay(300,eraseSplash,1)
 
       -- ALSO IN ERASESPLASH>>>>????
       -- COMPARE WITH gameover.lua
 
 
-      -- startBtnsAbout:addEventListener("touch",doFunction)
-      -- startBtnsPlayGame:addEventListener("touch",doFunction)
-      -- startBtnsOptions:addEventListener("touch",doFunction) 
   end
 end
 
 function scene:hide( event )
-
+      local sceneGroup=self.view
+    local phase = event.phase
 
   if event.phase=="will" then
 
-
+print("d")
     composer.removeScene("menu",false)   
   end  
 end
 
 function scene:destroy( event )
   local group = self.view
+  print("e")
   
 end
 

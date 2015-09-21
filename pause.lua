@@ -337,7 +337,7 @@ function scene:hide( event )
     composer.removeScene("pause",false)   
      elseif event.phase == "did" then
 
-   returnFunction()
+  returnFunction()
 
      end
 end
