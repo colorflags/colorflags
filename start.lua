@@ -7,7 +7,20 @@ local scene = composer.newScene()
   local cruiseBtn
   local background
   local phaseGroup=display.newGroup()
- 
+
+local menuStart  
+  
+local menuSeq = {
+    { name = "start", frames = {6}, time = 500 },
+    { name = "start_anim", frames = {7, 8, 9, 10}, time = 500 },
+    { name = "cruise", frames = {1}, time = 500 },
+    { name = "cruise_anim", frames = {2, 3, 4, 5}, time = 500 },
+    { name = "tutorial", frames = {11}, time = 500 },
+    { name = "tutorial_anim", frames = {12, 13, 14, 15}, time = 500 }
+}
+
+local menuSpriteCoords = require("lua-sheets.playgame-menu")
+local menuStartSheet = graphics.newImageSheet( "images/playgame-menu.png", menuSpriteCoords:getSheet() )
 
 --local function phase4(btn)
 --display.remove(btn)
@@ -24,7 +37,68 @@ end
 transition.to(e,{time=50, xScale=.8,yScale=.8,onComplete=phase3}) 
   end
 
+local currentObject
+local boundaryCheck = false
+
+local function myTouchListener( event )
+    if event.phase == "began" then
+        print("begin touch, why such a delay?? because referencing a class?")        
+        currentObject = event.target 
+        display.getCurrentStage():setFocus(currentObject)
+    elseif event.phase == "ended" or event.phase == "cancelled" then
+        if currentObject.name == "menuStart" then
+            currentObject:setSequence("start")
+        elseif currentObject.name == "menuTutorial" then
+            currentObject:setSequence("tutorial")
+        elseif currentObject.name == "menuCruise" then
+            currentObject:setSequence("cruise")
+        end
+        currentObject:setFrame(1)
+        
+        if boundaryCheck == true then 
+            local goto = currentObject.gotoScene
+            composer.gotoScene( goto, { effect = defaultTransition } )
+        end
+        
+        currentObject = nil
+        display.getCurrentStage():setFocus(nil)
+        boundaryCheck = false
+    end
+end
  
+local function doFunction(e)
+    if currentObject ~= nil then
+        if e.x < currentObject.contentBounds.xMin or
+            e.x > currentObject.contentBounds.xMax or
+            e.y < currentObject.contentBounds.yMin or 
+            e.y > currentObject.contentBounds.yMax then 
+ 
+            if currentObject.name == "menuStart" then
+                currentObject:setSequence("start")
+            elseif currentObject.name == "menuTutorial" then
+                currentObject:setSequence("tutorial")
+            elseif currentObject.name == "menuCruise" then
+                currentObject:setSequence("cruise")
+            end
+            currentObject:setFrame(1)
+            boundaryCheck = false
+        else
+            if boundaryCheck == false then
+                if currentObject.name == "menuStart" then
+                    currentObject:setSequence("start_anim")
+                elseif currentObject.name == "menuTutorial" then
+                    currentObject:setSequence("tutorial_anim")
+                elseif currentObject.name == "menuCruise" then
+                    currentObject:setSequence("cruise_anim")
+                end
+                currentObject:play()
+            end
+            boundaryCheck = true
+        end
+    end
+end
+
+
 local function buttonHit(e)
    
    print("buttonhitdaf")
@@ -32,7 +106,7 @@ local function buttonHit(e)
   if e.phase == "began" then
      print("ButtonHit")
     print(e.target)
-  elseif e.phase == "moved" then 
+  elseif e.phase == "moved" then
     print(e.target)
   elseif e.phase == "ended" then 
     display.remove(phaseGroup)
@@ -77,7 +151,7 @@ local function removeIt(e)
 end
 
 local function catchAllTaps(event)
-return true
+    return true
 end
 
 
@@ -97,37 +171,57 @@ print("1")
       background.x=_W/2
       background.y=_H/2
 --      background:toFront()
-  
-   startBtn = display.newText("Start", _W/2, _H/3, "federalescort3d", 35 )
-   startBtn:setFillColor(224/225,96/225,224/225) 
+    
+    menuStart = display.newSprite( menuStartSheet, menuSeq )
+    menuStart:addEventListener( "touch", myTouchListener )
+    menuStart:addEventListener( "touch", doFunction )
+    menuStart.x=_W/2 
+    menuStart.y=_H/2 - 50
+    menuStart:setSequence( "start" )
+    menuStart:setFrame( 1 )
+    menuStart.name = "menuStart"
+    menuStart.gotoScene="game" 
  
-   tutorialBtn = display.newText("Tutorial", _W/2, _H/2, "federalescort3d", 35 )
-   tutorialBtn:setFillColor(224/225,96/225,224/225)  
+    menuTutorial = display.newSprite( menuStartSheet, menuSeq )
+    menuTutorial:addEventListener( "touch", myTouchListener )
+    menuTutorial:addEventListener( "touch", doFunction )
+    menuTutorial.x=_W/2 
+    menuTutorial.y=_H/2
+    menuTutorial:setSequence( "tutorial" )
+    menuTutorial:setFrame( 1 )
+    menuTutorial.name = "menuTutorial"
+    menuTutorial.gotoScene="game" 
 
-   cruiseBtn = display.newText("Cruise", _W/2, _H*(2/3), "federalescort3d", 35 )
-   cruiseBtn:setFillColor(224/225,96/225,224/225) 
+    menuCruise = display.newSprite( menuStartSheet, menuSeq )
+    menuCruise:addEventListener( "touch", myTouchListener )
+    menuCruise:addEventListener( "touch", doFunction )
+    menuCruise.x=_W/2 
+    menuCruise.y=_H/2 + 50
+    menuCruise:setSequence( "cruise" )
+    menuCruise:setFrame( 1 )
+    menuCruise.name = "menuCruise"
+    menuCruise.gotoScene="game" 
 
-
-
-   catchAll:addEventListener("tap",catchAllTaps) 
+   --catchAll:addEventListener("tap",catchAllTaps) 
 
    sceneGroup:insert(catchAll)
-   sceneGroup:insert(background) 
-   sceneGroup:insert(startBtn)              
-   sceneGroup:insert(cruiseBtn)
-   sceneGroup:insert(tutorialBtn)
-
+   sceneGroup:insert(background)
+   sceneGroup:insert(menuStart)
+   sceneGroup:insert(menuTutorial)              
+   sceneGroup:insert(menuCruise)
+   --sceneGroup:toFront()
+   
    phaseGroup:insert(catchAll)
-   phaseGroup:insert(background) 
-   phaseGroup:insert(cruiseBtn)
-   phaseGroup:insert(startBtn)
-   phaseGroup:insert(tutorialBtn)
+   phaseGroup:insert(background)
+   phaseGroup:insert(menuStart)
+   phaseGroup:insert(menuTutorial)
+   phaseGroup:insert(menuCruise)
    phaseGroup:toFront()
 
 
-   cruiseBtn:addEventListener("touch",buttonHit) 
-   startBtn:addEventListener("touch",buttonHit)
-   tutorialBtn:addEventListener("touch",buttonHit)  
+   --cruiseBtn:addEventListener("touch",buttonHit) 
+   --startBtn:addEventListener("touch",buttonHit)
+   --tutorialBtn:addEventListener("touch",buttonHit)  
 
 end
 

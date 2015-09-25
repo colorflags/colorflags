@@ -234,9 +234,7 @@ local function myTouchListener( event )
         -- event.target:setFrame( 1 )
         currentObject = event.target
 
-        -- Can't remember what this was for?
-        display.getCurrentStage():setFocus(event.target)
-
+        display.getCurrentStage():setFocus(currentObject)
     elseif event.phase == "ended" or event.phase == "cancelled" then
         print("end phase")
         -- event.target.alpha = 1
@@ -244,15 +242,12 @@ local function myTouchListener( event )
         if boundaryCheck == true then 
             local goto = event.target.gotoScene
             composer.gotoScene ( goto, { effect = defaultTransition } )
-
         end
 
         currentObject:setFrame(1)
         currentObject = nil
         
-        -- Can't remember what this was for?
         display.getCurrentStage():setFocus(nil) 
-
     end
 end
 
