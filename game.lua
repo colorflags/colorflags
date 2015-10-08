@@ -74,15 +74,15 @@ local random
 local thisRoll=0
 local lastRoll=0
 local e=0
+
+local bonusText
 local scoreText
 local speedText
-local bonusText
+
 local countryText
 local country
 --local lowBar
 --local topBar
-
-local dog3
 
 --composer.recycleOnSceneChange = true
 
@@ -269,12 +269,8 @@ end
     prevState=nil
 
              if bonusText ~= nil then
-                 bonusText:removeSelf()
+                 bonusText:Remove()
                  bonusText=nil
-               end
-             if dog3 ~= nil then
-                 dog3:Remove()
-                 dog3=nil
              end
 
      --      timer.cancel(timerSpeed)
@@ -2893,10 +2889,8 @@ local function newFlag()
             if deadText~=nil then
             display.remove(deadText)
               if bonusText ~= nil then
-               bonusText:removeSelf()
+               bonusText:Remove()
                bonusText=nil
-               dog3:Remove()
-               dog3=nil
                spread=1
                prevState=nil
                currState=nil
@@ -3111,14 +3105,12 @@ if e.phase=="began" and e.target.isBodyActive==true then
 -- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isLeft)
 
             if lookupCode(code,e.target)==0 then   --You are Dead
+              
               if bonusText ~= nil then
-               bonusText:removeSelf()
-               bonusText=nil
+                  bonusText:Remove()
+                  bonusText=nil
               end
-              if dog3 ~= nil then
-                  dog3:Remove()
-                  dog3=nil
-              end
+              
               if deadText==nil then
                 deadText = display.newText("DEAD", _W*(4/5), _H*(2/3), native.systemFont, 28)
                 deadText:setFillColor( 1, 0, 0 )
@@ -3176,20 +3168,13 @@ if e.phase=="began" and e.target.isBodyActive==true then
             if currState==prevState then
                spread=spread+1
                if bonusText ~= nil then
-                 bonusText:removeSelf()
-                 bonusText=nil
-               end
-               if dog3 ~= nil then
-                 dog3:Remove()
-                   dog3=nil
+                 bonusText:Remove()
+                   bonusText=nil
                end
 
                text="+"..spread
 
-               dog3 = CreateText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), (_H*(1/3))+35 )
-
-               bonusText = display.newText(text, _W*(4/5), _H*(1/3), native.systemFont, 28)
-               bonusText:setFillColor( 1, 0, 0 )
+               bonusText = CreateText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), (_H*(1/3))+35 )
                print("Spread =" .. spread)
                if motion~=nil then
                  timer.cancel(motion)
@@ -3233,12 +3218,8 @@ if e.phase=="began" and e.target.isBodyActive==true then
               currState=nil
               prevState=nil
               if bonusText~=nil then
-                bonusText:removeSelf()
-                bonusText=nil
-              end
-               if dog3 ~= nil then
-                   dog3:Remove()
-                   dog3=nil
+                   bonusText:Remove()
+                   bonusText=nil
                end
           end
               prevState=e.target.type
@@ -3311,19 +3292,14 @@ if e.phase == "will" then
 display.remove(background)
 
 scoreText:RemoveDisplay()
---display.remove(scoreText)
---dog1:remove()
---dog2:remove()
-dog3:RemoveDisplay()
+speedText:RemoveDisplay()
+
 display.remove(flag)
-display.remove(bonusText)
 display.remove(deadText)
 display.remove(piece)
 display.remove(map)
 display.remove(topBar)
 display.remove(lowBar)
-speedText:RemoveDisplay()
---display.remove(speedText)
 display.remove(infoPic)
 if timerSpeed~=nil then
 timer.cancel(timerSpeed)
