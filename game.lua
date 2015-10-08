@@ -1,6 +1,8 @@
 -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html 
 
+local CreateText = require("textclass")
+
 --game.lua
 local composer = require("composer")
 local scene = composer.newScene()
@@ -10,7 +12,9 @@ local scene = composer.newScene()
 
 --media.playSound('Brazil.mid')
 
+--for testing purposes. if true, go to GameOver screen.
 local gotoDeath=true
+
 local state=1
 local speed=2
 local timeVar=1250
@@ -78,6 +82,7 @@ local country
 --local lowBar
 --local topBar
 
+local dog3
 
 --composer.recycleOnSceneChange = true
 
@@ -156,19 +161,19 @@ local nationalFlagsSeq = {
 local bonusShatterSpriteCoords = require("bonus-shatter")
 local bonusShatterSheet = graphics.newImageSheet( "images/bonus-shatter.png", bonusShatterSpriteCoords:getSheet() )
 local bonusShatterSeq={
-    {name="2x", frames={1,1,1,1,2,3,4,5,6},time=800, loopCount=1},
-    {name="3x", frames={7,7,7,7,8,9,10,11,12},time=800, loopCount=1},
-    {name="4x", frames={13,13,13,13,14,15,16,17,18},time=800, loopCount=1},
-    {name="5x", frames={19,19,19,19,20,21,22,23,24},time=800, loopCount=1},
-    {name="6x", frames={25,25,25,25,26,27,28,29,30},time=800, loopCount=1},
-    {name="7x", frames={31,31,31,31,32,33,34,35,36},time=800, loopCount=1},
-    {name="8x", frames={37,37,37,37,38,39,40,41,42},time=800, loopCount=1},
-    {name="9x", frames={43,43,43,43,44,45,46,47,48},time=800, loopCount=1}
+    {name="2x", frames={1},time=800, loopCount=1},
+    {name="3x", frames={3},time=800, loopCount=1},
+    {name="4x", frames={6},time=800, loopCount=1},
+    {name="5x", frames={9},time=800, loopCount=1},
+    {name="6x", frames={13},time=800, loopCount=1},
+    {name="7x", frames={16},time=800, loopCount=1},
+    {name="8x", frames={19},time=800, loopCount=1},
+    {name="9x", frames={22},time=800, loopCount=1}
 }
 
 local bonusShatter=display.newSprite(bonusShatterSheet,bonusShatterSeq)
-bonusShatter:setSequence("2x")
---bonusShatter.alpha=1
+--bonusShatter:setSequence("9x")
+bonusShatter.alpha=0 --start with 0
 bonusShatter:toFront()
 bonusShatter.anchorX=0.5
 bonusShatter.anchorY=0.5
@@ -177,46 +182,15 @@ bonusShatter.y=_H/2
 --bonusShatter:play()
 
 -- BONUS SHATTER TESTING PURPOSES
-local function mySpriteListener( event )
-    if ( event.phase == "ended" ) then
-        local thisSprite = event.target  --"event.target" references the sprite
-        if (thisSprite.sequence == "2x") then
-            thisSprite:setSequence( "3x" )  --switch to "fastRun" sequence
-            thisSprite:play()  --play the new sequence; it won't play automatically!
-        elseif (thisSprite.sequence == "3x") then
-            thisSprite:setSequence( "4x" )  --switch to "fastRun" sequence
-            thisSprite:play()  --play the new sequence; it won't play automatically!
-        elseif (thisSprite.sequence == "4x") then
-            thisSprite:setSequence( "5x" )  --switch to "fastRun" sequence
-            thisSprite:play()  --play the new sequence; it won't play automatically!
-        elseif (thisSprite.sequence == "5x") then
-            thisSprite:setSequence( "6x" )  --switch to "fastRun" sequence
-            thisSprite:play()  --play the new sequence; it won't play automatically!
-        elseif (thisSprite.sequence == "6x") then
-            thisSprite:setSequence( "7x" )  --switch to "fastRun" sequence
-            thisSprite:play()  --play the new sequence; it won't play automatically!
-        elseif (thisSprite.sequence == "7x") then
-            thisSprite:setSequence( "8x" )  --switch to "fastRun" sequence
-            thisSprite:play()  --play the new sequence; it won't play automatically!
-        elseif (thisSprite.sequence == "8x") then
-            thisSprite:setSequence( "9x" )  --switch to "fastRun" sequence
-            thisSprite:play()  --play the new sequence; it won't play automatically!
-        elseif (thisSprite.sequence == "9x") then
-            thisSprite:setSequence( "2x" )  --switch to "fastRun" sequence
-            thisSprite:play()  --play the new sequence; it won't play automatically!
-        end
-    end
-end
-local startScore=0
-     scoreText = display.newText(score, _W*(4/5), _H/2, native.systemFont, 28)
-      scoreText:setFillColor( 1, 0, 0 )
-      scoreText:toFront()
- 
+--bonusShatter:addEventListener( "sprite", mySpriteListener )
+
+scoreText = CreateText.new( score, "Arial Rounded MT Bold", 30, _W*(4/5), _H/2+35 )
+scoreText:ToFront()
 --if gotoDeath==false then
 
-      speedText = display.newText(speed, _W*(1/5), _H/2, native.systemFont, 28)
-      speedText:setFillColor( 1, 0, 0 )
-      speedText:toFront()
+speedText = CreateText.new( speed, "Arial Rounded MT Bold", 30, _W*(1/5), _H/2+35 )
+speedText:ToFront()
+
 --end
 --[[
 local bonusSheetData = { width=150,height=100,numFrames=6,sheetContentWidth=900,sheetContentHeight=100}
@@ -271,11 +245,10 @@ local function speedUp()
     --print(levels[idx].speed)
     --if gotoDeath==false then
     
-       display.remove(speedText)
-       speedText = display.newText(speed, _W*(1/5), _H/2, native.systemFont, 28)
-       speedText:setFillColor( 1, 0, 0 )
-       speedText:toFront()
-    
+       --display.remove(speedText)
+       speedText:Text(speed)
+       speedText:ToFront()
+
    -- end   
   elseif finalChallenge==false then
      finalChallenge=true
@@ -299,6 +272,11 @@ end
                  bonusText:removeSelf()
                  bonusText=nil
                end
+             if dog3 ~= nil then
+                 dog3:Remove()
+                 dog3=nil
+             end
+
      --      timer.cancel(timerSpeed)
 
 
@@ -320,12 +298,9 @@ end
              end
              speed=levels[idx].speed
              timeVar=levels[idx].timeVar
-       display.remove(speedText)
-       speedText = display.newText(speed, _W*(1/5), _H/2, native.systemFont, 28)
-       speedText:setFillColor( 1, 0, 0 )
-       speedText:toFront()
-
- end  
+        speedText:Text(speed)
+        speedText:ToFront() 
+end  
    
 
 
@@ -999,12 +974,11 @@ local function delayPace()
      --print(levels[idx].speed)
    --  if gotoDeath==false then
        if speedText~=0 and speedText~=nil then
-        display.remove(speedText)
+        --display.remove(speedText)
       -- speedText:removeSelf()
       -- speedtext=nil
-       speedText = display.newText(speed, _W*(1/5), _H/2, native.systemFont, 28)
-       speedText:setFillColor( 1, 0, 0 )
-       speedText:toFront()
+        speedText:Text(speed)
+        speedText:ToFront()
     end  
 end    
 
@@ -2921,6 +2895,8 @@ local function newFlag()
               if bonusText ~= nil then
                bonusText:removeSelf()
                bonusText=nil
+               dog3:Remove()
+               dog3=nil
                spread=1
                prevState=nil
                currState=nil
@@ -3104,14 +3080,6 @@ local function setupVariables()
 
 end
 
-local function cancelAlpha()
-
- -- bonusAnimation:toBack()
-    bonusShatter.alpha=0
-end
-
-
-
 
 local function removeFinal(x)
 
@@ -3124,10 +3092,20 @@ local function removeFinal(x)
 
 end
 
-
-
-
-
+local bonusTimer
+local eventTimer
+local t = {}
+function t:timer( event )
+   local count = event.count
+   if count < 8 then
+        bonusShatter.x = bonusShatter.x-50
+   else
+       bonusShatter.alpha = 0
+       bonusShatter:pause()
+       timer.cancel(event.source)
+   end
+end
+ 
 function objTouch(self,e)
 if e.phase=="began" and e.target.isBodyActive==true then
 -- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isLeft)
@@ -3136,6 +3114,10 @@ if e.phase=="began" and e.target.isBodyActive==true then
               if bonusText ~= nil then
                bonusText:removeSelf()
                bonusText=nil
+              end
+              if dog3 ~= nil then
+                  dog3:Remove()
+                  dog3=nil
               end
               if deadText==nil then
                 deadText = display.newText("DEAD", _W*(4/5), _H*(2/3), native.systemFont, 28)
@@ -3147,6 +3129,7 @@ if e.phase=="began" and e.target.isBodyActive==true then
               self.isBodyActive=false
               self:removeEventListener("touch",objTouch)
               
+              -- Death Palette Animation
               for i = 1, #spawnTable do
                 if spawnTable[i]~=0 then
                 spawnTable[i].isBodyActive=false
@@ -3196,7 +3179,15 @@ if e.phase=="began" and e.target.isBodyActive==true then
                  bonusText:removeSelf()
                  bonusText=nil
                end
+               if dog3 ~= nil then
+                 dog3:Remove()
+                   dog3=nil
+               end
+
                text="+"..spread
+
+               dog3 = CreateText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), (_H*(1/3))+35 )
+
                bonusText = display.newText(text, _W*(4/5), _H*(1/3), native.systemFont, 28)
                bonusText:setFillColor( 1, 0, 0 )
                print("Spread =" .. spread)
@@ -3208,7 +3199,7 @@ if e.phase=="began" and e.target.isBodyActive==true then
                       bonusShatter:setSequence("2x")
                elseif spread==3 then
                       bonusShatter:setSequence("3x")
-              elseif spread==4 then
+               elseif spread==4 then
                       bonusShatter:setSequence("4x")
                elseif spread==5 then
                       bonusShatter:setSequence("5x")
@@ -3221,11 +3212,22 @@ if e.phase=="began" and e.target.isBodyActive==true then
                elseif spread==9 then
                       bonusShatter:setSequence("9x")                       
                end 
-               bonusShatter:setFrame(1)
-               bonusShatter:toFront()
+               
                bonusShatter.alpha=1
+               bonusShatter:toFront()
                bonusShatter:play()
-               motion= timer.performWithDelay(800,cancelAlpha,1)      
+               
+               bonusShatter.anchorX = 0 
+               bonusShatter.x = _W/2
+               bonusShatter.y = _H/2
+               
+               if eventTimer~=nil then   
+                   --print("cancel bonus timer")
+                   timer.cancel(eventTimer)
+               end
+               eventTimer = timer.performWithDelay(100, t, 0)
+
+               --motion= timer.performWithDelay(800,cancelAlpha,1)      
             else
               spread=1
               currState=nil
@@ -3234,22 +3236,25 @@ if e.phase=="began" and e.target.isBodyActive==true then
                 bonusText:removeSelf()
                 bonusText=nil
               end
-            end
+               if dog3 ~= nil then
+                   dog3:Remove()
+                   dog3=nil
+               end
+          end
               prevState=e.target.type
-              display.remove(scoreText)
+              
+              scoreText:Text(score+spread) 
+                
               score=score+spread
+
+              -- why startScore?
               startScore=score
-              scoreText = display.newText(startScore, _W*(4/5), _H/2, native.systemFont, 28)
-              scoreText:setFillColor( 1, 0, 0 )
-            end
+              --scoreText = display.newText(startScore, _W*(4/5), _H/2, native.systemFont, 28)
+              --scoreText:setFillColor( 1, 0, 0 )
+          end
       
   end
 end
-
-
-
-
-
 
 function scene:create(e)
       print("CREATE")
@@ -3304,7 +3309,12 @@ if e.phase == "will" then
 
 --print(#spawnTable)
 display.remove(background)
-display.remove(scoreText)
+
+scoreText:RemoveDisplay()
+--display.remove(scoreText)
+--dog1:remove()
+--dog2:remove()
+dog3:RemoveDisplay()
 display.remove(flag)
 display.remove(bonusText)
 display.remove(deadText)
@@ -3312,7 +3322,8 @@ display.remove(piece)
 display.remove(map)
 display.remove(topBar)
 display.remove(lowBar)
-display.remove(speedText)
+speedText:RemoveDisplay()
+--display.remove(speedText)
 display.remove(infoPic)
 if timerSpeed~=nil then
 timer.cancel(timerSpeed)

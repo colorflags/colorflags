@@ -167,28 +167,32 @@ function scene:create( event )
   -- Taken directly from options.lua
 
   menuColorFlags = display.newSprite(colorFlagsSheet,colorFlagsSeq)
-  menuColorFlags.x=_W/2; menuColorFlags.y=70
+  menuColorFlags.anchorY = 0
+  menuColorFlags.x=_W/2
+  menuColorFlags.y=0
   menuColorFlags:setSequence("colorflags")
   menuColorFlags.alpha = 0.88
   menuColorFlags:play()
 
   menuColorFlags:addEventListener("sprite", animationPop)
 
-  local offsetStartBtns = 20
+  local offsetStartBtns = _H/3
 
   startBtnsPlayGame = display.newSprite( startBtnsPlayGameSheet, startBtnSeq )
   startBtnsPlayGame:addEventListener( "touch", myTouchListener )
-  startBtnsPlayGame.x=_W/2 ;startBtnsPlayGame.y=(_H/2)+offsetStartBtns
+  startBtnsPlayGame.anchorY = 0
+  startBtnsPlayGame.x=_W/2
+  startBtnsPlayGame.y=offsetStartBtns
   startBtnsPlayGame:setSequence( "playgame" )
   startBtnsPlayGame:setFrame( 1 )
   startBtnsPlayGame.alpha=0
   startBtnsPlayGame.gotoScene="start"
 
-
-
   startBtnsOptions= display.newSprite( startBtnsOptionsSheet, startBtnSeq )
   startBtnsOptions:addEventListener( "touch", myTouchListener )
-  startBtnsOptions.x=_W/2 ;startBtnsOptions.y=(_H/2+50)+offsetStartBtns
+  startBtnsOptions.anchorY = 0
+  startBtnsOptions.x=_W/2
+  startBtnsOptions.y=offsetStartBtns+70
   startBtnsOptions:setSequence( "tutorial" )
   startBtnsOptions:setFrame( 1 )
   startBtnsOptions.alpha=0
@@ -196,7 +200,9 @@ function scene:create( event )
 
   startBtnsAbout= display.newSprite( startBtnsAboutSheet, startBtnSeq )
   startBtnsAbout:addEventListener( "touch", myTouchListener )
-  startBtnsAbout.x=_W/2 ;startBtnsAbout.y=(_H/2+100)+offsetStartBtns
+  startBtnsAbout.anchorY = 0
+  startBtnsAbout.x=_W/2
+  startBtnsAbout.y=offsetStartBtns+140
   startBtnsAbout:setSequence( "about" )
   startBtnsAbout:setFrame( 1 )
   startBtnsAbout.alpha=0
