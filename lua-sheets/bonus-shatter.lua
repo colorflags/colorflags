@@ -188,8 +188,48 @@ SheetInfo.sheet =
             width=536,
             height=122,
         },
-    },
-    
+        {
+            x=906,
+            y=384,
+            width=134,
+            height=122,
+        },
+        {
+            -- 9X_shatter_hinted_sprite
+            x=1040,
+            y=384,
+            width=804,
+            height=122,
+        },
+        {
+            -- 9X_shatter_hinted_sprite
+            x=1174,
+            y=384,
+            width=804,
+            height=122,
+        },
+        {
+            -- 9X_shatter_hinted_sprite
+            x=1308,
+            y=384,
+            width=804,
+            height=122,
+        },
+        {
+            -- 9X_shatter_hinted_sprite
+            x=1442,
+            y=384,
+            width=804,
+            height=122,
+        },
+        {
+            -- 9X_shatter_hinted_sprite
+            x=1576,
+            y=384,
+            width=804,
+            height=122,
+        },    
+    },    
     sheetContentWidth = 1756,
     sheetContentHeight = 508
 }
@@ -227,6 +267,15 @@ SheetInfo.frameIndex =
     ["9X_shatter_hinted_sprite1"] = 22,
     ["9X_shatter_hinted_sprite2"] = 23,
     ["9X_shatter_hinted_sprite3"] = 24,
+
+    ["10X_shatter_hinted_sprite1"] = 25,
+    ["10X_shatter_hinted_sprite2"] = 26,
+    ["10X_shatter_hinted_sprite3"] = 27,
+    ["10X_shatter_hinted_sprite4"] = 28,
+    ["10X_shatter_hinted_sprite5"] = 29,
+    ["10X_shatter_hinted_sprite6"] = 30,
+
+
 }
 
 function SheetInfo:getSheet()

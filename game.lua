@@ -158,37 +158,42 @@ local nationalFlagsSeq = {
     -- { name="argentina", sheet=nationalFlags1Sheet, frames={2} }
 }
 
-local bonusShatterSpriteCoords = require("bonus-shatter")
-local bonusShatterSheet = graphics.newImageSheet( "images/bonus-shatter.png", bonusShatterSpriteCoords:getSheet() )
-local bonusShatterSeq={
-    {name="2x", frames={1},time=800, loopCount=1},
-    {name="3x", frames={3},time=800, loopCount=1},
-    {name="4x", frames={6},time=800, loopCount=1},
-    {name="5x", frames={9},time=800, loopCount=1},
-    {name="6x", frames={13},time=800, loopCount=1},
-    {name="7x", frames={16},time=800, loopCount=1},
-    {name="8x", frames={19},time=800, loopCount=1},
-    {name="9x", frames={22},time=800, loopCount=1}
+local bonusImplodeSpriteCoords1 = require("lua-sheets.bonus-implode1")
+local bonusImplodeSheet1 = graphics.newImageSheet( "images/bonus-implode1.png", bonusImplodeSpriteCoords1:getSheet() )
+
+local bonusImplodeSpriteCoords2 = require("lua-sheets.bonus-implode2")
+local bonusImplodeSheet2 = graphics.newImageSheet( "images/bonus-implode2.png", bonusImplodeSpriteCoords2:getSheet() )
+
+local bonusImplodeSeq={
+    {name="2x", sheet=bonusImplodeSheet1, frames={1,2,3,4,5,6},time=800, loopCount=1},
+    {name="3x", sheet=bonusImplodeSheet2, frames={1,2,3,4,5,6},time=800, loopCount=1},
+    {name="4x", sheet=bonusImplodeSheet1, frames={7,8,9,10,11,12},time=800, loopCount=1},
+    {name="5x", sheet=bonusImplodeSheet2, frames={7,8,9,10,11,12},time=800, loopCount=1},
+    {name="6x", sheet=bonusImplodeSheet1, frames={13,14,15,16,17,18},time=800, loopCount=1},
+    {name="7x", sheet=bonusImplodeSheet1, frames={19,20,21,22,23,24},time=800, loopCount=1},
+    {name="8x", sheet=bonusImplodeSheet1, frames={25,26,27,28,29,30},time=800, loopCount=1},
+    {name="9x", sheet=bonusImplodeSheet2, frames={13,14,15,16,17,18},time=800, loopCount=1},
+
 }
 
-local bonusShatter=display.newSprite(bonusShatterSheet,bonusShatterSeq)
---bonusShatter:setSequence("9x")
-bonusShatter.alpha=0 --start with 0
-bonusShatter:toFront()
-bonusShatter.anchorX=0.5
-bonusShatter.anchorY=0.5
-bonusShatter.x=_W/2
-bonusShatter.y=_H/2
---bonusShatter:play()
+local bonusImplode=display.newSprite(bonusImplodeSheet1,bonusImplodeSeq)
+bonusImplode.alpha=0 --start with 0
 
--- BONUS SHATTER TESTING PURPOSES
---bonusShatter:addEventListener( "sprite", mySpriteListener )
+local function myImplodeListener( event )
+    local thisSprite = event.target
+    if ( event.phase == "ended" ) then
+        thisSprite.alpha = 0
+        thisSprite:pause()
+    end
+end
 
-scoreText = CreateText.new( score, "Arial Rounded MT Bold", 30, _W*(4/5), _H/2+35 )
+--bonusImplode:addEventListener( "sprite", myImplodeListener )
+
+scoreText = CreateText.new( score, "Arial Rounded MT Bold", 30, _W*(4/5), _H/2 )
 scoreText:ToFront()
 --if gotoDeath==false then
 
-speedText = CreateText.new( speed, "Arial Rounded MT Bold", 30, _W*(1/5), _H/2+35 )
+speedText = CreateText.new( speed, "Arial Rounded MT Bold", 30, _W*(1/5), _H/2 )
 speedText:ToFront()
 
 --end
@@ -634,6 +639,10 @@ local function killObject (e)
       if spawnTable[i]~=0 and spawnTable[i].x ~=nil then
           if spawnTable[i].x < -40 or spawnTable[i].x > _W+40 then
             if lookupCode(code,spawnTable[i])==1 then
+             if bonusText ~= nil then
+               bonusText:Remove()
+               bonusText=nil
+             end 
              if deadText==nil then
                deadText = display.newText("DEAD", _W*(4/5), _H*(2/3), native.systemFont, 28)
                deadText:setFillColor( 1, 0, 0 )
@@ -3091,15 +3100,21 @@ local eventTimer
 local t = {}
 function t:timer( event )
    local count = event.count
-   if count < 8 then
+   if count ~= 9 then
         bonusShatter.x = bonusShatter.x-50
    else
        bonusShatter.alpha = 0
-       bonusShatter:pause()
+       --bonusShatter:pause()
        timer.cancel(event.source)
    end
 end
- 
+
+local function cancelTimerBonusImplode()
+    bonusImplode.alpha=0
+    bonusImplode:pause()
+end
+
+
 function objTouch(self,e)
 if e.phase=="began" and e.target.isBodyActive==true then
 -- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isLeft)
@@ -3174,45 +3189,44 @@ if e.phase=="began" and e.target.isBodyActive==true then
 
                text="+"..spread
 
-               bonusText = CreateText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), (_H*(1/3))+35 )
+               bonusText = CreateText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
                print("Spread =" .. spread)
                if motion~=nil then
                  timer.cancel(motion)
                  motion=nil
                end
                if spread==2 then
-                      bonusShatter:setSequence("2x")
+                      bonusImplode:setSequence("2x")
                elseif spread==3 then
-                      bonusShatter:setSequence("3x")
+                      bonusImplode:setSequence("3x")
                elseif spread==4 then
-                      bonusShatter:setSequence("4x")
+                      bonusImplode:setSequence("4x")
                elseif spread==5 then
-                      bonusShatter:setSequence("5x")
+                      bonusImplode:setSequence("5x")
                elseif spread==6 then
-                      bonusShatter:setSequence("6x")
+                      bonusImplode:setSequence("6x")
                elseif spread==7 then
-                      bonusShatter:setSequence("7x")
+                      bonusImplode:setSequence("7x")
                elseif spread==8 then
-                      bonusShatter:setSequence("8x")
+                      bonusImplode:setSequence("8x")
                elseif spread==9 then
-                      bonusShatter:setSequence("9x")                       
+                      bonusImplode:setSequence("9x")                       
                end 
+               bonusImplode.alpha=1
+               bonusImplode:toFront()
+               bonusImplode:play()
                
-               bonusShatter.alpha=1
-               bonusShatter:toFront()
-               bonusShatter:play()
-               
-               bonusShatter.anchorX = 0 
-               bonusShatter.x = _W/2
-               bonusShatter.y = _H/2
-               
+               --bonusImplode.anchorX = 0 
+               bonusImplode.x = _W*(4/5)
+               bonusImplode.y = _H/2
+               --[[ 
                if eventTimer~=nil then   
                    --print("cancel bonus timer")
                    timer.cancel(eventTimer)
                end
                eventTimer = timer.performWithDelay(100, t, 0)
-
-               --motion= timer.performWithDelay(800,cancelAlpha,1)      
+               ]]--
+               motion= timer.performWithDelay(800,cancelTimerBonusImplode,1)      
             else
               spread=1
               currState=nil
