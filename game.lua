@@ -158,6 +158,14 @@ local nationalFlagsSeq = {
     -- { name="argentina", sheet=nationalFlags1Sheet, frames={2} }
 }
 
+local topBtmBarSpriteCoords = require("lua-sheets.TopBtmBar")
+local topBtmBarSheet = graphics.newImageSheet( "images/TopBtmBar.png", topBtmBarSpriteCoords:getSheet() )
+
+local topBtmBarSeq = {
+    {name="top", frames={1,2,3,4,5,6,7}, time=1000, loopCount=0},
+    {name="btm", frames={5,6,7,1,2,3,4}, time=1000, loopcount=0},
+}
+
 local bonusImplodeSpriteCoords1 = require("lua-sheets.bonus-implode1")
 local bonusImplodeSheet1 = graphics.newImageSheet( "images/bonus-implode1.png", bonusImplodeSpriteCoords1:getSheet() )
 
@@ -935,7 +943,9 @@ end
 
     
 local function finishScale()
- topBar=display.newImage("images/sidebar.png",580,100)
+    topBar = display.newImage("images/sidebar.png", 580, 150)
+            --topBar:setSequence("top")
+            --topBar:play()
             topBar:setFillColor(0,0,0)
             topBar.yScale=-1
             topBar.anchorY=0.5
@@ -947,7 +957,9 @@ local function finishScale()
             topBar:toFront()
             topBar1=transition.to(topBar,{time=1300, yScale=-.8})       
             topBar2=transition.to(topBar,{time=1300, alpha=.72})
- lowBar=display.newImage("images/sidebar.png",580,100)
+    lowBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
+            lowBar:setSequence("btm")
+            lowBar:play()
             lowBar:setFillColor(0,0,0)
             lowBar.anchorY=0.5
             lowBar.anchorX=0.5
@@ -1124,6 +1136,7 @@ local function countries(test)
             -- flag = display.newImageRect( "images/andorra.png", 200,100)
             -- flag = display.newSprite( nationalFlagsSheet , {frames={nationalFlags1Coords:getFrameIndex("andorra")}} )
 
+            country="Andorra"
             flag:setSequence("andorra")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1156,6 +1169,7 @@ local function countries(test)
 
         -- Argentina
         elseif e==2 then
+            country="Argentina"
             flag:setSequence("argentina")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1185,6 +1199,7 @@ local function countries(test)
 
         -- Australia
         elseif e==3 then
+            country="Australia"
             flag:setSequence("australia")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1218,6 +1233,7 @@ local function countries(test)
 
         -- Austria
         elseif e==4 then
+            country="Austria"
             flag:setSequence("austria")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1247,6 +1263,7 @@ local function countries(test)
 
         -- Belgium
         elseif e==5 then
+            country="Belgium"
             flag:setSequence("belgium")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1280,6 +1297,7 @@ local function countries(test)
 
         -- Brazil
         elseif e==6 then
+            country="Brazil"
             flag:setSequence("brazil")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1317,6 +1335,7 @@ local function countries(test)
 
         -- Canada
         elseif e==7 then
+            country="Canada"
             flag:setSequence("canada")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1346,6 +1365,7 @@ local function countries(test)
 
         -- Chile
         elseif e==8 then
+            country="Chile"
             flag:setSequence("chile")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1378,6 +1398,7 @@ local function countries(test)
 
         -- China
         elseif e==9 then
+            country="China"
             flag:setSequence("china")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1407,6 +1428,7 @@ local function countries(test)
 
         -- Croatia
         elseif e==10 then        
+            country="Croatia"
             flag:setSequence("croatia") 
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1440,6 +1462,7 @@ local function countries(test)
 
             -- Cypress
             elseif e==11 then        
+                country="Cypress"
             flag:setSequence("cypress")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1473,6 +1496,7 @@ local function countries(test)
 
         -- Czech Republic
         elseif e==12 then        
+            country="Czech Republic"
             flag:setSequence("czech_republic")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1502,6 +1526,7 @@ local function countries(test)
 
         -- Denmark
         elseif e==13 then        
+            country="Denmark"
             flag:setSequence("denmark")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1531,6 +1556,7 @@ local function countries(test)
 
         -- Egypt
         elseif e==14 then        
+            country="Egypt"
             flag:setSequence("egypt")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1560,6 +1586,7 @@ local function countries(test)
 
         -- Estonia
         elseif e==15 then        
+            country="Estonia"
             flag:setSequence("estonia")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1589,6 +1616,7 @@ local function countries(test)
 
         -- Finland
         elseif e==16 then        
+            country="Finland"
             flag:setSequence("finland")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1618,6 +1646,7 @@ local function countries(test)
 
             -- France
         elseif e==18 then        
+            country="France"
             flag:setSequence("france")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1650,7 +1679,8 @@ local function countries(test)
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- Germany
-        elseif e==19 then        
+        elseif e==19 then   
+            country="Germany"
             flag:setSequence("germany") 
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1685,6 +1715,7 @@ local function countries(test)
 
         -- Greece
         elseif e==20 then        
+            country="Greece"
             flag:setSequence("greece")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1714,6 +1745,7 @@ local function countries(test)
 
         -- Hungary
         elseif e==21 then        
+            country="Hungary"
             flag:setSequence("hungary")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1748,6 +1780,7 @@ local function countries(test)
 
         -- Iceland
         elseif e==22 then        
+            country="Iceland"
             flag:setSequence("iceland") 
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1781,6 +1814,7 @@ local function countries(test)
 
         -- India
         elseif e==23 then        
+            country="India"
             flag:setSequence("india")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1818,6 +1852,7 @@ local function countries(test)
 
         -- Indonesia
         elseif e==24 then        
+            country="Indonesia"
             flag:setSequence("indonesia")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1847,6 +1882,7 @@ local function countries(test)
 
         -- Ireland
         elseif e==25 then        
+            country="Ireland"
             flag:setSequence("ireland")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1880,6 +1916,7 @@ local function countries(test)
 
         -- Isreal
         elseif e==26 then        
+            country="Isreal"
             flag:setSequence("isreal")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1909,6 +1946,7 @@ local function countries(test)
 
         -- Italy
         elseif e==27 then        
+            country="Italy"
             flag:setSequence("italy")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1942,6 +1980,7 @@ local function countries(test)
 
         -- Japan
         elseif e==28 then        
+            country="Japan"
             flag:setSequence("japan")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -1971,6 +2010,7 @@ local function countries(test)
 
         -- Lithuania
         elseif e==29 then        
+            country="Lithuania"
             flag:setSequence("lithuania")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2004,6 +2044,7 @@ local function countries(test)
 
         -- Luxembourg
         elseif e==30 then        
+            country="Luxembourg"
             flag:setSequence("luxembourg")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2037,6 +2078,7 @@ local function countries(test)
 
         -- Malaysia
         elseif e==31 then        
+            country="Malaysia"
             flag:setSequence("malaysia")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2074,6 +2116,7 @@ local function countries(test)
 
         -- Malta
         elseif e==32 then        
+            country="Malta"
             flag:setSequence("malta")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2103,6 +2146,7 @@ local function countries(test)
 
         -- Mexico
         elseif e==33 then        
+            country="Mexico"
             flag:setSequence("mexico")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2136,6 +2180,7 @@ local function countries(test)
 
         -- Netherland
         elseif e==34 then        
+            country="Netherland"
             flag:setSequence("netherland")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2167,8 +2212,9 @@ local function countries(test)
             -- bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
-        -- New Zeland
+        -- New Zealand
         elseif e==35 then        
+            country="New Zealand"
             flag:setSequence("new_zealand")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2202,6 +2248,7 @@ local function countries(test)
 
         -- Norway
         elseif e==36 then        
+            country="Norway"
             flag:setSequence("norway")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2235,6 +2282,7 @@ local function countries(test)
 
         -- Philippines
         elseif e==37 then        
+            country="Philippines"
             flag:setSequence("philippines")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2272,6 +2320,7 @@ local function countries(test)
 
         -- Poland
         elseif e==38 then        
+            country="Poland"
             flag:setSequence("poland") 
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2301,6 +2350,7 @@ local function countries(test)
 
         -- Portugal
         elseif e==39 then        
+            country="Portugal"
             flag:setSequence("portugal")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2330,6 +2380,7 @@ local function countries(test)
 
         -- Russia
         elseif e==40 then        
+            country="Russia"
             flag:setSequence("russia")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2363,6 +2414,7 @@ local function countries(test)
 
         -- San Marino
         elseif e==41 then        
+            country="San Marino"
             flag:setSequence("san_marino") 
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2392,6 +2444,7 @@ local function countries(test)
 
         -- Singapore
         elseif e==42 then        
+            country="Singapore"
             flag:setSequence("singapore")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2421,6 +2474,7 @@ local function countries(test)
 
         -- Slovakia
         elseif e==43 then        
+            country="Slovakia"
             flag:setSequence("slovakia")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2454,6 +2508,7 @@ local function countries(test)
 
         -- Slovenia
         elseif e==44 then        
+            country="Slovenia"
             flag:setSequence("slovenia")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2487,6 +2542,7 @@ local function countries(test)
 
         -- South Africa
         elseif e==45 then        
+            country="South Africa"
             flag:setSequence("south_africa")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2532,6 +2588,7 @@ local function countries(test)
 
         -- South Korea
         elseif e==46 then        
+            country="South Korea"
             flag:setSequence("south_korea")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2569,6 +2626,7 @@ local function countries(test)
 
         -- Spain
         elseif e==47 then        
+            country="Spain"
             flag:setSequence("spain")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2598,6 +2656,7 @@ local function countries(test)
 
         -- Sri Lanka
         elseif e==48 then        
+            country="Sri Lanka"
             flag:setSequence("sri_lanka")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2635,6 +2694,7 @@ local function countries(test)
 
         -- Sweden
         elseif e==49 then        
+            country="Sweden"
             flag:setSequence("sweden")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2664,6 +2724,7 @@ local function countries(test)
 
         -- Switzerland
         elseif e==50 then        
+            country="Switzerland"
             flag:setSequence("switzerland")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2692,6 +2753,7 @@ local function countries(test)
 
         -- Taiwan (Republic of China)
         elseif e==51 then        
+            country="Taiwan"
             flag:setSequence("taiwan")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2725,6 +2787,7 @@ local function countries(test)
 
         -- Thailand
         elseif e==52 then        
+            country="Thailand"
             flag:setSequence("thailand")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2758,6 +2821,7 @@ local function countries(test)
 
         -- Turkey
         elseif e==53 then        
+            country="Turkey"
             flag:setSequence("turkey")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2787,6 +2851,7 @@ local function countries(test)
 
         -- United Arab Emirates
         elseif e==54 then        
+            country="United Arab Emirates"
             flag:setSequence("united_arab_emirates")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2824,6 +2889,7 @@ local function countries(test)
 
         -- United Kingdom
         elseif e==55 then        
+            country="United Kingdom"
             flag:setSequence("united_kingdom")
             flag.anchorX=0.5
             flag.anchorY=0.5
@@ -2857,6 +2923,7 @@ local function countries(test)
 
         -- United States
         elseif e==56 then        
+            country="United States"
             flag:setSequence("united_states")
             flag.anchorX=0.5
             flag.anchorY=0.5
