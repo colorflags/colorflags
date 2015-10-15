@@ -162,8 +162,8 @@ local topBtmBarSpriteCoords = require("lua-sheets.TopBtmBar")
 local topBtmBarSheet = graphics.newImageSheet( "images/TopBtmBar.png", topBtmBarSpriteCoords:getSheet() )
 
 local topBtmBarSeq = {
-    {name="top", frames={1,2,3,4,5,6,7}, time=1000, loopCount=0},
-    {name="btm", frames={5,6,7,1,2,3,4}, time=1000, loopcount=0},
+    {name="top", frames={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}, time=1000, loopCount=0},
+    {name="btm", frames={5,6,7,8,9,10,11,12,13,14,15,16,1,2,3,4}, time=1000, loopcount=0},
 }
 
 local bonusImplodeSpriteCoords1 = require("lua-sheets.bonus-implode1")
@@ -943,9 +943,10 @@ end
 
     
 local function finishScale()
-    topBar = display.newImage("images/sidebar.png", 580, 150)
-            --topBar:setSequence("top")
-            --topBar:play()
+    --topBar = display.newImage("images/sidebar.png", 580, 150)
+    topBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
+            topBar:setSequence("top")
+            topBar:play()
             topBar:setFillColor(0,0,0)
             topBar.yScale=-1
             topBar.anchorY=0.5
