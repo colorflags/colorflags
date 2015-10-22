@@ -162,8 +162,8 @@ local topBtmBarSpriteCoords = require("lua-sheets.TopBtmBar")
 local topBtmBarSheet = graphics.newImageSheet( "images/TopBtmBar.png", topBtmBarSpriteCoords:getSheet() )
 
 local topBtmBarSeq = {
-    {name="top", frames={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}, time=1000, loopCount=0},
-    {name="btm", frames={5,6,7,8,9,10,11,12,13,14,15,16,1,2,3,4}, time=1000, loopcount=0},
+    {name="top", frames={1,2,3,4,5,6,7,8,9,10}, time=1000, loopCount=0},
+    {name="btm", frames={6,7,8,9,10,1,2,3,4,5}, time=1000, loopcount=0},
 }
 
 local bonusImplodeSpriteCoords1 = require("lua-sheets.bonus-implode1")
