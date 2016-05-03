@@ -12,9 +12,9 @@ local scene = composer.newScene()
 
 --media.playSound('Brazil.mid')
 
---for testing purposes. if true, go to GameOver screen.
-local gotoDeath=true
 
+local gotoDeath=true    --for testing purposes. if true, go to GameOver screen.
+local lightningCount=1  --correct default is set to 1, bump up to test for more lightnings
 local state=1
 local speed=2
 local timeVar=1250
@@ -30,6 +30,8 @@ local infoTimer
 --local idx=25
 local localGroup = display.newGroup()
 local spawnTable = {}   --Create a table to hold our spawns
+local lineTable = {} --Table for deleting lighning lines
+local lineTableCount=0
 local currState="first"
 local prevState="first"
 local GameOver=0
@@ -64,7 +66,26 @@ local newFlagTimer
 local killLowTimer
 local killTopTimer
 local isPausing=false
-
+local flagLightningReady
+local flagLightningActive=false
+local rotationTimer
+local lightningIcon1
+local lightningIcon2
+local lightningIcon3
+local lightningIcon4
+local lightningIcon5
+local lightningIcon6
+local lightningIcon7
+local lightningIcon8
+local lightningIcon9
+local lightningIcon10
+local lightningIcon11
+local lightningIcon12
+local lightningIcon13
+local lightningIcon14
+local lightningScore=0
+local lightningMultiplier = 1
+local line
 local paceRect
 
 local map
@@ -240,7 +261,7 @@ local      background = display.newRect(0,0,580,320)
       background.x=_W/2 ;background.y=_H/2
       background:toBack()
 
-
+-- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isLeft)
 
 
 
@@ -793,23 +814,39 @@ local function spawn(params)
 
     if params.type=="white" then
         object:setFillColor(w1,w2,w3)
-     
+        object.L1=w1   --L1, L2, L3 set colors for lightning beams
+        object.L2=w2
+        object.L3=w3
     elseif params.type=="black" then
-       object:setFillColor(k1,k2,k3)
-         
-    --   object.strokeWidth=1
-    --  object:setStrokeColor(1,1,1) 
-  
+        object:setFillColor(k1,k2,k3)
+        object.L1=k1
+        object.L2=k2
+        object.L3=k3
     elseif params.type=="red" then
-         object:setFillColor(r1,r2,r3)
+        object:setFillColor(r1,r2,r3)
+        object.L1=r1
+        object.L2=r2
+        object.L3=r3
     elseif params.type=="orange" then
-       object:setFillColor(o1,o2,o3)
+        object:setFillColor(o1,o2,o3)
+        object.L1=o1
+        object.L2=o2
+        object.L3=o3
     elseif params.type=="yellow" then
-         object:setFillColor(y1,y2,y3)
+        object:setFillColor(y1,y2,y3)
+        object.L1=y1
+        object.L2=y2
+        object.L3=y3
     elseif params.type=="green" then
        object:setFillColor(g1,g2,g3)
+       object.L1=g1
+       object.L2=g2
+       object.L3=g3
     elseif params.type=="blue" then
        object:setFillColor(b1,b2,b3)
+       object.L1=b1
+       object.L2=b2
+       object.L3=b3
     end
       object.touch=objTouch
       object:addEventListener("touch",object)
@@ -925,23 +962,220 @@ local function createObject (e)
           end
 end
 
+local function lightningWatch() 
+  if lightningCount==0 then
+    lightningIcon1:toBack()
+  elseif lightningCount==1 then
+    lightningIcon1:toFront()
+    lightningIcon2:toBack()
+  elseif lightningCount==2 then
+    lightningIcon2:toFront()
+    lightningIcon3:toBack()
+  elseif lightningCount==3 then    
+    lightningIcon3:toFront()
+    lightningIcon4:toBack()
+  elseif lightningCount==4 then
+    lightningIcon4:toFront()
+    lightningIcon5:toBack()
+  elseif lightningCount==5 then
+    lightningIcon5:toFront()
+    lightningIcon6:toBack()
+  elseif lightningCount==6 then    
+    lightningIcon6:toFront()
+    lightningIcon7:toBack()
+  elseif lightningCount==7 then
+    lightningIcon7:toFront()
+    lightningIcon8:toBack()
+  elseif lightningCount==8 then    
+    lightningIcon8:toFront()
+    lightningIcon9:toBack()
+  elseif lightningCount==9 then
+    lightningIcon9:toFront()
+    lightningIcon10:toBack()
+  elseif lightningCount==10 then
+    lightningIcon10:toFront()
+    lightningIcon11:toBack()
+  elseif lightningCount==11 then    
+    lightningIcon11:toFront()
+    lightningIcon12:toBack()
+  elseif lightningCount==12 then
+    lightningIcon12:toFront()
+    lightningIcon13:toBack()
+  elseif lightningCount==13 then
+    lightningIcon13:toFront()
+    lightningIcon14:toBack()
+  elseif lightningCount==14 then    
+    lightningIcon14:toFront()
+  end
+end  
+
+local function removeLine()
+  print(#lineTable) 
+  for i = 1, #lineTable do
+    print(lineTable[i].strokeWidth)
+    display.remove(lineTable[i])
+  end
+end
+
+local function resumeFlagListener()
+ -- flag:addEventListener( "tap", flagLightning ) 
+end
+local function flagRotate4()
+  transition.to( flag, { time=30, rotation=0 , onComplete=flagRotate5 } )
+  timer.performWithDelay(30, resumeFlagListener,1)
+end
+
+local function flagRotate3()
+  transition.to( flag, { time=40, rotation=10 , onComplete=flagRotate4 } )
+end
+
+local function flagRotate2()
+  transition.to( flag, { time=40, rotation=-10 , onComplete=flagRotate3 } )
+end
+
+local function flagRotate1()
+  transition.to( flag, { time=40, rotation=10 , onComplete=flagRotate2 } )
+end
+
+local function flagLightning(e)
+
+  if lightningCount > 0 then
+  --  flag:removeEventListener( "tap", flagLightning ) 
+    lineTable= {}
+    lineTableCount=0
+    lightningCount=lightningCount-1
+    transition.to( flag, { time=30, rotation=-10, onComplete=flagRotate1 } )
 
 
+    for i = 1, #spawnTable do
+      if spawnTable[i]~=0 and spawnTable[i]~=nil and spawnTable[i].isBodyActive==true and spawnTable[i].isReady==true then
+        if lookupCode(code,spawnTable[i])==1 then
+          lineTableCount=lineTableCount+1
+          line = display.newLine( spawnTable[i].x, spawnTable[i].y, _W/2, _H/2)
+          line:setStrokeColor( spawnTable[i].L1,spawnTable[i].L2,spawnTable[i].L3 )
+          line.strokeWidth = 6
+          line:toFront()
+          lineTable[lineTableCount]=line
+          transition.to( line, { time=300, xScale=0.01, yScale=0.01, onComplete=removeLine })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+          objTouchLightning(spawnTable[i])
+          --print(lineTable[2].strokeWidth)
     
+        end
+      end 
+    end
+        -- 
+  end  
+  lightningWatch()
+end
+
+local function flagLightningFunction()
+
+  if lightningCount > 0 then
+    flag:addEventListener( "tap", flagLightning ) 
+    lightningWatch()
+  else 
+   flag:removeEventListener( "tap", flagLightning ) 
+  end
+end
+
+
+local function trackLightning ()
+  if lightningScore >= 10 then 
+    lightningScore=score - (10*lightningMultiplier)
+    lightningCount=lightningCount+1
+    lightningWatch()
+    lightningMultiplier=lightningMultiplier+1
+  end  
+end  
+
+
+
+
+function objTouchLightning(self)
+-- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isLeft)
+ --You are Alive
+             
+               self.isBodyActive=false
+              if self.win==true then 
+                self:removeSelf()
+                spawnTable[self.index]=0          
+              else      
+                  if self.x < 1 or self.x > _W-1 then
+                 transition.to( self, { time=100, rotation=0, xScale=0.01, yScale=0.01, onComplete=removeStuff  }) 
+       
+        
+                   else
+                   transition.to( self, { time=500, rotation=400, xScale=0.01, yScale=0.01, onComplete=removeStuff  })    
+                   end
+              end     
+              currState=self.type
+              --bonus score
+            if currState==prevState then
+               spread=spread+1
+               if bonusText ~= nil then
+                 bonusText:Remove()
+                   bonusText=nil
+               end
+
+               text="+"..spread
+
+               bonusText = CreateText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
+               --print("Spread =" .. spread)
+               if motion~=nil then
+                 timer.cancel(motion)
+                 motion=nil
+               end
+               if spread==2 then
+                      bonusImplode:setSequence("2x")
+               elseif spread==3 then
+                      bonusImplode:setSequence("3x")
+               elseif spread==4 then
+                      bonusImplode:setSequence("4x")
+               elseif spread==5 then
+                      bonusImplode:setSequence("5x")
+               elseif spread==6 then
+                      bonusImplode:setSequence("6x")
+               elseif spread==7 then
+                      bonusImplode:setSequence("7x")
+               elseif spread==8 then
+                      bonusImplode:setSequence("8x")
+               elseif spread==9 then
+                      bonusImplode:setSequence("9x")                       
+               end 
+               bonusImplode.alpha=1
+               bonusImplode:toFront()
+               bonusImplode:play()
+               
+               --bonusImplode.anchorX = 0 
+               bonusImplode.x = _W*(4/5)
+               bonusImplode.y = _H/2
+               --[[ 
+               if eventTimer~=nil then   
+                   --print("cancel bonus timer")
+                   timer.cancel(eventTimer)
+               end
+               eventTimer = timer.performWithDelay(100, t, 0)
+               ]]--
+               motion= timer.performWithDelay(800,cancelTimerBonusImplode,1)      
+            else
+              spread=1
+              currState=nil
+              prevState=nil
+              if bonusText~=nil then
+                   bonusText:Remove()
+                   bonusText=nil
+               end
+          end
+              prevState=self.type
+              scoreText:Text(score+spread) 
+                
+              score=score+spread
+              lightningScore=lightningScore+spread
+              trackLightning()
+
+end
+  
 local function finishScale()
     --topBar = display.newImage("images/sidebar.png", 580, 150)
     topBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
@@ -972,6 +1206,9 @@ local function finishScale()
             lowBar1=transition.to(lowBar,{time=1300, yScale=0.8})          
             lowBar2=transition.to(lowBar,{time=1300,alpha=.72}) 
             flag2Timer=transition.to( flag, { time=1000, xScale=1, yScale=1})
+            flagLightningReady=timer.performWithDelay( 1000, flagLightningFunction, 1 )
+
+
       --      if state ~= 3 then
               timerSpeed=timer.performWithDelay(9500,speedUp,1)
          --   else
@@ -2921,7 +3158,6 @@ local function countries(test)
             -- music = audio.loadStream( 'anthems/united_kingdom.mp3' ) 
             -- bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
-
         -- United States
         elseif e==56 then        
             country="United States"
@@ -2975,9 +3211,7 @@ local function newFlag()
           end
             lastRoll=e
             while thisRoll==lastRoll do
-
                -- e = math.random(1,5)
-
                 e = math.random(1,56)
                 thisRoll=e
             end
@@ -2998,15 +3232,11 @@ local function newFlag()
           countryText:setFillColor( 0, 0, 0 )
           countryText:toFront()
    
-         timer.performWithDelay(2000,countryScale,1)
-
-
+          timer.performWithDelay(2000,countryScale,1)
           piece.x=-xCoord+_W/2+map.x
           piece.y=-yCoord+_H/2+map.y
           piece.alpha=1
-
           flag.alpha=1
-
            --delay start of color squares
           flag:scale(0,0)
 
@@ -3014,7 +3244,6 @@ local function newFlag()
 
           if state==3 then
           sideTimer=timer.performWithDelay(1500,finishScale,1)
-
           pieceTimer=transition.to( piece, { time=2000, x=_W/2, y=_H/2 }) 
           mapTimer=transition.to( map, { time=2000, x=xCoord, y=yCoord })                     
           flagTimer=transition.to( flag, { time=2000, xScale=.2, yScale=.2})  
@@ -3047,7 +3276,8 @@ local function killPiece()
 
 end
 local function removeFlag()
-                flag:removeSelf()
+              flag:removeEventListener( "tap", flagLightning ) 
+              flag:removeSelf()
               flag  = nil
      
   end            
@@ -3147,8 +3377,62 @@ local function setupVariables()
                { speed=20, timeVar=135},{ speed=21, timeVar=125},{ speed=22, timeVar=120},{ speed=23, timeVar=110}}          
 
 
-
-
+      lightningIcon1 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon1.x = 20
+      lightningIcon1.y = lightningY
+      lightningIcon2 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon2.x = 60
+      lightningIcon2.y = lightningY
+      lightningIcon3 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon3.x = 100
+      lightningIcon3.y = lightningY
+      lightningIcon4 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon4.x = 140
+      lightningIcon4.y = lightningY
+      lightningIcon5 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon5.x = 180
+      lightningIcon5.y = lightningY
+      lightningIcon6 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon6.x = 220
+      lightningIcon6.y = lightningY
+      lightningIcon7 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon7.x = 260
+      lightningIcon7.y = lightningY
+      lightningIcon8 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon8.x = 300
+      lightningIcon8.y = lightningY
+      lightningIcon9 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon9.x = 340
+      lightningIcon9.y = lightningY
+      lightningIcon10= display.newImage( "images/star.png", 30,29)              
+      lightningIcon10.x = 380
+      lightningIcon10.y = lightningY
+      lightningIcon11 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon11.x = 420
+      lightningIcon11.y = lightningY
+      lightningIcon12 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon12.x = 460
+      lightningIcon12.y = lightningY
+      lightningIcon13 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon13.x = 500
+      lightningIcon13.y = lightningY
+      lightningIcon14 = display.newImage( "images/star.png", 30,29)              
+      lightningIcon14.x = 540
+      lightningIcon14.y = lightningY   
+      lightningIcon1:toBack()
+      lightningIcon2:toBack()
+      lightningIcon3:toBack()
+      lightningIcon4:toBack()
+      lightningIcon5:toBack()   
+      lightningIcon6:toBack()
+      lightningIcon7:toBack()
+      lightningIcon8:toBack()
+      lightningIcon9:toBack()
+      lightningIcon10:toBack()  
+      lightningIcon11:toBack()
+      lightningIcon12:toBack()
+      lightningIcon13:toBack()
+      lightningIcon14:toBack()                                 
 end
 
 
@@ -3231,8 +3515,8 @@ if e.phase=="began" and e.target.isBodyActive==true then
               transition.to( e.target, { time=500, rotation=400, xScale=5, yScale=5, onComplete=removeStuff    })
               end 
               e.target.isBodyActive=false
-
-            else      --You are Alive
+ --You are Alive
+            else     
                e.target.isBodyActive=false
               if e.target.win==true then 
                 e.target:removeSelf()
@@ -3248,94 +3532,91 @@ if e.phase=="began" and e.target.isBodyActive==true then
               end     
               currState=e.target.type
               --bonus score
-            if currState==prevState then
-               spread=spread+1
-               if bonusText ~= nil then
-                 bonusText:Remove()
-                   bonusText=nil
-               end
-
-               text="+"..spread
-
-               bonusText = CreateText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
-               print("Spread =" .. spread)
-               if motion~=nil then
-                 timer.cancel(motion)
-                 motion=nil
-               end
-               if spread==2 then
-                      bonusImplode:setSequence("2x")
-               elseif spread==3 then
-                      bonusImplode:setSequence("3x")
-               elseif spread==4 then
-                      bonusImplode:setSequence("4x")
-               elseif spread==5 then
-                      bonusImplode:setSequence("5x")
-               elseif spread==6 then
-                      bonusImplode:setSequence("6x")
-               elseif spread==7 then
-                      bonusImplode:setSequence("7x")
-               elseif spread==8 then
-                      bonusImplode:setSequence("8x")
-               elseif spread==9 then
-                      bonusImplode:setSequence("9x")                       
-               end 
-               bonusImplode.alpha=1
-               bonusImplode:toFront()
-               bonusImplode:play()
-               
-               --bonusImplode.anchorX = 0 
-               bonusImplode.x = _W*(4/5)
-               bonusImplode.y = _H/2
-               --[[ 
-               if eventTimer~=nil then   
-                   --print("cancel bonus timer")
-                   timer.cancel(eventTimer)
-               end
-               eventTimer = timer.performWithDelay(100, t, 0)
-               ]]--
-               motion= timer.performWithDelay(800,cancelTimerBonusImplode,1)      
-            else
-              spread=1
-              currState=nil
-              prevState=nil
-              if bonusText~=nil then
+              if currState==prevState then
+                 spread=spread+1
+                 if bonusText ~= nil then
                    bonusText:Remove()
-                   bonusText=nil
-               end
-          end
+                     bonusText=nil
+                 end
+
+                 text="+"..spread
+
+                 bonusText = CreateText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
+                -- print("Spread =" .. spread)
+                 if motion~=nil then
+                   timer.cancel(motion)
+                   motion=nil
+                 end
+                 if spread==2 then
+                        bonusImplode:setSequence("2x")
+                 elseif spread==3 then
+                        bonusImplode:setSequence("3x")
+                 elseif spread==4 then
+                        bonusImplode:setSequence("4x")
+                 elseif spread==5 then
+                        bonusImplode:setSequence("5x")
+                 elseif spread==6 then
+                        bonusImplode:setSequence("6x")
+                 elseif spread==7 then
+                        bonusImplode:setSequence("7x")
+                 elseif spread==8 then
+                        bonusImplode:setSequence("8x")
+                 elseif spread==9 then
+                        bonusImplode:setSequence("9x")                       
+                 end 
+                 bonusImplode.alpha=1
+                 bonusImplode:toFront()
+                 bonusImplode:play()
+                 
+                 --bonusImplode.anchorX = 0 
+                 bonusImplode.x = _W*(4/5)
+                 bonusImplode.y = _H/2
+                 --[[ 
+                 if eventTimer~=nil then   
+                     --print("cancel bonus timer")
+                     timer.cancel(eventTimer)
+                 end
+                 eventTimer = timer.performWithDelay(100, t, 0)
+                 ]]--
+                 motion= timer.performWithDelay(800,cancelTimerBonusImplode,1)      
+              else
+                spread=1
+                currState=nil
+                prevState=nil
+                if bonusText~=nil then
+                     bonusText:Remove()
+                     bonusText=nil
+                 end
+              end
               prevState=e.target.type
               
               scoreText:Text(score+spread) 
-                
               score=score+spread
-
-              -- why startScore?
-              startScore=score
-              --scoreText = display.newText(startScore, _W*(4/5), _H/2, native.systemFont, 28)
-              --scoreText:setFillColor( 1, 0, 0 )
+              lightningScore=lightningScore+spread
+              trackLightning()
+  
           end
       
+
   end
 end
 
+
+
+
+
+------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
-      print("CREATE")
-
-
-   
-
-     -- self.view:insert(background)
- 
-    --  self.view:insert(paceRect)   
+      print("CREATE")                
 end
 
 function scene:show(e)
     if (e.phase == "will") then
       print("SHOWWILL")
+
       setupVariables()
       random = math.randomseed( os.time() )
-
       paceRect = display.newRect( 0, 0, 80, 60 )
       paceRect:setFillColor( 1,0,0 )
       paceRect.anchorX=0
@@ -3344,76 +3625,60 @@ function scene:show(e)
       paceRect.isLeft=false
       paceRect.isReady=false
       paceRect.alpha=0
-
-   
-    self.view:insert(paceRect)
-
-
+      self.view:insert(paceRect)
 
     elseif (e.phase == "did") then
        Runtime:addEventListener("enterFrame", killObject)
        Runtime:addEventListener("enterFrame", moveObject)
-
        Runtime:addEventListener("enterFrame", readyObject)
+   
        system.activate( "multitouch" )       
        setTimer=timer.performWithDelay(20000, setFlag, 0)
      --  timer.performWithDelay(15000, checkMemory,0)
-    
        newFlag()
-
     end
 end
 
 function scene:hide(e)
-
   print("HIDE")
-if e.phase == "will" then
-
-
---print(#spawnTable)
-display.remove(background)
-
-scoreText:RemoveDisplay()
-speedText:RemoveDisplay()
-
-display.remove(flag)
-display.remove(deadText)
-display.remove(piece)
-display.remove(map)
-display.remove(topBar)
-display.remove(lowBar)
-display.remove(infoPic)
-if timerSpeed~=nil then
-timer.cancel(timerSpeed)
+  if e.phase == "will" then
+    display.remove(background)
+    scoreText:RemoveDisplay()
+    speedText:RemoveDisplay()
+    display.remove(flag)
+    display.remove(deadText)
+    display.remove(piece)
+    display.remove(map)
+    display.remove(topBar)
+    display.remove(lowBar)
+    display.remove(infoPic)
+    display.remove(lightningIcon1)
+    display.remove(lightningIcon2)
+    display.remove(lightningIcon3)
+    display.remove(lightningIcon4)
+    display.remove(lightningIcon5)
+    display.remove(lightningIcon6)
+    display.remove(lightningIcon7)
+    display.remove(lightningIcon8)
+    display.remove(lightningIcon9)
+    display.remove(lightningIcon10) 
+    display.remove(lightningIcon11)
+    display.remove(lightningIcon12)
+    display.remove(lightningIcon13)
+    display.remove(lightningIcon14) 
+    if timerSpeed~=nil then
+      timer.cancel(timerSpeed)
+    end
+    Runtime:removeEventListener("enterFrame", killObject)
+    Runtime:removeEventListener("enterFrame", moveObject)
+    Runtime:removeEventListener("enterFrame", readyObject)
+    Runtime:removeEventListener("enterFrame", trackObject)    
+    composer.removeScene("game",false) 
+  end
 end
---end
-
---background=removeSelf()
---background=nil
-
-
-                  Runtime:removeEventListener("enterFrame", killObject)
-       Runtime:removeEventListener("enterFrame", moveObject)
-
-       Runtime:removeEventListener("enterFrame", readyObject)
-
-
-    composer.removeScene("game",false)
-
-  
-end
-
-
-end
-
 
 function scene:destroy(e)
-
- print("DESTROY")
-
-
-
-
+  print("DESTROY")
 end
 
 scene:addEventListener( "create", scene)

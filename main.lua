@@ -29,6 +29,7 @@ local backgroundColor={255,255,255}
 
  heightModeTop=35
  heightModeLow=_H-35
+ lightningY=90
  infoMode=true
 
 local    splash = display.newImageRect( "images/MMG.png", 580, 320 )

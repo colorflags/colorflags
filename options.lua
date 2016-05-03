@@ -146,7 +146,8 @@ local function buttonHit(e)
                 -- wide        	
                 phasePic = display.newImage("images/widePic.png", 585,337)
                 heightModeTop=35
-                heightModeLow=_H-35     
+                heightModeLow=_H-35  
+                lightningY=90   
                 -- phaseNarrowBtn = display.newText("Narrow", _W*(3/4) ,_H*(1/6), arialFont, 35 ) 
                 -- phaseWideBtn = display.newText("Wide", _W*(1/5), _H*(1/6) , arialFont, 35 )
                 transition.to(phaseWideBtn[1],{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})
@@ -154,7 +155,8 @@ local function buttonHit(e)
                 -- narrow        	
                 phasePic = display.newImage("images/narrowPic.png", 585,337)
                 heightModeTop=70
-                heightModeLow=_H-70  
+                heightModeLow=_H-70 
+                lightningY=16 
                 -- phaseWideBtn = display.newText("Wide", _W*(1/5) ,_H*(1/6) , arialFont, 35 )  
                 -- phaseNarrowBtn = display.newText("Narrow",_W*(3/4) ,_H*(1/6), arialFont, 35 )
                 transition.to(phaseNarrowBtn[1],{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})

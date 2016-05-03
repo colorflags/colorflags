@@ -16,8 +16,6 @@ music = audio.loadStream( 'anthems/Magee_ColorFlags2_B_7.mp3' )
 bobby = audio.play(music,{loops=-1})
 
  soundOn=false
-print("HeightModeTop")
- print(heightModeTop)
 
 local colorFlagsSpriteCoords = require("lua-sheets.title-menu")
 local colorFlagsSheet = graphics.newImageSheet( "images/title-menu.png", colorFlagsSpriteCoords:getSheet() )
