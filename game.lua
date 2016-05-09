@@ -1368,7 +1368,7 @@ local function countries(test)
         bobby = audio.play(music,{loops=-1})
             
         -- Set e here to pick a specific flag to go to. Otherwise, e=random
-        e=54 -- or 52 55
+        e=54 -- try countries 52, 54, or 55
         
         if e==1 then
             -- flag = display.newImageRect( "images/andorra.png", 200,100)
