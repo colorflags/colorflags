@@ -6,16 +6,6 @@ require("lineprinter")
 
 local title
 local backBtn
-local twitterBtn
-local mageeBtn
-local colorBtn
-local mgBtn
-local facebookBtn
-local font1
-local font2
-local font3
-local font4
-
 local fontTable = {}
 local tempFont
 local m
@@ -74,7 +64,7 @@ end
 
 
 
---[[
+
 local fonts = native.getFontNames()
 
 count = 0
@@ -139,6 +129,7 @@ local gameCredits = {
         {fontTable[22]},
         {fontTable[23]},
         {fontTable[24]},   
+    }
 linePrinter(gameCredits, 50, 0)
 
 gamecredits={}
@@ -242,41 +233,39 @@ linePrinter(gameCredits, 500, 0)
 
 
 
-   
-  --  local model = system.getInfo("model")
-  --  local myModel= display.newText(model, _W/2, _H/2, "Optima-ExtraBlack", 25 )
-  --  myModel.x = 200
- --   myModel.y = 210  
- --   local environment = system.getInfo("environment")
-  --  local myEnvironment= display.newText(environment, _W/2, _H/2, "Optima-ExtraBlack", 25 )
-  --  myEnvironment.x = 200
-   -- myEnvironment.y = 240  
+    font1 = display.newText("Optima-Regular", _W/2, _H/2, "Optima-Regular", 25 )
+    font1.x = 200
+    font1.y = 30
+    font2 = display.newText("Optima-Italic", _W/2, _H/2, "Optima-Italic", 25 )
+    font2.x = 200
+    font2.y = 60
+    font3 = display.newText("Optima-Bold", _W/2, _H/2, "Optima-Bold", 25 )
+    font3.x = 200
+    font3.y = 90
+    font4 = display.newText("Optima-BoldItalic", _W/2, _H/2, "Optima-BoldItalic", 25 )
+    font4.x = 200
+    font4.y = 120
+    font5 = display.newText("Optima-ExtraBlack", _W/2, _H/2, "Optima-ExtraBlack", 25 )
+    font5.x = 200
+    font5.y = 150           
+    font6 = display.newText("simulator font", _W/2, _H/2, "FFF_Tusj", 25 )
+    font6.x = 200
+    font6.y = 180    
+    local model = system.getInfo("model")
+    local myModel= display.newText(model, _W/2, _H/2, "Optima-ExtraBlack", 25 )
+    myModel.x = 200
+    myModel.y = 210  
+    local environment = system.getInfo("environment")
+    local myEnvironment= display.newText(environment, _W/2, _H/2, "Optima-ExtraBlack", 25 )
+    myEnvironment.x = 200
+    myEnvironment.y = 240  
 
-
---]]
 local function buttonHit(event)
     local goto = event.target.gotoScene
 
     composer.gotoScene ( goto, { effect = defaultTransition } )
     return true
 end
-
-local function urlMG(e)
-  system.openURL( "http://www.facebook.com/mageegames")
-end 
-local function urlTwitter(e)
-  system.openURL( "http://www.twitter.com/colorflagsgame")
-end    
-local function urlFacebook(e)
-  system.openURL( "http://www.facebook.com/colorflagsgame")
-end  
-local function urlMagee(e)
-  system.openURL( "http://www.mageegames.com")
-end    
-
-local function urlColor(e)
-  system.openURL( "http://www.colorflagsgame.com")
-end    
 
 function scene:create( event )
 
@@ -285,31 +274,11 @@ function scene:create( event )
    -- title.x = _W/2
    -- title.y = 30
 
- font1 = display.newText("Mike Magee", _W/2, 0, "SnackerComic", 25 )
-    font1.y = 80
-    font2 = display.newText("Game Designer, Guitar Composition", _W/2, 0, "FFF_Tusj", 25 )
-    font2.y = 110
-    font3 = display.newText("Sam Englander", _W/2, 0, "SnackerComic", 25 )
-    font3.y = 140
-    font4 = display.newText("Audio/Visual Design, Programmer", _W/2, 0, "FFF_Tusj", 25 )
-    font4.y = 170
-    mageeBtn = display.newText("www.mageegames.com", _W/2, 0, "ALBAS", 25 )
-    mageeBtn.y = 200           
-    colorBtn = display.newText("www.colorflagsgame.com", _W/2, 0, "ALBAS", 25 )
-    colorBtn.y = 230    
 
-    twitterBtn = display.newImage("images/twitter51x51.png",_W-40,_H-40)
-    twitterBtn.anchorX=0.5
-    twitterBtn.anchorY=0.5
-    facebookBtn = display.newImage("images/facebook50x50.png",_W-100,_H-40)
-    facebookBtn.anchorX=0.5
-    facebookBtn.anchorY=0.5
-    mgBtn = display.newImage("images/MG80x80.png",5,5)
-    mgBtn.anchorX=0
-    mgBtn.anchorY=0
 
      backBtn = makeTextButton("Back", 40, _H-20, {listener=buttonHit, group=group})
     backBtn.gotoScene = "menu"
+
 
 
 
@@ -317,34 +286,16 @@ function scene:create( event )
 
 
     self.view:insert(backBtn)
-    self.view:insert(twitterBtn)
-    self.view:insert(mageeBtn)
-    self.view:insert(colorBtn)
-    self.view:insert(facebookBtn)
-    self.view:insert(mgBtn)
-    self.view:insert(font1)
-    self.view:insert(font2)
-    self.view:insert(font3)
-    self.view:insert(font4)
 end
 
 function scene:show( event )
     local group = self.view
-    twitterBtn:addEventListener("tap",urlTwitter)
-    mageeBtn:addEventListener("tap",urlMagee)
-    colorBtn:addEventListener("tap",urlColor) 
-    facebookBtn:addEventListener("tap",urlFacebook)  
-    mgBtn:addEventListener("tap",urlMG)   
 end
 
 function scene:hide( event )
     if event.phase=="will" then
      display.remove(gameCredits)
-    twitterBtn:removeEventListener("tap",urlTwitter)
-    mageeBtn:removeEventListener("tap",urlMagee)
-    colorBtn:removeEventListener("tap",urlColor) 
-    facebookBtn:addEventListener("tap",urlFacebook)    
-    mgBtn:removeEventListener("tap",urlMG)        
+  
     composer.removeScene("about",true)
 
     end  

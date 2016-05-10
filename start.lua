@@ -200,7 +200,7 @@ print("1")
     menuCruise:setSequence( "cruise" )
     menuCruise:setFrame( 1 )
     menuCruise.name = "menuCruise"
-    menuCruise.gotoScene="game" 
+    menuCruise.gotoScene="cruise" 
 
    --catchAll:addEventListener("tap",catchAllTaps) 
 

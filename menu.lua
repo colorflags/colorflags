@@ -26,7 +26,7 @@ local colorFlagsSeq = {
 
 local startBtnSeq = {
     { name = "playgame", frames={8,9}, time=500 },
-    { name = "tutorial", frames={5,6}, time=500 },
+    { name = "options", frames={5,6}, time=500 },
     { name = "about", frames={1,2}, time=500 }
 }
 
@@ -96,11 +96,11 @@ local function doFunction(e)
 end
 
 
-local function eraseSplash()
+local function prepareMenu()
    titleLogo.alpha=1
-    transition.to(startBtnsPlayGame, {time=400,alpha=.98})          
-    transition.to(startBtnsOptions, {time=400,alpha=.98}) 
-    transition.to(startBtnsAbout, {time=400,alpha=.98})        
+    transition.to(startBtnsPlayGame, {time=0,alpha=.98})          
+    transition.to(startBtnsOptions, {time=0,alpha=.98}) 
+    transition.to(startBtnsAbout, {time=0,alpha=.98})        
 
       -- startBtnsAbout:addEventListener("tap",tapBtn)
       -- startBtnsPlayGame:addEventListener("tap",tapBtn)
@@ -134,11 +134,11 @@ function removeFunction()
    --   startBtnsOptions:removeEventListener("touch",doFunction)  
 end
 
-local function checkMemory(e)
-  collectgarbage();
-  print("Memory usage " .. collectgarbage("count"));
-  print("Texture memory usage " .. system.getInfo("textureMemoryUsed")/1024/1024 .. "MB")
-end
+--local function checkMemory(e)
+ -- collectgarbage();
+ -- print("Memory usage " .. collectgarbage("count"));
+--  print("Texture memory usage " .. system.getInfo("textureMemoryUsed")/1024/1024 .. "MB")
+--end
 
 
 function animationPop(event)
@@ -160,7 +160,7 @@ function scene:create( event )
   titleLogo.anchorY=0.5
   titleLogo.x = _W/2
   titleLogo.y = _H/2  
-  titleLogo.alpha=0
+  titleLogo.alpha=0.98
 
   -- Taken directly from options.lua
 
@@ -183,7 +183,7 @@ function scene:create( event )
   startBtnsPlayGame.y=offsetStartBtns
   startBtnsPlayGame:setSequence( "playgame" )
   startBtnsPlayGame:setFrame( 1 )
-  startBtnsPlayGame.alpha=0
+  startBtnsPlayGame.alpha=0.98
   startBtnsPlayGame.gotoScene="start"
 
   startBtnsOptions= display.newSprite( startBtnsOptionsSheet, startBtnSeq )
@@ -191,9 +191,9 @@ function scene:create( event )
   startBtnsOptions.anchorY = 0
   startBtnsOptions.x=_W/2
   startBtnsOptions.y=offsetStartBtns+70
-  startBtnsOptions:setSequence( "tutorial" )
+  startBtnsOptions:setSequence( "options" )
   startBtnsOptions:setFrame( 1 )
-  startBtnsOptions.alpha=0
+  startBtnsOptions.alpha=.98
   startBtnsOptions.gotoScene="options"
 
   startBtnsAbout= display.newSprite( startBtnsAboutSheet, startBtnSeq )
@@ -203,7 +203,7 @@ function scene:create( event )
   startBtnsAbout.y=offsetStartBtns+140
   startBtnsAbout:setSequence( "about" )
   startBtnsAbout:setFrame( 1 )
-  startBtnsAbout.alpha=0
+  startBtnsAbout.alpha=0.98
   startBtnsAbout.gotoScene="about"
 
   sceneGroup:insert(titleLogo) -- BACKGROUND NOT TITLE !!! CHANGE NAME
@@ -226,7 +226,8 @@ function scene:show( event )
       --Runtime:addEventListener("enterFrame", checkMemory)
     elseif event.phase == "did" then
       print("c")
-    timer.performWithDelay(300,eraseSplash,1)
+   --   prepareMenu()
+    --timer.performWithDelay(300,eraseSplash,1)
 
       -- ALSO IN ERASESPLASH>>>>????
       -- COMPARE WITH gameover.lua
