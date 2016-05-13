@@ -9,20 +9,16 @@
 
 local composer=require("composer")
 
-
-
-
 display.setStatusBar( display.HiddenStatusBar )
 
 _W = display.contentWidth; -- Get the width of the screen
 _H = display.contentHeight; -- Get the height of the screen
 
-
 defaultTransition="crossFade"
 
 audioCanPlay=true
 
-
+local showSplash = true    --set false to skip mageegames splash 
 local fontFace
 local backgrounImage=nil
 local backgroundColor={255,255,255}
@@ -32,24 +28,32 @@ local backgroundColor={255,255,255}
  lightningY=90
  infoMode=true
 
-local    splash = display.newImageRect( "images/MMG.png", 580, 320 )
-    splash.anchorX=0.5
-    splash.anchorY=0.5
-    splash.x = _W/2
-    splash.y = _H/2 
 
+local splash1 = display.newImageRect( "images/MMG1.png", 580, 320 )
+    splash1.anchorX=0.5
+    splash1.anchorY=0.5
+    splash1.x = _W/2
+    splash1.y = _H/2 
+    splash1:toFront()
 
+local splash2 = display.newImageRect( "images/MMG2.png", 580, 320 )
+    splash2.anchorX=0.5
+    splash2.anchorY=0.5
+    splash2.x = _W/2
+    splash2.y = _H/2 
+    splash2.alpha=0
+    splash2:toFront()
 
 local function eraseSplash()
-
-   transition.to(splash, {time=300,alpha=0})    
-
-  --   startBtnsAbout.alpha=0
---  startBtnsOptions.alpha=0
- -- startBtnsPlayGame.alpha=0
-          
+    display.remove(splash1)
+    display.remove(splash2)
+ composer.gotoScene( "menu", {effect = defaultTransition} )   
 end
 
+local function fadeSplash()
+    check1=transition.to(splash2, {time=1500,alpha=1})  
+    timer.performWithDelay(2500,eraseSplash,1)
+end
 
 --composer.recycleOnSceneChange = true
 
@@ -99,12 +103,15 @@ function makeTextButton(txt,x,y,opts)
     return btn
 end
 
-
-
-      timer.performWithDelay(300,eraseSplash,1)
+if showSplash==true then
+    timer.performWithDelay(1000,fadeSplash,1)
+elseif showSplash==false then
+        display.remove(splash1)
+    display.remove(splash2)
+     composer.gotoScene( "menu", {effect = defaultTransition})
+end    
 
 
   -- composer.removeScene("main",false)  
 --composer.gotoScene("menu")
 
-composer.gotoScene( "menu", {effect = defaultTransition} )
