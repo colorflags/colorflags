@@ -1368,11 +1368,8 @@ local function countries(test)
         bobby = audio.play(music,{loops=-1})
             
         -- Set e here to pick a specific flag to go to. Otherwise, e=random
-<<<<<<< HEAD
-        e=51 -- try countries 51, 52, 54, or 55
-=======
-        e=55 -- try countries 52, 54, or 55
->>>>>>> 99e35864393fba43657a4147c87fe96d75ec31d5
+
+        e=49 -- try countries 49, 50, 51, 52, 54, or 55
         
         if e==1 then
             -- flag = display.newImageRect( "images/andorra.png", 200,100)
@@ -2953,11 +2950,11 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
+            
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/Sweden.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
             -- music = audio.loadStream( 'anthems/sweden.mp3' ) 
@@ -2982,11 +2979,11 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
 
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/Switzerland.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
             -- music = audio.loadStream( 'anthems/switzerland.mp3' ) 
