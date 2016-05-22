@@ -31,6 +31,7 @@ local randomFlag5
 local randomFlag6
 local randomFlag7
 local randomFlag8
+local scoreText
 
 music=nil
 bobby=nil
@@ -614,14 +615,16 @@ menuQuit.gotoScene="menu"
 end
 
 function scene:show(e) 
+  if e.phase == "will" then
+       print(e.params.saveScore)
+        scoreText = display.newText(e.params.saveScore, _W/2, _H/2, native.systemFont, 28)
+        scoreText:setFillColor( 1, 0, 0 )
+        scoreText:toFront()
+        self.view:insert(scoreText)
 
 
-  if e.phase== "did" then
-       -- print(e.params.saveScore)
-       -- scoreText = display.newText(e.params.saveScore, _W/2, _H/2, native.systemFont, 28)
-       -- scoreText:setFillColor( 1, 0, 0 )
-       -- scoreText:toFront()
-       -- self.view:insert(scoreText)
+  elseif e.phase== "did" then
+ 
 
 menuAgain:addEventListener( "touch", doFunction )
 menuQuit:addEventListener( "touch", doFunction )
