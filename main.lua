@@ -18,7 +18,7 @@ defaultTransition="crossFade"
 
 audioCanPlay=true
 
-local showSplash = true    --set false to skip mageegames splash 
+local showSplash = false    --set false to skip mageegames splash 
 local fontFace
 local backgrounImage=nil
 local backgroundColor={255,255,255}

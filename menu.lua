@@ -59,6 +59,7 @@ local function myTouchListener( event )
             local goto = event.target.gotoScene
 
             if goto == "start" and event.target == startBtnsPlayGame then
+              print("HHHHHH")
               composer.showOverlay( goto, { isModal= true})
             else
               composer.gotoScene ( goto, { effect = defaultTransition } )

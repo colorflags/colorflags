@@ -22,20 +22,6 @@ local menuSeq = {
 local menuSpriteCoords = require("lua-sheets.playgame-menu")
 local menuStartSheet = graphics.newImageSheet( "images/playgame-menu.png", menuSpriteCoords:getSheet() )
 
---local function phase4(btn)
---display.remove(btn)
--- btn = display.newText(btn.text,btn.x,btn.y, "federalescortchrome", 35 ) 
---end
-
-  local function phase3(e)
-transition.to(e,{time=50, xScale=1,yScale=1})
-end
-
-
-  local function phase2(e)
-
-transition.to(e,{time=50, xScale=.8,yScale=.8,onComplete=phase3}) 
-  end
 
 local currentObject
 local boundaryCheck = false
@@ -46,6 +32,7 @@ local function myTouchListener( event )
         currentObject = event.target 
         display.getCurrentStage():setFocus(currentObject)
     elseif event.phase == "ended" or event.phase == "cancelled" then
+  
         if currentObject.name == "menuStart" then
             currentObject:setSequence("start")
         elseif currentObject.name == "menuTutorial" then
@@ -56,6 +43,8 @@ local function myTouchListener( event )
         currentObject:setFrame(1)
         
         if boundaryCheck == true then 
+         
+          print(currentObject.gotoScene)
             local goto = currentObject.gotoScene
             composer.gotoScene( goto, { effect = defaultTransition } )
         end
@@ -98,176 +87,119 @@ local function doFunction(e)
     end
 end
 
-
-local function buttonHit(e)
-   
-   print("buttonhitdaf")
-
-  if e.phase == "began" then
-     print("ButtonHit")
-    print(e.target)
-  elseif e.phase == "moved" then
-    print(e.target)
-  elseif e.phase == "ended" then 
-    display.remove(phaseGroup)
-    composer.removeScene("start",false)
-    -- if e.target==startBtn then
-    --     display.remove(phaseGroup)
-    --   composer.hideOverlay("fade",50) 
-    --   print("START") 
-    --   composer.removeScene("start",false)
-    -- elseif e.target==tutorialBtn then
-    --     display.remove(phaseGroup)
-    --   composer.hideOverlay("fade",50) 
-    -- elseif e.target==cruiseBtn then
-    --     display.remove(phaseGroup)
-    --   composer.hideOverlay("fade",50) 
-    -- end 
-   -- composer.removeScene("start",false)
-
-  end 
-   -- composer.removeScene("start", true)
- -- display.remove(startBtn)
-
-  -- display.remove(tutorialBtn)
-  -- display.remove(cruiseBtn)
-    --   display.remove(backgr)        
-   
- 
-  return true
-end
-
-
---local catchAll
-
---local function catchAllTaps(event)
---    return true
---end
-
-
-
 local function removeIt(e)
        display.remove(e)
 end
 
-local function catchAllTaps(event)
-    return true
+local function doNothing(e)
+  return true
 end
 
+local function catchAllTaps(e)
+    catchAll:removeEventListener("tap",catchAllTaps) 
+    background:removeEventListener("tap",doNothing)
+    menuStart:removeEventListener( "touch", myTouchListener )
+    menuStart:removeEventListener( "touch", doFunction )
+    menuTutorial:removeEventListener( "touch", myTouchListener )
+    menuTutorial:removeEventListener( "touch", doFunction )    
+    menuCruise:removeEventListener( "touch", myTouchListener )
+    menuCruise:removeEventListener( "touch", doFunction ) 
+    composer.hideOverlay()
+end
 
-
-function scene:create( event )
-      local sceneGroup=self.view
- catchAll=display.newRect(0,0,_W,_H)
- catchAll.alpha=0.8
- catchAll.anchorX=0
- catchAll.anchorY=0
- catchAll.isHitTestable = true
-print("1")
- background=display.newRoundedRect(50,50,_W-100,_H-100,3)
- background:setFillColor(64/255,64/255,224/225)   
-  background:setStrokeColor( 25/255, 1 ,20/255 )
-  background.strokeWidth = 5
-      background.x=_W/2
-      background.y=_H/2
---      background:toFront()
-    
-    menuStart = display.newSprite( menuStartSheet, menuSeq )
+local function initFunction()
+catchAll:addEventListener("tap",catchAllTaps) 
+background:addEventListener("tap",doNothing)
     menuStart:addEventListener( "touch", myTouchListener )
     menuStart:addEventListener( "touch", doFunction )
+    menuTutorial:addEventListener( "touch", myTouchListener )
+    menuTutorial:addEventListener( "touch", doFunction )    
+    menuCruise:addEventListener( "touch", myTouchListener )
+    menuCruise:addEventListener( "touch", doFunction )    
+end
+
+function scene:create( event )
+    local sceneGroup=self.view
+     catchAll=display.newRect(0,0,_W,_H)
+     catchAll.alpha=0.8
+     catchAll.anchorX=0
+     catchAll.anchorY=0
+
+     background=display.newRoundedRect(50,50,_W-250,_H-125,20)
+     background:setFillColor(120/255,115/255,115/255)   
+     --background:setStrokeColor( 25/255, 1 ,20/255 )
+    -- background.strokeWidth = 5
+     background.x=_W/2
+     background.y=_H/2
+     background.alpha=0
+     transition.to( background, {time = 200, alpha=1})
+      
+    menuStart = display.newSprite( menuStartSheet, menuSeq )
     menuStart.x=_W/2 
     menuStart.y=_H/2 - 50
     menuStart:setSequence( "start" )
     menuStart:setFrame( 1 )
     menuStart.name = "menuStart"
     menuStart.gotoScene="game" 
+    menuStart.alpha=0
+    transition.to( menuStart, {time = 200, alpha=1})
  
     menuTutorial = display.newSprite( menuStartSheet, menuSeq )
-    menuTutorial:addEventListener( "touch", myTouchListener )
-    menuTutorial:addEventListener( "touch", doFunction )
     menuTutorial.x=_W/2 
     menuTutorial.y=_H/2
     menuTutorial:setSequence( "tutorial" )
     menuTutorial:setFrame( 1 )
     menuTutorial.name = "menuTutorial"
     menuTutorial.gotoScene="game" 
+    menuTutorial.alpha=0
+    transition.to( menuTutorial, {time = 200, alpha=1})
 
     menuCruise = display.newSprite( menuStartSheet, menuSeq )
-    menuCruise:addEventListener( "touch", myTouchListener )
-    menuCruise:addEventListener( "touch", doFunction )
     menuCruise.x=_W/2 
     menuCruise.y=_H/2 + 50
     menuCruise:setSequence( "cruise" )
     menuCruise:setFrame( 1 )
     menuCruise.name = "menuCruise"
-    menuCruise.gotoScene="cruise" 
+    menuCruise.gotoScene="cruise"
+    menuCruise.alpha=0
+    transition.to( menuCruise, {time = 200, alpha=1}) 
+    timer.performWithDelay(300,initFunction)
 
-   --catchAll:addEventListener("tap",catchAllTaps) 
-
+   catchAll:toBack()
    sceneGroup:insert(catchAll)
    sceneGroup:insert(background)
    sceneGroup:insert(menuStart)
    sceneGroup:insert(menuTutorial)              
    sceneGroup:insert(menuCruise)
-   --sceneGroup:toFront()
-   
+
    phaseGroup:insert(catchAll)
    phaseGroup:insert(background)
    phaseGroup:insert(menuStart)
    phaseGroup:insert(menuTutorial)
    phaseGroup:insert(menuCruise)
-   phaseGroup:toFront()
-
-
-   --cruiseBtn:addEventListener("touch",buttonHit) 
-   --startBtn:addEventListener("touch",buttonHit)
-   --tutorialBtn:addEventListener("touch",buttonHit)  
+  phaseGroup:toFront()
 
 end
 
 function scene:show( event )
-
-      local sceneGroup=self.view
+    local sceneGroup=self.view
     local phase = event.phase
-
     if event.phase == "will" then
---removeFunction()
-  print("2")
-
     elseif event.phase=="did" then
-  print("3")
---  refreshTimer=timer.performWithDelay(20,event.parent.testF,0)   --calling a parent function
-
---timer.performWithDelay(100,initButtons,1) 
-
-           end
+    end
 end
 
 function scene:hide( event )
     local sceneGroup=self.view
     local phase = event.phase
     if event.phase=="will" then
-  print("4")
-
-
-      print("HELLO")
-     -- transition.to(background, {time=25, xScale=0.01,yScale=0.01,onComplete=removeIt})
-       -- phaseGroup:removeEventListener("tap",buttonHit) 
-      transition.to(phaseGroup, {time=0, alpha=0,onComplete=removeIt})      
-   
-    --parent:resumeGame()
-     elseif event.phase == "did" then
-     print("5")
-       
-
-
+    transition.to(phaseGroup, {time=0, alpha=0,onComplete=removeIt})      
+    elseif event.phase == "did" then
      end
 end
 
 function scene:destroy( event )
-    local sceneGroup=self.view
-  print("6")
-  --composer.removeScene("start",true) 
+  local sceneGroup=self.view
   composer.hideOverlay("start")
 end
 
