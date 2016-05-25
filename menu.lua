@@ -4,9 +4,14 @@ local scene = composer.newScene()
 
 local titleLogo 
 local menuColorFlags 
+
 local startBtnsPlayGame
 local startBtnsOptions
 local startBtnsAbout
+
+local currentObject
+local isLoading = false
+local touchInsideBtn = false
 
 music=nil
 bobby=nil
@@ -15,7 +20,7 @@ audio.stop( )
 music = audio.loadStream( 'anthems/Magee_ColorFlags2_B_7.mp3' ) 
 bobby = audio.play(music,{loops=-1})
 
- soundOn=false
+soundOn=false
 
 local colorFlagsSpriteCoords = require("lua-sheets.title-menu")
 local colorFlagsSheet = graphics.newImageSheet( "images/title-menu.png", colorFlagsSpriteCoords:getSheet() )
@@ -36,10 +41,6 @@ local startBtnsPlayGameSheet = graphics.newImageSheet( "images/menu-btns.png", s
 local startBtnsOptionsSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
 local startBtnsAboutSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
 
-
-local currentObject
-local touchInsideBtn = false
-
 local function myTouchListener( event )
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
@@ -51,8 +52,12 @@ local function myTouchListener( event )
         -- redundant ?? 
         -- currentObject:setFrame(1)
         
-        if touchInsideBtn == true then 
+        if touchInsideBtn == true and isLoading == false then 
             -- print("touch OFF. inside")
+            
+            -- prevents scenes from firing twice!!
+            isLoading = true
+            
             local goto = currentObject.gotoScene
             if goto == "start" and event.target == startBtnsPlayGame then
                 composer.showOverlay( goto, { isModal= true})

@@ -29,6 +29,7 @@ local menuStartSheet = graphics.newImageSheet( "images/playgame-menu.png", menuS
 
 
 local currentObject
+local isLoading = false
 local touchInsideBtn = false
 
 local function myTouchListener( event )
@@ -51,10 +52,16 @@ local function myTouchListener( event )
         -- redundant ?? 
         -- currentObject:setFrame(1)
         
-        if touchInsideBtn == true then 
+        if touchInsideBtn == true and isLoading == false then 
             -- print("touch OFF. inside")
+            -- composer.removeScene("start")
+            
+            -- prevents scenes from firing twice!!
+            isLoading = true
+            
             local goto = currentObject.gotoScene
             composer.gotoScene( goto, { effect = defaultTransition } )
+            
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
         end
