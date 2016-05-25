@@ -1,14 +1,19 @@
---about.lua
 local composer=require("composer")
 local scene = composer.newScene()
 
-  local startBtn
-  local tutorialBtn
-  local cruiseBtn
-  local background
-  local phaseGroup=display.newGroup()
+-- These can be deleted right?? 
+-- The scene:create(event) function now takes care of creating these variables within its scope
 
-local menuStart  
+-- local menuStart
+-- local menuTutorial
+-- local menuCruise
+
+-- local startBtn
+-- local tutorialBtn
+-- local cruiseBtn
+
+local background
+local phaseGroup=display.newGroup()  
   
 local menuSeq = {
     { name = "start", frames = {6}, time = 500 },
@@ -24,15 +29,17 @@ local menuStartSheet = graphics.newImageSheet( "images/playgame-menu.png", menuS
 
 
 local currentObject
-local boundaryCheck = false
+local touchInsideBtn = false
 
 local function myTouchListener( event )
+    currentObject = event.target
+    display.getCurrentStage():setFocus(currentObject)
+    
     if event.phase == "began" then
-        print("begin touch, why such a delay?? because referencing a class?")        
-        currentObject = event.target 
-        display.getCurrentStage():setFocus(currentObject)
+        -- print("touch ON. inside")          
     elseif event.phase == "ended" or event.phase == "cancelled" then
-  
+        
+        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
         if currentObject.name == "menuStart" then
             currentObject:setSequence("start")
         elseif currentObject.name == "menuTutorial" then
@@ -40,18 +47,21 @@ local function myTouchListener( event )
         elseif currentObject.name == "menuCruise" then
             currentObject:setSequence("cruise")
         end
-        currentObject:setFrame(1)
         
-        if boundaryCheck == true then 
-         
-          print(currentObject.gotoScene)
+        -- redundant ?? 
+        -- currentObject:setFrame(1)
+        
+        if touchInsideBtn == true then 
+            -- print("touch OFF. inside")
             local goto = currentObject.gotoScene
             composer.gotoScene( goto, { effect = defaultTransition } )
+        elseif touchInsideBtn == false then
+            -- print("touch OFF outside")
         end
         
         currentObject = nil
         display.getCurrentStage():setFocus(nil)
-        boundaryCheck = false
+        touchInsideBtn = false
     end
 end
  
@@ -69,10 +79,12 @@ local function doFunction(e)
             elseif currentObject.name == "menuCruise" then
                 currentObject:setSequence("cruise")
             end
-            currentObject:setFrame(1)
-            boundaryCheck = false
+            
+            -- redundant ??
+            -- currentObject:setFrame(1)
+            touchInsideBtn = false
         else
-            if boundaryCheck == false then
+            if touchInsideBtn == false then
                 if currentObject.name == "menuStart" then
                     currentObject:setSequence("start_anim")
                 elseif currentObject.name == "menuTutorial" then
@@ -82,7 +94,7 @@ local function doFunction(e)
                 end
                 currentObject:play()
             end
-            boundaryCheck = true
+            touchInsideBtn = true
         end
     end
 end
@@ -163,22 +175,23 @@ function scene:create( event )
     menuCruise.gotoScene="cruise"
     menuCruise.alpha=0
     transition.to( menuCruise, {time = 200, alpha=1}) 
+    
+    -- What does this do?
     timer.performWithDelay(300,initFunction)
 
-   catchAll:toBack()
-   sceneGroup:insert(catchAll)
-   sceneGroup:insert(background)
-   sceneGroup:insert(menuStart)
-   sceneGroup:insert(menuTutorial)              
-   sceneGroup:insert(menuCruise)
+    catchAll:toBack()
+    sceneGroup:insert(catchAll)
+    sceneGroup:insert(background)
+    sceneGroup:insert(menuStart)
+    sceneGroup:insert(menuTutorial)              
+    sceneGroup:insert(menuCruise)
 
-   phaseGroup:insert(catchAll)
-   phaseGroup:insert(background)
-   phaseGroup:insert(menuStart)
-   phaseGroup:insert(menuTutorial)
-   phaseGroup:insert(menuCruise)
-  phaseGroup:toFront()
-
+    phaseGroup:insert(catchAll)
+    phaseGroup:insert(background)
+    phaseGroup:insert(menuStart)
+    phaseGroup:insert(menuTutorial)
+    phaseGroup:insert(menuCruise)
+    phaseGroup:toFront()
 end
 
 function scene:show( event )

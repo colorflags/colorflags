@@ -38,47 +38,38 @@ local startBtnsAboutSheet = graphics.newImageSheet( "images/menu-btns.png", star
 
 
 local currentObject
-local boundaryCheck = false
+local touchInsideBtn = false
 
 local function myTouchListener( event )
-    if event.phase == "began" then      
-        print("began phase")
-        -- event.target.alpha = 0.5
-        -- event.target:setFrame( 1 )
-        currentObject = event.target
-
-        -- Can't remember what this was for?
-        display.getCurrentStage():setFocus(event.target)
-
+    currentObject = event.target
+    display.getCurrentStage():setFocus(currentObject)
+    
+    if event.phase == "began" then
+        -- print("touch ON. inside") 
     elseif event.phase == "ended" or event.phase == "cancelled" then
-        print("end phase")
-        -- event.target.alpha = 1
         
-        -- BOUNDRY CHECK
-        if boundaryCheck == true then 
-            local goto = event.target.gotoScene
-
+        -- redundant ?? 
+        -- currentObject:setFrame(1)
+        
+        if touchInsideBtn == true then 
+            -- print("touch OFF. inside")
+            local goto = currentObject.gotoScene
             if goto == "start" and event.target == startBtnsPlayGame then
-              print("HHHHHH")
-              composer.showOverlay( goto, { isModal= true})
+                composer.showOverlay( goto, { isModal= true})
             else
-              composer.gotoScene ( goto, { effect = defaultTransition } )
+                composer.gotoScene ( goto, { effect = defaultTransition } )
             end  
+        elseif touchInsideBtn == false then
+            -- print("touch OFF outside")
         end
         
-        if currentObject ~= nil then
-          currentObject:setFrame(1)
-          currentObject = nil
-        end 
-        -- Can't remember what this was for?
-        display.getCurrentStage():setFocus(nil) 
-
+        currentObject = nil
+        display.getCurrentStage():setFocus(nil)
+        touchInsideBtn = false
     end
 end
 
-
 local function doFunction(e)
-     print("doFunction")
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
             e.x > currentObject.contentBounds.xMax or
@@ -86,12 +77,10 @@ local function doFunction(e)
             e.y > currentObject.contentBounds.yMax then
             
             currentObject:setFrame( 1 )
-            -- print("Its out")
-            boundaryCheck = false
+            touchInsideBtn = false
         else
             currentObject:setFrame( 2 )
-            -- print("Its in")
-            boundaryCheck = true
+            touchInsideBtn = true
         end   
     end     
 end
