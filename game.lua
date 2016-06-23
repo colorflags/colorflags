@@ -1369,7 +1369,7 @@ local function countries(test)
             
         -- Set e here to pick a specific flag to go to. Otherwise, e=random
 
-        e=47 -- try countries 47, 48, 49, 50, 51, 52, 54, or 55
+        e=55 -- try countries 47, 48, 49, 50, 51, 52, 54, or 55
         
         if e==1 then
             -- flag = display.newImageRect( "images/andorra.png", 200,100)
@@ -2700,15 +2700,9 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/singapore.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/Singapore.mp3' ) 
+            bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- Slovakia
@@ -2734,15 +2728,9 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/slovakia.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/Slovakia.mp3' ) 
+            bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- Slovenia
@@ -2768,15 +2756,9 @@ local function countries(test)
 
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/slovenia.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/Slovenia.mp3' ) 
+            bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- South Africa
@@ -2814,15 +2796,9 @@ local function countries(test)
 
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/south_africa.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/SouthAfrica.mp3' ) 
+            bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- South Korea
@@ -2852,15 +2828,11 @@ local function countries(test)
 
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
+          
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/SouthKorea.mp3' )
+            bobby = audio.play(music,{loops=-1})
 
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/south_korea.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- Spain
