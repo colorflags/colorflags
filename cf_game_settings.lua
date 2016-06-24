@@ -236,477 +236,313 @@ CFGameSettings = class(function(c)
             w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["isreal"] = { 
+        id = 26,
+        name = "isreal",
+        code = "bw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            b = CFColor(0,56,184),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["italy"] = { 
+        id = 27,
+        name = "italy",
+        code = "rgw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(206,43,55),
+            g = CFColor(0,146,70),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["japan"] = { 
+        id = 28,
+        name = "japan",
+        code = "rw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(188,0,45),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["lithuania"] = { 
+        id = 29,
+        name = "lithuania",
+        code = "ryg",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(139,39,45),
+            y = CFColor(253,185,19),
+            g = CFColor(0,106,68)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["luxembourg"] = { 
+        id = 30,
+        name = "luxembourg",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(237,41,57),
+            b = CFColor(0,161,222),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["malaysia"] = { 
+        id = 31,
+        name = "malaysia",
+        code = "rybw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(204,0,1),
+            y = CFColor(255,204,0),
+            b = CFColor(1,0,102),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["malta"] = { 
+        id = 32,
+        name = "malta",
+        code = "rw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(207,20,43),
+            w = CFColor(255,255,255),
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["mexico"] = { 
+        id = 33,
+        name = "mexico",
+        code = "rgw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(206,17,38),
+            g = CFColor(0,104,71),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["netherland"] = { 
+        id = 34,
+        name = "netherland",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(174,28,40),
+            b = CFColor(33,70,139),
+            w = CFColor(255,255,255)
         }
     } 
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["newzealand"] = { 
+        id = 35,
+        name = "newzealand",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(204,20,43),
+            b = CFColor(0,36,125),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["norway"] = { 
+        id = 36,
+        name = "norway",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(239,43,45),
+            b = CFColor(0,40,104),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["philippines"] = { 
+        id = 37,
+        name = "philippines",
+        code = "rybw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(206,17,38),
+            y = CFColor(252,209,22),
+            b = CFColor(0,56,168),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["poland"] = { 
+        id = 38,
+        name = "poland",
+        code = "rw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(220,20,60),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["portugal"] = { 
+        id = 39,
+        name = "portugal",
+        code = "rg",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(255,0,0),
+            g = CFColor(0,102,0)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["russia"] = { 
+        id = 40,
+        name = "russia",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(213,43,30),
+            b = CFColor(0,57,166),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["sanmarino"] = { 
+        id = 41,
+        name = "sanmarino",
+        code = "bw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            b = CFColor(94,182,228),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["singapore"] = { 
+        id = 42,
+        name = "singapore",
+        code = "rw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(237,41,57),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["slovakia"] = { 
+        id = 43,
+        name = "slovakia",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(238,28,37),
+            b = CFColor(11,78,162),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["slovenia"] = { 
+        id = 44,
+        name = "slovenia",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(237,28,36),
+            b = CFColor(0,93,164),
+            w = CFColor(255,255,255)
         }
     } 
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["southafrica"] = { 
+        id = 45,
+        name = "southafrica",
+        code = "rygbwk",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(222,56,49),
+            y = CFColor(255,182,18),
+            g = CFColor(0,122,77),
+            g = CFColor(0,35,149),
+            g = CFColor(255,255,255),
+            k = CFColor(0,0,0)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["southkorea"] = { 
+        id = 46,
+        name = "southkorea",
+        code = "rbwk",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(198,12,48),
+            b = CFColor(0,52,120),
+            w = CFColor(255,255,255),
+            k = CFColor(0,0,0)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["spain"] = { 
+        id = 47,
+        name = "spain",
+        code = "ry",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(198,11,30),
+            y = CFColor(225,196,0)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["srilanka"] = { 
+        id = 48,
+        name = "srilanka",
+        code = "royg",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(141,32,41),
+            o = CFColor(255,91,0),
+            y = CFColor(255,183,0),
+            g = CFColor(0,86,65)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["sweden"] = { 
+        id = 49,
+        name = "sweden",
+        code = "yb",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            y = CFColor(255,183,0),
+            b = CFColor(0,106,167)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["switzerland"] = { 
+        id = 50,
+        name = "switzerland",
+        code = "rw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(213,43,30),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["taiwan"] = { 
+        id = 51,
+        name = "taiwan",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(254,0,0),
+            b = CFColor(0,0,149),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["thailand"] = { 
+        id = 52,
+        name = "thailand",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(237,28,36),
+            b = CFColor(36,29,79),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["turkey"] = { 
+        id = 53,
+        name = "turkey",
+        code = "rw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(227,10,23),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["unitedarabemirates"] = { 
+        id = 54,
+        name = "unitedarabemirates",
+        code = "rgwk",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(255,0,0),
+            g = CFColor(0,115,47),
+            y = CFColor(255,255,255),
+            k = CFColor(0,0,0)
         }
     } 
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["unitedkingdom"] = { 
+        id = 55,
+        name = "unitedkingdom",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(207,20,43),
+            b = CFColor(0,36,125),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
+    countries["unitedstates"] = { 
+        id = 56,
+        name = "unitedstates",
+        code = "rbw",
         colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
+            r = CFColor(178,34,52),
+            b = CFColor(60,59,110),
+            w = CFColor(255,255,255)
         }
     }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    } 
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    countries[""] = { 
-        id = 1,
-        name = "",
-        code = "",
-        colors = {
-            = CFColor(),
-            = CFColor(),
-            = CFColor()
-        }
-    }
-    
     
     c.countries = countries
     print("working here:", #countries)
