@@ -7,6 +7,9 @@
 --local storyboard = require "storyboard"
 --storyboard.purgeOnSceneChange = true
 
+require("cf_game_settings")
+CFGameSettings = CFGameSettings()
+
 local composer=require("composer")
 
 display.setStatusBar( display.HiddenStatusBar )

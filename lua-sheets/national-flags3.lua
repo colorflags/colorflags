@@ -79,13 +79,13 @@ SheetInfo.sheet =
 SheetInfo.frameIndex =
 {
 
-    ["sweden"] = 1,
-    ["switzerland"] = 2,
-    ["thailand"] = 3,
-    ["turkey"] = 4,
-    ["united_arab_emirates"] = 5,
-    ["united_kingdom"] = 6,
-    ["united_states"] = 7,
+    ["Sweden"] = 1,
+    ["Switzerland"] = 2,
+    ["Thailand"] = 3,
+    ["Turkey"] = 4,
+    ["UnitedArabEmirates"] = 5,
+    ["UnitedKingdom"] = 6,
+    ["UnitedStates"] = 7,
 }
 
 function SheetInfo:getSheet()
