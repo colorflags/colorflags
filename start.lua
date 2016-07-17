@@ -169,7 +169,7 @@ function scene:create( event )
     menuTutorial:setSequence( "tutorial" )
     menuTutorial:setFrame( 1 )
     menuTutorial.name = "menuTutorial"
-    menuTutorial.gotoScene="game" 
+    menuTutorial.gotoScene="tutorial" 
     menuTutorial.alpha=0
     transition.to( menuTutorial, {time = 200, alpha=1})
 
