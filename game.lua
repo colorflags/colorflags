@@ -1359,7 +1359,9 @@ local function countryScale()
 end 
 
 local function countries(test)
-    country = CFGameSettings:getItemByID(math.random(56))
+    local e = math.random(56)
+    country = CFGameSettings:getItemByID(e)
+    print("country : ", e)
     print(country.name)
     
     info="images/infoBrazil.png"

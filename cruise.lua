@@ -1,7 +1,7 @@
 -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html 
 
-local CreateText = require("textclass")
+local CreateText = require("cf_text")
 
 --game.lua
 local composer = require("composer")
