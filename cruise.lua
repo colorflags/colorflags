@@ -10,6 +10,9 @@ local scene = composer.newScene()
 --local physics = require("physics")
 --physics.start()
 
+local xBtn
+local fwBtn
+local canQuit=false
 --media.playSound('Brazil.mid')
 local touchFlagReady
 local infoPic
@@ -37,7 +40,6 @@ local pieceTimer
 local mapTimer
 local flagTimer
 local paceTimer
-local setTimer
 local killBarsTimer
 local resetTimer
 local flag3Timer
@@ -72,62 +74,63 @@ local nationalFlags3Sheet = graphics.newImageSheet( "images/national-flags3.png"
 
 
 local nationalFlagsSeq = {
-    { name="andorra", sheet=nationalFlags1Sheet, frames={1} },
-    { name="argentina", sheet=nationalFlags1Sheet, frames={2} },
-    { name="australia", sheet=nationalFlags1Sheet, frames={3} },
-    { name="austria", sheet=nationalFlags1Sheet, frames={4} },
-    { name="belgium", sheet=nationalFlags1Sheet, frames={5} },
-    { name="brazil", sheet=nationalFlags1Sheet, frames={6} },
-    { name="canada", sheet=nationalFlags1Sheet, frames={7} },
-    { name="chile", sheet=nationalFlags1Sheet, frames={8} },
-    { name="china", sheet=nationalFlags1Sheet, frames={9} },
-    { name="croatia", sheet=nationalFlags1Sheet, frames={10} },
-    { name="cyprus", sheet=nationalFlags1Sheet, frames={11} },
-    { name="czech_republic", sheet=nationalFlags1Sheet, frames={12} },
-    { name="denmark", sheet=nationalFlags1Sheet, frames={13} },
-    { name="egypt", sheet=nationalFlags1Sheet, frames={14} },
-    { name="estonia", sheet=nationalFlags1Sheet, frames={15} },
-    { name="finland", sheet=nationalFlags1Sheet, frames={16} },
-    { name="france", sheet=nationalFlags1Sheet, frames={17} },
-    { name="germany", sheet=nationalFlags1Sheet, frames={18} },
-    { name="greece", sheet=nationalFlags1Sheet, frames={19} },
-    { name="hungary", sheet=nationalFlags1Sheet, frames={20} },
-    { name="iceland", sheet=nationalFlags1Sheet, frames={21} },
-    { name="india", sheet=nationalFlags1Sheet, frames={22} },
-    { name="indonesia", sheet=nationalFlags1Sheet, frames={23} },
-    { name="ireland", sheet=nationalFlags1Sheet, frames={24} },
+    { name="Andorra", sheet=nationalFlags1Sheet, frames={1} },
+    { name="Argentina", sheet=nationalFlags1Sheet, frames={2} },
+    { name="Australia", sheet=nationalFlags1Sheet, frames={3} },
+    { name="Austria", sheet=nationalFlags1Sheet, frames={4} },
+    { name="Belgium", sheet=nationalFlags1Sheet, frames={5} },
+    { name="Brazil", sheet=nationalFlags1Sheet, frames={6} },
+    { name="Canada", sheet=nationalFlags1Sheet, frames={7} },
+    { name="Chile", sheet=nationalFlags1Sheet, frames={8} },
+    { name="China", sheet=nationalFlags1Sheet, frames={9} },
+    { name="Croatia", sheet=nationalFlags1Sheet, frames={10} },
+    { name="Cyprus", sheet=nationalFlags1Sheet, frames={11} },
+    { name="CzechRepublic", sheet=nationalFlags1Sheet, frames={12} },
+    { name="Denmark", sheet=nationalFlags1Sheet, frames={13} },
+    { name="Egypt", sheet=nationalFlags1Sheet, frames={14} },
+    { name="Estonia", sheet=nationalFlags1Sheet, frames={15} },
+    { name="Finland", sheet=nationalFlags1Sheet, frames={16} },
+    { name="France", sheet=nationalFlags1Sheet, frames={17} },
+    { name="Germany", sheet=nationalFlags1Sheet, frames={18} },
+    { name="Greece", sheet=nationalFlags1Sheet, frames={19} },
+    { name="Hungary", sheet=nationalFlags1Sheet, frames={20} },
+    { name="Iceland", sheet=nationalFlags1Sheet, frames={21} },
+    { name="India", sheet=nationalFlags1Sheet, frames={22} },
+    { name="Indonesia", sheet=nationalFlags1Sheet, frames={23} },
+    { name="Ireland", sheet=nationalFlags1Sheet, frames={24} },
+    { name="Isreal", sheet=nationalFlags2Sheet, frames={1} },  
+    { name="Italy", sheet=nationalFlags2Sheet, frames={2} },
+    { name="Japan", sheet=nationalFlags2Sheet, frames={3} },
+    { name="Lithuania", sheet=nationalFlags2Sheet, frames={4} },
+    { name="Luxembourg", sheet=nationalFlags2Sheet, frames={5} },   
+    { name="Malaysia", sheet=nationalFlags2Sheet, frames={6} },   
+    { name="Malta", sheet=nationalFlags2Sheet, frames={7} },   
+    { name="Mexico", sheet=nationalFlags2Sheet, frames={8} }, 
+    { name="Netherlands", sheet=nationalFlags2Sheet, frames={9} }, 
+    { name="NewZealand", sheet=nationalFlags2Sheet, frames={10} },
+    { name="Norway", sheet=nationalFlags2Sheet, frames={11} },
+    { name="Philippines", sheet=nationalFlags2Sheet, frames={12} },
+    { name="Poland", sheet=nationalFlags2Sheet, frames={13} },
+    { name="Portugal", sheet=nationalFlags2Sheet, frames={14} },   
+    { name="Russia", sheet=nationalFlags2Sheet, frames={16} },    
+    { name="SanMarino", sheet=nationalFlags2Sheet, frames={17} },    
+    { name="Singapore", sheet=nationalFlags2Sheet, frames={18} },    
+    { name="Slovakia", sheet=nationalFlags2Sheet, frames={19} },    
+    { name="Slovenia", sheet=nationalFlags2Sheet, frames={20} },        
+    { name="SouthAfrica", sheet=nationalFlags2Sheet, frames={21} },    
+    { name="SouthKorea", sheet=nationalFlags2Sheet, frames={22} },    
+    { name="Spain", sheet=nationalFlags2Sheet, frames={23} },    
+    { name="SriLanka", sheet=nationalFlags2Sheet, frames={24} },    
+    { name="Sweden", sheet=nationalFlags3Sheet, frames={1} }, 
+    { name="Switzerland", sheet=nationalFlags3Sheet, frames={2} }, 
 
-    { name="isreal", sheet=nationalFlags2Sheet, frames={1} },  
-    { name="italy", sheet=nationalFlags2Sheet, frames={2} },
-    { name="japan", sheet=nationalFlags2Sheet, frames={3} },
-    { name="lithuania", sheet=nationalFlags2Sheet, frames={4} },
-    { name="luxembourg", sheet=nationalFlags2Sheet, frames={5} },   
-    { name="malaysia", sheet=nationalFlags2Sheet, frames={6} },   
-    { name="malta", sheet=nationalFlags2Sheet, frames={7} },   
-    { name="mexico", sheet=nationalFlags2Sheet, frames={8} }, 
-    { name="netherlands", sheet=nationalFlags2Sheet, frames={9} }, 
-    { name="new_zealand", sheet=nationalFlags2Sheet, frames={10} },
-    { name="norway", sheet=nationalFlags2Sheet, frames={11} },
-    { name="philippines", sheet=nationalFlags2Sheet, frames={12} },
-    { name="poland", sheet=nationalFlags2Sheet, frames={13} },
-    { name="portugal", sheet=nationalFlags2Sheet, frames={14} },
-    { name="republic_of_china", sheet=nationalFlags2Sheet, frames={15} },    
-    { name="russia", sheet=nationalFlags2Sheet, frames={16} },    
-    { name="san_marino", sheet=nationalFlags2Sheet, frames={17} },    
-    { name="singapore", sheet=nationalFlags2Sheet, frames={18} },    
-    { name="slovakia", sheet=nationalFlags2Sheet, frames={19} },    
-    { name="slovenia", sheet=nationalFlags2Sheet, frames={20} },        
-    { name="south_africa", sheet=nationalFlags2Sheet, frames={21} },    
-    { name="south_korea", sheet=nationalFlags2Sheet, frames={22} },    
-    { name="spain", sheet=nationalFlags2Sheet, frames={23} },    
-    { name="sri_lanka", sheet=nationalFlags2Sheet, frames={24} },    
-    { name="sweden", sheet=nationalFlags3Sheet, frames={1} }, 
-    { name="switzerland", sheet=nationalFlags3Sheet, frames={2} }, 
-    { name="thailand", sheet=nationalFlags3Sheet, frames={3} }, 
-    { name="turkey", sheet=nationalFlags3Sheet, frames={4} }, 
-    { name="united_arab_emirates", sheet=nationalFlags3Sheet, frames={5} }, 
-    { name="united_kingdom", sheet=nationalFlags3Sheet, frames={6} }, 
-    { name="united_states", sheet=nationalFlags3Sheet, frames={7} }, 
+    -- SAM: IS THIS OKAY!?
+    { name="Taiwan", sheet=nationalFlags2Sheet, frames={15} }, 
+    { name="Thailand", sheet=nationalFlags3Sheet, frames={3} }, 
+    { name="Turkey", sheet=nationalFlags3Sheet, frames={4} }, 
+    { name="UnitedArabEmirates", sheet=nationalFlags3Sheet, frames={5} }, 
+    { name="UnitedKingdom", sheet=nationalFlags3Sheet, frames={6} }, 
+    { name="UnitedStates", sheet=nationalFlags3Sheet, frames={7} }, 
               
     -- { name="argentina", sheet=nationalFlags1Sheet, frames={2} }
 }
@@ -191,10 +194,6 @@ local function setFlag()
 local function touchFlagNext(e)
      print("YOOOOO")
     flag:removeEventListener( "tap", touchFlagNext ) 
-    if setTimer ~= nil then
-        timer.cancel(setTimer)
-        setTimer=timer.performWithDelay(20000, setFlag, 0)
-    end   
     setTheFlag=true
 
 end  
@@ -203,6 +202,7 @@ end
 local function touchFlagFunction()
     
     flag:addEventListener( "tap", touchFlagNext ) 
+    canQuit=true
 
 end
 
@@ -234,18 +234,76 @@ local function countryScale()
 end 
 
 local function countries(test)
-        -- TESTING FOR SAM
-        info="images/infoBrazil.png"
-        music="music/brazil.mid"  
-        country="    BRAZIL,\nSouth America"   
-        flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
-        audio.stop( bobby )
-        music = audio.loadStream( 'anthems/canada.mp3' )
-        bobby = audio.play(music,{loops=-1})
-            
-        -- Set e here to pick a specific flag to go to. Otherwise, e=random
-        e=9
-        
+    local e = math.random(56)
+    country = CFGameSettings:getItemByID(e)
+    print("country : ", e)
+    print(country.name)
+    
+    info="images/infoBrazil.png"
+    
+    flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
+    flag:setSequence(country.name)
+    flag.anchorX = 0.5
+    flag.anchorY = 0.5
+    code = country.code
+    flag.x = _W/2
+    flag.y = _H/2
+
+    if(country.colors.r) then
+        r1= country.colors.r.r
+        r2= country.colors.r.g
+        r3= country.colors.r.b
+        print(r1,r2,r3)
+    end
+    if(country.colors.w) then 
+        w1= country.colors.w.r
+        w2= country.colors.w.g
+        w3= country.colors.w.b
+        print(w1,w2,w3)
+    end
+    if(country.colors.y) then 
+        y1= country.colors.y.r
+        y2= country.colors.y.g
+        y3= country.colors.y.b
+        print(y1,y2,y3)
+    end
+    if(country.colors.g) then 
+        g1= country.colors.g.r
+        g2= country.colors.g.g
+        g3= country.colors.g.b
+        print(g1,g2,g3)
+    end 
+    if(country.colors.b) then 
+        b1= country.colors.b.r
+        b2= country.colors.b.g
+        b3= country.colors.b.b
+        print(b1,b2,b3)
+    end
+    if(country.colors.o) then 
+        o1= country.colors.o.r
+        o2= country.colors.o.g
+        o3= country.colors.o.b
+        print(o1,o2,o3)
+    end
+    if(country.colors.k) then 
+        k1= country.colors.k.r
+        k2= country.colors.k.g
+        k3= country.colors.k.b
+        print(k1,k2,k3)
+    end
+
+    xCoord=350
+    yCoord=442
+    
+    -- if check.. when first flag appear. there will be no music. !!!
+    audio.stop( bobby )
+    music = audio.loadStream( "anthems/" .. country.name .. ".mp3" )
+    bobby = audio.play(music,{loops=-1})
+    
+    piece = display.newImage( "images/andorra104x102.png", 529,229)
+
+
+        --[[    
         if e==1 then
             -- flag = display.newImageRect( "images/andorra.png", 200,100)
             -- flag = display.newSprite( nationalFlagsSheet , {frames={nationalFlags1Coords:getFrameIndex("andorra")}} )
@@ -1575,15 +1633,9 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/singapore.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/Singapore.mp3' ) 
+            bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- Slovakia
@@ -1609,15 +1661,9 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/slovakia.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/Slovakia.mp3' ) 
+            bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- Slovenia
@@ -1643,15 +1689,9 @@ local function countries(test)
 
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/slovenia.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/Slovenia.mp3' ) 
+            bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- South Africa
@@ -1689,15 +1729,9 @@ local function countries(test)
 
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/south_africa.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
+            audio.stop( bobby )
+            music = audio.loadStream( 'anthems/SouthAfrica.mp3' ) 
+            bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- South Korea
@@ -1727,15 +1761,11 @@ local function countries(test)
 
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
+          
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/SouthKorea.mp3' )
+            bobby = audio.play(music,{loops=-1})
 
-            -- if check.. when first flag appear. there will be no music. !!!
-            --   audio.stop( bobby )
-            -- music = audio.loadStream( 'anthems/south_korea.mp3' ) 
-            -- bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
 
         -- Spain
@@ -1757,11 +1787,11 @@ local function countries(test)
 
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
+            
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/Spain.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
             -- music = audio.loadStream( 'anthems/spain.mp3' ) 
@@ -1795,10 +1825,10 @@ local function countries(test)
 
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
+
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/SriLanka.mp3' )
+            bobby = audio.play(music,{loops=-1})
 
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
@@ -1825,11 +1855,11 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
-
+            
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/Sweden.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
             -- music = audio.loadStream( 'anthems/sweden.mp3' ) 
@@ -1854,11 +1884,11 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
 
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/Switzerland.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
             -- music = audio.loadStream( 'anthems/switzerland.mp3' ) 
@@ -1888,10 +1918,11 @@ local function countries(test)
 
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
+            
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/Taiwan.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            
 
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
@@ -1922,11 +1953,13 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
+            
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/Thailand.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            
 
+            
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
             -- music = audio.loadStream( 'anthems/thailand.mp3' ) 
@@ -1990,10 +2023,11 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
+
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/UnitedArabEmirates.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            
 
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
@@ -2024,11 +2058,11 @@ local function countries(test)
             
             xCoord=350
             yCoord=442
-            -- if music == nil and soundOn==true then
-            --   music="anthems/Brazil.mp3"
-            --   audio.play(music, {loops = -1})
-            --   end
 
+            audio.stop( bobby )  
+            music = audio.loadStream( 'anthems/UnitedKingdom.mp3' )
+            bobby = audio.play(music,{loops=-1})
+            
             -- if check.. when first flag appear. there will be no music. !!!
             --   audio.stop( bobby )
             -- music = audio.loadStream( 'anthems/united_kingdom.mp3' ) 
@@ -2068,7 +2102,7 @@ local function countries(test)
             -- bobby = audio.play(music,{loops=-1})
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
         end
-
+        ]]--
         flag.width=200
         flag.height=100
 end
@@ -2132,7 +2166,8 @@ local function removeFlag()
 
 local function readyObject (e)
 
-  if setTheFlag==true then     --START A NEW FLAG
+  if setTheFlag==true then     --START A NEW FLAG 
+  canQuit=false
   transition.to( piece, { time=490, alpha=0,onComplete=killPiece})
     setTheFlag=false
 
@@ -2156,10 +2191,38 @@ local function setupVariables()
       map.x=0 ;map.y=0;                
 end
 
+
+local function buttonHit(e)     
+    if canQuit==true then
+        if e.target.type=="fwBtn" then           
+           setTheFlag = true
+        elseif e.target.type=="xBtn" then
+           composer.gotoScene ( "menu", { effect = defaultTransition } )   
+        end
+        return true
+    end
+end
+
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
-      print("CREATE")                
+    fwBtn = display.newImageRect( "images/greenArrow.png", 70, 70 )
+    fwBtn.type = "fwBtn"
+    fwBtn.anchorX=0.5
+    fwBtn.anchorY=0.5
+    fwBtn.x = 120
+    fwBtn.y = 40
+    fwBtn:toBack() 
+    xBtn = display.newImageRect( "images/greenX.png", 70, 70 )
+    xBtn.type = "xBtn"
+    xBtn.anchorX=0.5
+    xBtn.anchorY=0.5
+    xBtn.x = 40
+    xBtn.y = 40 
+    xBtn.gotoScene = "menu"
+    self.view:insert(fwBtn)  
+    self.view:insert(xBtn)  
+
 end
 
 function scene:show(e)
@@ -2171,9 +2234,11 @@ function scene:show(e)
 
     elseif (e.phase == "did") then
  
-   --    system.activate( "multitouch" )     
+   --    system.activate( "multitouch" )  
+      xBtn:addEventListener("tap",buttonHit)
+      fwBtn:addEventListener("tap",buttonHit)
       Runtime:addEventListener("enterFrame", readyObject)  
-       setTimer=timer.performWithDelay(20000, setFlag, 0)
+    --   setTimer=timer.performWithDelay(20000, setFlag, 0)
      --  timer.performWithDelay(15000, checkMemory,0)
        newFlag()
     end
@@ -2187,12 +2252,18 @@ function scene:hide(e)
     display.remove(deadText)
     display.remove(piece)
     display.remove(map)
-
+    display.remove(flag)
+    display.remove(xBtn)
+    display.remove(fwBtn)
+    display.remove(countryText)
+    display.remove(country)
     display.remove(infoPic)
-
+    print("quit")
     if timerSpeed~=nil then
       timer.cancel(timerSpeed)
     end
+ --   xBtn:RemoveEventListener("tap",buttonHit)
+   -- fwBtn:RemoveEventListener("tap",buttonHit)
     Runtime:removeEventListener("enterFrame", readyObject)
     composer.removeScene("cruise",false) 
   end
