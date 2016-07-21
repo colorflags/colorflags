@@ -157,7 +157,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["France"] = { 
-        id = 18,
+        id = 17,
         name = "France",
         code = "rbw",
         colors = {
@@ -167,7 +167,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Germany"] = { 
-        id = 19,
+        id = 18,
         name = "Germany",
         code = "ryk",
         colors = {
@@ -177,7 +177,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Greece"] = { 
-        id = 20,
+        id = 19,
         name = "Greece",
         code = "bw",
         colors = {
@@ -186,7 +186,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Hungary"] = { 
-        id = 21,
+        id = 20,
         name = "Hungary",
         code = "rgw",
         colors = {
@@ -196,7 +196,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Iceland"] = { 
-        id = 22,
+        id = 21,
         name = "Iceland",
         code = "rbw",
         colors = {
@@ -206,7 +206,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["India"] = { 
-        id = 23,
+        id = 22,
         name = "India",
         code = "ogbw",
         colors = {
@@ -217,7 +217,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Indonesia"] = { 
-        id = 24,
+        id = 23,
         name = "Indonesia",
         code = "rw",
         colors = {
@@ -226,7 +226,7 @@ CFGameSettings = class(function(c)
         }
     } 
     countries["Ireland"] = { 
-        id = 25,
+        id = 24,
         name = "Ireland",
         code = "ogw",
         colors = {
@@ -236,7 +236,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Isreal"] = { 
-        id = 26,
+        id = 25,
         name = "Isreal",
         code = "bw",
         colors = {
@@ -245,7 +245,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Italy"] = { 
-        id = 27,
+        id = 26,
         name = "Italy",
         code = "rgw",
         colors = {
@@ -255,7 +255,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Japan"] = { 
-        id = 28,
+        id = 27,
         name = "Japan",
         code = "rw",
         colors = {
@@ -264,7 +264,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Lithuania"] = { 
-        id = 29,
+        id = 28,
         name = "Lithuania",
         code = "ryg",
         colors = {
@@ -274,7 +274,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Luxembourg"] = { 
-        id = 30,
+        id = 29,
         name = "Luxembourg",
         code = "rbw",
         colors = {
@@ -284,7 +284,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Malaysia"] = { 
-        id = 31,
+        id = 30,
         name = "Malaysia",
         code = "rybw",
         colors = {
@@ -295,7 +295,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Malta"] = { 
-        id = 32,
+        id = 31,
         name = "Malta",
         code = "rw",
         colors = {
@@ -304,7 +304,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Mexico"] = { 
-        id = 33,
+        id = 32,
         name = "Mexico",
         code = "rgw",
         colors = {
@@ -313,9 +313,9 @@ CFGameSettings = class(function(c)
             w = CFColor(255,255,255)
         }
     }
-    countries["Netherland"] = { 
-        id = 34,
-        name = "Netherland",
+    countries["Netherlands"] = { 
+        id = 33,
+        name = "Netherlands",
         code = "rbw",
         colors = {
             r = CFColor(174,28,40),
@@ -324,7 +324,7 @@ CFGameSettings = class(function(c)
         }
     } 
     countries["NewZealand"] = { 
-        id = 35,
+        id = 34,
         name = "NewZealand",
         code = "rbw",
         colors = {
@@ -334,7 +334,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Norway"] = { 
-        id = 36,
+        id = 35,
         name = "Norway",
         code = "rbw",
         colors = {
@@ -344,7 +344,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Philippines"] = { 
-        id = 37,
+        id = 36,
         name = "Philippines",
         code = "rybw",
         colors = {
@@ -355,7 +355,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Poland"] = { 
-        id = 38,
+        id = 37,
         name = "Poland",
         code = "rw",
         colors = {
@@ -364,7 +364,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Portugal"] = { 
-        id = 39,
+        id = 38,
         name = "Portugal",
         code = "rg",
         colors = {
@@ -373,7 +373,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Russia"] = { 
-        id = 40,
+        id = 39,
         name = "Russia",
         code = "rbw",
         colors = {
@@ -383,7 +383,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["SanMarino"] = { 
-        id = 41,
+        id = 40,
         name = "SanMarino",
         code = "bw",
         colors = {
@@ -392,7 +392,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Singapore"] = { 
-        id = 42,
+        id = 41,
         name = "Singapore",
         code = "rw",
         colors = {
@@ -401,7 +401,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Slovakia"] = { 
-        id = 43,
+        id = 42,
         name = "Slovakia",
         code = "rbw",
         colors = {
@@ -411,7 +411,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Slovenia"] = { 
-        id = 44,
+        id = 43,
         name = "Slovenia",
         code = "rbw",
         colors = {
@@ -421,7 +421,7 @@ CFGameSettings = class(function(c)
         }
     } 
     countries["SouthAfrica"] = { 
-        id = 45,
+        id = 44,
         name = "southafrica",
         code = "rygbwk",
         colors = {
@@ -434,7 +434,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["SouthKorea"] = { 
-        id = 46,
+        id = 45,
         name = "SouthKorea",
         code = "rbwk",
         colors = {
@@ -445,7 +445,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Spain"] = { 
-        id = 47,
+        id = 46,
         name = "Spain",
         code = "ry",
         colors = {
@@ -454,7 +454,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["SriLanka"] = { 
-        id = 48,
+        id = 47,
         name = "SriLanka",
         code = "royg",
         colors = {
@@ -465,7 +465,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Sweden"] = { 
-        id = 49,
+        id = 48,
         name = "Sweden",
         code = "yb",
         colors = {
@@ -474,7 +474,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Switzerland"] = { 
-        id = 50,
+        id = 49,
         name = "Switzerland",
         code = "rw",
         colors = {
@@ -483,7 +483,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Taiwan"] = { 
-        id = 51,
+        id = 50,
         name = "Taiwan",
         code = "rbw",
         colors = {
@@ -493,7 +493,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Thailand"] = { 
-        id = 52,
+        id = 51,
         name = "Thailand",
         code = "rbw",
         colors = {
@@ -503,7 +503,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["Turkey"] = { 
-        id = 53,
+        id = 52,
         name = "Turkey",
         code = "rw",
         colors = {
@@ -512,7 +512,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["UnitedArabEmirates"] = { 
-        id = 54,
+        id = 53,
         name = "UnitedArabEmirates",
         code = "rgwk",
         colors = {
@@ -523,7 +523,7 @@ CFGameSettings = class(function(c)
         }
     } 
     countries["UnitedKingdom"] = { 
-        id = 55,
+        id = 54,
         name = "UnitedKingdom",
         code = "rbw",
         colors = {
@@ -533,7 +533,7 @@ CFGameSettings = class(function(c)
         }
     }
     countries["UnitedStates"] = { 
-        id = 56,
+        id = 55,
         name = "UnitedStates",
         code = "rbw",
         colors = {

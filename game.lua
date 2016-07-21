@@ -3398,12 +3398,12 @@ local function setupVariables()
 
      
 
-      map = display.newImage( "images/alpha2048_1.png", 2048,1038)
+      map = display.newImage( "images/world.png", 2048,1038)
+      map.alpha = .65
       map.anchorX=0.5
       map.anchorY=0.5
       map.name="map"
       map.x=0 ;map.y=0;
-
 
    levels = {
                { speed=1, timeVar=2550},{ speed=1.5, timeVar=1700},{ speed=2, timeVar=1250},{ speed=2.5, timeVar=1000},{ speed=3, timeVar=910},{ speed=3.5, timeVar=750},
