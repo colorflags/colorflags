@@ -1,7 +1,8 @@
 local composer=require("composer")
 local scene = composer.newScene()
 
-
+local highScore
+local gameScore
 local cloudsBG1
 local cloudsBG2
 local cloudsFG1
@@ -32,6 +33,7 @@ local randomFlag6
 local randomFlag7
 local randomFlag8
 local scoreText
+local highScoreText
 
 music=nil
 bobby=nil
@@ -241,8 +243,16 @@ local function myTouchListener( event )
         -- event.target.alpha = 1
         
         if boundaryCheck == true then 
-            local goto = event.target.gotoScene
-            composer.gotoScene ( goto, { effect = defaultTransition } )
+            if event.target.gotoScene == "menu" then
+               if  system.getInfo("platformName")=="Android" then
+                 native.requestExit()
+               else
+                  os.exit() 
+               end
+            else            
+              local goto = event.target.gotoScene
+              composer.gotoScene ( goto, { effect = defaultTransition } )
+            end  
         end
 
         currentObject:setFrame(1)
@@ -281,6 +291,57 @@ end
   --composer.gotoScene ( goto, { effect = defaultTransition } )
   --return true
 --end
+
+local function scoreSave(tempScore)
+   local path = system.pathForFile( "scorefile.txt", system.DocumentsDirectory )
+   local file = io.open(path, "w")
+   if ( file ) then
+      local contents = tostring(tempScore )
+      file:write( tempScore )
+      io.close( file )
+      return true
+   else
+      print( "Error: could not read ", "scorefile.txt", "." )
+      return false
+   end
+end
+ 
+local function scoreLoad()
+   local path = system.pathForFile( "scorefile.txt", system.DocumentsDirectory )
+   local contents = ""
+   local file = io.open( path, "r" )
+   if ( file ) then
+      -- Read all contents of file into a string
+      local contents = file:read( "*a" )
+      local score = tonumber(contents);
+      io.close( file )
+      return score
+   else
+      print( "Error: could not read scores from ", "scorefile.txt", "." )
+   end
+   return nil
+end
+ 
+local function scoreCheck()
+
+     local loadedHighScore=scoreLoad()
+
+    if loadedHighScore == nil then
+      scoreSave(gameScore)
+      highScore=gameScore
+    elseif loadedHighScore ~= nil then
+      if loadedHighScore >= gameScore then
+         highScore=loadedHighScore
+      elseif loadedHighScore < gameScore then
+         scoreSave(gameScore)
+         highScore=gameScore
+      end
+    end
+        highScoreText = display.newText("BEST " .. highScore, _W/2, _H/2+40, native.systemFont, 16)
+        highScoreText:setFillColor( 0, 1, 0 )
+        highScoreText:toFront()
+end
+
 
 function scene:create(e)  
   killScreen = display.newImage( "images/bricks-sunken-w-bg.png", 568,320)
@@ -616,11 +677,14 @@ end
 
 function scene:show(e) 
   if e.phase == "will" then
-       print(e.params.saveScore)
+       gameScore=e.params.saveScore
+       print("game score is ", gameScore)
+       scoreCheck()
         scoreText = display.newText(e.params.saveScore, _W/2, _H/2, native.systemFont, 28)
         scoreText:setFillColor( 1, 0, 0 )
         scoreText:toFront()
-        self.view:insert(scoreText)
+        self.view:insert(scoreText)      
+
 
 
   elseif e.phase== "did" then
@@ -648,7 +712,7 @@ function scene:hide(e)
   display.remove(randomFlag7)
   display.remove(randomFlag8)
   display.remove(title)
-
+  display.remove(highScoreText)
   
    composer.removeScene("gameover")
   end
