@@ -5,13 +5,18 @@ local t1
 local t2
 local t3
 local t4
-local bkBtn
-local fwBtn
-local xBtn
 local phase = 1
 
-local function buttonHit(e)     
-    
+-- RENAME VARS
+
+local samBack
+local samFwd
+local samX
+
+local buttonSheetInfo = require("lua-sheets.back_buttons")
+local buttonSheet = graphics.newImageSheet( "images/back_buttons.png", buttonSheetInfo:getSheet() )
+
+local function buttonHit(e)         
    
         if e.target.type=="bkBtn" then          
             if phase == 2 then
@@ -42,13 +47,13 @@ local function buttonHit(e)
          
         end
     if phase ~= 4 then
-      fwBtn:toFront()
+      samFwd:toFront()
     end
     
     if phase ~= 1 then      
-      bkBtn:toFront()
+      samBack:toFront()
     end
-    xBtn:toFront()   
+    samX:toFront()   
     return true
 end
 
@@ -78,34 +83,41 @@ function scene:create( event )
     t1.anchorY=0.5
     t1.x = _W/2
     t1.y = _H/2  
-    bkBtn = display.newImageRect( "images/greenArrow.png", 70, 70 )
-    bkBtn.type = "bkBtn"
-    bkBtn.xScale = -1
-    bkBtn.anchorX=0.5
-    bkBtn.anchorY=0.5
-    bkBtn.x = 40
-    bkBtn.y = _H/2  
-    bkBtn:toBack() 
-    fwBtn = display.newImageRect( "images/greenArrow.png", 70, 70 )
-    fwBtn.type = "fwBtn"
-    fwBtn.anchorX=0.5
-    fwBtn.anchorY=0.5
-    fwBtn.x = _W-40
-    fwBtn.y = _H/2  
-    xBtn = display.newImageRect( "images/greenX.png", 70, 70 )
-    xBtn.type = "xBtn"
-    xBtn.anchorX=0.5
-    xBtn.anchorY=0.5
-    xBtn.x = 40
-    xBtn.y = 40 
-    xBtn.gotoScene = "menu"
-    self.view:insert(bkBtn)
+
+    local margins = 6
+    
+    samBack = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_--Btn")}} )
+    samBack.type = "bkBtn"
+    samBack.anchorX=0
+    samBack.anchorY=0
+    samBack.x = margins
+    samBack.y = _H - samBack.height - margins
+    samBack:toBack() 
+
+    
+    samFwd = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_--Btn")}} )
+    samFwd.type = "fwBtn"
+    samFwd.xScale = -1
+    samFwd.anchorX=0
+    samFwd.anchorY=0
+    samFwd.x = _W - margins
+    samFwd.y = _H - samFwd.height - margins 
+    
+    samX = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_xBtn")}} )
+    samX.type = "xBtn"
+    samX.anchorX=0
+    samX.anchorY=0
+    samX.x = 0 + margins
+    samX.y = 0 + margins
+    samX.gotoScene = "menu"
+
     self.view:insert(t4)
     self.view:insert(t3) 
     self.view:insert(t2)    
     self.view:insert(t1)
-    self.view:insert(fwBtn)
-    self.view:insert(xBtn)    
+    self.view:insert(samBack)
+    self.view:insert(samFwd)
+    self.view:insert(samX)
 end
 
 
@@ -115,17 +127,17 @@ function scene:show( event )
     if event.phase == "will" then
 
     elseif event.phase=="did" then
-       bkBtn:addEventListener("tap",buttonHit)  
-       fwBtn:addEventListener("tap",buttonHit)
-       xBtn:addEventListener("tap",buttonHit)  
+       samBack:addEventListener("tap", buttonHit)
+       samFwd:addEventListener("tap",buttonHit)
+       samX:addEventListener("tap", buttonHit)
     end
 end
 
 function scene:hide( event )
     if event.phase == "will" then
-          bkBtn:removeEventListener("tap",buttonHit)  
-          fwBtn:removeEventListener("tap",buttonHit)
-          xBtn:removeEventListener("tap",buttonHit)  
+          samBack:removeEventListener("tap", buttonHit)
+          samFwd:removeEventListener("tap",buttonHit)
+          samX:removeEventListener("tap",buttonHit)  
           composer.removeScene("tutorial",false)   
     elseif event.phase == "did" then
     end
