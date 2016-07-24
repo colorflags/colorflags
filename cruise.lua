@@ -10,15 +10,15 @@ local scene = composer.newScene()
 --local physics = require("physics")
 --physics.start()
 
-<<<<<<< HEAD
+
 --SAM: we probebly want a global flag var
 local flagGroup
 
-=======
+
 local xBtn
 local fwBtn
 local canQuit=false
->>>>>>> d9d4d4c69317a4af74fbd71470e71c00c90f2b7b
+
 --media.playSound('Brazil.mid')
 local touchFlagReady
 local infoPic
@@ -245,7 +245,7 @@ local function countries(test)
     print("country : ", e)
     print(country.name)
     
-<<<<<<< HEAD
+
     -- SAM: what is this? not needed anymore?
     code = country.code
    
@@ -275,17 +275,7 @@ local function countries(test)
 
     flagGroup:insert(blurBox)
     flagGroup:insert(flag)
-=======
-    info="images/infoBrazil.png"
-    
-    flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
-    flag:setSequence(country.name)
-    flag.anchorX = 0.5
-    flag.anchorY = 0.5
-    code = country.code
-    flag.x = _W/2
-    flag.y = _H/2
->>>>>>> d9d4d4c69317a4af74fbd71470e71c00c90f2b7b
+
 
     if(country.colors.r) then
         r1= country.colors.r.r
@@ -339,11 +329,11 @@ local function countries(test)
     bobby = audio.play(music,{loops=-1})
     
     piece = display.newImage( "images/andorra104x102.png", 529,229)
-<<<<<<< HEAD
+
         
     --flagGroup.width=200
     --flagGroup.height=100
-=======
+
 
 
         --[[    
@@ -2148,7 +2138,7 @@ local function countries(test)
         ]]--
         flag.width=200
         flag.height=100
->>>>>>> d9d4d4c69317a4af74fbd71470e71c00c90f2b7b
+
 end
 
 local function newFlag() 

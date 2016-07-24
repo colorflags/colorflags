@@ -7,6 +7,7 @@ local cloudsBG1
 local cloudsBG2
 local cloudsFG1
 local cloudsFG2
+local whatBackground
 local killScreen
 local cloud1
 local cloud2
@@ -34,6 +35,17 @@ local randomFlag7
 local randomFlag8
 local scoreText
 local highScoreText
+local FG1Transition1
+local FG1Transition2
+local FG1Transition3
+local FG1Transition4
+local FG2Transition1
+local FG2Transition2
+local FG2Transition3
+local FG2Transition4
+local cloudFadeTransition1
+local cloudFadeTransition2
+
 
 music=nil
 bobby=nil
@@ -44,6 +56,9 @@ bobby = audio.play(music,{loops=-1})
 
 -- local flagHeights = {24, 23, -46}
 -- local flagX = {20, 98, 44, 515, 525, 100, 480, 534}
+
+
+
 
 local flagHeights = {24, -18, -46}
 local flagX = {20, 98, 69, 500, 525, 100, 480, 534}
@@ -64,10 +79,7 @@ local niceTrySeq = {
 
 }
 
-menuNiceTry = display.newSprite(niceTrySheet,niceTrySeq)
-menuNiceTry.x=_W/2; menuNiceTry.y=70
-menuNiceTry:setSequence("nicetry")
-menuNiceTry:play()
+
 
 function niceTryPop(event)
     local thisAnimation = event.target
@@ -82,7 +94,7 @@ end
 
 
 
-menuNiceTry:addEventListener("sprite", niceTryPop)
+
 
 local menuSpriteCoords = require("lua-sheets.btns-gameover")
 local menuAgainSheet = graphics.newImageSheet( "images/btns-gameover.png", menuSpriteCoords:getSheet() )
@@ -232,27 +244,28 @@ local boundaryCheck = false
 
 local function myTouchListener( event )
     if event.phase == "began" then      
-        print("began phase")
         -- event.target.alpha = 0.5
         -- event.target:setFrame( 1 )
         currentObject = event.target
 
         display.getCurrentStage():setFocus(currentObject)
     elseif event.phase == "ended" or event.phase == "cancelled" then
-        print("end phase")
         -- event.target.alpha = 1
         
         if boundaryCheck == true then 
-            if event.target.gotoScene == "menu" then
-               if  system.getInfo("platformName")=="Android" then
-                 native.requestExit()
-               else
-                  os.exit() 
-               end
-            else            
-              local goto = event.target.gotoScene
+    local goto = event.target.gotoScene
+              if event.target.gotoScene == "menu" then
+
+              composer.gotoScene ( "menu", { effect = defaultTransition } )
+              elseif event.target.gotoScene == "options" then
+              
+  
+              else
+          
               composer.gotoScene ( goto, { effect = defaultTransition } )
-            end  
+         
+              end
+
         end
 
         currentObject:setFrame(1)
@@ -264,135 +277,36 @@ end
 
 
 local function doFunction(e)
+
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
             e.x > currentObject.contentBounds.xMax or
             e.y < currentObject.contentBounds.yMin or
             e.y > currentObject.contentBounds.yMax then
-            
             currentObject:setFrame( 1 )
-            -- print("Its out")
+        
             boundaryCheck = false
         else
             currentObject:setFrame( 2 )
-            -- print("Its in")
             boundaryCheck = true
         end   
     end     
 end
 
 
-
-
-
-
---local function buttonHit(e)
-  --local goto = e.target.gotoScene
-  --composer.gotoScene ( goto, { effect = defaultTransition } )
-  --return true
---end
-
-local function scoreSave(tempScore)
-   local path = system.pathForFile( "scorefile.txt", system.DocumentsDirectory )
-   local file = io.open(path, "w")
-   if ( file ) then
-      local contents = tostring(tempScore )
-      file:write( tempScore )
-      io.close( file )
-      return true
-   else
-      print( "Error: could not read ", "scorefile.txt", "." )
-      return false
-   end
-end
- 
-local function scoreLoad()
-   local path = system.pathForFile( "scorefile.txt", system.DocumentsDirectory )
-   local contents = ""
-   local file = io.open( path, "r" )
-   if ( file ) then
-      -- Read all contents of file into a string
-      local contents = file:read( "*a" )
-      local score = tonumber(contents);
-      io.close( file )
-      return score
-   else
-      print( "Error: could not read scores from ", "scorefile.txt", "." )
-   end
-   return nil
-end
- 
-local function scoreCheck()
-
-     local loadedHighScore=scoreLoad()
-
-    if loadedHighScore == nil then
-      scoreSave(gameScore)
-      highScore=gameScore
-    elseif loadedHighScore ~= nil then
-      if loadedHighScore >= gameScore then
-         highScore=loadedHighScore
-      elseif loadedHighScore < gameScore then
-         scoreSave(gameScore)
-         highScore=gameScore
-      end
-    end
-        highScoreText = display.newText("BEST " .. highScore, _W/2, _H/2+40, native.systemFont, 16)
-        highScoreText:setFillColor( 0, 1, 0 )
-        highScoreText:toFront()
-end
-
-
-function scene:create(e)  
-  killScreen = display.newImage( "images/bricks-sunken-w-bg.png", 568,320)
-  killScreen.name="killScreen"
-  killScreen.x=_W/2 ;killScreen.y=_H/2
-
-  cloudsBG1 = display.newImage( "images/clouds_bg_2.png", 568, 320 )
-  cloudsBG1.name="cloudsBG1"
-  cloudsBG1.alpha=.57
-  cloudsBG1.x=_W/2 ;cloudsBG1.y=_H/2
-cloudsBG1.speed = 1
-
-  cloudsBG2 = display.newImage( "images/clouds_bg_2.png", 568, 320 )
-  cloudsBG2.name="cloudsBG2"
-  cloudsBG2.alpha=.57
--- cloudsBG2 = display.newRect( 0,0,568,320 )
--- cloudsBG2:setFillColor(1.0, 1.0, 0.0)
--- cloudsBG2.alpha = .5
-  cloudsBG2.x=_W/2+568 ;cloudsBG2.y=_H/2
-cloudsBG2.speed = 1
-
-local offsetCloudFG = 20
-
-  cloudsFG1 = display.newImage( "images/clouds_fg4_large.png", 568, 350 )
-  cloudsFG1.name="cloudsFG1"
-  -- cloudsFG1:setFillColor( 1, 1, 0 )
-  cloudsFG1.x=_W/2-(offsetCloudFG) ;cloudsFG1.y=_H/2
-cloudsFG1.speed = 2
-  cloudsFG2 = display.newImage( "images/clouds_fg4_large.png", 568, 350 )
-  cloudsFG2.name="cloudsFG2"
-  -- cloudsFG2:setFillColor( 1, 1, 0 )  
-  cloudsFG2.x=_W/2+(_W-offsetCloudFG) ;cloudsFG2.y=_H/2
-cloudsFG2.speed = 2
-
--- ISSUES WITH THESE RECYCLING (JUMPING TO BEHIND ONE ANOTHER) IMAGES FOR:
---   1. SIMULATOR, NON IPHONE 5
---   2. ON DEVICES THEMSELVES (INCLUDING IPHONE 5)
-
-  function scrollCloudsBG(self, event)
+ local function scrollCloudsBG(self, event)
     
     if self.x < -284 then -- 477
       self.x = _W/2+566 -- 480
-    -- print(self.x)      
+       
     else
-    -- print(self.x)      
+     
 
       self.x = self.x - self.speed
     end
   end
 
-  function scrollCloudsFG(self, event)
+ local function scrollCloudsFG(self, event)
 
     -- transition.to( self, { time=4000, y=200, transition=easing.continuousLoop } )
     if self.x < -284 then -- 477
@@ -408,13 +322,13 @@ local function cloudCirculate(self)
     self:toFront( )
     if myPusa == "cloudsFG1" then
 
-        transition.to(self, {time=200, y=self.y-2, onComplete=function()
-            transition.to(
+        FG1Transition4= transition.to(self, {time=200, y=self.y-2, onComplete=function()
+            FG1Transition3 = transition.to(
                 self, {time=1400, y=self.y+10, onComplete=function()
-                    transition.to(
+                   FG1Transition2 = transition.to(
                         self, {time=200, y=self.y+2, onComplete=function()
 
-                            transition.to(
+                           FG1Transition1 = transition.to(
                                 self, {time=1400, y=self.y-10, onComplete=cloudCirculate})
                         end
                         })
@@ -424,13 +338,13 @@ local function cloudCirculate(self)
         })
     elseif myPusa == "cloudsFG2" then
 
-        transition.to(self, {time=200, y=self.y+2, onComplete=function()
-            transition.to(
+        FG2Transition4 =  transition.to(self, {time=200, y=self.y+2, onComplete=function()
+            FG2Transition3 = transition.to(
                 self, {time=1400, y=self.y-10, onComplete=function()
-                    transition.to(
+                    FG2Transition2 = transition.to(
                         self, {time=200, y=self.y-2,  onComplete=function()
 
-                            transition.to(
+                           FG2Transition1 = transition.to(
                                 self, {time=1400, y=self.y+10, onComplete=cloudCirculate})
                         end
                         })
@@ -441,61 +355,23 @@ local function cloudCirculate(self)
     end
 end
 
-function cloudFade(self)
-    transition.to( self, {time=3920, alpha=.28,onComplete=function()
-        transition.to( self, {time=2360, alpha=.57,onComplete=cloudFade})
+local function cloudFade(self)
+   cloudFadeTransition2 = transition.to( self, {time=3920, alpha=.28,onComplete=function()
+        cloudFadeTransition1 = transition.to( self, {time=2360, alpha=.57,onComplete=cloudFade})
     end
     })
 end
 
+local function setScene()
 
-cloudsBG1.enterFrame = scrollCloudsBG
-Runtime:addEventListener("enterFrame", cloudsBG1)
-cloudsBG2.enterFrame = scrollCloudsBG
-Runtime:addEventListener("enterFrame", cloudsBG2)
 
-cloudsFG1.enterFrame = scrollCloudsFG
-Runtime:addEventListener("enterFrame", cloudsFG1)
-cloudsFG2.enterFrame = scrollCloudsFG
-Runtime:addEventListener("enterFrame", cloudsFG2)
 
-cloudCirculate(cloudsFG1)
-cloudCirculate(cloudsFG2)
+  killScreen = display.newImage( whatBackground, 568,320)
+  killScreen.name="killScreen"
+  killScreen.x=_W/2 ;killScreen.y=_H/2
 
-cloudFade(cloudsBG1)
-cloudFade(cloudsBG2)
-  -- cloud1 = display.newImage( "images/cloud150x74.png", 150,74)
-  -- cloud1.anchorX=0.5
-  -- cloud1.anchorY=1
-  -- cloud1.name="cloud1"
-  -- cloud1.x=_W/2+130 ;cloud1.y=_H/2
 
-  -- cloud2 = display.newImage( "images/cloud2150x74.png", 150,74)
-  -- cloud2.anchorX=0.5
-  -- cloud2.anchorY=1
-  -- cloud2.name="cloud2"
-  -- cloud2.x=_W/2-130 ;cloud2.y=_H/2-50
 
-  -- cloud3 = display.newImage( "images/cloud3150x96.png", 150,96)
-  -- cloud3.anchorX=0.5
-  -- cloud3.anchorY=1
-  -- cloud3.name="cloud3"
-  -- cloud3.x=_W/2+190 ;cloud3.y=90
-
-  -- cloud4 = display.newImage( "images/cloud4100x62.png", 100,62)
-  -- cloud4.anchorX=0.5
-  -- cloud4.anchorY=1
-  -- cloud4.name="cloud4"
-  -- cloud4.x=50 ;cloud4.y=70    
-  -- cloud5 = display.newImage( "images/cloud5100x72.png", 100,72)
-  -- cloud5.anchorX=0.5
-  -- cloud5.anchorY=1
-  -- cloud5.name="cloud1"
-  -- cloud5.x=_W-50 ;cloud5.y=_H/2+50          
-
-  -- add a base for the flag pole ! get it to rest behind ?
-
-    selectRandomFlags()
 
 
   flagPole1 = display.newImage( "images/flagpole-142.png", 18,142)
@@ -549,160 +425,195 @@ cloudFade(cloudsBG2)
   flagPole8.name="flagPole8"
   flagPole8.x=flagX[8] ;flagPole8.y=_H/2+66      
 
+  -- fab=display.newSprite(myImageSheet2,fabSeq)
 
--- fab=display.newSprite(myImageSheet2,fabSeq)
-
-menuAgain = display.newSprite( menuAgainSheet, menuSeq )
-menuAgain:addEventListener( "touch", myTouchListener )
-menuAgain.x=88 ;menuAgain.y=_H-36
-menuAgain:setSequence( "again" )
-menuAgain:setFrame( 1 )
-menuAgain.gotoScene="game"
-
-
-menuShare= display.newSprite( menuShareSheet, menuSeq )
-menuShare:addEventListener( "touch", myTouchListener )
-menuShare.x=_W/2+20 ;menuShare.y=_H-39
-menuShare:setSequence( "share" )
-menuShare:setFrame( 1 )
-menuShare.gotoScene="options"
-
-menuQuit= display.newSprite( menuQuitSheet, menuSeq )
-menuQuit:addEventListener( "touch", myTouchListener )
-menuQuit.x=_W-69 ;menuQuit.y=_H-37
--- menuQuit.x=_W/2+10 ;menuQuit.y=_H-40
-menuQuit:setSequence( "quit" )
-menuQuit:setFrame( 1 )
-menuQuit.gotoScene="menu"
+  menuAgain = display.newSprite( menuAgainSheet, menuSeq )
+  menuAgain:addEventListener( "touch", myTouchListener )
+  menuAgain.x=88 ;menuAgain.y=_H-36
+  menuAgain:setSequence( "again" )
+  menuAgain:setFrame( 1 )
+  menuAgain.gotoScene="game"
 
 
---  local againBtn = makeTextButton("Again", 100, _H-50, {listener=buttonHit, group=group, fontSize=36})
-  --againBtn.gotoScene = "game"
---  local shareBtn = makeTextButton("Share", _W/2, _H-50, {listener=buttonHit, group=group,fontSize=36})
-  --shareBtn.gotoScene = "menu"
---  local quitBtn = makeTextButton("Quit",_W-100, _H-50, {listener=buttonHit, group=group,fontSize=36})
---  quitBtn.gotoScene = "menu"    
-  
+  menuShare= display.newSprite( menuShareSheet, menuSeq )
+  menuShare:addEventListener( "touch", myTouchListener )
+  menuShare.x=_W/2+20 ;menuShare.y=_H-39
+  menuShare:setSequence( "share" )
+  menuShare:setFrame( 1 )
+  menuShare.gotoScene="options"
 
-  -- self.view:insert(cloud1)
-  -- self.view:insert(cloud2)
-  -- self.view:insert(cloud3)
-  -- self.view:insert(cloud4)
-  -- self.view:insert(cloud5)
-
-
-  -- self.view:insert(flagPole1)
-  -- self.view:insert(flagPole2)
-
-  -- self.view:insert(flagPole7)
-  -- self.view:insert(flagPole8)  
+  menuQuit= display.newSprite( menuQuitSheet, menuSeq )
+  menuQuit:addEventListener( "touch", myTouchListener )
+  menuQuit.x=_W-69 ;menuQuit.y=_H-37
+  -- menuQuit.x=_W/2+10 ;menuQuit.y=_H-40
+  menuQuit:setSequence( "quit" )
+  menuQuit:setFrame( 1 )
+  menuQuit.gotoScene="menu"
 
 
 
-  -- IMPORTANT IMPORTANT IMPORTANT IMPORTANT
+   selectRandomFlags()
+   killScreen:toBack()
+end
 
-  -- why are flagPole objects being added to this scene but not flagWaves?
-  -- I what I'm doing with the ordering (toFront and toBack), determining the ordering ok to do it here? I had troubles doing it before all the objects were insterted (I needed to put the below code after lines 348 to 353)
+local function newHighScore()
+whatBackground = "images/bricks-sunken-w-bg_blue.png"
+setScene()
+end
 
+local function noHighScore()
+  cloudsBG1 = display.newImage( "images/clouds_bg_2.png", 568, 320 )
+  cloudsBG1.name="cloudsBG1"
+  cloudsBG1.alpha=.57
+  cloudsBG1.x=_W/2 ;cloudsBG1.y=_H/2
+  cloudsBG1.speed = 1
 
+  cloudsBG2 = display.newImage( "images/clouds_bg_2.png", 568, 320 )
+  cloudsBG2.name="cloudsBG2"
+  cloudsBG2.alpha=.57
+-- cloudsBG2 = display.newRect( 0,0,568,320 )
+-- cloudsBG2:setFillColor(1.0, 1.0, 0.0)
+-- cloudsBG2.alpha = .5
+  cloudsBG2.x=_W/2+568 ;cloudsBG2.y=_H/2
+  cloudsBG2.speed = 1
 
-  -- ADD RANDOMFLAGS AFTER FLAGPOLES !
+  offsetCloudFG = 20
 
-    -- THIS ORDERING IS IMPORTANT. ITS THE KEY
+  cloudsFG1 = display.newImage( "images/clouds_fg4_large.png", 568, 350 )
+  cloudsFG1.name="cloudsFG1"
+  -- cloudsFG1:setFillColor( 1, 1, 0 )
+  cloudsFG1.x=_W/2-(offsetCloudFG) ;cloudsFG1.y=_H/2
+  cloudsFG1.speed = 2
+  cloudsFG2 = display.newImage( "images/clouds_fg4_large.png", 568, 350 )
+  cloudsFG2.name="cloudsFG2"
+  -- cloudsFG2:setFillColor( 1, 1, 0 )  
+  cloudsFG2.x=_W/2+(_W-offsetCloudFG) ;cloudsFG2.y=_H/2
+  cloudsFG2.speed = 2
 
+-- ISSUES WITH THESE RECYCLING (JUMPING TO BEHIND ONE ANOTHER) IMAGES FOR:
+--   1. SIMULATOR, NON IPHONE 5
+--   2. ON DEVICES THEMSELVES (INCLUDING IPHONE 5)
 
+  cloudsBG1.enterFrame = scrollCloudsBG
+  Runtime:addEventListener("enterFrame", cloudsBG1)
+  cloudsBG2.enterFrame = scrollCloudsBG
+  Runtime:addEventListener("enterFrame", cloudsBG2)
 
+  cloudsFG1.enterFrame = scrollCloudsFG
+  Runtime:addEventListener("enterFrame", cloudsFG1)
+  cloudsFG2.enterFrame = scrollCloudsFG
+  Runtime:addEventListener("enterFrame", cloudsFG2)
 
-  -- self.view:insert(cloudsBG1)
-  -- self.view:insert(cloudsBG2)
+  cloudCirculate(cloudsFG1)
+  cloudCirculate(cloudsFG2)
 
+  cloudFade(cloudsBG1)
+  cloudFade(cloudsBG2)
 
-    -- cloudsFG1:toBack( )
-    -- cloudsFG2:toBack( )
+  highScoreText = display.newText("BEST " .. highScore, _W/2, _H/2+_H*(1/4)+2, native.systemFont, 16)
+  highScoreText:setFillColor( 1, 1, 1 )
+  highScoreText:toFront()
 
+  menuNiceTry = display.newSprite(niceTrySheet,niceTrySeq)
+  menuNiceTry.x=_W/2; menuNiceTry.y=70
+  menuNiceTry:setSequence("nicetry")
+  menuNiceTry:play()
+  menuNiceTry:addEventListener("sprite", niceTryPop)
+  whatBackground = "images/bricks-sunken-w-bg.png"
+  setScene()
+end
 
-
-  self.view:insert(killScreen)
-
-  self.view:insert(flagPole3) 
-  self.view:insert(flagPole4)  
-    -- flagPole3:toBack( )
-    -- flagPole4:toBack( )
-  self.view:insert(randomFlag3) 
-  self.view:insert(randomFlag4)  
-    -- randomFlag3:toBack( )
-    -- randomFlag4:toBack( )
-
-
-
-  -- cloudsBG1:toBack( )
-  -- cloudsBG2:toBack( )
-
-  self.view:insert(menuNiceTry)  
-
-  self.view:insert(flagPole1)
-  self.view:insert(flagPole2)
-
-  self.view:insert(flagPole7)
-  self.view:insert(flagPole8)  
-
-  self.view:insert(randomFlag1)
-  self.view:insert(randomFlag2)
-
-  self.view:insert(randomFlag7)
-  self.view:insert(randomFlag8) 
-
-  self.view:insert(cloudsBG1)
-  self.view:insert(cloudsBG2)
-
-  self.view:insert(cloudsFG1)
-  self.view:insert(cloudsFG2)
-
-
-
-
-  -- killScreen:toBack( )
-   
-
-  -- self.view:insert(flagPole5)
-  -- self.view:insert(flagPole6)   
+local function scoreSave(tempScore)
+   local path = system.pathForFile( "CFscorefile.txt", system.DocumentsDirectory )
+   local file = io.open(path, "w")
+   if ( file ) then
+      local contents = tostring(tempScore )
+      file:write( tempScore )
+      io.close( file )
+      return true
+   else
+      print( "Error: could not read ", "CFscorefile.txt", "." )
+      return false
+   end
+end
  
-  self.view:insert(menuAgain)
-  self.view:insert(menuShare)
-  self.view:insert(menuQuit)           
- -- self.view:insert(againBtn)
- -- self.view:insert(shareBtn)
- -- self.view:insert(quitBtn)
+local function scoreLoad()
+   local path = system.pathForFile( "CFscorefile.txt", system.DocumentsDirectory )
+   local contents = ""
+   local file = io.open( path, "r" )
+   if ( file ) then
+      -- Read all contents of file into a string
+      local contents = file:read( "*a" )
+      local score = tonumber(contents);
+      io.close( file )
+      return score
+   else
+      print( "Error: could not read scores from ", "CFscorefile.txt", "." )
+   end
+   return nil
+end
+ 
+local function scoreCheck()
+
+    local loadedHighScore=scoreLoad()
+    if loadedHighScore == nil then
+      scoreSave(gameScore)
+      highScore=gameScore
+      newHighScore()
+    elseif loadedHighScore ~= nil then
+      if loadedHighScore >= gameScore then
+         highScore=loadedHighScore
+         noHighScore()
+      elseif loadedHighScore < gameScore then
+         scoreSave(gameScore)
+         highScore=gameScore
+         newHighScore()
+      end
+    end
+ 
+end
+
+
+function scene:create(e)  
 end
 
 function scene:show(e) 
   if e.phase == "will" then
-       gameScore=e.params.saveScore
-       print("game score is ", gameScore)
-       scoreCheck()
-        scoreText = display.newText(e.params.saveScore, _W/2, _H/2, native.systemFont, 28)
+
+        if setScore==true then
+          gameScore=scoreLoad()+1
+          --gameScore=0
+        elseif setScore == false then
+          gameScore=e.params.saveScore
+        end
+        scoreText = display.newText(gameScore, _W/2, _H/2, native.systemFont, 60)
         scoreText:setFillColor( 1, 0, 0 )
         scoreText:toFront()
-        self.view:insert(scoreText)      
-
-
-
+        self.view:insert(scoreText)         
+        scoreCheck()
   elseif e.phase== "did" then
- 
-
-menuAgain:addEventListener( "touch", doFunction )
-menuQuit:addEventListener( "touch", doFunction )
-menuShare:addEventListener( "touch", doFunction )
--- menuAgain:addEventListener( "tap", buttonHit )
--- menuQuit:addEventListener( "tap", buttonHit )
--- menuShare:addEventListener( "tap", buttonHit )
+        menuAgain:addEventListener( "touch", doFunction )
+        menuQuit:addEventListener( "touch", doFunction )
+        menuShare:addEventListener( "touch", doFunction )
   end
-
-  
 end
 
 function scene:hide(e)
   if e.phase == "will" then
+  Runtime:removeEventListener("enterFrame", cloudsBG1)
+  Runtime:removeEventListener("enterFrame", cloudsBG2)
+  Runtime:removeEventListener("enterFrame", cloudsFG1)
+  Runtime:removeEventListener("enterFrame", cloudsFG2)
+  transition.cancel(cloudFadeTransition1)
+  transition.cancel(cloudFadeTransition2)
+  transition.cancel(FG1Transition1)
+  transition.cancel(FG1Transition2)
+  transition.cancel(FG1Transition3)
+  transition.cancel(FG1Transition4)
+  transition.cancel(FG2Transition1)
+  transition.cancel(FG2Transition2)
+  transition.cancel(FG2Transition3)
+  transition.cancel(FG2Transition4)
   display.remove(randomFlag1)
   display.remove(randomFlag2)
   display.remove(randomFlag3)
@@ -713,16 +624,27 @@ function scene:hide(e)
   display.remove(randomFlag8)
   display.remove(title)
   display.remove(highScoreText)
-  
-   composer.removeScene("gameover")
+  display.remove(cloudsFG1)
+  display.remove(cloudsFG2)
+  display.remove(killScreen)
+  display.remove(cloudsBG1)
+  display.remove(cloudsBF2)
+  display.remove(flagPole1)
+  display.remove(flagPole2)
+  display.remove(flagPole3)
+  display.remove(flagPole4)
+  display.remove(flagPole7)
+  display.remove(flagPole8)
+  display.remove(menuNiceTry)
+  display.remove(menuAgain)
+  display.remove(menuShare)
+  display.remove(menuQuit)
+  composer.removeScene("gameover")
   end
-
 end
 
 function scene:destroy(e)
-
 end
-
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
