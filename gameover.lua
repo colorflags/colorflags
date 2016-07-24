@@ -3,6 +3,9 @@ local scene = composer.newScene()
 
 local highScore
 local gameScore
+local shakeTextRight = true
+local shakeTextTimer
+local shakeText
 local cloudsBG1
 local cloudsBG2
 local cloudsFG1
@@ -570,9 +573,21 @@ local function scoreCheck()
          newHighScore()
       end
     end
+end    
  
-end
+-- transition.to( self, { time=4000, y=200, transition=easing.continuousLoop } )
 
+local function shakeText()
+ 
+     if shakeTextRight == true then
+        transition.to( scoreText, { time=150, rotation=-10 , onComplete=shakeText } )
+        shakeTextRight=false
+      elseif shakeTextRight == false then
+        transition.to( scoreText, { time=150, rotation=10 , onComplete=shakeText } )
+        shakeTextRight=true
+     end
+
+end
 
 function scene:create(e)  
 end
@@ -582,14 +597,16 @@ function scene:show(e)
 
         if setScore==true then
           gameScore=scoreLoad()+1
-          --gameScore=0
+         -- gameScore=0
         elseif setScore == false then
           gameScore=e.params.saveScore
         end
-        scoreText = display.newText(gameScore, _W/2, _H/2, native.systemFont, 60)
+        scoreText = display.newText(gameScore, _W/2, _H/2, native.systemFont, 80)
         scoreText:setFillColor( 1, 0, 0 )
         scoreText:toFront()
-        self.view:insert(scoreText)         
+
+        shakeText()
+        self.view:insert(scoreText)    
         scoreCheck()
   elseif e.phase== "did" then
         menuAgain:addEventListener( "touch", doFunction )
