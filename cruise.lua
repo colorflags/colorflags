@@ -10,15 +10,12 @@ local scene = composer.newScene()
 --local physics = require("physics")
 --physics.start()
 
-<<<<<<< HEAD
 --SAM: we probebly want a global flag var
 local flagGroup
 
-=======
-local xBtn
-local fwBtn
+--local xBtn
+--local fwBtn
 local canQuit=false
->>>>>>> d9d4d4c69317a4af74fbd71470e71c00c90f2b7b
 --media.playSound('Brazil.mid')
 local touchFlagReady
 local infoPic
@@ -245,7 +242,6 @@ local function countries(test)
     print("country : ", e)
     print(country.name)
     
-<<<<<<< HEAD
     -- SAM: what is this? not needed anymore?
     code = country.code
    
@@ -275,7 +271,7 @@ local function countries(test)
 
     flagGroup:insert(blurBox)
     flagGroup:insert(flag)
-=======
+
     info="images/infoBrazil.png"
     
     flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
@@ -285,7 +281,6 @@ local function countries(test)
     code = country.code
     flag.x = _W/2
     flag.y = _H/2
->>>>>>> d9d4d4c69317a4af74fbd71470e71c00c90f2b7b
 
     if(country.colors.r) then
         r1= country.colors.r.r
@@ -339,12 +334,6 @@ local function countries(test)
     bobby = audio.play(music,{loops=-1})
     
     piece = display.newImage( "images/andorra104x102.png", 529,229)
-<<<<<<< HEAD
-        
-    --flagGroup.width=200
-    --flagGroup.height=100
-=======
-
 
         --[[    
         if e==1 then
@@ -2148,7 +2137,6 @@ local function countries(test)
         ]]--
         flag.width=200
         flag.height=100
->>>>>>> d9d4d4c69317a4af74fbd71470e71c00c90f2b7b
 end
 
 local function newFlag() 
@@ -2228,7 +2216,6 @@ local function readyObject (e)
 end    
 
 local function setupVariables()
-
       map = display.newImage( "images/world.png", 2048,1038)
       map.alpha=0.65
       map.anchorX=0.5
@@ -2252,6 +2239,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
+    --[[
     fwBtn = display.newImageRect( "images/greenArrow.png", 70, 70 )
     fwBtn.type = "fwBtn"
     fwBtn.anchorX=0.5
@@ -2268,7 +2256,7 @@ function scene:create(e)
     xBtn.gotoScene = "menu"
     self.view:insert(fwBtn)  
     self.view:insert(xBtn)  
-
+    ]]--
 end
 
 function scene:show(e)
@@ -2281,8 +2269,8 @@ function scene:show(e)
     elseif (e.phase == "did") then
  
    --    system.activate( "multitouch" )  
-      xBtn:addEventListener("tap",buttonHit)
-      fwBtn:addEventListener("tap",buttonHit)
+      --xBtn:addEventListener("tap",buttonHit)
+      --fwBtn:addEventListener("tap",buttonHit)
       Runtime:addEventListener("enterFrame", readyObject)  
     --   setTimer=timer.performWithDelay(20000, setFlag, 0)
      --  timer.performWithDelay(15000, checkMemory,0)
@@ -2299,8 +2287,8 @@ function scene:hide(e)
     display.remove(piece)
     display.remove(map)
     display.remove(flag)
-    display.remove(xBtn)
-    display.remove(fwBtn)
+    --display.remove(xBtn)
+    --display.remove(fwBtn)
     display.remove(countryText)
     display.remove(country)
     display.remove(infoPic)
