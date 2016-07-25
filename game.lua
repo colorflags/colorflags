@@ -3711,7 +3711,7 @@ function scene:hide(e)
     Runtime:removeEventListener("enterFrame", moveObject)
     Runtime:removeEventListener("enterFrame", readyObject)
     Runtime:removeEventListener("enterFrame", trackObject)    
-    composer.removeScene("game",false) 
+    composer.removeScene("game",false)
   end
 end
 

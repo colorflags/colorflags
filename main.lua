@@ -19,12 +19,16 @@ _H = display.contentHeight; -- Get the height of the screen
 
 defaultTransition="crossFade"
 
-audioCanPlay=true
+setScore=true  --set true to get a high score every time
 
 local showSplash = false    --set false to skip mageegames splash 
+
 local fontFace
 local backgrounImage=nil
 local backgroundColor={255,255,255}
+
+audioCanPlay=true
+
 
  heightModeTop=35
  heightModeLow=_H-35
@@ -111,7 +115,7 @@ if showSplash==true then
 elseif showSplash==false then
         display.remove(splash1)
     display.remove(splash2)
-     composer.gotoScene( "tutorial", {effect = defaultTransition})
+     composer.gotoScene( "gameover", {effect = defaultTransition})
 end    
 
 
