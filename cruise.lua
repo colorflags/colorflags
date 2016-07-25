@@ -19,13 +19,8 @@ local flagGroup
 local canQuit=false
 =======
 
---SAM: we probebly want a global flag var
-local flagGroup
 
 
-local xBtn
-local fwBtn
-local canQuit=false
 
 >>>>>>> c97515a514aaeb684ab3387877748e01a5a7e4ed
 --media.playSound('Brazil.mid')
@@ -289,15 +284,6 @@ local function countries(test)
     flagGroup:insert(flag)
 
 <<<<<<< HEAD
-    info="images/infoBrazil.png"
-    
-    flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
-    flag:setSequence(country.name)
-    flag.anchorX = 0.5
-    flag.anchorY = 0.5
-    code = country.code
-    flag.x = _W/2
-    flag.y = _H/2
 =======
 >>>>>>> c97515a514aaeb684ab3387877748e01a5a7e4ed
 
@@ -2163,8 +2149,6 @@ local function countries(test)
             piece = display.newImage( "images/andorra104x102.png", 529,229)              
         end
         ]]--
-        flag.width=200
-        flag.height=100
 <<<<<<< HEAD
 =======
 
