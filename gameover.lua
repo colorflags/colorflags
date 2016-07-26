@@ -595,9 +595,9 @@ end
 function scene:show(e) 
   if e.phase == "will" then
 
-        if setScore==true then
-          gameScore=scoreLoad()+1
-         -- gameScore=0
+        if overrideScore==true then
+          gameScore=5
+         highScore=6
         elseif setScore == false then
           gameScore=e.params.saveScore
         end
@@ -606,8 +606,18 @@ function scene:show(e)
         scoreText:toFront()
 
         shakeText()
-        self.view:insert(scoreText)    
-        scoreCheck()
+        self.view:insert(scoreText) 
+
+        if overrideScore== true then
+          if highScore>gameScore then 
+         newHighScore()
+          elseif highScore<=gameScore then
+          noHighScore()
+        end
+        elseif overrideScore==false then
+           scoreCheck()
+
+        end
   elseif e.phase== "did" then
         menuAgain:addEventListener( "touch", doFunction )
         menuQuit:addEventListener( "touch", doFunction )

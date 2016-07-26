@@ -19,7 +19,7 @@ _H = display.contentHeight; -- Get the height of the screen
 
 defaultTransition="crossFade"
 
-setScore=true  --set true to get a high score every time
+overrideScore=true  --set true to test gameover.lua
 
 local showSplash = false    --set false to skip mageegames splash 
 
@@ -115,8 +115,9 @@ if showSplash==true then
 elseif showSplash==false then
         display.remove(splash1)
     display.remove(splash2)
-     composer.gotoScene( "menu", {effect = defaultTransition})
+     composer.gotoScene( "gameover", {effect = defaultTransition})
 end    
+
 
 
   -- composer.removeScene("main",false)  
