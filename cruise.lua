@@ -127,16 +127,13 @@ local nationalFlagsSeq = {
     { name="SriLanka", sheet=nationalFlags2Sheet, frames={24} },    
     { name="Sweden", sheet=nationalFlags3Sheet, frames={1} }, 
     { name="Switzerland", sheet=nationalFlags3Sheet, frames={2} }, 
-
-    -- SAM: IS THIS OKAY!?
+    -- SAM: Taiwan flag out of order in sprite/atlas because originally named Republic of China
     { name="Taiwan", sheet=nationalFlags2Sheet, frames={15} }, 
     { name="Thailand", sheet=nationalFlags3Sheet, frames={3} }, 
     { name="Turkey", sheet=nationalFlags3Sheet, frames={4} }, 
     { name="UnitedArabEmirates", sheet=nationalFlags3Sheet, frames={5} }, 
     { name="UnitedKingdom", sheet=nationalFlags3Sheet, frames={6} }, 
-    { name="UnitedStates", sheet=nationalFlags3Sheet, frames={7} }, 
-              
-    -- { name="argentina", sheet=nationalFlags1Sheet, frames={2} }
+    { name="UnitedStates", sheet=nationalFlags3Sheet, frames={7} } 
 }
 
 local topBtmBarSpriteCoords = require("lua-sheets.TopBtmBar")
@@ -146,36 +143,6 @@ local topBtmBarSeq = {
     {name="top", frames={1,2,3,4,5,6,7,8,9,10}, time=1000, loopCount=0},
     {name="btm", frames={6,7,8,9,10,1,2,3,4,5}, time=1000, loopcount=0},
 }
-
-local bonusImplodeSpriteCoords1 = require("lua-sheets.bonus-implode1")
-local bonusImplodeSheet1 = graphics.newImageSheet( "images/bonus-implode1.png", bonusImplodeSpriteCoords1:getSheet() )
-
-local bonusImplodeSpriteCoords2 = require("lua-sheets.bonus-implode2")
-local bonusImplodeSheet2 = graphics.newImageSheet( "images/bonus-implode2.png", bonusImplodeSpriteCoords2:getSheet() )
-
-local bonusImplodeSeq={
-    {name="2x", sheet=bonusImplodeSheet1, frames={1,2,3,4,5,6},time=800, loopCount=1},
-    {name="3x", sheet=bonusImplodeSheet2, frames={1,2,3,4,5,6},time=800, loopCount=1},
-    {name="4x", sheet=bonusImplodeSheet1, frames={7,8,9,10,11,12},time=800, loopCount=1},
-    {name="5x", sheet=bonusImplodeSheet2, frames={7,8,9,10,11,12},time=800, loopCount=1},
-    {name="6x", sheet=bonusImplodeSheet1, frames={13,14,15,16,17,18},time=800, loopCount=1},
-    {name="7x", sheet=bonusImplodeSheet1, frames={19,20,21,22,23,24},time=800, loopCount=1},
-    {name="8x", sheet=bonusImplodeSheet1, frames={25,26,27,28,29,30},time=800, loopCount=1},
-    {name="9x", sheet=bonusImplodeSheet2, frames={13,14,15,16,17,18},time=800, loopCount=1},
-
-}
-
-local bonusImplode=display.newSprite(bonusImplodeSheet1,bonusImplodeSeq)
-bonusImplode.alpha=0 --start with 0
-
-local function myImplodeListener( event )
-    local thisSprite = event.target
-    if ( event.phase == "ended" ) then
-        thisSprite.alpha = 0
-        thisSprite:pause()
-    end
-end
-
 
 local piece = display.newImage( "images/australia259x229.png", 529,229)
       piece.anchorX=0.5
@@ -190,7 +157,6 @@ local      background = display.newRect(0,0,580,320)
       background.x=_W/2 ;background.y=_H/2
       background:toBack()
 
-
 local function setFlag()
    setTheFlag=true
   end
@@ -199,7 +165,6 @@ local function touchFlagNext(e)
      print("YOOOOO")
     flag:removeEventListener( "tap", touchFlagNext ) 
     setTheFlag=true
-
 end  
 
 
@@ -214,7 +179,6 @@ end
 local function finishScale()
             flag2Timer=transition.to( flag, { time=1000, xScale=1, yScale=1})
             touchFlagReady=timer.performWithDelay( 1000, touchFlagFunction, 1 )
-      
 end
 
 
@@ -431,6 +395,8 @@ end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
+    --MIKE: can we get rid of this??
+
     --[[
     fwBtn = display.newImageRect( "images/greenArrow.png", 70, 70 )
     fwBtn.type = "fwBtn"
