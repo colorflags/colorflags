@@ -38,8 +38,8 @@ local btnsSeq = {
     {
         name = "playgame",
         frames = {
-            btnsSheetCoords:getFrameIndex("PlayGame1"),
-            btnsSheetCoords:getFrameIndex("PlayGame4")
+            btnsSheetCoords:getFrameIndex("PlayGame3"),
+            btnsSheetCoords:getFrameIndex("PlayGame5")
         },
         time = 500 
     },
@@ -56,8 +56,8 @@ local btnsSeq = {
     {
         name = "options",
         frames = {
-            btnsSheetCoords:getFrameIndex("Options1"),
-            btnsSheetCoords:getFrameIndex("Options4")
+            btnsSheetCoords:getFrameIndex("Options3"),
+            btnsSheetCoords:getFrameIndex("Options5")
         },
         time = 500 
     },
@@ -74,8 +74,8 @@ local btnsSeq = {
     {
         name = "about",
         frames = {
-            btnsSheetCoords:getFrameIndex("About1"),
-            btnsSheetCoords:getFrameIndex("About4")
+            btnsSheetCoords:getFrameIndex("About3"),
+            btnsSheetCoords:getFrameIndex("About5")
         },
         time = 500 
     },
