@@ -36,7 +36,7 @@ io.output():setvbuf( "no" )
 
 local composer=require("composer")
 
-composer.gotoScene( "unitTestListing" )
+--composer.gotoScene( "unitTestListing" )
 
 display.setStatusBar( display.HiddenStatusBar )
 
@@ -147,5 +147,5 @@ end
 
 
   -- composer.removeScene("main",false)  
---composer.gotoScene("menu")
+composer.gotoScene("menu")
 
