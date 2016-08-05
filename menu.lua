@@ -9,17 +9,17 @@ local startBtnsPlayGame
 local startBtnsOptions
 local startBtnsAbout
 
-local currentObject
 local isLoading = false
-local touchInsideBtn = false
 
+local currentObject
+local touchInsideBtn = false
 local isBtnAnim = false
 
 music=nil
 bobby=nil
 
 audio.stop( )            
-music = audio.loadStream( "magee_music/magee_8bit.mp3" ) 
+music = audio.loadStream( "magee_music/magee_main.mp3" ) 
 bobby = audio.play(music,{loops=-1})
 
 soundOn=false
@@ -31,6 +31,7 @@ local colorFlagsSeq = {
     { name = "colorflags", frames={1,2,3,4,5,6,7,8,9}, time=500, loopCount=0},    
 }
 
+-- GLOBALIZE
 local btnsSheetCoords = require("lua-sheets.buttons")
 local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
 
@@ -375,11 +376,11 @@ function scene:create( event )
   sceneGroup:insert(startBtnsAbout)  
 
 
-   startBtnsAbout:addEventListener("touch",myTouchListener)
+   --startBtnsAbout:addEventListener("touch",myTouchListener)
    startBtnsAbout:addEventListener("touch",doFunction)
-   startBtnsPlayGame:addEventListener("touch",myTouchListener)
+   --startBtnsPlayGame:addEventListener("touch",myTouchListener)
    startBtnsPlayGame:addEventListener("touch",doFunction)
-   startBtnsOptions:addEventListener("touch",myTouchListener) 
+   --startBtnsOptions:addEventListener("touch",myTouchListener) 
    startBtnsOptions:addEventListener("touch",doFunction) 
 end
 

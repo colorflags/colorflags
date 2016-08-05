@@ -49,6 +49,10 @@ local FG2Transition4
 local cloudFadeTransition1
 local cloudFadeTransition2
 
+local currentObject
+local isLoading = false
+local touchInsideBtn = false
+local isBtnAnim = false
 
 music=nil
 bobby=nil
@@ -82,6 +86,66 @@ local niceTrySeq = {
 
 }
 
+-- GLOBALIZE
+local btnsSheetCoords = require("lua-sheets.buttons")
+local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
+
+local btnsSeq = {
+    {
+        name = "again",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Again3"),
+            btnsSheetCoords:getFrameIndex("Again5")
+        },
+        time = 500 
+    },
+    {
+        name = "again_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Again2"),
+            btnsSheetCoords:getFrameIndex("Again3"),
+            btnsSheetCoords:getFrameIndex("Again4"),
+            btnsSheetCoords:getFrameIndex("Again5")
+        },
+        time = 500 
+    },
+    {
+        name = "share",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Share3"),
+            btnsSheetCoords:getFrameIndex("Share5")
+        },
+        time = 500 
+    },
+    {
+        name = "share_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Share2"),
+            btnsSheetCoords:getFrameIndex("Share3"),
+            btnsSheetCoords:getFrameIndex("Share4"),
+            btnsSheetCoords:getFrameIndex("Share5")
+        },
+        time = 500 
+    },
+    {
+        name = "quit",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Quit3"),
+            btnsSheetCoords:getFrameIndex("Quit5")
+        },
+        time = 500 
+    },
+    {
+        name = "quit_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Quit2"),
+            btnsSheetCoords:getFrameIndex("Quit3"),
+            btnsSheetCoords:getFrameIndex("Quit4"),
+            btnsSheetCoords:getFrameIndex("Quit5")
+        },
+        time = 500 
+    },
+}
 
 
 function niceTryPop(event)
@@ -242,60 +306,98 @@ end
 --   return true
 -- end
 
-local currentObject
-local boundaryCheck = false
-
 local function myTouchListener( event )
-    if event.phase == "began" then      
-        -- event.target.alpha = 0.5
-        -- event.target:setFrame( 1 )
-        currentObject = event.target
-
-        display.getCurrentStage():setFocus(currentObject)
+    currentObject = event.target
+    display.getCurrentStage():setFocus(currentObject)
+    
+    if event.phase == "began" then
+        -- print("touch ON. inside")          
     elseif event.phase == "ended" or event.phase == "cancelled" then
-        -- event.target.alpha = 1
         
-        if boundaryCheck == true then 
-    local goto = event.target.gotoScene
-              if event.target.gotoScene == "menu" then
-
-              composer.gotoScene ( "menu", { effect = defaultTransition } )
-              elseif event.target.gotoScene == "options" then
-              
-  
-              else
-          
-              composer.gotoScene ( goto, { effect = defaultTransition } )
-         
-              end
-
+        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
+        if currentObject.name == "again" then
+            currentObject:setSequence("again")
+        elseif currentObject.name == "share" then
+            currentObject:setSequence("share")
+        elseif currentObject.name == "quit" then
+            currentObject:setSequence("quit")
         end
-
-        currentObject:setFrame(1)
-        currentObject = nil
         
-        display.getCurrentStage():setFocus(nil) 
+        -- redundant ?? 
+        -- currentObject:setFrame(1)
+        
+        if touchInsideBtn == true and isLoading == false then 
+            -- print("touch OFF. inside")
+            -- composer.removeScene("start")
+            
+            -- prevents scenes from firing twice!!
+            isLoading = true
+            
+            local goto = currentObject.gotoScene
+            composer.gotoScene( goto, { effect = defaultTransition } )
+            
+        elseif touchInsideBtn == false then
+            -- print("touch OFF outside")
+        end
+        
+        currentObject = nil
+        display.getCurrentStage():setFocus(nil)
+        touchInsideBtn = false
     end
 end
-
-
+ 
 local function doFunction(e)
-
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
             e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or
-            e.y > currentObject.contentBounds.yMax then
-            currentObject:setFrame( 1 )
-        
-            boundaryCheck = false
+            e.y < currentObject.contentBounds.yMin or 
+            e.y > currentObject.contentBounds.yMax then 
+            
+            if(isBtnAnim) then
+                if currentObject.name == "again" then
+                    currentObject:setSequence("again")
+                elseif currentObject.name == "share" then
+                    currentObject:setSequence("share")
+                elseif currentObject.name == "quit" then
+                    currentObject:setSequence("quit")
+                end
+            else 
+                if currentObject.name == "again" then
+                    currentObject:setFrame(1)
+                elseif currentObject.name == "share" then
+                    currentObject:setFrame(1)
+                elseif currentObject.name == "quit" then
+                    currentObject:setFrame(1)
+                end
+            end
+            -- redundant ??
+            -- currentObject:setFrame(1)
+            touchInsideBtn = false
         else
-            currentObject:setFrame( 2 )
-            boundaryCheck = true
-        end   
-    end     
+            if touchInsideBtn == false then
+                if(isBtnAnim) then
+                    if currentObject.name == "again" then
+                        currentObject:setSequence("again_anim")
+                    elseif currentObject.name == "share" then
+                        currentObject:setSequence("share_anim")
+                    elseif currentObject.name == "quit" then
+                        currentObject:setSequence("quit_anim")
+                    end
+                    currentObject:play()
+                else
+                    if currentObject.name == "again" then
+                        currentObject:setFrame(2)
+                    elseif currentObject.name == "share" then
+                        currentObject:setFrame(2)
+                    elseif currentObject.name == "quit" then
+                        currentObject:setFrame(2)
+                    end
+                end
+            end
+            touchInsideBtn = true
+        end
+    end
 end
-
 
  local function scrollCloudsBG(self, event)
     
@@ -430,7 +532,8 @@ local function setScene()
 
   -- fab=display.newSprite(myImageSheet2,fabSeq)
 
-  menuAgain = display.newSprite( menuAgainSheet, menuSeq )
+  menuAgain = display.newSprite(btnsSheet, btnsSeq)
+  menuAgain.name = "again"
   menuAgain:addEventListener( "touch", myTouchListener )
   menuAgain.x=88 ;menuAgain.y=_H-36
   menuAgain:setSequence( "again" )
@@ -438,17 +541,18 @@ local function setScene()
   menuAgain.gotoScene="game"
 
 
-  menuShare= display.newSprite( menuShareSheet, menuSeq )
+  menuShare= display.newSprite(btnsSheet, btnsSeq)
+  menuShare.name = "share"
   menuShare:addEventListener( "touch", myTouchListener )
   menuShare.x=_W/2+20 ;menuShare.y=_H-39
   menuShare:setSequence( "share" )
   menuShare:setFrame( 1 )
   menuShare.gotoScene="options"
 
-  menuQuit= display.newSprite( menuQuitSheet, menuSeq )
+  menuQuit= display.newSprite(btnsSheet, btnsSeq)
+  menuQuit.name = "quit"
   menuQuit:addEventListener( "touch", myTouchListener )
   menuQuit.x=_W-69 ;menuQuit.y=_H-37
-  -- menuQuit.x=_W/2+10 ;menuQuit.y=_H-40
   menuQuit:setSequence( "quit" )
   menuQuit:setFrame( 1 )
   menuQuit.gotoScene="menu"
