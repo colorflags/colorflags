@@ -9,9 +9,8 @@ local startBtnsPlayGame
 local startBtnsOptions
 local startBtnsAbout
 
-local isLoading = false
-
 local currentObject
+local isLoading = false
 local touchInsideBtn = false
 local isBtnAnim = false
 
@@ -108,59 +107,7 @@ local startBtnsPlayGameSheet = graphics.newImageSheet( "images/menu-btns.png", s
 local startBtnsOptionsSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
 local startBtnsAboutSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
 
-local function myTouchListener( event )
-    currentObject = event.target
-    display.getCurrentStage():setFocus(currentObject)
-    
-    if event.phase == "began" then
-        -- print("touch ON. inside") 
-    elseif event.phase == "ended" or event.phase == "cancelled" then
-        
-        -- redundant ?? 
-        -- currentObject:setFrame(1)
-        
-        if touchInsideBtn == true and isLoading == false then 
-            -- print("touch OFF. inside")
-            
-            -- prevents scenes from firing twice!!
-            isLoading = true
-            
-            local goto = currentObject.gotoScene
-            if goto == "start" and event.target == startBtnsPlayGame then
-                composer.showOverlay( goto, { isModal= true})
-            else
-                composer.gotoScene ( goto, { effect = defaultTransition } )
-            end  
-        elseif touchInsideBtn == false then
-            -- print("touch OFF outside")
-        end
-        
-        currentObject = nil
-        display.getCurrentStage():setFocus(nil)
-        touchInsideBtn = false
-    end
-end
-
---[[
-local function doFunction(e)
-    if currentObject ~= nil then
-        if e.x < currentObject.contentBounds.xMin or
-            e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or
-            e.y > currentObject.contentBounds.yMax then
-            
-            currentObject:setFrame( 1 )
-            touchInsideBtn = false
-        else
-            currentObject:setSequence("")
-            touchInsideBtn = true
-        end   
-    end     
-end
-]]--
-
--- buttons funciontality imported from start.lua
-
+-- New
 local function myTouchListener( event )
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
@@ -189,8 +136,11 @@ local function myTouchListener( event )
             isLoading = true
             
             local goto = currentObject.gotoScene
-            composer.gotoScene( goto, { effect = defaultTransition } )
-            
+            if goto == "start" and event.target == startBtnsPlayGame then
+                composer.showOverlay( goto, { isModal= true})
+            else
+                composer.gotoScene ( goto, { effect = defaultTransition } )
+            end  
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
         end

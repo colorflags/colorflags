@@ -10,6 +10,11 @@ local cloudsBG1
 local cloudsBG2
 local cloudsFG1
 local cloudsFG2
+
+local bg
+-- fills transparent brick cracks. Try some hot fx here!
+local brickCracks
+
 local whatBackground
 local killScreen
 local cloud1
@@ -158,10 +163,6 @@ function niceTryPop(event)
       thisAnimation.alpha = .3
     end
 end
-
-
-
-
 
 local menuSpriteCoords = require("lua-sheets.btns-gameover")
 local menuAgainSheet = graphics.newImageSheet( "images/btns-gameover.png", menuSpriteCoords:getSheet() )
@@ -468,99 +469,148 @@ local function cloudFade(self)
 end
 
 local function setScene()
+    bg = display.newRect(0, 0, 568, 320)
+    bg:setFillColor(0,.6,1)
+    bg.x = _W/2
+    bg.y = _H/2
+    
+    --[[
+    local group = display.newGroup()
+
+    brickCracks = display.newRect(group, 0, 0, 568, 94)
+    brickCracks:setFillColor(0,.6,1)
+    --brickCracks:setStrokeColor(1,0,0)
+    --brickCracks.strokeWidth = 2
+    brickCracks.anchorX=0.5
+    brickCracks.anchorY=0.5
+    brickCracks.x=_W/2
+    brickCracks.y= _H + (brickCracks.height/2)
+    brickCracks.fill.effect = "generator.radialGradient"
+    brickCracks.fill.effect.color1 = {0,1,0}
+    brickCracks.fill.effect.color2 = {0,0,1}
+    brickCracks.fill.effect.center_and_radiuses = {0.5,0.5,0.5,.75}
+    brickCracks.fill.effect.aspectRatio = 1
+    
+    local mask = graphics.newMask("images/mask.png")
+    group:setMask(mask)
+
+    --brickCracks.maskX = brickCracks.maskScaleX
+    group.maskScaleX = brickCracks.width
+    group.maskScaleY = brickCracks.height/2
+    --group.maskX = group.maskScaleX+(group.x/2)
+    --group.maskY = _H
+    group.maskX = _W
+    group.maskY = _H
+
+    local reverse = 1
+
+    local function rockRect()
+        if ( reverse == 0 ) then
+            reverse = 1
+            transition.to( brickCracks, { rotation=-25, time=500, transition=easing.inOutCubic } )
+        else
+            reverse = 0
+            transition.to( brickCracks, { rotation=25, time=500, transition=easing.inOutCubic } )
+        end
+    end
+
+    timer.performWithDelay( 600, rockRect, 0 )  -- Repeat forever
+    ]]--
+
+    -- SAM: rename all this
+    killScreen = display.newImage( "images/bricks_trans_cracks.png", 568, 94)
+    killScreen.name="killScreen"
+    killScreen.anchorX=0.5
+    killScreen.anchorY=1
+    killScreen.x=_W/2
+    killScreen.y=_H
+    
+    killScreen:toBack()
+    --group:toBack()
+    bg:toBack()
+
+    flagPole1 = display.newImage( "images/flagpole-142.png", 18,142)
+    flagPole1.anchorX=0.5
+    flagPole1.anchorY=1
+    flagPole1.name="flagPole1"
+    flagPole1.x=flagX[1] ;flagPole1.y=_H/2+66
+
+
+    flagPole2 = display.newImage( "images/flagpole-142.png", 18,142)
+    flagPole2.anchorX=0.5
+    flagPole2.anchorY=1
+    flagPole2.name="flagPole2"
+    flagPole2.x=flagX[2] ;flagPole2.y=_H/2+66
+
+    flagPole3 = display.newImage( "images/flagpole-110.png", 18,110)
+    flagPole3.anchorX=0.5
+    flagPole3.anchorY=1
+    flagPole3.name="flagPole3"
+    flagPole3.x=flagX[3] ;flagPole3.y=_H/2+66
+    flagPole3.alpha=0.30
+
+    flagPole4 = display.newImage( "images/flagpole-110.png", 18,110)
+    flagPole4.anchorX=0.5
+    flagPole4.anchorY=1
+    flagPole4.name="flagPole4"
+    flagPole4.x=flagX[4] ;flagPole4.y=_H/2+66
+    flagPole4.alpha=0.30
+
+    -- flagPole5 = display.newImage( "images/flagpole-sm.png", 18,75)
+    -- flagPole5.anchorX=0.5
+    -- flagPole5.anchorY=1
+    -- flagPole5.name="flagPole5"
+    -- flagPole5.x=flagX[5] ;flagPole5.y=_H/2+66
+
+    -- flagPole6 = display.newImage( "images/flagpole-sm.png", 18,75)
+    -- flagPole6.anchorX=0.5
+    -- flagPole6.anchorY=1
+    -- flagPole6.name="flagPole6"
+    -- flagPole6.x=flagX[6];flagPole6.y=_H/2+66
+
+    flagPole7 = display.newImage( "images/flagpole-142.png", 18,142)
+    flagPole7.anchorX=0.5
+    flagPole7.anchorY=1
+    flagPole7.name="flagPole7"
+    flagPole7.x=flagX[7] ;flagPole7.y=_H/2+66
+
+    flagPole8 = display.newImage( "images/flagpole-142.png", 18,142)
+    flagPole8.anchorX=0.5
+    flagPole8.anchorY=1
+    flagPole8.name="flagPole8"
+    flagPole8.x=flagX[8] ;flagPole8.y=_H/2+66      
+
+    -- fab=display.newSprite(myImageSheet2,fabSeq)
+
+    menuAgain = display.newSprite(btnsSheet, btnsSeq)
+    menuAgain.name = "again"
+    menuAgain:addEventListener( "touch", myTouchListener )
+    menuAgain.x=88 ;menuAgain.y=_H-36
+    menuAgain:setSequence( "again" )
+    menuAgain:setFrame( 1 )
+    menuAgain.gotoScene="game"
+
+
+    menuShare= display.newSprite(btnsSheet, btnsSeq)
+    menuShare.name = "share"
+    menuShare:addEventListener( "touch", myTouchListener )
+    menuShare.x=_W/2+20 ;menuShare.y=_H-39
+    menuShare:setSequence( "share" )
+    menuShare:setFrame( 1 )
+    menuShare.gotoScene="options"
+
+    menuQuit= display.newSprite(btnsSheet, btnsSeq)
+    menuQuit.name = "quit"
+    menuQuit:addEventListener( "touch", myTouchListener )
+    menuQuit.x=_W-69 ;menuQuit.y=_H-37
+    menuQuit:setSequence( "quit" )
+    menuQuit:setFrame( 1 )
+    menuQuit.gotoScene="menu"
 
 
 
-  killScreen = display.newImage( whatBackground, 568,320)
-  killScreen.name="killScreen"
-  killScreen.x=_W/2 ;killScreen.y=_H/2
+    selectRandomFlags()
 
-
-
-
-
-  flagPole1 = display.newImage( "images/flagpole-142.png", 18,142)
-  flagPole1.anchorX=0.5
-  flagPole1.anchorY=1
-  flagPole1.name="flagPole1"
-  flagPole1.x=flagX[1] ;flagPole1.y=_H/2+66
-
-
-  flagPole2 = display.newImage( "images/flagpole-142.png", 18,142)
-  flagPole2.anchorX=0.5
-  flagPole2.anchorY=1
-  flagPole2.name="flagPole2"
-  flagPole2.x=flagX[2] ;flagPole2.y=_H/2+66
-
-  flagPole3 = display.newImage( "images/flagpole-110.png", 18,110)
-  flagPole3.anchorX=0.5
-  flagPole3.anchorY=1
-  flagPole3.name="flagPole3"
-  flagPole3.x=flagX[3] ;flagPole3.y=_H/2+66
-  flagPole3.alpha=0.30
-
-  flagPole4 = display.newImage( "images/flagpole-110.png", 18,110)
-  flagPole4.anchorX=0.5
-  flagPole4.anchorY=1
-  flagPole4.name="flagPole4"
-  flagPole4.x=flagX[4] ;flagPole4.y=_H/2+66
-  flagPole4.alpha=0.30
-
-  -- flagPole5 = display.newImage( "images/flagpole-sm.png", 18,75)
-  -- flagPole5.anchorX=0.5
-  -- flagPole5.anchorY=1
-  -- flagPole5.name="flagPole5"
-  -- flagPole5.x=flagX[5] ;flagPole5.y=_H/2+66
-
-  -- flagPole6 = display.newImage( "images/flagpole-sm.png", 18,75)
-  -- flagPole6.anchorX=0.5
-  -- flagPole6.anchorY=1
-  -- flagPole6.name="flagPole6"
-  -- flagPole6.x=flagX[6];flagPole6.y=_H/2+66
-
-  flagPole7 = display.newImage( "images/flagpole-142.png", 18,142)
-  flagPole7.anchorX=0.5
-  flagPole7.anchorY=1
-  flagPole7.name="flagPole7"
-  flagPole7.x=flagX[7] ;flagPole7.y=_H/2+66
-
-  flagPole8 = display.newImage( "images/flagpole-142.png", 18,142)
-  flagPole8.anchorX=0.5
-  flagPole8.anchorY=1
-  flagPole8.name="flagPole8"
-  flagPole8.x=flagX[8] ;flagPole8.y=_H/2+66      
-
-  -- fab=display.newSprite(myImageSheet2,fabSeq)
-
-  menuAgain = display.newSprite(btnsSheet, btnsSeq)
-  menuAgain.name = "again"
-  menuAgain:addEventListener( "touch", myTouchListener )
-  menuAgain.x=88 ;menuAgain.y=_H-36
-  menuAgain:setSequence( "again" )
-  menuAgain:setFrame( 1 )
-  menuAgain.gotoScene="game"
-
-
-  menuShare= display.newSprite(btnsSheet, btnsSeq)
-  menuShare.name = "share"
-  menuShare:addEventListener( "touch", myTouchListener )
-  menuShare.x=_W/2+20 ;menuShare.y=_H-39
-  menuShare:setSequence( "share" )
-  menuShare:setFrame( 1 )
-  menuShare.gotoScene="options"
-
-  menuQuit= display.newSprite(btnsSheet, btnsSeq)
-  menuQuit.name = "quit"
-  menuQuit:addEventListener( "touch", myTouchListener )
-  menuQuit.x=_W-69 ;menuQuit.y=_H-37
-  menuQuit:setSequence( "quit" )
-  menuQuit:setFrame( 1 )
-  menuQuit.gotoScene="menu"
-
-
-
-   selectRandomFlags()
-   killScreen:toBack()
 end
 
 local function newHighScore()
@@ -757,6 +807,9 @@ function scene:hide(e)
   display.remove(highScoreText)
   display.remove(cloudsFG1)
   display.remove(cloudsFG2)
+
+  display.remove(bg)
+
   display.remove(killScreen)
   display.remove(cloudsBG1)
   display.remove(cloudsBF2)
