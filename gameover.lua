@@ -180,7 +180,7 @@ function listFonts()
         end
     end
 end
-listFonts()
+--listFonts()
 
 local menuSpriteCoords = require("lua-sheets.btns-gameover")
 local menuAgainSheet = graphics.newImageSheet( "images/btns-gameover.png", menuSpriteCoords:getSheet() )
@@ -608,12 +608,15 @@ killScreen.fill.effect.progress = 0.5
 
     -- fab=display.newSprite(myImageSheet2,fabSeq)
 
+    local offsetY = _H/4 - 40
+
     menuAgain = display.newSprite(btnsSheet, btnsSeq)
 
     menuAgain.isHitTestMasked = false
     menuAgain.name = "again"
     menuAgain:addEventListener( "touch", myTouchListener )
-    menuAgain.x=88 ;menuAgain.y=_H-26
+    menuAgain.x=88
+    menuAgain.y=_H-offsetY
     menuAgain:setSequence( "again" )
     menuAgain:setFrame( 1 )
     menuAgain.gotoScene="game"
@@ -625,7 +628,8 @@ killScreen.fill.effect.progress = 0.5
     menuShare.name = "share"
     menuShare:addEventListener( "touch", myTouchListener )
     --offset 20 from center
-    menuShare.x=_W/2+20;menuShare.y=_H-28
+    menuShare.x=_W/2+20
+    menuShare.y=_H-offsetY-1
     menuShare:setSequence( "share" )
     menuShare:setFrame( 1 )
     menuShare.gotoScene="options"
@@ -636,7 +640,8 @@ killScreen.fill.effect.progress = 0.5
     menuQuit.isHitTestMasked = false
     menuQuit.name = "quit"
     menuQuit:addEventListener( "touch", myTouchListener )
-    menuQuit.x=_W-69 ;menuQuit.y=_H-26
+    menuQuit.x=_W-69
+    menuQuit.y=_H-offsetY
     menuQuit:setSequence( "quit" )
     menuQuit:setFrame( 1 )
     menuQuit.gotoScene="menu"
