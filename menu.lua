@@ -296,6 +296,7 @@ function scene:create( event )
   startBtnsPlayGame:setFrame( 1 )
   startBtnsPlayGame.alpha=0.98
   startBtnsPlayGame.gotoScene="start"
+  startBtnsPlayGame:scale(.8,.8)
 
   startBtnsOptions= display.newSprite(btnsSheet, btnsSeq)
   startBtnsOptions.name = "opt"
@@ -307,6 +308,7 @@ function scene:create( event )
   startBtnsOptions:setFrame( 1 )
   startBtnsOptions.alpha=.98
   startBtnsOptions.gotoScene="options"
+  startBtnsOptions:scale(.8,.8)
 
   startBtnsAbout= display.newSprite(btnsSheet, btnsSeq)
   startBtnsAbout.name = "abt"
@@ -318,6 +320,7 @@ function scene:create( event )
   startBtnsAbout:setFrame( 1 )
   startBtnsAbout.alpha=0.98
   startBtnsAbout.gotoScene="about"
+  startBtnsAbout:scale(.8,.8)
 
   sceneGroup:insert(titleLogo) -- BACKGROUND NOT TITLE !!! CHANGE NAME
   sceneGroup:insert(menuColorFlags) 

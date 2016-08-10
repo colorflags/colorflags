@@ -99,8 +99,8 @@ local btnsSeq = {
     {
         name = "again",
         frames = {
-            btnsSheetCoords:getFrameIndex("Again3"),
-            btnsSheetCoords:getFrameIndex("Again5")
+            btnsSheetCoords:getFrameIndex("Again4"),
+            btnsSheetCoords:getFrameIndex("Again1")
         },
         time = 500 
     },
@@ -117,8 +117,8 @@ local btnsSeq = {
     {
         name = "share",
         frames = {
-            btnsSheetCoords:getFrameIndex("Share3"),
-            btnsSheetCoords:getFrameIndex("Share5")
+            btnsSheetCoords:getFrameIndex("Share4"),
+            btnsSheetCoords:getFrameIndex("Share1")
         },
         time = 500 
     },
@@ -135,8 +135,8 @@ local btnsSeq = {
     {
         name = "quit",
         frames = {
-            btnsSheetCoords:getFrameIndex("Quit3"),
-            btnsSheetCoords:getFrameIndex("Quit5")
+            btnsSheetCoords:getFrameIndex("Quit4"),
+            btnsSheetCoords:getFrameIndex("Quit1")
         },
         time = 500 
     },
@@ -163,6 +163,24 @@ function niceTryPop(event)
       thisAnimation.alpha = .3
     end
 end
+
+function listFonts()
+    local systemFonts = native.getFontNames()
+
+    -- Set the string to query for (part of the font name to locate)
+    local searchString = "pt"
+
+    -- Display each font in the Terminal/console
+    for i, fontName in ipairs( systemFonts ) do
+
+        local j, k = string.find( string.lower(fontName), string.lower(searchString) )
+
+        if ( j ~= nil ) then
+            print( "Font Name = " .. tostring( fontName ) )
+        end
+    end
+end
+listFonts()
 
 local menuSpriteCoords = require("lua-sheets.btns-gameover")
 local menuAgainSheet = graphics.newImageSheet( "images/btns-gameover.png", menuSpriteCoords:getSheet() )
@@ -519,12 +537,20 @@ local function setScene()
 
     -- SAM: rename all this
     killScreen = display.newImage( "images/bricks_trans_cracks.png", 568, 94)
+    killScreen:setFillColor( .9, .55, .8, 1 )
+    killScreen.alpha = 0.33
     killScreen.name="killScreen"
     killScreen.anchorX=0.5
     killScreen.anchorY=1
     killScreen.x=_W/2
     killScreen.y=_H
-    
+
+killScreen.fill.effect = "filter.linearWipe"
+
+killScreen.fill.effect.direction = { 0, 1 }
+killScreen.fill.effect.smoothness = 1
+killScreen.fill.effect.progress = 0.5
+
     killScreen:toBack()
     --group:toBack()
     bg:toBack()
@@ -583,30 +609,38 @@ local function setScene()
     -- fab=display.newSprite(myImageSheet2,fabSeq)
 
     menuAgain = display.newSprite(btnsSheet, btnsSeq)
+
+    menuAgain.isHitTestMasked = false
     menuAgain.name = "again"
     menuAgain:addEventListener( "touch", myTouchListener )
-    menuAgain.x=88 ;menuAgain.y=_H-36
+    menuAgain.x=88 ;menuAgain.y=_H-26
     menuAgain:setSequence( "again" )
     menuAgain:setFrame( 1 )
     menuAgain.gotoScene="game"
-
+    menuAgain:scale(.8,.8)
 
     menuShare= display.newSprite(btnsSheet, btnsSeq)
+
+    menuShare.isHitTestMasked = false
     menuShare.name = "share"
     menuShare:addEventListener( "touch", myTouchListener )
-    menuShare.x=_W/2+20 ;menuShare.y=_H-39
+    --offset 20 from center
+    menuShare.x=_W/2+20;menuShare.y=_H-28
     menuShare:setSequence( "share" )
     menuShare:setFrame( 1 )
     menuShare.gotoScene="options"
+    menuShare:scale(.8,.8)
 
     menuQuit= display.newSprite(btnsSheet, btnsSeq)
+
+    menuQuit.isHitTestMasked = false
     menuQuit.name = "quit"
     menuQuit:addEventListener( "touch", myTouchListener )
-    menuQuit.x=_W-69 ;menuQuit.y=_H-37
+    menuQuit.x=_W-69 ;menuQuit.y=_H-26
     menuQuit:setSequence( "quit" )
     menuQuit:setFrame( 1 )
     menuQuit.gotoScene="menu"
-
+    menuQuit:scale(.8,.8)
 
 
     selectRandomFlags()
@@ -755,9 +789,17 @@ function scene:show(e)
         elseif setScore == false then
           gameScore=e.params.saveScore
         end
-        scoreText = display.newText(gameScore, _W/2, _H/2, native.systemFont, 80)
-        scoreText:setFillColor( 1, 0, 0 )
-        scoreText:toFront()
+
+        local color = 
+        {
+            highlight = { r=1, g=1, b=1 },
+            shadow = { r=0, g=0, b=0 }
+        }
+        
+        --align to center of "share" btn
+        scoreText = display.newEmbossedText( gameScore, _W/2+20, _H/2,"PTMono-Bold", 38 )
+        scoreText:setFillColor( 1, .9, .4)
+        scoreText:setEmbossColor( color )
 
         shakeText()
         self.view:insert(scoreText) 
