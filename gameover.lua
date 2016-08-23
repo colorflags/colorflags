@@ -63,14 +63,11 @@ music=nil
 bobby=nil
 
 audio.stop( )            
-music = audio.loadStream( 'anthems/magee-gameover.mp3' ) 
+music = audio.loadStream( 'magee_music/magee_gameover_2.mp3' ) 
 bobby = audio.play(music,{loops=-1})
 
 -- local flagHeights = {24, 23, -46}
 -- local flagX = {20, 98, 44, 515, 525, 100, 480, 534}
-
-
-
 
 local flagHeights = {24, -18, -46}
 local flagX = {20, 98, 69, 500, 525, 100, 480, 534}
