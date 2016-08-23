@@ -551,6 +551,12 @@ killScreen.fill.effect.direction = { 0, 1 }
 killScreen.fill.effect.smoothness = 1
 killScreen.fill.effect.progress = 0.5
 
+  menuNiceTry = display.newSprite(niceTrySheet,niceTrySeq)
+  menuNiceTry.x=_W/2; menuNiceTry.y=70
+  menuNiceTry:setSequence("nicetry")
+  menuNiceTry:play()
+  menuNiceTry:addEventListener("sprite", niceTryPop)
+
     killScreen:toBack()
     --group:toBack()
     bg:toBack()
@@ -646,6 +652,7 @@ killScreen.fill.effect.progress = 0.5
     menuQuit:setFrame( 1 )
     menuQuit.gotoScene="menu"
     menuQuit:scale(.8,.8)
+
 
 
     selectRandomFlags()
