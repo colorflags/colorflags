@@ -4,17 +4,79 @@ local scene = composer.newScene()
 -- These can be deleted right?? 
 -- The scene:create(event) function now takes care of creating these variables within its scope
 
--- local menuStart
--- local menuTutorial
--- local menuCruise
-
--- local startBtn
--- local tutorialBtn
--- local cruiseBtn
-
 local background
 local phaseGroup=display.newGroup()  
-  
+
+local menuStart
+local menuCruise
+local menuTutorial
+
+local currentObject
+local isLoading = false
+local touchInsideBtn = false
+local isBtnAnim = false
+
+-- GLOBALIZE
+local btnsSheetCoords = require("lua-sheets.buttons")
+local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
+
+local btnsSeq = {
+    {
+        name = "start",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Start3"),
+            btnsSheetCoords:getFrameIndex("Start5")
+        },
+        time = 500 
+    },
+    {
+        name = "start_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Start2"),
+            btnsSheetCoords:getFrameIndex("Start3"),
+            btnsSheetCoords:getFrameIndex("Start4"),
+            btnsSheetCoords:getFrameIndex("Start5")
+        },
+        time = 500 
+    },
+    {
+        name = "cruise",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Cruise3"),
+            btnsSheetCoords:getFrameIndex("Cruise5")
+        },
+        time = 500 
+    },
+    {
+        name = "cruise_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Cruise2"),
+            btnsSheetCoords:getFrameIndex("Cruise3"),
+            btnsSheetCoords:getFrameIndex("Cruise4"),
+            btnsSheetCoords:getFrameIndex("Cruise5")
+        },
+        time = 500 
+    },
+    {
+        name = "tutorial",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Tutorial3"),
+            btnsSheetCoords:getFrameIndex("Tutorial5")
+        },
+        time = 500 
+    },
+    {
+        name = "tutorial_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("Tutorial2"),
+            btnsSheetCoords:getFrameIndex("Tutorial3"),
+            btnsSheetCoords:getFrameIndex("Tutorial4"),
+            btnsSheetCoords:getFrameIndex("Tutorial5")
+        },
+        time = 500 
+    },
+}
+
 local menuSeq = {
     { name = "start", frames = {6}, time = 500 },
     { name = "start_anim", frames = {7, 8, 9, 10}, time = 500 },
@@ -27,41 +89,40 @@ local menuSeq = {
 local menuSpriteCoords = require("lua-sheets.playgame-menu")
 local menuStartSheet = graphics.newImageSheet( "images/playgame-menu.png", menuSpriteCoords:getSheet() )
 
-
-local currentObject
-local isLoading = false
-local touchInsideBtn = false
-
+-- New
 local function myTouchListener( event )
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
     
     if event.phase == "began" then
-        -- print("touch ON. inside")          
+        print("touch ON. inside")          
     elseif event.phase == "ended" or event.phase == "cancelled" then
         
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "menuStart" then
-            currentObject:setSequence("start")
-        elseif currentObject.name == "menuTutorial" then
-            currentObject:setSequence("tutorial")
-        elseif currentObject.name == "menuCruise" then
-            currentObject:setSequence("cruise")
+        if currentObject.name == "pg" then
+            currentObject:setSequence("playgame")
+        elseif currentObject.name == "opt" then
+            currentObject:setSequence("options")
+        elseif currentObject.name == "abt" then
+            currentObject:setSequence("about")
         end
         
         -- redundant ?? 
         -- currentObject:setFrame(1)
         
         if touchInsideBtn == true and isLoading == false then 
-            -- print("touch OFF. inside")
+            print("touch OFF. inside")
             -- composer.removeScene("start")
             
             -- prevents scenes from firing twice!!
             isLoading = true
             
             local goto = currentObject.gotoScene
-            composer.gotoScene( goto, { effect = defaultTransition } )
-            
+            if goto == "start" and event.target == startBtnsPlayGame then
+                composer.showOverlay( goto, { isModal= true})
+            else
+                composer.gotoScene ( goto, { effect = defaultTransition } )
+            end  
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
         end
@@ -78,28 +139,47 @@ local function doFunction(e)
             e.x > currentObject.contentBounds.xMax or
             e.y < currentObject.contentBounds.yMin or 
             e.y > currentObject.contentBounds.yMax then 
- 
-            if currentObject.name == "menuStart" then
-                currentObject:setSequence("start")
-            elseif currentObject.name == "menuTutorial" then
-                currentObject:setSequence("tutorial")
-            elseif currentObject.name == "menuCruise" then
-                currentObject:setSequence("cruise")
-            end
             
+            if(isBtnAnim) then
+                if currentObject.name == "start" then
+                    currentObject:setSequence("start")
+                elseif currentObject.name == "cruise" then
+                    currentObject:setSequence("cruise")
+                elseif currentObject.name == "tutorial" then
+                    currentObject:setSequence("tutorial")
+                end
+            else 
+                if currentObject.name == "start" then
+                    currentObject:setFrame(1)
+                elseif currentObject.name == "cruise" then
+                    currentObject:setFrame(1)
+                elseif currentObject.name == "tutorial" then
+                    currentObject:setFrame(1)
+                end
+            end
             -- redundant ??
             -- currentObject:setFrame(1)
             touchInsideBtn = false
         else
             if touchInsideBtn == false then
-                if currentObject.name == "menuStart" then
-                    currentObject:setSequence("start_anim")
-                elseif currentObject.name == "menuTutorial" then
-                    currentObject:setSequence("tutorial_anim")
-                elseif currentObject.name == "menuCruise" then
-                    currentObject:setSequence("cruise_anim")
+                if(isBtnAnim) then
+                    if currentObject.name == "start" then
+                        currentObject:setSequence("start_anim")
+                    elseif currentObject.name == "cruise" then
+                        currentObject:setSequence("cruise_anim")
+                    elseif currentObject.name == "tutorial" then
+                        currentObject:setSequence("tutorial_anim")
+                    end
+                    currentObject:play()
+                else
+                    if currentObject.name == "start" then
+                        currentObject:setFrame(2)
+                    elseif currentObject.name == "cruise" then
+                        currentObject:setFrame(2)
+                    elseif currentObject.name == "tutorial" then
+                        currentObject:setFrame(2)
+                    end
                 end
-                currentObject:play()
             end
             touchInsideBtn = true
         end
@@ -144,44 +224,69 @@ function scene:create( event )
      catchAll.anchorX=0
      catchAll.anchorY=0
 
-     background=display.newRoundedRect(50,50,_W-250,_H-125,20)
-     background:setFillColor(120/255,115/255,115/255)   
-     --background:setStrokeColor( 25/255, 1 ,20/255 )
-    -- background.strokeWidth = 5
-     background.x=_W/2
-     background.y=_H/2
-     background.alpha=0
-     transition.to( background, {time = 200, alpha=1})
-      
-    menuStart = display.newSprite( menuStartSheet, menuSeq )
+    local offsetStartBtns = _H/2.2
+    local btnSpacing = 58
+
+    btnHeight1 = offsetStartBtns
+    btnHeight2 = offsetStartBtns+btnSpacing
+    btnHeight3 = offsetStartBtns+(btnSpacing*2)
+    
+    background=display.newRoundedRect(50, 50, _W-95, 0, 20)
+    background:setFillColor(120/255,115/255,115/255)   
+    --background:setStrokeColor( 25/255, 1 ,20/255 )
+    --background.strokeWidth = 5
+    background.anchorY = 0  
+    background.x=_W/2
+    background.y=offsetStartBtns
+    background.alpha=0
+    transition.to( background, {time = 200, alpha=1})
+
+    menuStart = display.newSprite(btnsSheet, btnsSeq)
+    menuStart.name = "start"
+    --menuStart:addEventListener("touch", myTouchListener)
+    menuStart.anchorY = 0
     menuStart.x=_W/2 
-    menuStart.y=_H/2 - 50
+    menuStart.y=offsetStartBtns
     menuStart:setSequence( "start" )
     menuStart:setFrame( 1 )
-    menuStart.name = "menuStart"
-    menuStart.gotoScene="game" 
     menuStart.alpha=0
+    menuStart.gotoScene="game" 
+    menuStart:scale(.8,.8)
     transition.to( menuStart, {time = 200, alpha=1})
  
-    menuTutorial = display.newSprite( menuStartSheet, menuSeq )
-    menuTutorial.x=_W/2 
-    menuTutorial.y=_H/2
-    menuTutorial:setSequence( "tutorial" )
-    menuTutorial:setFrame( 1 )
-    menuTutorial.name = "menuTutorial"
-    menuTutorial.gotoScene="tutorial" 
-    menuTutorial.alpha=0
-    transition.to( menuTutorial, {time = 200, alpha=1})
-
-    menuCruise = display.newSprite( menuStartSheet, menuSeq )
+    menuCruise = display.newSprite(btnsSheet, btnsSeq)
+    menuCruise.name = "cruise"
+    --menuCruise:addEventListener("touch", myTouchListener)
+    menuCruise.anchorY = 0
     menuCruise.x=_W/2 
-    menuCruise.y=_H/2 + 50
+    menuCruise.y=offsetStartBtns+btnSpacing
     menuCruise:setSequence( "cruise" )
     menuCruise:setFrame( 1 )
-    menuCruise.name = "menuCruise"
-    menuCruise.gotoScene="cruise"
     menuCruise.alpha=0
-    transition.to( menuCruise, {time = 200, alpha=1}) 
+    menuCruise.gotoScene="cruise" 
+    menuCruise:scale(.8,.8)
+    transition.to( menuCruise, {time = 200, alpha=1})
+    
+    menuTutorial = display.newSprite(btnsSheet, btnsSeq)
+    menuTutorial.name = "tutorial"
+    --menuTutorial:addEventListener("touch", myTouchListener)
+    menuTutorial.anchorY = 0
+    menuTutorial.x=_W/2 
+    menuTutorial.y=offsetStartBtns+(btnSpacing*2)
+    menuTutorial:setSequence( "tutorial" )
+    menuTutorial:setFrame( 1 )
+    menuTutorial.alpha=0
+    menuTutorial.gotoScene="tutorial" 
+    menuTutorial:scale(.8,.8)
+    transition.to( menuTutorial, {time = 200, alpha=1})
+
+    background.height = (menuTutorial.y+menuTutorial.height) - menuStart.y
+    background.y = background.y-4
+
+    --Duplicates of objs' addEventListener
+    --menuStart:addEventListener("touch",doFunction)
+    --menuCruise:addEventListener("touch",doFunction)
+    --menuTutorial:addEventListener("touch",doFunction)
     
     -- What does this do?
     timer.performWithDelay(300,initFunction)
@@ -213,13 +318,17 @@ function scene:hide( event )
     local sceneGroup=self.view
     local phase = event.phase
     if event.phase=="will" then
-    transition.to(phaseGroup, {time=0, alpha=0,onComplete=removeIt})      
+        transition.to(phaseGroup, {time=0, alpha=0,onComplete=removeIt})      
     elseif event.phase == "did" then
-     end
+        local parent = event.parent
+        parent:focusMenu()
+    end
 end
 
 function scene:destroy( event )
   local sceneGroup=self.view
+  
+  -- Do we need this? We already have a removeIt() function
   composer.hideOverlay("start")
 end
 

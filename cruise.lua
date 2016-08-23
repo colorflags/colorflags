@@ -14,8 +14,8 @@ local scene = composer.newScene()
 --SAM: we probebly want a global flag var
 local flagGroup
 
---local xBtn
---local fwBtn
+local xBtn
+local fwBtn
 local canQuit=false
 
 --media.playSound('Brazil.mid')
@@ -66,6 +66,8 @@ local e=0
 local countryText
 local country
 
+local buttonSheetInfo = require("lua-sheets.back_buttons")
+local buttonSheet = graphics.newImageSheet( "images/back_buttons.png", buttonSheetInfo:getSheet() )
 
 local boycha = 1 -- FOR TESTING PURPOSES.
 local nationalFlags1Coords = require("lua-sheets.national-flags1")
@@ -78,62 +80,62 @@ local nationalFlags3Coords = require("lua-sheets.national-flags3")
 local nationalFlags3Sheet = graphics.newImageSheet( "images/national-flags3.png", nationalFlags3Coords:getSheet() )
 
 local nationalFlagsSeq = {
-    { name="Andorra", sheet=nationalFlags1Sheet, frames={1} },
-    { name="Argentina", sheet=nationalFlags1Sheet, frames={2} },
-    { name="Australia", sheet=nationalFlags1Sheet, frames={3} },
-    { name="Austria", sheet=nationalFlags1Sheet, frames={4} },
-    { name="Belgium", sheet=nationalFlags1Sheet, frames={5} },
-    { name="Brazil", sheet=nationalFlags1Sheet, frames={6} },
-    { name="Canada", sheet=nationalFlags1Sheet, frames={7} },
-    { name="Chile", sheet=nationalFlags1Sheet, frames={8} },
-    { name="China", sheet=nationalFlags1Sheet, frames={9} },
-    { name="Croatia", sheet=nationalFlags1Sheet, frames={10} },
-    { name="Cyprus", sheet=nationalFlags1Sheet, frames={11} },
-    { name="CzechRepublic", sheet=nationalFlags1Sheet, frames={12} },
-    { name="Denmark", sheet=nationalFlags1Sheet, frames={13} },
-    { name="Egypt", sheet=nationalFlags1Sheet, frames={14} },
-    { name="Estonia", sheet=nationalFlags1Sheet, frames={15} },
-    { name="Finland", sheet=nationalFlags1Sheet, frames={16} },
-    { name="France", sheet=nationalFlags1Sheet, frames={17} },
-    { name="Germany", sheet=nationalFlags1Sheet, frames={18} },
-    { name="Greece", sheet=nationalFlags1Sheet, frames={19} },
-    { name="Hungary", sheet=nationalFlags1Sheet, frames={20} },
-    { name="Iceland", sheet=nationalFlags1Sheet, frames={21} },
-    { name="India", sheet=nationalFlags1Sheet, frames={22} },
-    { name="Indonesia", sheet=nationalFlags1Sheet, frames={23} },
-    { name="Ireland", sheet=nationalFlags1Sheet, frames={24} },
-    { name="Isreal", sheet=nationalFlags2Sheet, frames={1} },  
-    { name="Italy", sheet=nationalFlags2Sheet, frames={2} },
-    { name="Japan", sheet=nationalFlags2Sheet, frames={3} },
-    { name="Lithuania", sheet=nationalFlags2Sheet, frames={4} },
-    { name="Luxembourg", sheet=nationalFlags2Sheet, frames={5} },   
-    { name="Malaysia", sheet=nationalFlags2Sheet, frames={6} },   
-    { name="Malta", sheet=nationalFlags2Sheet, frames={7} },   
-    { name="Mexico", sheet=nationalFlags2Sheet, frames={8} }, 
-    { name="Netherlands", sheet=nationalFlags2Sheet, frames={9} }, 
-    { name="NewZealand", sheet=nationalFlags2Sheet, frames={10} },
-    { name="Norway", sheet=nationalFlags2Sheet, frames={11} },
-    { name="Philippines", sheet=nationalFlags2Sheet, frames={12} },
-    { name="Poland", sheet=nationalFlags2Sheet, frames={13} },
-    { name="Portugal", sheet=nationalFlags2Sheet, frames={14} },   
-    { name="Russia", sheet=nationalFlags2Sheet, frames={16} },    
-    { name="SanMarino", sheet=nationalFlags2Sheet, frames={17} },    
-    { name="Singapore", sheet=nationalFlags2Sheet, frames={18} },    
-    { name="Slovakia", sheet=nationalFlags2Sheet, frames={19} },    
-    { name="Slovenia", sheet=nationalFlags2Sheet, frames={20} },        
-    { name="SouthAfrica", sheet=nationalFlags2Sheet, frames={21} },    
-    { name="SouthKorea", sheet=nationalFlags2Sheet, frames={22} },    
-    { name="Spain", sheet=nationalFlags2Sheet, frames={23} },    
-    { name="SriLanka", sheet=nationalFlags2Sheet, frames={24} },    
-    { name="Sweden", sheet=nationalFlags3Sheet, frames={1} }, 
-    { name="Switzerland", sheet=nationalFlags3Sheet, frames={2} }, 
+    { name="andorra", sheet=nationalFlags1Sheet, frames={1} },
+    { name="argentina", sheet=nationalFlags1Sheet, frames={2} },
+    { name="australia", sheet=nationalFlags1Sheet, frames={3} },
+    { name="austria", sheet=nationalFlags1Sheet, frames={4} },
+    { name="belgium", sheet=nationalFlags1Sheet, frames={5} },
+    { name="brazil", sheet=nationalFlags1Sheet, frames={6} },
+    { name="canada", sheet=nationalFlags1Sheet, frames={7} },
+    { name="chile", sheet=nationalFlags1Sheet, frames={8} },
+    { name="china", sheet=nationalFlags1Sheet, frames={9} },
+    { name="croatia", sheet=nationalFlags1Sheet, frames={10} },
+    { name="cyprus", sheet=nationalFlags1Sheet, frames={11} },
+    { name="czechrepublic", sheet=nationalFlags1Sheet, frames={12} },
+    { name="denmark", sheet=nationalFlags1Sheet, frames={13} },
+    { name="egypt", sheet=nationalFlags1Sheet, frames={14} },
+    { name="estonia", sheet=nationalFlags1Sheet, frames={15} },
+    { name="finland", sheet=nationalFlags1Sheet, frames={16} },
+    { name="france", sheet=nationalFlags1Sheet, frames={17} },
+    { name="germany", sheet=nationalFlags1Sheet, frames={18} },
+    { name="greece", sheet=nationalFlags1Sheet, frames={19} },
+    { name="hungary", sheet=nationalFlags1Sheet, frames={20} },
+    { name="iceland", sheet=nationalFlags1Sheet, frames={21} },
+    { name="india", sheet=nationalFlags1Sheet, frames={22} },
+    { name="indonesia", sheet=nationalFlags1Sheet, frames={23} },
+    { name="ireland", sheet=nationalFlags1Sheet, frames={24} },
+    { name="israel", sheet=nationalFlags2Sheet, frames={1} },  
+    { name="italy", sheet=nationalFlags2Sheet, frames={2} },
+    { name="japan", sheet=nationalFlags2Sheet, frames={3} },
+    { name="lithuania", sheet=nationalFlags2Sheet, frames={4} },
+    { name="luxembourg", sheet=nationalFlags2Sheet, frames={5} },   
+    { name="malaysia", sheet=nationalFlags2Sheet, frames={6} },   
+    { name="malta", sheet=nationalFlags2Sheet, frames={7} },   
+    { name="mexico", sheet=nationalFlags2Sheet, frames={8} }, 
+    { name="netherlands", sheet=nationalFlags2Sheet, frames={9} }, 
+    { name="newzealand", sheet=nationalFlags2Sheet, frames={10} },
+    { name="norway", sheet=nationalFlags2Sheet, frames={11} },
+    { name="philippines", sheet=nationalFlags2Sheet, frames={12} },
+    { name="poland", sheet=nationalFlags2Sheet, frames={13} },
+    { name="portugal", sheet=nationalFlags2Sheet, frames={14} },   
+    { name="russia", sheet=nationalFlags2Sheet, frames={16} },    
+    { name="sanmarino", sheet=nationalFlags2Sheet, frames={17} },    
+    { name="singapore", sheet=nationalFlags2Sheet, frames={18} },    
+    { name="slovakia", sheet=nationalFlags2Sheet, frames={19} },    
+    { name="slovenia", sheet=nationalFlags2Sheet, frames={20} },        
+    { name="southafrica", sheet=nationalFlags2Sheet, frames={21} },    
+    { name="southkorea", sheet=nationalFlags2Sheet, frames={22} },    
+    { name="spain", sheet=nationalFlags2Sheet, frames={23} },    
+    { name="sriLanka", sheet=nationalFlags2Sheet, frames={24} },    
+    { name="sweden", sheet=nationalFlags3Sheet, frames={1} }, 
+    { name="switzerland", sheet=nationalFlags3Sheet, frames={2} }, 
     -- SAM: Taiwan flag out of order in sprite/atlas because originally named Republic of China
-    { name="Taiwan", sheet=nationalFlags2Sheet, frames={15} }, 
-    { name="Thailand", sheet=nationalFlags3Sheet, frames={3} }, 
-    { name="Turkey", sheet=nationalFlags3Sheet, frames={4} }, 
-    { name="UnitedArabEmirates", sheet=nationalFlags3Sheet, frames={5} }, 
-    { name="UnitedKingdom", sheet=nationalFlags3Sheet, frames={6} }, 
-    { name="UnitedStates", sheet=nationalFlags3Sheet, frames={7} } 
+    { name="taiwan", sheet=nationalFlags2Sheet, frames={15} }, 
+    { name="thailand", sheet=nationalFlags3Sheet, frames={3} }, 
+    { name="turkey", sheet=nationalFlags3Sheet, frames={4} }, 
+    { name="unitedarabemirates", sheet=nationalFlags3Sheet, frames={5} }, 
+    { name="unitedkingdom", sheet=nationalFlags3Sheet, frames={6} }, 
+    { name="unitedstates", sheet=nationalFlags3Sheet, frames={7} } 
 }
 
 local topBtmBarSpriteCoords = require("lua-sheets.TopBtmBar")
@@ -169,10 +171,8 @@ end
 
 
 local function touchFlagFunction()
-    
     flag:addEventListener( "tap", touchFlagNext ) 
     canQuit=true
-
 end
 
 
@@ -395,8 +395,23 @@ end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
-    --MIKE: can we get rid of this??
-
+    
+    local margins = 6
+    fwBtn = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_--Btn")}} )
+    fwBtn.type = "fwBtn"
+    fwBtn.xScale = -1
+    fwBtn.anchorX=0
+    fwBtn.anchorY=0
+    fwBtn.x = _W - margins
+    fwBtn.y = _H - fwBtn.height - margins 
+    
+    xBtn = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_xBtn")}} )
+    xBtn.type = "xBtn"
+    xBtn.anchorX=0
+    xBtn.anchorY=0
+    xBtn.x = 0 + margins
+    xBtn.y = 0 + margins
+    xBtn.gotoScene = "menu"
     --[[
     fwBtn = display.newImageRect( "images/greenArrow.png", 70, 70 )
     fwBtn.type = "fwBtn"
@@ -412,9 +427,9 @@ function scene:create(e)
     xBtn.x = 40
     xBtn.y = 40 
     xBtn.gotoScene = "menu"
+    ]]--
     self.view:insert(fwBtn)  
     self.view:insert(xBtn)  
-    ]]--
 end
 
 function scene:show(e)
@@ -422,13 +437,10 @@ function scene:show(e)
       print("SHOWWILL")
       setupVariables()
       random = math.randomseed( os.time() )
-   
-
     elseif (e.phase == "did") then
- 
    --    system.activate( "multitouch" )  
-      --xBtn:addEventListener("tap",buttonHit)
-      --fwBtn:addEventListener("tap",buttonHit)
+      xBtn:addEventListener("tap",buttonHit)
+      fwBtn:addEventListener("tap",buttonHit)
       Runtime:addEventListener("enterFrame", readyObject)  
     --   setTimer=timer.performWithDelay(20000, setFlag, 0)
      --  timer.performWithDelay(15000, checkMemory,0)
@@ -441,12 +453,12 @@ function scene:hide(e)
   if e.phase == "will" then
     display.remove(background)
     display.remove(flag)
+    display.remove(flagGroup)
     display.remove(deadText)
     display.remove(piece)
     display.remove(map)
-    display.remove(flag)
-    --display.remove(xBtn)
-    --display.remove(fwBtn)
+    display.remove(xBtn)
+    display.remove(fwBtn)
     display.remove(countryText)
     display.remove(country)
     display.remove(infoPic)
@@ -454,8 +466,8 @@ function scene:hide(e)
     if timerSpeed~=nil then
       timer.cancel(timerSpeed)
     end
- --   xBtn:RemoveEventListener("tap",buttonHit)
-   -- fwBtn:RemoveEventListener("tap",buttonHit)
+    --xBtn:RemoveEventListener("tap",buttonHit)
+    --fwBtn:RemoveEventListener("tap",buttonHit)
     Runtime:removeEventListener("enterFrame", readyObject)
     composer.removeScene("cruise",false) 
   end
