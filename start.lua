@@ -11,6 +11,11 @@ local menuStart
 local menuCruise
 local menuTutorial
 
+local currentObject
+local isLoading = false
+local touchInsideBtn = false
+local isBtnAnim = false
+
 -- GLOBALIZE
 local btnsSheetCoords = require("lua-sheets.buttons")
 local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
@@ -90,7 +95,7 @@ local function myTouchListener( event )
     display.getCurrentStage():setFocus(currentObject)
     
     if event.phase == "began" then
-        -- print("touch ON. inside")          
+        print("touch ON. inside")          
     elseif event.phase == "ended" or event.phase == "cancelled" then
         
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
@@ -106,7 +111,7 @@ local function myTouchListener( event )
         -- currentObject:setFrame(1)
         
         if touchInsideBtn == true and isLoading == false then 
-            -- print("touch OFF. inside")
+            print("touch OFF. inside")
             -- composer.removeScene("start")
             
             -- prevents scenes from firing twice!!
@@ -167,11 +172,11 @@ local function doFunction(e)
                     end
                     currentObject:play()
                 else
-                    if currentObject.name == "pg" then
+                    if currentObject.name == "start" then
                         currentObject:setFrame(2)
-                    elseif currentObject.name == "opt" then
+                    elseif currentObject.name == "cruise" then
                         currentObject:setFrame(2)
-                    elseif currentObject.name == "abt" then
+                    elseif currentObject.name == "tutorial" then
                         currentObject:setFrame(2)
                     end
                 end
@@ -180,83 +185,6 @@ local function doFunction(e)
         end
     end
 end
-
--- OLD, delete
---[[
-local function myTouchListener( event )
-    currentObject = event.target
-    display.getCurrentStage():setFocus(currentObject)
-    
-    if event.phase == "began" then
-        -- print("touch ON. inside")          
-    elseif event.phase == "ended" or event.phase == "cancelled" then
-        
-        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "menuStart" then
-            currentObject:setSequence("start")
-        elseif currentObject.name == "menuTutorial" then
-            currentObject:setSequence("tutorial")
-        elseif currentObject.name == "menuCruise" then
-            currentObject:setSequence("cruise")
-        end
-        
-        -- redundant ?? 
-        -- currentObject:setFrame(1)
-        
-        if touchInsideBtn == true and isLoading == false then 
-            -- print("touch OFF. inside")
-            -- composer.removeScene("start")
-            
-            -- prevents scenes from firing twice!!
-            isLoading = true
-            
-            local goto = currentObject.gotoScene
-            composer.gotoScene( goto, { effect = defaultTransition } )
-            
-        elseif touchInsideBtn == false then
-            -- print("touch OFF outside")
-        end
-        
-        currentObject = nil
-        display.getCurrentStage():setFocus(nil)
-        touchInsideBtn = false
-    end
-end
- 
-local function doFunction(e)
-    if currentObject ~= nil then
-        if e.x < currentObject.contentBounds.xMin or
-            e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or 
-            e.y > currentObject.contentBounds.yMax then 
- 
-            if currentObject.name == "menuStart" then
-                currentObject:setSequence("start")
-            elseif currentObject.name == "menuTutorial" then
-                currentObject:setSequence("tutorial")
-            elseif currentObject.name == "menuCruise" then
-                currentObject:setSequence("cruise")
-            end
-            
-            -- redundant ??
-            -- currentObject:setFrame(1)
-            touchInsideBtn = false
-        else
-            if touchInsideBtn == false then
-                if currentObject.name == "menuStart" then
-                    currentObject:setSequence("start_anim")
-                elseif currentObject.name == "menuTutorial" then
-                    currentObject:setSequence("tutorial_anim")
-                elseif currentObject.name == "menuCruise" then
-                    currentObject:setSequence("cruise_anim")
-                end
-                currentObject:play()
-            end
-            touchInsideBtn = true
-        end
-    end
-end
-]]--
 
 local function removeIt(e)
        display.remove(e)
@@ -315,7 +243,7 @@ function scene:create( event )
 
     menuStart = display.newSprite(btnsSheet, btnsSeq)
     menuStart.name = "start"
-    menuStart:addEventListener("touch", myTouchListener)
+    --menuStart:addEventListener("touch", myTouchListener)
     menuStart.anchorY = 0
     menuStart.x=_W/2 
     menuStart.y=offsetStartBtns
@@ -328,7 +256,7 @@ function scene:create( event )
  
     menuCruise = display.newSprite(btnsSheet, btnsSeq)
     menuCruise.name = "cruise"
-    menuCruise:addEventListener("touch", myTouchListener)
+    --menuCruise:addEventListener("touch", myTouchListener)
     menuCruise.anchorY = 0
     menuCruise.x=_W/2 
     menuCruise.y=offsetStartBtns+btnSpacing
@@ -341,7 +269,7 @@ function scene:create( event )
     
     menuTutorial = display.newSprite(btnsSheet, btnsSeq)
     menuTutorial.name = "tutorial"
-    menuTutorial:addEventListener("touch", myTouchListener)
+    --menuTutorial:addEventListener("touch", myTouchListener)
     menuTutorial.anchorY = 0
     menuTutorial.x=_W/2 
     menuTutorial.y=offsetStartBtns+(btnSpacing*2)
@@ -354,9 +282,12 @@ function scene:create( event )
 
     background.height = (menuTutorial.y+menuTutorial.height) - menuStart.y
     background.y = background.y-4
-    menuStart:addEventListener("touch",doFunction)
-    menuCruise:addEventListener("touch",doFunction)
-    menuTutorial:addEventListener("touch",doFunction)
+
+    --Duplicates of objs' addEventListener
+    --menuStart:addEventListener("touch",doFunction)
+    --menuCruise:addEventListener("touch",doFunction)
+    --menuTutorial:addEventListener("touch",doFunction)
+    
     -- What does this do?
     timer.performWithDelay(300,initFunction)
 
@@ -387,13 +318,17 @@ function scene:hide( event )
     local sceneGroup=self.view
     local phase = event.phase
     if event.phase=="will" then
-    transition.to(phaseGroup, {time=0, alpha=0,onComplete=removeIt})      
+        transition.to(phaseGroup, {time=0, alpha=0,onComplete=removeIt})      
     elseif event.phase == "did" then
-     end
+        local parent = event.parent
+        parent:focusMenu()
+    end
 end
 
 function scene:destroy( event )
   local sceneGroup=self.view
+  
+  -- Do we need this? We already have a removeIt() function
   composer.hideOverlay("start")
 end
 

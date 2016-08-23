@@ -114,7 +114,7 @@ local nationalFlagsSeq = {
     { name="india", sheet=nationalFlags1Sheet, frames={22} },
     { name="indonesia", sheet=nationalFlags1Sheet, frames={23} },
     { name="ireland", sheet=nationalFlags1Sheet, frames={24} },
-    { name="isreal", sheet=nationalFlags2Sheet, frames={1} },  
+    { name="israel", sheet=nationalFlags2Sheet, frames={1} },  
     { name="italy", sheet=nationalFlags2Sheet, frames={2} },
     { name="japan", sheet=nationalFlags2Sheet, frames={3} },
     { name="lithuania", sheet=nationalFlags2Sheet, frames={4} },

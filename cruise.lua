@@ -14,8 +14,8 @@ local scene = composer.newScene()
 --SAM: we probebly want a global flag var
 local flagGroup
 
---local xBtn
---local fwBtn
+local xBtn
+local fwBtn
 local canQuit=false
 
 --media.playSound('Brazil.mid')
@@ -66,6 +66,8 @@ local e=0
 local countryText
 local country
 
+local buttonSheetInfo = require("lua-sheets.back_buttons")
+local buttonSheet = graphics.newImageSheet( "images/back_buttons.png", buttonSheetInfo:getSheet() )
 
 local boycha = 1 -- FOR TESTING PURPOSES.
 local nationalFlags1Coords = require("lua-sheets.national-flags1")
@@ -169,10 +171,8 @@ end
 
 
 local function touchFlagFunction()
-    
     flag:addEventListener( "tap", touchFlagNext ) 
     canQuit=true
-
 end
 
 
@@ -395,8 +395,23 @@ end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
-    --MIKE: can we get rid of this??
-
+    
+    local margins = 6
+    fwBtn = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_--Btn")}} )
+    fwBtn.type = "fwBtn"
+    fwBtn.xScale = -1
+    fwBtn.anchorX=0
+    fwBtn.anchorY=0
+    fwBtn.x = _W - margins
+    fwBtn.y = _H - fwBtn.height - margins 
+    
+    xBtn = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_xBtn")}} )
+    xBtn.type = "xBtn"
+    xBtn.anchorX=0
+    xBtn.anchorY=0
+    xBtn.x = 0 + margins
+    xBtn.y = 0 + margins
+    xBtn.gotoScene = "menu"
     --[[
     fwBtn = display.newImageRect( "images/greenArrow.png", 70, 70 )
     fwBtn.type = "fwBtn"
@@ -412,9 +427,9 @@ function scene:create(e)
     xBtn.x = 40
     xBtn.y = 40 
     xBtn.gotoScene = "menu"
+    ]]--
     self.view:insert(fwBtn)  
     self.view:insert(xBtn)  
-    ]]--
 end
 
 function scene:show(e)
@@ -422,13 +437,10 @@ function scene:show(e)
       print("SHOWWILL")
       setupVariables()
       random = math.randomseed( os.time() )
-   
-
     elseif (e.phase == "did") then
- 
    --    system.activate( "multitouch" )  
-      --xBtn:addEventListener("tap",buttonHit)
-      --fwBtn:addEventListener("tap",buttonHit)
+      xBtn:addEventListener("tap",buttonHit)
+      fwBtn:addEventListener("tap",buttonHit)
       Runtime:addEventListener("enterFrame", readyObject)  
     --   setTimer=timer.performWithDelay(20000, setFlag, 0)
      --  timer.performWithDelay(15000, checkMemory,0)
@@ -441,12 +453,12 @@ function scene:hide(e)
   if e.phase == "will" then
     display.remove(background)
     display.remove(flag)
+    display.remove(flagGroup)
     display.remove(deadText)
     display.remove(piece)
     display.remove(map)
-    display.remove(flag)
-    --display.remove(xBtn)
-    --display.remove(fwBtn)
+    display.remove(xBtn)
+    display.remove(fwBtn)
     display.remove(countryText)
     display.remove(country)
     display.remove(infoPic)
@@ -454,8 +466,8 @@ function scene:hide(e)
     if timerSpeed~=nil then
       timer.cancel(timerSpeed)
     end
- --   xBtn:RemoveEventListener("tap",buttonHit)
-   -- fwBtn:RemoveEventListener("tap",buttonHit)
+    --xBtn:RemoveEventListener("tap",buttonHit)
+    --fwBtn:RemoveEventListener("tap",buttonHit)
     Runtime:removeEventListener("enterFrame", readyObject)
     composer.removeScene("cruise",false) 
   end

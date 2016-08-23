@@ -235,9 +235,9 @@ CFGameSettings = class(function(c)
             w = CFColor(255,255,255)
         }
     }
-    countries["Isreal"] = { 
+    countries["Israel"] = { 
         id = 25,
-        name = "isreal",
+        name = "israel",
         code = "bw",    
         colors = {
             b = CFColor(0,56,184),

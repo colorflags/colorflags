@@ -111,9 +111,9 @@ local startBtnsAboutSheet = graphics.newImageSheet( "images/menu-btns.png", star
 local function myTouchListener( event )
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
-    
+    print(currentObject.name) 
     if event.phase == "began" then
-        -- print("touch ON. inside")          
+        print("touch ON. inside")          
     elseif event.phase == "ended" or event.phase == "cancelled" then
         
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
@@ -127,14 +127,14 @@ local function myTouchListener( event )
         
         -- redundant ?? 
         -- currentObject:setFrame(1)
-        
+        print(touchInsideBtn, isLoading)  
         if touchInsideBtn == true and isLoading == false then 
-            -- print("touch OFF. inside")
+            print("touch OFF. inside")
             -- composer.removeScene("start")
             
             -- prevents scenes from firing twice!!
             isLoading = true
-            
+            print("going to..") 
             local goto = currentObject.gotoScene
             if goto == "start" and event.target == startBtnsPlayGame then
                 composer.showOverlay( goto, { isModal= true})
@@ -328,7 +328,6 @@ function scene:create( event )
   sceneGroup:insert(startBtnsOptions)
   sceneGroup:insert(startBtnsAbout)  
 
-
    --startBtnsAbout:addEventListener("touch",myTouchListener)
    startBtnsAbout:addEventListener("touch",doFunction)
    --startBtnsPlayGame:addEventListener("touch",myTouchListener)
@@ -337,14 +336,24 @@ function scene:create( event )
    startBtnsOptions:addEventListener("touch",doFunction) 
 end
 
+function scene:focusMenu()
+    isLoading = false
+    touchInsideBtn = false
+    isBtnAnim = false
+end
+
 function scene:show( event )
     local sceneGroup=self.view
     local phase = event.phase
+
+    touchInsideBtn = false
+    print("focus")
   if event.phase == "will" then
     print("b")
       --Runtime:addEventListener("enterFrame", checkMemory)
     elseif event.phase == "did" then
-      print("c")
+        print("c")
+
    --   prepareMenu()
     --timer.performWithDelay(300,eraseSplash,1)
 
@@ -359,6 +368,7 @@ function scene:hide( event )
       local sceneGroup=self.view
     local phase = event.phase
 
+    print("a")
   if event.phase=="will" then
 
 print("d")
