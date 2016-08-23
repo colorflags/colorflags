@@ -1294,38 +1294,62 @@ local function readyObject ()
                                     count=count+2
         
                               elseif state==3 then
-                                if spawnTable[count]~=0 then
-                                  spawnTable[count].isGrown=true
-                                end
-                                if spawnTable[count+1]~=0 then
-                                  spawnTable[count+1].isGrown=true
-                                end
-                                if spawnTable[count+2]~=0 then
-                                  spawnTable[count+2].isGrown=true
-                                end
-                                if spawnTable[count+3]~=0 then
-                                  spawnTable[count+3].isGrown=true
-                                end
-                                count=count+4
-                                print ("SSSSS  " .. stateFour .. "   " .. count)
-                                elseif  state ==6 then
-                                  if spawnTable[count]~=0 then
-                                  spawnTable[count].isGrown=true
-                                end
-                                if spawnTable[count+1]~=0 then
-                                  spawnTable[count+1].isGrown=true
-                                end
-                                if spawnTable[count+2]~=0 then
-                                  spawnTable[count+2].isGrown=true
-                                end
-                                if spawnTable[count+3]~=0 then
-                                  spawnTable[count+3].isGrown=true
-                                end
-                                count=count+4
-                                print ("SSSSS  " .. stateFour .. "   " .. count)
-                              elseif state==4 then
-                                 stateFourGrow=stateFourGrow+1  
-                                if stateFourGrow >=4 then
+                                          if spawnTable[count]~=0 then
+                                            spawnTable[count].isGrown=true
+                                          end
+                                          if spawnTable[count+1]~=0 then
+                                            spawnTable[count+1].isGrown=true
+                                          end
+                                          if spawnTable[count+2]~=0 then
+                                            spawnTable[count+2].isGrown=true
+                                          end
+                                          if spawnTable[count+3]~=0 then
+                                            spawnTable[count+3].isGrown=tue
+                                          end
+                                          count=count+4
+                                elseif state == 4 then
+
+                                        stateFourGrow=stateFourGrow+1 
+
+                                            if stateFourGrow >=6  and state == 5 then
+                                                    if spawnTable[count]~=0 then
+                                                      spawnTable[count].isGrown=true
+                                                    end
+                                                    if spawnTable[count+1]~=0 then
+                                                      spawnTable[count+1].isGrown=true
+                                                    end
+                                                    if spawnTable[count+2]~=0 then
+                                                      spawnTable[count+2].isGrown=true
+                                                    end
+                                                    if spawnTable[count+3]~=0 then
+                                                      spawnTable[count+3].isGrown=true
+                                                    end
+                                                    if spawnTable[count+4]~=0 then
+                                                      spawnTable[count+4].isGrown=true
+                                                    end
+                                                    if spawnTable[count+5]~=0 then
+                                                      spawnTable[count+5].isGrown=true
+                                                    end       
+                                                    count=count+6  
+                               elseif stateFourGrow >=5 and state == 5 then
+                                            if spawnTable[count]~=0 then
+                                            spawnTable[count].isGrown=true
+                                          end
+                                          if spawnTable[count+1]~=0 then
+                                            spawnTable[count+1].isGrown=true
+                                          end
+                                          if spawnTable[count+2]~=0 then
+                                            spawnTable[count+2].isGrown=true
+                                          end
+                                          if spawnTable[count+3]~=0 then
+                                            spawnTable[count+3].isGrown=true
+                                          end
+                                        if spawnTable[count+4]~=0 then
+                                              spawnTable[count+4].isGrown=true
+                                            end
+                
+                                          count=count+5 
+                                if stateFourGrow >=4 and state == 5 then
                                             if spawnTable[count]~=0 then
                                             spawnTable[count].isGrown=true
                                           end
@@ -1340,7 +1364,7 @@ local function readyObject ()
                                           end
 
                                           count=count+4
-                                elseif stateFourGrow >=3 then     
+                                elseif stateFourGrow >=3 and state == 5 then     
                                           if spawnTable[count]~=0 then
                                             spawnTable[count].isGrown=true
                                           end
@@ -1351,7 +1375,7 @@ local function readyObject ()
                                             spawnTable[count+2].isGrown=true
                                           end
                                           count=count+3
-                                elseif stateFourGrow >=2 then   
+                                elseif stateFourGrow >=2 and state == 5 then   
                                         if spawnTable[count]~=0 then
                                             spawnTable[count].isGrown=true
                                           end
@@ -1359,7 +1383,91 @@ local function readyObject ()
                                             spawnTable[count+1].isGrown=true
                                           end
                                           count=count+2
-                                elseif stateFourGrow >=1 then
+                                elseif stateFourGrow >=1 and state == 5 or state == 4 then
+                                        if spawnTable[count]~=0 then
+                                            spawnTable[count].isGrown=true
+                                          end
+                                          count=count+1
+                                end      
+
+
+        elseif state == 5 then
+
+                                        stateFourGrow=stateFourGrow+1 
+
+                                            if stateFourGrow >=6 and state == 5 then
+                                                    if spawnTable[count]~=0 then
+                                                      spawnTable[count].isGrown=true
+                                                    end
+                                                    if spawnTable[count+1]~=0 then
+                                                      spawnTable[count+1].isGrown=true
+                                                    end
+                                                    if spawnTable[count+2]~=0 then
+                                                      spawnTable[count+2].isGrown=true
+                                                    end
+                                                    if spawnTable[count+3]~=0 then
+                                                      spawnTable[count+3].isGrown=true
+                                                    end
+                                                    if spawnTable[count+4]~=0 then
+                                                      spawnTable[count+4].isGrown=true
+                                                    end
+                                                    if spawnTable[count+5]~=0 then
+                                                      spawnTable[count+5].isGrown=true
+                                                    end       
+                                                    count=count+6  
+                               elseif stateFourGrow >=5 and state == 5 then
+                                            if spawnTable[count]~=0 then
+                                            spawnTable[count].isGrown=true
+                                          end
+                                          if spawnTable[count+1]~=0 then
+                                            spawnTable[count+1].isGrown=true
+                                          end
+                                          if spawnTable[count+2]~=0 then
+                                            spawnTable[count+2].isGrown=true
+                                          end
+                                          if spawnTable[count+3]~=0 then
+                                            spawnTable[count+3].isGrown=true
+                                          end
+                                        if spawnTable[count+4]~=0 then
+                                              spawnTable[count+4].isGrown=true
+                                            end
+                
+                                          count=count+5 
+                                if stateFourGrow >=4 and state == 5 then
+                                            if spawnTable[count]~=0 then
+                                            spawnTable[count].isGrown=true
+                                          end
+                                          if spawnTable[count+1]~=0 then
+                                            spawnTable[count+1].isGrown=true
+                                          end
+                                          if spawnTable[count+2]~=0 then
+                                            spawnTable[count+2].isGrown=true
+                                          end
+                                          if spawnTable[count+3]~=0 then
+                                            spawnTable[count+3].isGrown=true
+                                          end
+
+                                          count=count+4
+                                elseif stateFourGrow >=3 and state == 5 then     
+                                          if spawnTable[count]~=0 then
+                                            spawnTable[count].isGrown=true
+                                          end
+                                          if spawnTable[count+1]~=0 then
+                                            spawnTable[count+1].isGrown=true
+                                          end
+                                          if spawnTable[count+2]~=0 then
+                                            spawnTable[count+2].isGrown=true
+                                          end
+                                          count=count+3
+                                elseif stateFourGrow >=2 and state == 5 then   
+                                        if spawnTable[count]~=0 then
+                                            spawnTable[count].isGrown=true
+                                          end
+                                          if spawnTable[count+1]~=0 then
+                                            spawnTable[count+1].isGrown=true
+                                          end
+                                          count=count+2
+                                elseif stateFourGrow >=1 and state == 5 or state == 4 then
                                         if spawnTable[count]~=0 then
                                             spawnTable[count].isGrown=true
                                           end
@@ -1368,11 +1476,11 @@ local function readyObject ()
 
                             end 
                              
-                                 
+                         end        
                           --     print("stateFourGrow    :".. stateFourGrow)   
                            --     print("COUNT           :" .. count)
 
-                       
+                       end
                             
                         end
                 end
