@@ -14,6 +14,8 @@ local scene = composer.newScene()
 --SAM: we probebly want a global flag var
 local flagGroup
 
+local countryPicker
+
 local xBtn
 local fwBtn
 local canQuit=false
@@ -151,13 +153,111 @@ local piece = display.newImage( "images/australia259x229.png", 529,229)
       piece.anchorY=0.5
       piece.alpha=0
 
-local      background = display.newRect(0,0,580,320)
+local background = display.newRect(0,0,580,320)
       background:setFillColor( 1,1,1 )
       background.anchorX=0.5
       background.anchorY=0.5
       background.name="background"
       background.x=_W/2 ;background.y=_H/2
       background:toBack()
+--[[
+-- New
+local function myTouchListener( event )
+    currentObject = event.target
+    display.getCurrentStage():setFocus(currentObject)
+    
+    if event.phase == "began" then
+        print("touch ON. inside")          
+    elseif event.phase == "ended" or event.phase == "cancelled" then
+        
+        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
+        if currentObject.name == "pg" then
+            currentObject:setSequence("playgame")
+        elseif currentObject.name == "opt" then
+            currentObject:setSequence("options")
+        elseif currentObject.name == "abt" then
+            currentObject:setSequence("about")
+        end
+        
+        -- redundant ?? 
+        -- currentObject:setFrame(1)
+        
+        if touchInsideBtn == true and isLoading == false then 
+            print("touch OFF. inside")
+            -- composer.removeScene("start")
+            
+            -- prevents scenes from firing twice!!
+            isLoading = true
+            
+            local goto = currentObject.gotoScene
+            if goto == "start" and event.target == startBtnsPlayGame then
+                composer.showOverlay( goto, { isModal= true})
+            else
+                composer.gotoScene ( goto, { effect = defaultTransition } )
+            end  
+        elseif touchInsideBtn == false then
+            -- print("touch OFF outside")
+        end
+        
+        currentObject = nil
+        display.getCurrentStage():setFocus(nil)
+        touchInsideBtn = false
+    end
+end
+ 
+local function doFunction(e)
+    if currentObject ~= nil then
+        if e.x < currentObject.contentBounds.xMin or
+            e.x > currentObject.contentBounds.xMax or
+            e.y < currentObject.contentBounds.yMin or 
+            e.y > currentObject.contentBounds.yMax then 
+            
+            if(isBtnAnim) then
+                if currentObject.name == "start" then
+                    currentObject:setSequence("start")
+                elseif currentObject.name == "cruise" then
+                    currentObject:setSequence("cruise")
+                elseif currentObject.name == "tutorial" then
+                    currentObject:setSequence("tutorial")
+                end
+            else 
+                if currentObject.name == "start" then
+                    currentObject:setFrame(1)
+                elseif currentObject.name == "cruise" then
+                    currentObject:setFrame(1)
+                elseif currentObject.name == "tutorial" then
+                    currentObject:setFrame(1)
+                end
+            end
+            -- redundant ??
+            -- currentObject:setFrame(1)
+            touchInsideBtn = false
+        else
+            if touchInsideBtn == false then
+                if(isBtnAnim) then
+                    if currentObject.name == "start" then
+                        currentObject:setSequence("start_anim")
+                    elseif currentObject.name == "cruise" then
+                        currentObject:setSequence("cruise_anim")
+                    elseif currentObject.name == "tutorial" then
+                        currentObject:setSequence("tutorial_anim")
+                    end
+                    currentObject:play()
+                else
+                    if currentObject.name == "start" then
+                        currentObject:setFrame(2)
+                    elseif currentObject.name == "cruise" then
+                        currentObject:setFrame(2)
+                    elseif currentObject.name == "tutorial" then
+                        currentObject:setFrame(2)
+                    end
+                end
+            end
+            touchInsideBtn = true
+        end
+    end
+end
+]]--
 
 local function setFlag()
    setTheFlag=true
@@ -203,7 +303,7 @@ end
 
 
 local function countries(test)
-    local e = math.random(56)
+    local e = math.random(55)
     country = CFGameSettings:getItemByID(e)
     print("country : ", e)
     print(country.name)
@@ -382,6 +482,7 @@ end
 
 
 local function buttonHit(e)     
+    -- Mike, can we get rid of this logic to prevent firing these buttons (fwBtn and xBtn) when countries are the delays are running to give time to move to next country coordinates. It's making things difficult for me.
     if canQuit==true then
         if e.target.type=="fwBtn" then           
            setTheFlag = true
@@ -391,11 +492,16 @@ local function buttonHit(e)
         return true
     end
 end
-
+--[[
+local function countryPicker()
+    composer.showOverlay("tableView", { isModal=true})
+end
+]]--
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
-    
+    local sceneGroup = self.view
+
     local margins = 6
     fwBtn = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_--Btn")}} )
     fwBtn.type = "fwBtn"
@@ -428,29 +534,47 @@ function scene:create(e)
     xBtn.y = 40 
     xBtn.gotoScene = "menu"
     ]]--
-    self.view:insert(fwBtn)  
-    self.view:insert(xBtn)  
+    
+    xBtn:addEventListener("tap",buttonHit)
+    fwBtn:addEventListener("tap",buttonHit)
+
+    sceneGroup:insert(fwBtn)  
+    sceneGroup:insert(xBtn)  
+
+    --composer.showOverlay("tableView")
 end
 
 function scene:show(e)
+    local sceneGroup = self.view
+
     if (e.phase == "will") then
       print("SHOWWILL")
       setupVariables()
+
+      -- TEMP COUNTRY PICKER FOR SAM
+      --countryPicker()
+      map:toBack()
+      background:toBack()
+      --
+
       random = math.randomseed( os.time() )
     elseif (e.phase == "did") then
    --    system.activate( "multitouch" )  
-      xBtn:addEventListener("tap",buttonHit)
-      fwBtn:addEventListener("tap",buttonHit)
+      --xBtn:addEventListener("tap",buttonHit)
+      --fwBtn:addEventListener("tap",buttonHit)
       Runtime:addEventListener("enterFrame", readyObject)  
     --   setTimer=timer.performWithDelay(20000, setFlag, 0)
      --  timer.performWithDelay(15000, checkMemory,0)
-       newFlag()
+      newFlag()
     end
 end
 
 function scene:hide(e)
+    local sceneGroup = self.view
+
   print("HIDE")
   if e.phase == "will" then
+    --composer.removeScene("tableView")
     display.remove(background)
     display.remove(flag)
     display.remove(flagGroup)
@@ -469,7 +593,7 @@ function scene:hide(e)
     --xBtn:RemoveEventListener("tap",buttonHit)
     --fwBtn:RemoveEventListener("tap",buttonHit)
     Runtime:removeEventListener("enterFrame", readyObject)
-    composer.removeScene("cruise",false) 
+    --composer.removeScene("cruise",false) 
   end
 end
 

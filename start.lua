@@ -207,8 +207,8 @@ local function catchAllTaps(e)
 end
 
 local function initFunction()
-catchAll:addEventListener("tap",catchAllTaps) 
-background:addEventListener("tap",doNothing)
+    catchAll:addEventListener("tap",catchAllTaps) 
+    background:addEventListener("tap",doNothing)
     menuStart:addEventListener( "touch", myTouchListener )
     menuStart:addEventListener( "touch", doFunction )
     menuTutorial:addEventListener( "touch", myTouchListener )

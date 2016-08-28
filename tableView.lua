@@ -5,6 +5,9 @@ local widget = require( "widget" )
 local composer = require( "composer" )
 local scene = composer.newScene()
 
+--SAM.. for passing clicks to parent!
+local parent
+
 --Forward reference for test function timer
 local testTimer = nil
 
@@ -21,7 +24,7 @@ local tableView
 
 function scene:createScene( event )
 	local group = self.view
-	
+
 	local xAnchor, yAnchor
 	
 	if not isGraphicsV1 then
@@ -34,7 +37,22 @@ function scene:createScene( event )
 		yAnchor = 0
 	end
 	
-	local fontColor = 0
+    local function touchToParent(e)
+        parent:buttonHit(e)
+        return true
+    end
+    --[[
+    local background = display.newRect(0,0,580,320)
+    background:setFillColor( 0,1,1 )
+    background.alpha = 0
+    background.anchorX=0.5
+    background.anchorY=0.5
+    background.x=_W/2 ;background.y=_H/2
+	
+    background.isHitTestable = true
+    background:addEventListener("tap", touchToParent)
+    ]]--
+    local fontColor = 0
 	local backColor = { 1 }
 	--[[
     local background = display.newRect( xAnchor, yAnchor, display.contentWidth, display.contentHeight )
@@ -56,8 +74,8 @@ function scene:createScene( event )
 		else background:setFillColor( 1, 1, 1, 1 ) end
 	end
 	group:insert( background )
-    ]]--	
-	local backButtonPosition = 5
+	
+    local backButtonPosition = 5
 	local backButtonSize = 34
 	
 	-- Button to return to unit test listing
@@ -74,6 +92,7 @@ function scene:createScene( event )
 	}
 	returnToListing.x = display.contentCenterX
 	group:insert( returnToListing )
+    ]]--
 	----------------------------------------------------------------------------------------------------------------
 	--										START OF UNIT TEST
 	----------------------------------------------------------------------------------------------------------------
@@ -113,7 +132,6 @@ function scene:createScene( event )
 				
 		return true
 	end
-
 
 	local noCategories = 0
 
@@ -221,23 +239,23 @@ function scene:createScene( event )
 			end
 		end
 	end
-	
+    	
 	-- Create a tableView
 	tableView = widget.newTableView
 	{
 		top = 40,
 		left = 0,
-		x = _W/2,
+		x = _W-((_W/3)/2),
 		y = _H/2,
-		width = display.contentWidth, 
-		height = display.contentHeight - 40,
+		width = _W/3, 
+		height = _H/2,
 		backgroundColor = backColor,
 		onRowRender = onRowRender,
 		onRowTouch = onRowTouch,
 	}
 	group:insert( tableView )
     tableView:toBack()
-
+    
     local countriesLength = CFGameSettings:getLength()
     print("number of countries", countriesLength)
 
@@ -275,10 +293,11 @@ function scene:createScene( event )
 
         print(CFGameSettings:getItemByID(i).name)
 
-		--]]
 		local rowParams = {
 		rowIdentifier = "testing"..i,
 		}
+
+        
 		-- Insert the row into the tableView
 		tableView:insertRow
 		{
@@ -289,6 +308,7 @@ function scene:createScene( event )
 			lineColor = lineColor,
 			params = rowParams
 		}
+        
 	end
 	
 	----------------------------------------------------------------------------------------------------------------
@@ -348,6 +368,14 @@ function scene:createScene( event )
 	end
 end
 
+function scene:show( event )
+    local sceneGroup=self.view
+    if event.phase=="will" then
+    elseif event.phase == "did" then
+        parent = event.parent
+    end
+end
+
 function scene:didExitScene( event )
 	--Cancel test timer if active
 	if testTimer ~= nil then
@@ -359,6 +387,10 @@ function scene:didExitScene( event )
 end
 
 scene:addEventListener( "create", function(event) scene:createScene(event) end )
+
+--SAM.. for passing clicks to parent!
+scene:addEventListener("show", scene)
+
 scene:addEventListener( "hide", function(event) print("hide"); if event.phase == 'did' then scene:didExitScene(event) end end )
 
 return scene
