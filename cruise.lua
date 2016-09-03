@@ -20,6 +20,11 @@ local xBtn
 local fwBtn
 local canQuit=false
 
+local currentObject
+local isLoading = false
+local touchInsideBtn = false
+local isBtnAnim = false
+
 --media.playSound('Brazil.mid')
 local touchFlagReady
 local infoPic
@@ -80,6 +85,52 @@ local nationalFlags2Sheet = graphics.newImageSheet( "images/national-flags2.png"
 
 local nationalFlags3Coords = require("lua-sheets.national-flags3")
 local nationalFlags3Sheet = graphics.newImageSheet( "images/national-flags3.png", nationalFlags3Coords:getSheet() )
+
+local btnsSheetCoords = require("lua-sheets.buttons")
+local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
+
+local btnsSeq = {
+    {
+        name = "xBtn",
+        frames = {
+            btnsSheetCoords:getFrameIndex("xBtn3"),
+            btnsSheetCoords:getFrameIndex("xBtn5")
+        },
+        time = 500 
+    },
+    {
+        name = "xBtn_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("xBtn2"),
+            btnsSheetCoords:getFrameIndex("xBtn3"),
+            btnsSheetCoords:getFrameIndex("xBtn4"),
+            btnsSheetCoords:getFrameIndex("xBtn5")
+        },
+        time = 500 
+    },
+    {
+        name = "fwBtn",
+        frames = {
+            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn5")
+        },
+        time = 500 
+    },
+    {
+        name = "fwBtn_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("backArrowBtn2"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn4"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn5")
+        },
+        time = 500 
+    }
+}
+
+local menuSpriteCoords = require("lua-sheets.playgame-menu")
+local menuStartSheet = graphics.newImageSheet( "images/playgame-menu.png", menuSpriteCoords:getSheet() )
+
 
 local nationalFlagsSeq = {
     { name="andorra", sheet=nationalFlags1Sheet, frames={1} },
@@ -160,41 +211,38 @@ local background = display.newRect(0,0,580,320)
       background.name="background"
       background.x=_W/2 ;background.y=_H/2
       background:toBack()
---[[
+
 -- New
 local function myTouchListener( event )
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
-    
+    print(currentObject.name) 
     if event.phase == "began" then
         print("touch ON. inside")          
     elseif event.phase == "ended" or event.phase == "cancelled" then
         
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "pg" then
-            currentObject:setSequence("playgame")
-        elseif currentObject.name == "opt" then
-            currentObject:setSequence("options")
-        elseif currentObject.name == "abt" then
-            currentObject:setSequence("about")
+        if currentObject.name == "fwBtn" then
+            currentObject:setSequence("fwBtn")
+        elseif currentObject.name == "xBtn" then
+            currentObject:setSequence("xBtn")
         end
         
         -- redundant ?? 
         -- currentObject:setFrame(1)
-        
+        print(touchInsideBtn, isLoading)  
         if touchInsideBtn == true and isLoading == false then 
             print("touch OFF. inside")
             -- composer.removeScene("start")
             
             -- prevents scenes from firing twice!!
             isLoading = true
-            
-            local goto = currentObject.gotoScene
-            if goto == "start" and event.target == startBtnsPlayGame then
-                composer.showOverlay( goto, { isModal= true})
-            else
-                composer.gotoScene ( goto, { effect = defaultTransition } )
-            end  
+            if(currentObject.name == "xBtn") then
+                composer.gotoScene ( "menu", { effect = defaultTransition } )
+            elseif(currentObject.name == "fwBtn") then
+                setTheFlag=true
+            end
+
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
         end
@@ -213,19 +261,15 @@ local function doFunction(e)
             e.y > currentObject.contentBounds.yMax then 
             
             if(isBtnAnim) then
-                if currentObject.name == "start" then
-                    currentObject:setSequence("start")
-                elseif currentObject.name == "cruise" then
-                    currentObject:setSequence("cruise")
-                elseif currentObject.name == "tutorial" then
-                    currentObject:setSequence("tutorial")
+                if currentObject.name == "fwBtn" then
+                    currentObject:setSequence("fwBtn")
+                elseif currentObject.name == "xBtn" then
+                    currentObject:setSequence("xBtn")
                 end
             else 
-                if currentObject.name == "start" then
+                if currentObject.name == "fwBtn" then
                     currentObject:setFrame(1)
-                elseif currentObject.name == "cruise" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "tutorial" then
+                elseif currentObject.name == "xBtn" then
                     currentObject:setFrame(1)
                 end
             end
@@ -235,20 +279,16 @@ local function doFunction(e)
         else
             if touchInsideBtn == false then
                 if(isBtnAnim) then
-                    if currentObject.name == "start" then
-                        currentObject:setSequence("start_anim")
-                    elseif currentObject.name == "cruise" then
-                        currentObject:setSequence("cruise_anim")
-                    elseif currentObject.name == "tutorial" then
-                        currentObject:setSequence("tutorial_anim")
+                    if currentObject.name == "fwBtn" then
+                        currentObject:setSequence("fwBtn_anim")
+                    elseif currentObject.name == "xBtn" then
+                        currentObject:setSequence("xBtn_anim")
                     end
                     currentObject:play()
                 else
-                    if currentObject.name == "start" then
+                    if currentObject.name == "fwBtn" then
                         currentObject:setFrame(2)
-                    elseif currentObject.name == "cruise" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "tutorial" then
+                    elseif currentObject.name == "xBtn" then
                         currentObject:setFrame(2)
                     end
                 end
@@ -257,11 +297,10 @@ local function doFunction(e)
         end
     end
 end
-]]--
 
 local function setFlag()
    setTheFlag=true
-  end
+end
 
 local function touchFlagNext(e)
      print("YOOOOO")
@@ -431,19 +470,21 @@ local function newFlag()
            --flagGroup:scale(0,0)
 
 
-              if state==3 then
-          sideTimer=timer.performWithDelay(1500,finishScale,1)
-          pieceTimer=transition.to( piece, { time=2000, x=_W/2, y=_H/2 }) 
-          mapTimer=transition.to( map, { time=2000, x=xCoord, y=yCoord })                     
-          flagTimer=transition.to( flagGroup, { time=2000, xScale=.2, yScale=.2})  
-          paceTimer=timer.performWithDelay(0,delayPace,1)       
+          if state==3 then
+              -- WTF IS GOING ON HERE!
+              --sideTimer=timer.performWithDelay(1500,finishScale,1)
+              pieceTimer=transition.to( piece, { time=2000, x=_W/2, y=_H/2 }) 
+              mapTimer=transition.to( map, { time=2000, x=xCoord, y=yCoord })                     
+              flagTimer=transition.to( flagGroup, { time=2000, xScale=.2, yScale=.2 })  
+              paceTimer=timer.performWithDelay(0,delayPace,1)       
           else
-
-          sideTimer=timer.performWithDelay(1500,finishScale,1)
-          pieceTimer=transition.to( piece, { time=1500, x=_W/2, y=_H/2 }) 
-          mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })                     
-          flagTimer=transition.to( flagGroup, { time=1500, xScale=.2, yScale=.2})  
-          paceTimer=timer.performWithDelay(900,delayPace,1)         
+              
+              -- WTF IS GOING ON HERE!
+              --sideTimer=timer.performWithDelay(1500,finishScale,1)
+              pieceTimer=transition.to( piece, { time=1500, x=_W/2, y=_H/2 }) 
+              mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })                     
+              flagTimer=transition.to( flagGroup, { time=1500, xScale=.2, yScale=.2 })  
+              paceTimer=timer.performWithDelay(900,delayPace,1)         
           end  
           flagGroup:toFront()       
 end    
@@ -451,7 +492,7 @@ end
 local function removeFlag()         
               flagGroup:removeSelf()
               flagGroup = nil  
-  end            
+end            
 
 local function readyObject (e)
 
@@ -503,16 +544,20 @@ function scene:create(e)
     local sceneGroup = self.view
 
     local margins = 6
-    fwBtn = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_--Btn")}} )
+    fwBtn = display.newSprite(btnsSheet, btnsSeq)
+    fwBtn:setSequence("fwBtn")
     fwBtn.type = "fwBtn"
+    fwBtn.name = "fwBtn"
     fwBtn.xScale = -1
     fwBtn.anchorX=0
     fwBtn.anchorY=0
     fwBtn.x = _W - margins
     fwBtn.y = _H - fwBtn.height - margins 
     
-    xBtn = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_xBtn")}} )
+    xBtn = display.newSprite(btnsSheet, btnsSeq)
+    xBtn:setSequence("xBtn")
     xBtn.type = "xBtn"
+    xBtn.name = "xBtn"
     xBtn.anchorX=0
     xBtn.anchorY=0
     xBtn.x = 0 + margins
@@ -535,8 +580,10 @@ function scene:create(e)
     xBtn.gotoScene = "menu"
     ]]--
     
-    xBtn:addEventListener("tap",buttonHit)
-    fwBtn:addEventListener("tap",buttonHit)
+    fwBtn:addEventListener("touch", myTouchListener)
+    fwBtn:addEventListener("touch", doFunction)
+    xBtn:addEventListener("touch", myTouchListener)
+    xBtn:addEventListener("touch", doFunction)
 
     sceneGroup:insert(fwBtn)  
     sceneGroup:insert(xBtn)  
@@ -574,6 +621,11 @@ function scene:hide(e)
 
   print("HIDE")
   if e.phase == "will" then
+
+    fwBtn:removeEventListener("touch", myTouchListener)
+    fwBtn:removeEventListener("touch", doFunction)
+    xBtn:removeEventListener("touch", myTouchListener)
+    xBtn:removeEventListener("touch", doFunction)
     --composer.removeScene("tableView")
     display.remove(background)
     display.remove(flag)
@@ -590,6 +642,7 @@ function scene:hide(e)
     if timerSpeed~=nil then
       timer.cancel(timerSpeed)
     end
+
     --xBtn:RemoveEventListener("tap",buttonHit)
     --fwBtn:RemoveEventListener("tap",buttonHit)
     Runtime:removeEventListener("enterFrame", readyObject)
