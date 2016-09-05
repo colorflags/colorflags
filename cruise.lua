@@ -7,12 +7,7 @@ local CreateText = require("cf_text")
 --game.lua
 local composer = require("composer")
 local scene = composer.newScene()
---media.playSound('yancy.mp3')
---local physics = require("physics")
---physics.start()
-
---SAM: we probebly want a global flag var
-local flagGroup
+local flagGroup     --SAM:GLOBAL FLAG VAR?
 
 local countryPicker
 
@@ -21,7 +16,6 @@ local fwBtn
 local canQuit=false
 
 local currentObject
-local isLoading = false
 local touchInsideBtn = false
 local isBtnAnim = false
 
@@ -37,7 +31,6 @@ local motion
 local coin=1
 local options
 local choice=0
-local timerSpeed
 local flag2Timer
 local finalChallenge=false
 local thatsIt=false
@@ -47,7 +40,6 @@ local setTheFlag=false
 local xCoord=0
 local yCoord=0
 
-local sideTimer
 local pieceTimer
 local mapTimer
 local flagTimer
@@ -191,14 +183,6 @@ local nationalFlagsSeq = {
     { name="unitedstates", sheet=nationalFlags3Sheet, frames={7} } 
 }
 
-local topBtmBarSpriteCoords = require("lua-sheets.TopBtmBar")
-local topBtmBarSheet = graphics.newImageSheet( "images/TopBtmBar.png", topBtmBarSpriteCoords:getSheet() )
-
-local topBtmBarSeq = {
-    {name="top", frames={1,2,3,4,5,6,7,8,9,10}, time=1000, loopCount=0},
-    {name="btm", frames={6,7,8,9,10,1,2,3,4,5}, time=1000, loopcount=0},
-}
-
 local piece = display.newImage( "images/australia259x229.png", 529,229)
       piece.anchorX=0.5
       piece.anchorY=0.5
@@ -213,7 +197,7 @@ local background = display.newRect(0,0,580,320)
       background:toBack()
 
 -- New
-local function myTouchListener( event )
+local function myTouchListener(event)
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
     print(currentObject.name) 
@@ -227,16 +211,12 @@ local function myTouchListener( event )
         elseif currentObject.name == "xBtn" then
             currentObject:setSequence("xBtn")
         end
-        
-        -- redundant ?? 
-        -- currentObject:setFrame(1)
-        print(touchInsideBtn, isLoading)  
-        if touchInsideBtn == true and isLoading == false then 
+
+        if touchInsideBtn == true and canQuit == true then 
+
             print("touch OFF. inside")
             -- composer.removeScene("start")
             
-            -- prevents scenes from firing twice!!
-            isLoading = true
             if(currentObject.name == "xBtn") then
                 composer.gotoScene ( "menu", { effect = defaultTransition } )
             elseif(currentObject.name == "fwBtn") then
@@ -298,33 +278,10 @@ local function doFunction(e)
     end
 end
 
-local function setFlag()
-   setTheFlag=true
-end
-
-local function touchFlagNext(e)
-     print("YOOOOO")
-    flag:removeEventListener( "tap", touchFlagNext ) 
-    setTheFlag=true
-end  
-
-
-local function touchFlagFunction()
-    flag:addEventListener( "tap", touchFlagNext ) 
-    canQuit=true
-end
-
-
 local function finishScale()
-            flag2Timer=transition.to( flag, { time=1000, xScale=1, yScale=1})
-            touchFlagReady=timer.performWithDelay( 1000, touchFlagFunction, 1 )
-end
-
-
-
-local function nextMove()
-              pointAnimation:pause()
-              pointAnimation:toBack()
+  xBtn:toFront()
+  fwBtn:toFront()   
+  canQuit=true
 end
 
 local function infoAppear()
@@ -465,27 +422,13 @@ local function newFlag()
           piece.alpha=1
           
           flagGroup.alpha=1
-           --delay start of color squares
 
            --flagGroup:scale(0,0)
 
+          pieceTimer=transition.to( piece, { time=1500, x=_W/2, y=_H/2 }) 
+          mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })                     
+          flagTimer=transition.to( flagGroup, { time=1500, xScale=.2, yScale=.2 , onComplete=finishScale})   
 
-          if state==3 then
-              -- WTF IS GOING ON HERE!
-              --sideTimer=timer.performWithDelay(1500,finishScale,1)
-              pieceTimer=transition.to( piece, { time=2000, x=_W/2, y=_H/2 }) 
-              mapTimer=transition.to( map, { time=2000, x=xCoord, y=yCoord })                     
-              flagTimer=transition.to( flagGroup, { time=2000, xScale=.2, yScale=.2 })  
-              paceTimer=timer.performWithDelay(0,delayPace,1)       
-          else
-              
-              -- WTF IS GOING ON HERE!
-              --sideTimer=timer.performWithDelay(1500,finishScale,1)
-              pieceTimer=transition.to( piece, { time=1500, x=_W/2, y=_H/2 }) 
-              mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })                     
-              flagTimer=transition.to( flagGroup, { time=1500, xScale=.2, yScale=.2 })  
-              paceTimer=timer.performWithDelay(900,delayPace,1)         
-          end  
           flagGroup:toFront()       
 end    
 
@@ -494,9 +437,10 @@ local function removeFlag()
               flagGroup = nil  
 end            
 
-local function readyObject (e)
+local function readyObject(e)
 
   if setTheFlag==true then     --START A NEW FLAG 
+
   canQuit=false
   transition.to( piece, { time=490, alpha=0,onComplete=killPiece})
     setTheFlag=false
@@ -518,21 +462,11 @@ local function setupVariables()
       map.anchorX=0.5
       map.anchorY=0.5
       map.name="map"
-      map.x=0 ;map.y=0;                
+      map.x=0 ;map.y=0;       
+            map:toBack()
+      background:toBack()         
 end
 
-
-local function buttonHit(e)     
-    -- Mike, can we get rid of this logic to prevent firing these buttons (fwBtn and xBtn) when countries are the delays are running to give time to move to next country coordinates. It's making things difficult for me.
-    if canQuit==true then
-        if e.target.type=="fwBtn" then           
-           setTheFlag = true
-        elseif e.target.type=="xBtn" then
-           composer.gotoScene ( "menu", { effect = defaultTransition } )   
-        end
-        return true
-    end
-end
 --[[
 local function countryPicker()
     composer.showOverlay("tableView", { isModal=true})
@@ -541,7 +475,6 @@ end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
-    local sceneGroup = self.view
 
     local margins = 6
     fwBtn = display.newSprite(btnsSheet, btnsSeq)
@@ -563,52 +496,21 @@ function scene:create(e)
     xBtn.x = 0 + margins
     xBtn.y = 0 + margins
     xBtn.gotoScene = "menu"
-    --[[
-    fwBtn = display.newImageRect( "images/greenArrow.png", 70, 70 )
-    fwBtn.type = "fwBtn"
-    fwBtn.anchorX=0.5
-    fwBtn.anchorY=0.5
-    fwBtn.x = 120
-    fwBtn.y = 40
-    fwBtn:toBack() 
-    xBtn = display.newImageRect( "images/greenX.png", 70, 70 )
-    xBtn.type = "xBtn"
-    xBtn.anchorX=0.5
-    xBtn.anchorY=0.5
-    xBtn.x = 40
-    xBtn.y = 40 
-    xBtn.gotoScene = "menu"
-    ]]--
-    
     fwBtn:addEventListener("touch", myTouchListener)
     fwBtn:addEventListener("touch", doFunction)
     xBtn:addEventListener("touch", myTouchListener)
     xBtn:addEventListener("touch", doFunction)
-
-    sceneGroup:insert(fwBtn)  
-    sceneGroup:insert(xBtn)  
-
-    --composer.showOverlay("tableView")
 end
 
 function scene:show(e)
-    local sceneGroup = self.view
-
     if (e.phase == "will") then
       print("SHOWWILL")
       setupVariables()
-
       -- TEMP COUNTRY PICKER FOR SAM
       --countryPicker()
-      map:toBack()
-      background:toBack()
-      --
-
       random = math.randomseed( os.time() )
     elseif (e.phase == "did") then
    --    system.activate( "multitouch" )  
-      --xBtn:addEventListener("tap",buttonHit)
-      --fwBtn:addEventListener("tap",buttonHit)
       Runtime:addEventListener("enterFrame", readyObject)  
     --   setTimer=timer.performWithDelay(20000, setFlag, 0)
      --  timer.performWithDelay(15000, checkMemory,0)
@@ -617,8 +519,6 @@ function scene:show(e)
 end
 
 function scene:hide(e)
-    local sceneGroup = self.view
-
   print("HIDE")
   if e.phase == "will" then
 
@@ -630,7 +530,6 @@ function scene:hide(e)
     display.remove(background)
     display.remove(flag)
     display.remove(flagGroup)
-    display.remove(deadText)
     display.remove(piece)
     display.remove(map)
     display.remove(xBtn)
@@ -639,14 +538,9 @@ function scene:hide(e)
     display.remove(country)
     display.remove(infoPic)
     print("quit")
-    if timerSpeed~=nil then
-      timer.cancel(timerSpeed)
-    end
-
-    --xBtn:RemoveEventListener("tap",buttonHit)
-    --fwBtn:RemoveEventListener("tap",buttonHit)
     Runtime:removeEventListener("enterFrame", readyObject)
-    --composer.removeScene("cruise",false) 
+
+    composer.removeScene("cruise",false) 
   end
 end
 
