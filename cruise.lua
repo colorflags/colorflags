@@ -19,48 +19,24 @@ local currentObject
 local touchInsideBtn = false
 local isBtnAnim = false
 
---media.playSound('Brazil.mid')
-local touchFlagReady
 local infoPic
 local info
 local infoTimer
---local idx=25
-local localGroup = display.newGroup()
 local infoMode = false
-local motion
-local coin=1
-local options
-local choice=0
-local flag2Timer
-local finalChallenge=false
-local thatsIt=false
-local count=1
-local firstObject=true
 local setTheFlag=false
 local xCoord=0
 local yCoord=0
 
 local pieceTimer
 local mapTimer
-local flagTimer
-local paceTimer
-local killBarsTimer
-local resetTimer
-local flag3Timer
+local flagScaleTimer
+local flagRemoveTimer
 local newFlagTimer
-
-local rotationTimer
-
-local line
-
-
 local map
-local lastFlag = 0
-local rep=false
 local random
 local thisRoll=0
 local lastRoll=0
-local e=0
+local tempRoll=0
 
 local countryText
 local country
@@ -393,11 +369,11 @@ end
 
 local function newFlag() 
             music=nil
-            lastRoll=e
+            lastRoll=tempRoll
             while thisRoll==lastRoll do
-               -- e = math.random(1,5)
-                e = math.random(1,56)
-                thisRoll=e
+               -- tempRoll = math.random(1,5)
+                tempRoll = math.random(1,56)
+                thisRoll=tempRoll
             end
 
           countries(1)
@@ -427,7 +403,7 @@ local function newFlag()
 
           pieceTimer=transition.to( piece, { time=1500, x=_W/2, y=_H/2 }) 
           mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })                     
-          flagTimer=transition.to( flagGroup, { time=1500, xScale=.2, yScale=.2 , onComplete=finishScale})   
+          flagScaleTimer=transition.to( flagGroup, { time=1500, xScale=.2, yScale=.2 , onComplete=finishScale})   
 
           flagGroup:toFront()       
 end    
@@ -450,7 +426,7 @@ local function readyObject(e)
      infoTimer=transition.to(infoPic, {time=500, alpha=0}) 
     end
 
-    flag3Timer=transition.to( flag, { time=500, alpha=0, onComplete=removeFlag   })    --remove flag
+    flagRemoveTimer=transition.to( flag, { time=500, alpha=0, onComplete=removeFlag   })    --remove flag
     newFlagTimer=timer.performWithDelay(600,newFlag)
 
   end
