@@ -26,7 +26,7 @@ local infoMode = false
 local setTheFlag=false
 local xCoord=0
 local yCoord=0
-
+local flag
 local pieceTimer
 local mapTimer
 local flagScaleTimer
@@ -255,6 +255,8 @@ local function doFunction(e)
 end
 
 local function finishScale()
+  transition.to( xBtn, { time=250, alpha=1 }) 
+  transition.to( fwBtn, { time=250, alpha=1 }) 
   xBtn:toFront()
   fwBtn:toFront()   
   canQuit=true
@@ -416,6 +418,8 @@ end
 local function readyObject(e)
 
   if setTheFlag==true then     --START A NEW FLAG 
+    transition.to( xBtn, { time=250, alpha=0 }) 
+    transition.to( fwBtn, { time=250, alpha=0 }) 
 
   canQuit=false
   transition.to( piece, { time=490, alpha=0,onComplete=killPiece})
@@ -440,7 +444,8 @@ local function setupVariables()
       map.name="map"
       map.x=0 ;map.y=0;       
             map:toBack()
-      background:toBack()         
+      background:toBack() 
+      xBtn.alpha=0 ; fwBtn.alpha=0     
 end
 
 --[[
