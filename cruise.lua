@@ -13,8 +13,8 @@ local countryPicker
 
 local xBtn
 local fwBtn
-local canQuit=false
 
+local canQuit=false
 local currentObject
 local touchInsideBtn = false
 local isBtnAnim = false

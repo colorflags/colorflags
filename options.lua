@@ -7,6 +7,10 @@ local infoIcon
 
 local backBtn
 
+local currentObject
+local touchInsideBtn = false
+local isBtnAnim = false
+
 local jamBtn = {}
 local stopBtn = {}
 local playBtn ={}
@@ -28,6 +32,100 @@ local arialFont = "Arial Rounded MT Bold"
 
 local musicOff
 
+local btnsSheetCoords = require("lua-sheets.buttons")
+
+local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
+
+local btnsSeq = {
+    {
+        name = "backBtn",
+        frames = {
+            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn5")
+        },
+        time = 500 
+    },
+    {
+        name = "backBtn_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("backArrowBtn2"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn4"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn5")
+        },
+        time = 500 
+    }
+}
+
+-- New
+local function myTouchListener(event)
+    currentObject = event.target
+    display.getCurrentStage():setFocus(currentObject)
+    print(currentObject.name) 
+    if event.phase == "began" then
+        print("touch ON. inside")          
+    elseif event.phase == "ended" or event.phase == "cancelled" then
+        
+        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
+        if currentObject.name == "backBtn" then
+            currentObject:setSequence("backBtn")
+        end
+
+        if touchInsideBtn == true then 
+
+            print("touch OFF. inside")
+            -- composer.removeScene("start")
+            
+            if(currentObject.name == "backBtn") then
+                composer.gotoScene("menu", { effect = defaultTransition })
+            end
+
+        elseif touchInsideBtn == false then
+            -- print("touch OFF outside")
+        end
+        
+        currentObject = nil
+        display.getCurrentStage():setFocus(nil)
+        touchInsideBtn = false
+    end
+end
+ 
+local function doFunction(e)
+    if currentObject ~= nil then
+        if e.x < currentObject.contentBounds.xMin or
+            e.x > currentObject.contentBounds.xMax or
+            e.y < currentObject.contentBounds.yMin or 
+            e.y > currentObject.contentBounds.yMax then 
+            
+            if(isBtnAnim) then
+                if currentObject.name == "backBtn" then
+                    currentObject:setSequence("backBtn")
+                end
+            else 
+                if currentObject.name == "backBtn" then
+                    currentObject:setFrame(1)
+                end
+            end
+            -- redundant ??
+            -- currentObject:setFrame(1)
+            touchInsideBtn = false
+        else
+            if touchInsideBtn == false then
+                if(isBtnAnim) then
+                    if currentObject.name == "backBtn" then
+                        currentObject:setSequence("backBtn_anim")
+                    end
+                    currentObject:play()
+                else
+                    if currentObject.name == "backBtn" then
+                        currentObject:setFrame(2)
+                    end
+                end
+            end
+            touchInsideBtn = true
+        end
+    end
+end
 
 function createText(text, x, y, font, size)       
     local textArray = {}                 
@@ -204,6 +302,7 @@ local function buttonHit(e)
 end
 
 function scene:create( event )
+    local margins = 6
 	titleLogo = display.newImageRect( "images/options_menu.png", 568, 320 )
     titleLogo.alpha = 1
 	titleLogo.anchorX=0.5
@@ -212,9 +311,16 @@ function scene:create( event )
 	titleLogo.y = _H/2	
     self.view:insert(titleLogo)
 
-	backBtn = makeTextButton("Back", 40, _H-20, {listener=buttonHit, group=group})
+	backBtn = display.newSprite(btnsSheet, btnsSeq)
+    backBtn:setSequence("backBtn")
+    backBtn.name = "backBtn"
+    backBtn.anchorX = 0
+    backBtn.anchorY = 1
+    backBtn.x = 0 + margins
+    backBtn.y = _H - backBtn.y - margins
 	backBtn.gotoScene = "menu"
     backBtn:setFillColor(224/225,96/225,224/225) 
+
     self.view:insert(backBtn)
 end
 
@@ -267,7 +373,7 @@ function scene:show( event )
         stopBtn[1].type="music"
         jamBtn[1].type="music"
 
-       -- transition.to(phaseNarrowBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})   
+        -- transition.to(phaseNarrowBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})   
         -- transition.to(phaseWideBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})           
         -- transition.to(infoYesBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})           
         -- transition.to(infoNoBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})        
@@ -275,8 +381,6 @@ function scene:show( event )
         -- transition.to(playBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})
         -- transition.to(stopBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})
         -- transition.to(jamBtn,{time=50, xScale=1.2,yScale=1.2,onComplete=phase2})
-
-
 
         -- Add these insert() into the createText() function?
         phaseGroup:insert(phaseNarrowBtn[1]) 
@@ -309,20 +413,25 @@ function scene:show( event )
         playBtn[1]:addEventListener("tap",buttonHit)
         stopBtn[1]:addEventListener("tap",buttonHit)  
                 
-        --[[ transition.to(playBtn, {time=25,x= _W/2-10,y=_H*(17/24)+5 })   
-           transition.to(stopBtn, {time=25,x=_W*(3/4)+10 ,y= _H*(19/24)-10 }) 
-           transition.to(jamBtn, {time=25,x=_W*(1/4)-15 ,y= _H*(15/24) }) 
-           transition.to(phaseNarrowBtn, {time=25,x=_W*(1/4)+30 ,y=_H*(7/24) }) 
-           transition.to(phaseWideBtn, {time=25, x= _W*(3/4)-10 ,y=_H*7/24 }) 
-         --]]
+        --[[
+            transition.to(playBtn, {time=25,x= _W/2-10,y=_H*(17/24)+5 })   
+            transition.to(stopBtn, {time=25,x=_W*(3/4)+10 ,y= _H*(19/24)-10 }) 
+            transition.to(jamBtn, {time=25,x=_W*(1/4)-15 ,y= _H*(15/24) }) 
+            transition.to(phaseNarrowBtn, {time=25,x=_W*(1/4)+30 ,y=_H*(7/24) }) 
+            transition.to(phaseWideBtn, {time=25, x= _W*(3/4)-10 ,y=_H*7/24 }) 
+        --]]
     elseif event.phase=="did" then
-        -- what is this for?
+        backBtn:addEventListener("touch", myTouchListener)
+        backBtn:addEventListener("touch", doFunction)
     end
 end
 
 function scene:hide( event )
     if event.phase == "will" then
         display.remove(phaseGroup)     
+        -- SAM: what about removing all the other listeners added in scene:show ???
+        backBtn:removeEventListener("touch", myTouchListener)
+        backBtn:removeEventListener("touch", doFunction)
         composer.removeScene("options",false)    
     elseif event.phase == "did" then
       --  composer.gotoScene("menu", {effect=defaultTransition} )

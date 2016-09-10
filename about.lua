@@ -16,6 +16,13 @@ local font2
 local font3
 local font4
 
+local backBtn
+
+local canQuit = true 
+local currentObject
+local touchInsideBtn = false
+local isBtnAnim = false
+
 local fontTable = {}
 local tempFont
 local m
@@ -24,6 +31,100 @@ local defaultLinePrinterSize = 14
 local defaultLinePrinterFont = "Helvetica"
 local defaultLinePrinterColor = {0,0,0}
 local defaultLinePrinterAlign = "center"
+
+local btnsSheetCoords = require("lua-sheets.buttons")
+
+local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
+
+local btnsSeq = {
+    {
+        name = "backBtn",
+        frames = {
+            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn5")
+        },
+        time = 500 
+    },
+    {
+        name = "backBtn_anim",
+        frames = {
+            btnsSheetCoords:getFrameIndex("backArrowBtn2"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn4"),
+            btnsSheetCoords:getFrameIndex("backArrowBtn5")
+        },
+        time = 500 
+    }
+}
+
+local function myTouchListener(event)
+    currentObject = event.target
+    display.getCurrentStage():setFocus(currentObject)
+    print(currentObject.name) 
+    if event.phase == "began" then
+        print("touch ON. inside")          
+    elseif event.phase == "ended" or event.phase == "cancelled" then
+        
+        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
+        if currentObject.name == "backBtn" then
+            currentObject:setSequence("backBtn")
+        end
+
+        if touchInsideBtn == true and canQuit == true then 
+
+            print("touch OFF. inside")
+            -- composer.removeScene("start")
+            
+            if(currentObject.name == "backBtn") then
+                composer.gotoScene("menu", { effect = defaultTransition })
+            end
+
+        elseif touchInsideBtn == false then
+            -- print("touch OFF outside")
+        end
+        
+        currentObject = nil
+        display.getCurrentStage():setFocus(nil)
+        touchInsideBtn = false
+    end
+end
+ 
+local function doFunction(e)
+    if currentObject ~= nil then
+        if e.x < currentObject.contentBounds.xMin or
+            e.x > currentObject.contentBounds.xMax or
+            e.y < currentObject.contentBounds.yMin or 
+            e.y > currentObject.contentBounds.yMax then 
+            
+            if(isBtnAnim) then
+                if currentObject.name == "backBtn" then
+                    currentObject:setSequence("backBtn")
+                end
+            else 
+                if currentObject.name == "backBtn" then
+                    currentObject:setFrame(1)
+                end
+            end
+            -- redundant ??
+            -- currentObject:setFrame(1)
+            touchInsideBtn = false
+        else
+            if touchInsideBtn == false then
+                if(isBtnAnim) then
+                    if currentObject.name == "backBtn" then
+                        currentObject:setSequence("backBtn_anim")
+                    end
+                    currentObject:play()
+                else
+                    if currentObject.name == "backBtn" then
+                        currentObject:setFrame(2)
+                    end
+                end
+            end
+            touchInsideBtn = true
+        end
+    end
+end
 
 local function linePrinter(t, xStart, yStart)
     local lineSpacing = 18
@@ -71,8 +172,6 @@ local function linePrinter(t, xStart, yStart)
         end
     end
 end
-
-
 
 --[[
 local fonts = native.getFontNames()
@@ -279,8 +378,7 @@ local function urlColor(e)
 end    
 
 function scene:create( event )
-
-  
+    local margins = 6
    --  title = display.newText("Game Credits", _W/2, _H/2, "Helvetica", 48 )
    -- title.x = _W/2
    -- title.y = 30
@@ -308,14 +406,21 @@ function scene:create( event )
     mgBtn.anchorX=0
     mgBtn.anchorY=0
 
-     backBtn = makeTextButton("Back", 40, _H-20, {listener=buttonHit, group=group})
-    backBtn.gotoScene = "menu"
+	backBtn = display.newSprite(btnsSheet, btnsSeq)
+    backBtn:setSequence("backBtn")
+    backBtn.name = "backBtn"
+    backBtn.anchorX = 0
+    backBtn.anchorY = 1
+    backBtn.x = 0 + margins
+    backBtn.y = _H - backBtn.y - margins
+	backBtn.gotoScene = "menu"
+    backBtn:setFillColor(224/225,96/225,224/225) 
 
-
+    -- add listeners here ??
+    --backBtn:addEventListener("touch", myTouchListener)
+    --backBtn:addEventListener("touch", doFunction)
 
     --self.view:insert(title)
-
-
     self.view:insert(backBtn)
     self.view:insert(twitterBtn)
     self.view:insert(mageeBtn)
@@ -330,25 +435,31 @@ end
 
 function scene:show( event )
     local group = self.view
-    twitterBtn:addEventListener("tap",urlTwitter)
-    mageeBtn:addEventListener("tap",urlMagee)
-    colorBtn:addEventListener("tap",urlColor) 
-    facebookBtn:addEventListener("tap",urlFacebook)  
-    mgBtn:addEventListener("tap",urlMG)   
+    if event.phase == "will" then
+    elseif event.phase == "did" then
+
+        backBtn:addEventListener("touch", myTouchListener)
+        backBtn:addEventListener("touch", doFunction)
+        twitterBtn:addEventListener("tap",urlTwitter)
+        mageeBtn:addEventListener("tap",urlMagee)
+        colorBtn:addEventListener("tap",urlColor) 
+        facebookBtn:addEventListener("tap",urlFacebook)  
+        mgBtn:addEventListener("tap",urlMG)   
+    end
 end
 
 function scene:hide( event )
     if event.phase=="will" then
-     display.remove(gameCredits)
-    twitterBtn:removeEventListener("tap",urlTwitter)
-    mageeBtn:removeEventListener("tap",urlMagee)
-    colorBtn:removeEventListener("tap",urlColor) 
-    facebookBtn:addEventListener("tap",urlFacebook)    
-    mgBtn:removeEventListener("tap",urlMG)        
-    composer.removeScene("about",true)
-
+        display.remove(gameCredits)
+        backBtn:removeEventListener("touch", myTouchListener)
+        backBtn:removeEventListener("touch", doFunction)
+        twitterBtn:removeEventListener("tap",urlTwitter)
+        mageeBtn:removeEventListener("tap",urlMagee)
+        colorBtn:removeEventListener("tap",urlColor) 
+        facebookBtn:addEventListener("tap",urlFacebook)    
+        mgBtn:removeEventListener("tap",urlMG)        
+        composer.removeScene("about",true)
     end  
-
 end
 
 function scene:destroy( event )
