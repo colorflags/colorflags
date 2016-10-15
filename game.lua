@@ -1,12 +1,11 @@
 -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html 
-
 local CFText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
 local gotoDeath=true    --for testing purposes. if true, go to GameOver screen.
 local lightningCount=1  --correct default is set to 1, bump up to test for more lightnings
-local state=4
+local state=1
 local stateFour=0
 local stateFourGrow=0
 local speed=2
@@ -18,13 +17,13 @@ local idx=3
 local infoPic
 local code
 local info
+local infoMode = false
 local infoTimer
 local spawnTable = {}   --Create a table to hold our spawns
 local lineTable = {} --Table for deleting lighning lines
 local lineTableCount=0
 local currColor="first"
 local prevColor="first"
-local deadText=nil
 local motion
 local choice=0
 local timerSpeed
@@ -40,7 +39,7 @@ local topBar2
 local lowBar1
 local lowBar2
 local sideTimer
-local countryTraceTimer
+--local countryTraceTimer
 local mapTimer
 local flagTimer
 local paceTimer
@@ -73,16 +72,21 @@ local lightningMultiplier = 1
 local line
 local paceRect
 local map
+local mapGroup
 local flag
 local random
 local thisRoll=0
 local lastRoll=0
 local tempRoll
+
+local deadText=nil
 local bonusText
 local scoreText
 local speedText
 local countryText
+
 local country
+
 local nationalFlags1Coords = require("lua-sheets.national-flags1")
 local nationalFlags1Sheet = graphics.newImageSheet( "images/national-flags1.png", nationalFlags1Coords:getSheet() )
 local nationalFlags2Coords = require("lua-sheets.national-flags2")
@@ -177,6 +181,33 @@ local bonusImplodeSeq={
 local bonusImplode=display.newSprite(bonusImplodeSheet1,bonusImplodeSeq)
 bonusImplode.alpha=0 --start with 0
 
+local countryOutlineSheetCoords = require("lua-sheets.country_outline")
+local countryOutlineSheet = graphics.newImageSheet("images/country_outline_mask.png", countryOutlineSheetCoords:getSheet())
+local countryOutline
+
+-- SAM: redunant
+
+--countryOutline.fill = { 1, 0, 0.5, 0.3 }
+--countryOutline.anchorX=.5
+--countryOutline.anchorY=.5
+--countryOutline.x = _W/2
+--countryOutline.y = _H/2
+
+local newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
+
+local canvasObj = display.newImageRect(
+    newTex.filename,  -- "filename" property required
+    newTex.baseDir,   -- "baseDir" property required
+    display.contentWidth,
+    display.contentHeight
+)
+canvasObj.x = display.contentCenterX
+canvasObj.y = display.contentCenterY
+
+--SAM: for masked effects! noise generator
+local circ
+local mask
+
 local function myImplodeListener( event )
     local thisSprite = event.target
     if ( event.phase == "ended" ) then
@@ -184,16 +215,29 @@ local function myImplodeListener( event )
         thisSprite:pause()
     end
 end
-scoreText = CFText.new( score, "Arial Rounded MT Bold", 30, _W*(4/5), _H/2 )
-scoreText:ToFront()
 
-speedText = CFText.new( speed, "Arial Rounded MT Bold", 30, _W*(1/5), _H/2 )
-speedText:ToFront()
 
-local countryTrace = display.newImage( "images/australia259x229.png", 529,229)
-      countryTrace.anchorX=0.5
-      countryTrace.anchorY=0.5
-      countryTrace.alpha=0
+local scoreboardColor = 
+{
+    highlight = { r=1, g=1, b=1 },
+    shadow = { r=0, g=0, b=0 }
+}
+        
+speedText = display.newEmbossedText( speed, _W*(1/5), _H/2, "PTMono-Bold", 38 )
+speedText:setFillColor( .2, .9, .4)
+speedText:setEmbossColor( scoreboardColor )
+
+scoreText = display.newEmbossedText( score, _W*(4/5), _H/2, "PTMono-Bold", 38 )
+scoreText:setFillColor( .2, .9, .4)
+scoreText:setEmbossColor( scoreboardColor )
+
+--SAM: CFText (advanced color classes), to be re-worked and implemented later
+
+--speedText = CFText.new( speed, "Arial Rounded MT Bold", 30, _W*(1/5), _H/2 )
+--speedText:ToFront()
+
+--scoreText = CFText.new( score, "Arial Rounded MT Bold", 30, _W*(4/5), _H/2 )
+--scoreText:ToFront()
 
 local background = display.newRect(0,0,580,320)
       background:setFillColor( 1,1,1 )
@@ -208,8 +252,11 @@ local function speedUp()
     idx=idx+1
     speed=levels[idx].speed
     timeVar=levels[idx].timeVar
-    speedText:Text(speed)
-    speedText:ToFront()
+    speedText.text = speed
+    speedText:toFront()
+    --SAM: CFText
+    --speedText:Text(speed)
+    --speedText:ToFront()
   elseif finalChallenge==false then
      finalChallenge=true
   end
@@ -226,7 +273,8 @@ local function resetSpawnTable()
    currColor=nil    --reset bonus score states for new flag
    prevColor=nil
    if bonusText ~= nil then
-       bonusText:Remove()
+       bonusText:removeSelf()
+       --bonusText:Remove()
        bonusText=nil
    end
   --decide what state is next
@@ -249,8 +297,11 @@ local function resetSpawnTable()
    end
    speed=levels[idx].speed
    timeVar=levels[idx].timeVar
-   speedText:Text(speed)
-   speedText:ToFront() 
+   --SAM: CFText
+   speedText.text = speed
+   speedText:toFront()
+   --speedText:Text(speed)
+   --speedText:ToFront()
 end  
 
 local function endGame(self)
@@ -501,12 +552,15 @@ local function boundaryCheck (e)
             if lookupCode(code,spawnTable[i])==1 then    --Out of bound and Palette Matches flag. GameOver
              breakLoop = true
              if bonusText ~= nil then
-               bonusText:Remove()
+               bonusText:removeSelf()
+               --bonusText:Remove()
                bonusText=nil
              end 
              if deadText==nil then
-               deadText = display.newText("DEAD", _W*(4/5), _H*(2/3), native.systemFont, 28)
-               deadText:setFillColor( 1, 0, 0 )
+
+                deadText = display.newEmbossedText( "DEAD", _W*(4/5), _H*(2/3), "PTMono-Bold", 38 )
+                deadText:setFillColor( 1, .9, .4)
+                deadText:setEmbossColor( scoreboardColor )
              end
              if gotoDeath==true then
                paceRect.isMoving=false
@@ -1001,13 +1055,20 @@ function lightningStrike(self)
       if currColor==prevColor then
          spread=spread+1
          if bonusText ~= nil then
-           bonusText:Remove()
+             bonusText:removeSelf()
+             --SAM: CFText
+             --bonusText:Remove()
              bonusText=nil
          end
 
          text="+"..spread
 
-         bonusText = CFText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
+         bonusText = display.newEmbossedText( text, _W*(1/5), _H*(1/3), "PTMono-Bold", 38 )
+         bonusText:setFillColor( 1, .9, .4)
+         bonusText:setEmbossColor( scoreboardColor )
+
+         --SAM: CFText
+         --bonusText = CFText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
          if motion~=nil then
            timer.cancel(motion)
            motion=nil
@@ -1040,17 +1101,23 @@ function lightningStrike(self)
         currColor=nil
         prevColor=nil
         if bonusText~=nil then
-             bonusText:Remove()
+            bonusText:removeSelf() 
+            --bonusText:Remove()
              bonusText=nil
         end
       end
       prevColor=self.type
-      scoreText:Text(score+spread) 
+
+      scoreText.text = score + spread
+      --SAM: CFText
+      --scoreText:Text(score+spread) 
+
       score=score+spread
       lightningScore=lightningScore+spread
       trackLightningScore()
 end
   
+--MIKE: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ??
 local function finishScale()
     topBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
             topBar:setSequence("top")
@@ -1075,21 +1142,38 @@ local function finishScale()
             lowBar1=transition.to(lowBar,{time=1300, yScale=0.8})          
             lowBar2=transition.to(lowBar,{time=1300,alpha=.72}) 
 
-            flag2Timer=transition.to( flag, { time=1000, xScale=1, yScale=1})
+            flag2Timer=transition.to( flag, { time=1000, alpha=1, xScale=.5, yScale=.5*(.7), onComplete=
+                function()
+                    --SAM: text anchors
+                    speedText.anchorX = 0
+                    speedText.anchorY = 1
+                    scoreText.anchorX = 1
+                    scoreText.anchorY = 1
+                    flag.x = 0 + ((flag.width*flag.xScale)/2)
+                    flag.y = lowBar.y
+                    speedText.x = flag.x - ((flag.width*flag.xScale)/2)
+                    speedText.y = flag.y + ((flag.height*flag.yScale)/2)
+                    scoreText.x = flag.x + ((flag.width*flag.xScale)/2)
+                    scoreText.y = flag.y + ((flag.height*flag.yScale)/2)
+                end
+            })
             flagLightningReady=timer.performWithDelay( 1000, lightningEnable, 1 )
           
             timerSpeed=timer.performWithDelay(9500,speedUp,1)
 end
 
 local function setFlag()
-   setTheFlag=true
-  end
+    setTheFlag=true
+end
 
 local function delayPace()
      paceRect.isMoving=true
        if speedText~=0 and speedText~=nil then
-        speedText:Text(speed)
-        speedText:ToFront()
+        --SAM: CFText
+        speedText.text = speed
+        speedText:toFront()
+        --speedText:Text(speed)
+        --speedText:ToFront()
     end  
 end    
 
@@ -1114,8 +1198,130 @@ end
 local function countries(test)
     local e = math.random(55)
     country = CFGameSettings:getItemByID(e)
-    print("country : ", e)
-    print(country.name)
+    --print("country : ", e)
+    --print(country.name)
+    if(countryOutline ~= nil) then
+        countryOutline:removeSelf()
+        countryOutline = nil
+    end
+
+    countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
+    countryOutline:scale(0.5, 0.5)
+    --countryOutline.fill = { 1, 0, 0.5, 0.3 }
+    --countryOutline.fill = paint
+    --countryOutline:setFillColor()
+    --countryOutline.x = _W/2
+    --countryOutline.y = _H/2
+    --countryOutline.anchorX=.5
+    --countryOutline.anchorY=.5
+    --countryOutline.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
+    --countryOutline.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
+
+    -- TEMP: alternative styles
+    --countryOutline.x=-country.coords.x-(countryOutline.width/2)
+    --countryOutline.y=-country.coords.y-(countryOutline.height/2)
+    --[[  
+    if(circ ~= nil) then
+        circ:removeSelf()
+        circ = nil
+    end
+    circ = display.newCircle( 0, 0, 64 )
+    circ:setFillColor(1,0,0,1)
+    ]]--
+
+    newTex:draw(countryOutline)
+    newTex:invalidate()
+    --[[
+    fxGroup = display.newGroup() 
+    fxGroup.x = _W/2
+    fxGroup.y = _H/2
+    local fxBG = display.newRect(0, 0, countryOutline.width, countryOutline.height)
+    fxBG:setFillColor(0, 0, 1, 1)
+    fxBG.anchorX=.5
+    fxBG.anchorY=.5
+    
+    local fxDot = display.newCircle(fxBG.x, fxBG.y, fxBG.width/4)
+    fxDot:setFillColor(1, 1, 1, 1)
+    fxDot.anchorX=.5
+    fxDot.anchorY=.5
+    
+    fxGroup:insert(fxBG)
+    fxGroup:insert(fxDot)
+    ]]--
+
+    local fxGroup = display.newGroup()
+    local fxSize
+    if(countryOutline.width > countryOutline.height) then 
+        fxSize = math.ceil(countryOutline.width)+120
+    else 
+        fxSize = math.ceil(countryOutline.height)+120
+    end
+    
+    local fxBG = display.newCircle(0, 0, fxSize)
+    fxBG.anchorX=.5
+    fxBG.anchorY=.5
+    
+    local scaleFactorX = 1 ; local scaleFactorY = 1
+    if ( fxBG.width > fxBG.height ) then
+        scaleFactorY = fxBG.width / fxBG.height
+    else
+        scaleFactorX = fxBG.height / fxBG.width
+    end
+
+    display.setDefault( "textureWrapX", "repeat" )
+    display.setDefault( "textureWrapY", "mirroredRepeat" )
+    fxBG.fill = { type="image", filename="images/fxgroup.png" }
+    fxBG.fill.scaleX = 0.5 * scaleFactorX
+    fxBG.fill.scaleY = 0.5 * scaleFactorY
+    fxBG.fill.effect = "filter.straighten"
+
+    fxBG.fill.effect.width = 10
+    fxBG.fill.effect.height = 50
+    fxBG.fill.effect.angle = 20
+    --fxBG.fill.effect = "filter.pixelate"
+    --fxBG.fill.effect.numPixels = 16
+    --fxBG.fill.effect = "filter.bulge"
+    --fxBG.fill.effect.intensity = 3.0
+    fxBG.rotation = 0
+
+    local function animateCountry()
+        --[[
+        transition.to( fxBG.fill.effect, { delay=50, time=250, intensity=3, onComplete=
+            function() transition.to(fxBG.fill.effect, { time=400, intensity=1}) end
+        })
+        ]]--
+        transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
+            function() transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop}) end
+        })
+        transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad} )
+    end
+ 
+    timer.performWithDelay( 1400, animateCountry, 0 )
+    animateCountry()
+
+    --fxGroup.x = _W/2
+    --fxGroup.y = _H/2
+    fxGroup.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
+    fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
+    fxGroup:insert(fxBG)
+    -- just to preview effect (uncomment to center DisplayObject on screen)
+    --fxBG.x = _W/2
+    --fxBG.y = _H/2    
+
+    --mask = display.newImageRect(newTex.filename, newTex.baseDir, display.contentWidth, display.contentHeight)
+    --local path = system.pathForFile( newTex.filename )
+    --print(path)
+    mask = graphics.newMask(newTex.filename, newTex.baseDir)
+    fxGroup:setMask(mask)
+    canvasObj.alpha = 0
+    --mask.x = circ.x + (20*2)
+    --canvasObj.x = circ.x + (20*3)
+
+    mapGroup:insert(fxGroup)
+
+    xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
+    yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
+    print("xCoord", xCoord, "yCoord", yCoord)
     
     info="images/infoBrazil.png"
     
@@ -1166,16 +1372,11 @@ local function countries(test)
         k3= country.colors.k.b
         print(k1,k2,k3)
     end
-    xCoord=350
-    yCoord=442
     
     -- if check.. when first flag appear. there will be no music. !!!
     audio.stop( bobby )
     music = audio.loadStream( "anthems/" .. country.name .. ".mp3" )
     bobby = audio.play(music,{loops=-1})
-    countryTrace = display.newImage( "images/andorra104x102.png", 529,229)
-    flag.width=200
-    flag.height=100
 end
 
 local function newFlag() 
@@ -1183,7 +1384,8 @@ local function newFlag()
           if deadText~=nil then
                 display.remove(deadText)
                 if bonusText ~= nil then
-                     bonusText:Remove()
+                     bonusText:removeSelf()
+                     --bonusText:Remove()
                      bonusText=nil
                      spread=1
                      prevColor=nil
@@ -1209,32 +1411,39 @@ local function newFlag()
           countryText:setFillColor( 0, 0, 0 )
           countryText:toFront()
           timer.performWithDelay(2000,countryTextScale,1)
-          countryTrace.x=-xCoord+_W/2+map.x
-          countryTrace.y=-yCoord+_H/2+map.y
-          countryTrace.alpha=1
-          flag.alpha=1
-    --delay start of color squares
+          
+          --SAM: redundant
+          flag.alpha=0
+          --delay start of color squares
           flag:scale(0,0)
+          --to change flag location
+          --flag.x = 0
+          
           if state==4 then
                 sideTimer=timer.performWithDelay(1500,finishScale,1)
-                countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
+                --countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
                 mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })                     
                 flagTimer=transition.to( flag, { time=1500, xScale=.2, yScale=.2})  
                 paceTimer=timer.performWithDelay(900,delayPace,1)
           elseif state==3 then
                 sideTimer=timer.performWithDelay(1500,finishScale,1)
-                CountryTraceTimer=transition.to( CountryTrace, { time=2000, x=_W/2, y=_H/2 }) 
+                --CountryTraceTimer=transition.to( CountryTrace, { time=2000, x=_W/2, y=_H/2 }) 
                 mapTimer=transition.to( map, { time=2000, x=xCoord, y=yCoord })                     
                 flagTimer=transition.to( flag, { time=2000, xScale=.2, yScale=.2})  
                 paceTimer=timer.performWithDelay(0,delayPace,1)       
           elseif state==2 or state==1 then
                 sideTimer=timer.performWithDelay(1500,finishScale,1)
-                countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
-                mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })                     
-                flagTimer=transition.to( flag, { time=1500, xScale=.2, yScale=.2})  
+                --TEMP: alternative styles
+                --countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
+                mapTimer=transition.to( mapGroup, { time=500, x=xCoord, y=yCoord })                     
+                --mapTimer=transition.to( countryOutline, { time=1500, x=_W/2, y=_H/2 })                     
+                --mapTimer=transition.to( countryOutline, { time=1500, x=_W/2, y=_H/2 })                     
+                flagTimer=transition.to( flag, { delay=500, time=1000, alpha=.2, xScale=.2, yScale=.2*(.5)})  
                 paceTimer=timer.performWithDelay(900,delayPace,1)         
           end  
           flag:toFront()        
+          speedText:toFront()
+          scoreText:toFront()
 end    
 
 
@@ -1275,7 +1484,7 @@ local function readyObject ()
                            infoTimer=transition.to(infoPic, {time=500, alpha=0}) 
                         end
                         flag3Timer=transition.to( flag, { time=500, alpha=0, onComplete=removeFlag   })    --remove flag
-                        newFlagTimer=timer.performWithDelay(600,newFlag) 
+                        newFlagTimer=timer.performWithDelay(600, newFlag) 
 
                        --CREATE A NEW COLOR SQUARE      
                 else                    
@@ -1520,12 +1729,17 @@ local function setupVariables()
       g1=0;g2=.4;g3=0
       b1=0;b2=0;b3=1 
 
-      map = display.newImage( "images/world.png", 2048,1038)
-      map.alpha = .65
-      map.anchorX=0.5
-      map.anchorY=0.5
+      mapGroup = display.newGroup()
+
+      map = display.newImage( "images/newmap_export_nopolar.png", 2031, 851)
+      map.alpha = 1
+      map.anchorX=0
+      map.anchorY=0
       map.name="map"
-      map.x=0 ;map.y=0;
+      map.x=0
+      map.y=0
+
+      mapGroup:insert(map)
 
    levels = {
                { speed=1, timeVar=2550},{ speed=1.5, timeVar=1700},{ speed=2, timeVar=1250},{ speed=2.5, timeVar=1000},{ speed=3, timeVar=910},{ speed=3.5, timeVar=750},
@@ -1621,13 +1835,15 @@ if e.phase=="began" and e.target.isPaletteActive==true then
             if lookupCode(code,e.target)==0 then   --You are Dead --color does not match 
               
               if bonusText ~= nil then
-                  bonusText:Remove()
+                  bonusText:removeSelf()
+                  --bonusText:Remove()
                   bonusText=nil
               end
               
               if deadText==nil then
-                deadText = display.newText("DEAD", _W*(4/5), _H*(2/3), native.systemFont, 28)
-                deadText:setFillColor( 1, 0, 0 )
+                deadText = display.newEmbossedText( "DEAD", _W*(4/5), _H*(2/3), "PTMono-Bold", 38 )
+                deadText:setFillColor( .86, .1, .2)
+                deadText:setEmbossColor( scoreboardColor )
               end       
               if gotoDeath==true then
                     self:toFront()  
@@ -1679,12 +1895,20 @@ if e.phase=="began" and e.target.isPaletteActive==true then
                 if currColor==prevColor then
                    spread=spread+1
                    if bonusText ~= nil then
-                     bonusText:Remove()
+                       bonusText:removeSelf()
+                       --bonusText:Remove()
                        bonusText=nil
                    end
                    text="+"..spread
-                   bonusText = CFText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
-                  -- print("Spread =" .. spread)
+                   
+                   bonusText = display.newEmbossedText( text, _W*(1/5), _H*(1/3), "PTMono-Bold", 38 )
+                   bonusText:setFillColor( 1, .9, .4)
+                   bonusText:setEmbossColor( scoreboardColor )
+                   
+                   --SAM: CFText (advanced color classes), to be re-worked and implemented later
+                   
+                   --bonusText = CFText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
+                  
                    if motion~=nil then
                      timer.cancel(motion)
                      motion=nil
@@ -1717,12 +1941,18 @@ if e.phase=="began" and e.target.isPaletteActive==true then
                    currColor=nil
                    prevColor=nil
                    if bonusText~=nil then
-                       bonusText:Remove()
+                       bonusText:removeSelf()
+                       --SAM: CFText
+                       --bonusText:Remove()
                        bonusText=nil
                    end
                 end
                 prevColor=e.target.type     
-                scoreText:Text(score+spread) 
+                scoreText.text = score + spread
+                
+                --SAM: CFText
+                --scoreText:Text(score+spread)
+
                 score=score+spread
                 lightningScore=lightningScore+spread
                 trackLightningScore()
@@ -1730,6 +1960,7 @@ if e.phase=="began" and e.target.isPaletteActive==true then
     end
     return true
 end
+
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
@@ -1768,6 +1999,8 @@ function scene:hide(e)
     display.remove(scoreText)
     display.remove(speedText)
     display.remove(flag)
+    -- what about mask applied to fxGroup
+    display.remove(fxGroup)
     display.remove(deadText)
     display.remove(piece)
     display.remove(map)
