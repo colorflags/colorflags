@@ -55,7 +55,7 @@ local backgroundColor={255,255,255}
 
 audioCanPlay=true
 
-
+ -- MIKE: Should we just keep this in game.lua
  heightModeTop=35
  heightModeLow=_H-35
  lightningY=90
@@ -141,7 +141,7 @@ if showSplash==true then
 elseif showSplash==false then
         display.remove(splash1)
     display.remove(splash2)
-     composer.gotoScene( "tutorial", {effect = defaultTransition})
+     composer.gotoScene( "game", {effect = defaultTransition})
 end    
 
 
