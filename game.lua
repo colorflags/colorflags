@@ -1413,9 +1413,9 @@ local function countries()
     end
 
 	-- if check.. when first flag appear. there will be no music. !!!
-    --audio.stop(bobby)
-    --music = audio.loadStream("anthems/" .. country.name .. ".mp3")
-    --bobby = audio.play(music, {loops = -1})
+    audio.stop(bobby)
+    music = audio.loadStream("anthems/" .. country.name .. ".mp3")
+    bobby = audio.play(music, {loops = -1})
 end
 
 local function killBars()
