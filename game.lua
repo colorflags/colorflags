@@ -3,7 +3,6 @@
 local CFText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
-<<<<<<< HEAD
 local gotoDeath = false    --for testing purposes. if true, go to GameOver screen.
 local lightningCount = 1  --correct default is set to 1, bump up to test for more lightnings
 local state = 1
@@ -11,15 +10,6 @@ local stateFour = 0
 local stateFourGrow = 0
 local speed = 2
 local timeVar = 1250
-=======
-local gotoDeath=true    --for testing purposes. if true, go to GameOver screen.
-local lightningCount=1  --correct default is set to 1, bump up to test for more lightnings
-local state=1
-local stateFour=0
-local stateFourGrow=0
-local speed=2
-local timeVar=1250
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
 local levels
 local score = 0
 local numDeaths = 0
@@ -28,7 +18,7 @@ local idx = 3
 --SAM: checks if game just started
 local countriesCompleted = 0
 
-local flagScaleStyle = 0
+local flagScaleStyle = 2
 local flagScalePos = 0 -- used only when flagScaleStyle = 2
 
 local infoPic
@@ -38,15 +28,9 @@ local infoMode = false
 local infoTimer
 local spawnTable = {}   --Create a table to hold our spawns
 local lineTable = {} --Table for deleting lighning lines
-<<<<<<< HEAD
 local lineTableCount = 0
 local currColor = "first"
 local prevColor = "first"
-=======
-local lineTableCount=0
-local currColor="first"
-local prevColor="first"
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
 local motion
 local choice = 0
 local timerSpeed
@@ -98,18 +82,10 @@ local map
 local mapGroup
 local flag
 local random
-<<<<<<< HEAD
 
 local deadText = nil
 local speedTextDesc
 local scoreTextDesc
-=======
-local thisRoll=0
-local lastRoll=0
-local tempRoll
-
-local deadText=nil
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
 local bonusText
 local scoreText
 local speedText
@@ -221,26 +197,13 @@ local fxBG
 
 -- SAM: redunant
 
-<<<<<<< HEAD
-=======
-local countryOutlineSheetCoords = require("lua-sheets.country_outline")
-local countryOutlineSheet = graphics.newImageSheet("images/country_outline_mask.png", countryOutlineSheetCoords:getSheet())
-local countryOutline
-
--- SAM: redunant
-
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
 --countryOutline.fill = { 1, 0, 0.5, 0.3 }
 --countryOutline.anchorX=.5
 --countryOutline.anchorY=.5
 --countryOutline.x = _W/2
 --countryOutline.y = _H/2
 
-<<<<<<< HEAD
 local newTex = graphics.newTexture({type = "canvas", width = display.contentWidth, height = display.contentHeight})
-=======
-local newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
 
 local canvasObj = display.newImageRect(
     newTex.filename,  -- "filename" property required
@@ -255,11 +218,7 @@ canvasObj.y = display.contentCenterY
 local circ
 local mask
 
-<<<<<<< HEAD
 local function myImplodeListener(event)
-=======
-local function myImplodeListener( event )
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
     local thisSprite = event.target
     if (event.phase == "ended") then
         thisSprite.alpha = 0
@@ -267,7 +226,6 @@ local function myImplodeListener( event )
     end
 end
 
-<<<<<<< HEAD
 local scoreboardColor = 
        {
     highlight = {r = 1, g = 1, b = 1},
@@ -295,30 +253,6 @@ scoreText:setFillColor(.2, .9, .4)
 scoreText:setEmbossColor(scoreboardColor)
 
 --SAM: CFText (advanced color classes), to be re-worked and implemented later
-=======
-
-local scoreboardColor = 
-{
-    highlight = { r=1, g=1, b=1 },
-    shadow = { r=0, g=0, b=0 }
-}
-        
-speedText = display.newEmbossedText( speed, _W*(1/5), _H/2, "PTMono-Bold", 38 )
-speedText:setFillColor( .2, .9, .4)
-speedText:setEmbossColor( scoreboardColor )
-
-scoreText = display.newEmbossedText( score, _W*(4/5), _H/2, "PTMono-Bold", 38 )
-scoreText:setFillColor( .2, .9, .4)
-scoreText:setEmbossColor( scoreboardColor )
-
---SAM: CFText (advanced color classes), to be re-worked and implemented later
-
---speedText = CFText.new( speed, "Arial Rounded MT Bold", 30, _W*(1/5), _H/2 )
---speedText:ToFront()
-
---scoreText = CFText.new( score, "Arial Rounded MT Bold", 30, _W*(4/5), _H/2 )
---scoreText:ToFront()
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
 
 --speedText = CFText.new( speed, "Arial Rounded MT Bold", 30, _W*(1/5), _H/2 )
 --speedText:ToFront()
@@ -335,7 +269,6 @@ background.x = _W / 2 ;background.y = _H / 2
 background:toBack()
 
 local function speedUp()
-<<<<<<< HEAD
     if idx ~= #levels then
         idx = idx + 1
         speed = levels[idx].speed
@@ -389,62 +322,6 @@ local function resetSpawnTable()
     speedText:toFront()
 	--speedText:Text(speed)
 	--speedText:ToFront()
-=======
-  if idx~= #levels then
-    idx=idx+1
-    speed=levels[idx].speed
-    timeVar=levels[idx].timeVar
-    speedText.text = speed
-    speedText:toFront()
-    --SAM: CFText
-    --speedText:Text(speed)
-    --speedText:ToFront()
-  elseif finalChallenge==false then
-     finalChallenge=true
-  end
-end   
-
-local function resetSpawnTable()
-   if music~= nil then
-     media.stopSound(music)
-     music=nil
-   end
-   spawnTable={}
-   count=1
-   firstObject=true
-   currColor=nil    --reset bonus score states for new flag
-   prevColor=nil
-   if bonusText ~= nil then
-       bonusText:removeSelf()
-       --bonusText:Remove()
-       bonusText=nil
-   end
-  --decide what state is next
-  if state == 4 then
-
-   state=4
-    idx=idx+1
-  elseif state==3 then
-    if finalChallenge==false then
-      state=1
-      idx=(idx)*2
-    end 
-  elseif state==1 then
-    state=2
-    idx=idx+1
-  elseif state==2 then
-    state=3
-   idx=idx/2-1
-   idx=math.round(idx)
-   end
-   speed=levels[idx].speed
-   timeVar=levels[idx].timeVar
-   --SAM: CFText
-   speedText.text = speed
-   speedText:toFront()
-   --speedText:Text(speed)
-   --speedText:ToFront()
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
 end  
 
 local function endGame(self)
@@ -685,7 +562,6 @@ local function boundaryCheck (e)
 end  
 --]]
 local function boundaryCheck (e)
-<<<<<<< HEAD
     local temp
     local breakLoop = false
 	--breakLoop ensures this outerloop will break after it finds the bad pallet
@@ -705,47 +581,6 @@ local function boundaryCheck (e)
                             deadText = display.newEmbossedText("DEAD", _W * (4 / 5), _H * (2 / 3), "PTMono-Bold", 38)
                             deadText:setFillColor(1, .9, .4)
                             deadText:setEmbossColor(scoreboardColor)
-=======
-  local temp
-  local breakLoop = false
-  --breakLoop ensures this outerloop will break after it finds the bad pallet
-  if #spawnTable >0 and breakLoop==false then  
-    for i = 1, #spawnTable do
-      if spawnTable[i]~=0 and spawnTable[i] ~=nil then
-          if spawnTable[i].x < -40 or spawnTable[i].x > _W+40 then
-            if lookupCode(code,spawnTable[i])==1 then    --Out of bound and Palette Matches flag. GameOver
-             breakLoop = true
-             if bonusText ~= nil then
-               bonusText:removeSelf()
-               --bonusText:Remove()
-               bonusText=nil
-             end 
-             if deadText==nil then
-
-                deadText = display.newEmbossedText( "DEAD", _W*(4/5), _H*(2/3), "PTMono-Bold", 38 )
-                deadText:setFillColor( 1, .9, .4)
-                deadText:setEmbossColor( scoreboardColor )
-             end
-             if gotoDeath==true then
-               paceRect.isMoving=false
-               spawnTable[i]:toFront() 
-               Runtime:removeEventListener("enterFrame", boundaryCheck)
-               Runtime:removeEventListener("enterFrame", moveObject)
-               for i = 1, #spawnTable do
-  --Check for other palettes that could be out of bounds              
-                     if spawnTable[i]~=0 then
-                        spawnTable[i].isPaletteActive=false
-                        spawnTable[i]:removeEventListener("touch",objTouch)
-  --Check for gameover palettes                      
-                        if spawnTable[i].x < -40 or spawnTable[i].x > _W+40 then      
-                          if lookupCode(code,spawnTable[i])==1 then       
-                            spawnTable[i]:removeEventListener("touch",objTouch)        
-                            spawnTable[i].dead=true 
-                            numDeaths=numDeaths+1
-                          else
-                            spawnTable[i].dead=false 
-                          end  
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
                         end
                         if gotoDeath == true then
                             paceRect.isMoving = false
@@ -1227,7 +1062,6 @@ function lightningStrike(self)
 	--You are Alive
     if self.isGrown == false then 
         self:removeSelf()
-<<<<<<< HEAD
         spawnTable[self.index] = 0          
     else      
         if self.x < 1 or self.x > _W - 1 then
@@ -1315,140 +1149,6 @@ local function delayPace()
         speedText:toFront()
 		--speedText:Text(speed)
 		--speedText:ToFront()
-=======
-        spawnTable[self.index]=0          
-      else      
-          if self.x < 1 or self.x > _W-1 then
-             transition.to( self, { time=100, rotation=0, xScale=0.01, yScale=0.01, onComplete=removePalette  }) 
-          else
-            transition.to( self, { time=500, rotation=400, xScale=0.01, yScale=0.01, onComplete=removePalette  })    
-          end
-      end     
-      currColor=self.type
-      --bonus score
-      if currColor==prevColor then
-         spread=spread+1
-         if bonusText ~= nil then
-             bonusText:removeSelf()
-             --SAM: CFText
-             --bonusText:Remove()
-             bonusText=nil
-         end
-
-         text="+"..spread
-
-         bonusText = display.newEmbossedText( text, _W*(1/5), _H*(1/3), "PTMono-Bold", 38 )
-         bonusText:setFillColor( 1, .9, .4)
-         bonusText:setEmbossColor( scoreboardColor )
-
-         --SAM: CFText
-         --bonusText = CFText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
-         if motion~=nil then
-           timer.cancel(motion)
-           motion=nil
-         end
-         if spread==2 then
-                bonusImplode:setSequence("2x")
-         elseif spread==3 then
-                bonusImplode:setSequence("3x")
-         elseif spread==4 then
-                bonusImplode:setSequence("4x")
-         elseif spread==5 then
-                bonusImplode:setSequence("5x")
-         elseif spread==6 then
-                bonusImplode:setSequence("6x")
-         elseif spread==7 then
-                bonusImplode:setSequence("7x")
-         elseif spread==8 then
-                bonusImplode:setSequence("8x")
-         elseif spread==9 then
-                bonusImplode:setSequence("9x")                       
-         end 
-         bonusImplode.alpha=1
-         bonusImplode:toFront()
-         bonusImplode:play()
-         bonusImplode.x = _W*(4/5)
-         bonusImplode.y = _H/2
-         motion= timer.performWithDelay(800,cancelTimerBonusImplode,1)      
-      else
-        spread=1
-        currColor=nil
-        prevColor=nil
-        if bonusText~=nil then
-            bonusText:removeSelf() 
-            --bonusText:Remove()
-             bonusText=nil
-        end
-      end
-      prevColor=self.type
-
-      scoreText.text = score + spread
-      --SAM: CFText
-      --scoreText:Text(score+spread) 
-
-      score=score+spread
-      lightningScore=lightningScore+spread
-      trackLightningScore()
-end
-  
---MIKE: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ??
-local function finishScale()
-    topBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
-            topBar:setSequence("top")
-            topBar:play()
-            topBar:setFillColor(0,0,0)
-            topBar.anchorY=0.5 ; topBar.anchorX=0.5
-            topBar.x=_W/2 ; topBar.y=heightModeTop
-            topBar.yScale=-0.01 ; topBar.yScale=-1
-            topBar.alpha=0
-            topBar:toFront()
-            topBar1=transition.to(topBar,{time=1300, yScale=-.8})       
-            topBar2=transition.to(topBar,{time=1300, alpha=.72})
-    lowBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
-            lowBar:setSequence("btm")
-            lowBar:play()
-            lowBar:setFillColor(0,0,0)
-            lowBar.anchorY=0.5 ; lowBar.anchorX=0.5
-            lowBar.x=_W/2 ; lowBar.y=heightModeLow
-            lowBar.yScale=0.01
-            lowBar.alpha=0
-            topBar:toFront()
-            lowBar1=transition.to(lowBar,{time=1300, yScale=0.8})          
-            lowBar2=transition.to(lowBar,{time=1300,alpha=.72}) 
-
-            flag2Timer=transition.to( flag, { time=1000, alpha=1, xScale=.5, yScale=.5*(.7), onComplete=
-                function()
-                    --SAM: text anchors
-                    speedText.anchorX = 0
-                    speedText.anchorY = 1
-                    scoreText.anchorX = 1
-                    scoreText.anchorY = 1
-                    flag.x = 0 + ((flag.width*flag.xScale)/2)
-                    flag.y = lowBar.y
-                    speedText.x = flag.x - ((flag.width*flag.xScale)/2)
-                    speedText.y = flag.y + ((flag.height*flag.yScale)/2)
-                    scoreText.x = flag.x + ((flag.width*flag.xScale)/2)
-                    scoreText.y = flag.y + ((flag.height*flag.yScale)/2)
-                end
-            })
-            flagLightningReady=timer.performWithDelay( 1000, lightningEnable, 1 )
-          
-            timerSpeed=timer.performWithDelay(9500,speedUp,1)
-end
-
-local function setFlag()
-    setTheFlag=true
-end
-
-local function delayPace()
-     paceRect.isMoving=true
-       if speedText~=0 and speedText~=nil then
-        --SAM: CFText
-        speedText.text = speed
-        speedText:toFront()
-        --speedText:Text(speed)
-        --speedText:ToFront()
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
     end  
 end    
 
@@ -1479,18 +1179,12 @@ local function countries()
 	--local e = 2
 	
     country = CFGameSettings:getItemByID(e)
-<<<<<<< HEAD
 	--print("country : ", e)
 	--print(country.name)
-=======
-    --print("country : ", e)
-    --print(country.name)
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
     if(countryOutline ~= nil) then
         countryOutline:removeSelf()
         countryOutline = nil
     end
-<<<<<<< HEAD
 	
 	if(countryOutlineTest ~= nil) then
         countryOutlineTest:removeSelf()
@@ -1525,25 +1219,6 @@ local function countries()
 	--countryOutline.y=-country.coords.y-(countryOutline.height/2)
     
 	--[[  
-=======
-
-    countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
-    countryOutline:scale(0.5, 0.5)
-    --countryOutline.fill = { 1, 0, 0.5, 0.3 }
-    --countryOutline.fill = paint
-    --countryOutline:setFillColor()
-    --countryOutline.x = _W/2
-    --countryOutline.y = _H/2
-    --countryOutline.anchorX=.5
-    --countryOutline.anchorY=.5
-    --countryOutline.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
-    --countryOutline.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
-
-    -- TEMP: alternative styles
-    --countryOutline.x=-country.coords.x-(countryOutline.width/2)
-    --countryOutline.y=-country.coords.y-(countryOutline.height/2)
-    --[[  
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
     if(circ ~= nil) then
         circ:removeSelf()
         circ = nil
@@ -1551,13 +1226,7 @@ local function countries()
     circ = display.newCircle( 0, 0, 64 )
     circ:setFillColor(1,0,0,1)
     ]]--
-<<<<<<< HEAD
 	
-=======
-
-    newTex:draw(countryOutline)
-    newTex:invalidate()
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
     --[[
     fxGroup = display.newGroup() 
     fxGroup.x = _W/2
@@ -1566,92 +1235,6 @@ local function countries()
     fxBG:setFillColor(0, 0, 1, 1)
     fxBG.anchorX=.5
     fxBG.anchorY=.5
-<<<<<<< HEAD
-=======
-    
-    local fxDot = display.newCircle(fxBG.x, fxBG.y, fxBG.width/4)
-    fxDot:setFillColor(1, 1, 1, 1)
-    fxDot.anchorX=.5
-    fxDot.anchorY=.5
-    
-    fxGroup:insert(fxBG)
-    fxGroup:insert(fxDot)
-    ]]--
-
-    local fxGroup = display.newGroup()
-    local fxSize
-    if(countryOutline.width > countryOutline.height) then 
-        fxSize = math.ceil(countryOutline.width)+120
-    else 
-        fxSize = math.ceil(countryOutline.height)+120
-    end
-    
-    local fxBG = display.newCircle(0, 0, fxSize)
-    fxBG.anchorX=.5
-    fxBG.anchorY=.5
-    
-    local scaleFactorX = 1 ; local scaleFactorY = 1
-    if ( fxBG.width > fxBG.height ) then
-        scaleFactorY = fxBG.width / fxBG.height
-    else
-        scaleFactorX = fxBG.height / fxBG.width
-    end
-
-    display.setDefault( "textureWrapX", "repeat" )
-    display.setDefault( "textureWrapY", "mirroredRepeat" )
-    fxBG.fill = { type="image", filename="images/fxgroup.png" }
-    fxBG.fill.scaleX = 0.5 * scaleFactorX
-    fxBG.fill.scaleY = 0.5 * scaleFactorY
-    fxBG.fill.effect = "filter.straighten"
-
-    fxBG.fill.effect.width = 10
-    fxBG.fill.effect.height = 50
-    fxBG.fill.effect.angle = 20
-    --fxBG.fill.effect = "filter.pixelate"
-    --fxBG.fill.effect.numPixels = 16
-    --fxBG.fill.effect = "filter.bulge"
-    --fxBG.fill.effect.intensity = 3.0
-    fxBG.rotation = 0
-
-    local function animateCountry()
-        --[[
-        transition.to( fxBG.fill.effect, { delay=50, time=250, intensity=3, onComplete=
-            function() transition.to(fxBG.fill.effect, { time=400, intensity=1}) end
-        })
-        ]]--
-        transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
-            function() transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop}) end
-        })
-        transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad} )
-    end
- 
-    timer.performWithDelay( 1400, animateCountry, 0 )
-    animateCountry()
-
-    --fxGroup.x = _W/2
-    --fxGroup.y = _H/2
-    fxGroup.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
-    fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
-    fxGroup:insert(fxBG)
-    -- just to preview effect (uncomment to center DisplayObject on screen)
-    --fxBG.x = _W/2
-    --fxBG.y = _H/2    
-
-    --mask = display.newImageRect(newTex.filename, newTex.baseDir, display.contentWidth, display.contentHeight)
-    --local path = system.pathForFile( newTex.filename )
-    --print(path)
-    mask = graphics.newMask(newTex.filename, newTex.baseDir)
-    fxGroup:setMask(mask)
-    canvasObj.alpha = 0
-    --mask.x = circ.x + (20*2)
-    --canvasObj.x = circ.x + (20*3)
-
-    mapGroup:insert(fxGroup)
-
-    xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
-    yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
-    print("xCoord", xCoord, "yCoord", yCoord)
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
     
     local fxDot = display.newCircle(fxBG.x, fxBG.y, fxBG.width/4)
     fxDot:setFillColor(1, 1, 1, 1)
@@ -1828,87 +1411,11 @@ local function countries()
         k3 = country.colors.k.b
         print(k1, k2, k3)
     end
-<<<<<<< HEAD
-=======
-    
-    -- if check.. when first flag appear. there will be no music. !!!
-    audio.stop( bobby )
-    music = audio.loadStream( "anthems/" .. country.name .. ".mp3" )
-    bobby = audio.play(music,{loops=-1})
-end
-
-local function newFlag() 
-          music=nil
-          if deadText~=nil then
-                display.remove(deadText)
-                if bonusText ~= nil then
-                     bonusText:removeSelf()
-                     --bonusText:Remove()
-                     bonusText=nil
-                     spread=1
-                     prevColor=nil
-                     currColor=nil
-                end
-          end
-          lastRoll=tempRoll
-          while thisRoll==lastRoll do
-                tempRoll = math.random(1,56)
-                thisRoll=tempRoll
-          end
-          countries(1)
-          if infoMode == true then
-                infoPic = display.newImage(info,165,77)
-                infoPic.x = _W/6
-                infoPic.y = _H/2
-                infoPic.alpha=0   
-                timer.performWithDelay(2000,infoAppear,1 )        
-          end  
-          countryText = display.newText(country, _W/2, _H/2, native.systemFont, 50)
-          countryText.anchorX=0.5
-          countryText.anchorY=0.5
-          countryText:setFillColor( 0, 0, 0 )
-          countryText:toFront()
-          timer.performWithDelay(2000,countryTextScale,1)
-          
-          --SAM: redundant
-          flag.alpha=0
-          --delay start of color squares
-          flag:scale(0,0)
-          --to change flag location
-          --flag.x = 0
-          
-          if state==4 then
-                sideTimer=timer.performWithDelay(1500,finishScale,1)
-                --countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
-                mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })                     
-                flagTimer=transition.to( flag, { time=1500, xScale=.2, yScale=.2})  
-                paceTimer=timer.performWithDelay(900,delayPace,1)
-          elseif state==3 then
-                sideTimer=timer.performWithDelay(1500,finishScale,1)
-                --CountryTraceTimer=transition.to( CountryTrace, { time=2000, x=_W/2, y=_H/2 }) 
-                mapTimer=transition.to( map, { time=2000, x=xCoord, y=yCoord })                     
-                flagTimer=transition.to( flag, { time=2000, xScale=.2, yScale=.2})  
-                paceTimer=timer.performWithDelay(0,delayPace,1)       
-          elseif state==2 or state==1 then
-                sideTimer=timer.performWithDelay(1500,finishScale,1)
-                --TEMP: alternative styles
-                --countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
-                mapTimer=transition.to( mapGroup, { time=500, x=xCoord, y=yCoord })                     
-                --mapTimer=transition.to( countryOutline, { time=1500, x=_W/2, y=_H/2 })                     
-                --mapTimer=transition.to( countryOutline, { time=1500, x=_W/2, y=_H/2 })                     
-                flagTimer=transition.to( flag, { delay=500, time=1000, alpha=.2, xScale=.2, yScale=.2*(.5)})  
-                paceTimer=timer.performWithDelay(900,delayPace,1)         
-          end  
-          flag:toFront()        
-          speedText:toFront()
-          scoreText:toFront()
-end    
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
 
 	-- if check.. when first flag appear. there will be no music. !!!
-    audio.stop(bobby)
-    music = audio.loadStream("anthems/" .. country.name .. ".mp3")
-    bobby = audio.play(music, {loops = -1})
+    --audio.stop(bobby)
+    --music = audio.loadStream("anthems/" .. country.name .. ".mp3")
+    --bobby = audio.play(music, {loops = -1})
 end
 
 local function killBars()
@@ -2138,7 +1645,6 @@ local function readyObject ()
                         if spawnTable[count + 1] ~= 0 then
                             spawnTable[count + 1].isGrown = true
                         end
-<<<<<<< HEAD
                         if spawnTable[count + 2] ~= 0 then
                             spawnTable[count + 2].isGrown = true
                         end
@@ -2163,179 +1669,6 @@ local function readyObject ()
                         end
                         if spawnTable[count + 1] ~= 0 then
                             spawnTable[count + 1].isGrown = true
-=======
-                        flag3Timer=transition.to( flag, { time=500, alpha=0, onComplete=removeFlag   })    --remove flag
-                        newFlagTimer=timer.performWithDelay(600, newFlag) 
-
-                       --CREATE A NEW COLOR SQUARE      
-                else                    
-                        createPalette()
-                        if firstObject==true then
-                             firstObject=false  
-                        elseif firstObject==false then
-                              if state==1 or state ==2 then
-                                    if spawnTable[count]~=0 then 
-                              --isGrown means colorPalletes are full size scale=1
-                                      spawnTable[count].isGrown=true  
-                                    end
-                                    if spawnTable[count+1]~=0 then
-                                    spawnTable[count+1].isGrown=true  
-                                    end
-                                    count=count+2
-        
-                              elseif state==3 then
-                                          if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          if spawnTable[count+1]~=0 then
-                                            spawnTable[count+1].isGrown=true
-                                          end
-                                          if spawnTable[count+2]~=0 then
-                                            spawnTable[count+2].isGrown=true
-                                          end
-                                          if spawnTable[count+3]~=0 then
-                                            spawnTable[count+3].isGrown=tue
-                                          end
-                                          count=count+4
-                                elseif state == 4 then
-
-                                        stateFourGrow=stateFourGrow+1 
-
-                                       
-                                if stateFourGrow >=4 then
-                                            if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          if spawnTable[count+1]~=0 then
-                                            spawnTable[count+1].isGrown=true
-                                          end
-                                          if spawnTable[count+2]~=0 then
-                                            spawnTable[count+2].isGrown=true
-                                          end
-                                          if spawnTable[count+3]~=0 then
-                                            spawnTable[count+3].isGrown=true
-                                          end
-
-                                          count=count+4
-                                elseif stateFourGrow >=3 then     
-                                          if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          if spawnTable[count+1]~=0 then
-                                            spawnTable[count+1].isGrown=true
-                                          end
-                                          if spawnTable[count+2]~=0 then
-                                            spawnTable[count+2].isGrown=true
-                                          end
-                                          count=count+3
-                                elseif stateFourGrow >=2 then   
-                                        if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          if spawnTable[count+1]~=0 then
-                                            spawnTable[count+1].isGrown=true
-                                          end
-                                          count=count+2
-                                elseif stateFourGrow >=1 then
-                                        if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          count=count+1
-                                  
-
-
-        elseif state == 5 then
-
-                                        stateFourGrow=stateFourGrow+1 
-
-                                            if stateFourGrow >=6 and state == 5 then
-                                                    if spawnTable[count]~=0 then
-                                                      spawnTable[count].isGrown=true
-                                                    end
-                                                    if spawnTable[count+1]~=0 then
-                                                      spawnTable[count+1].isGrown=true
-                                                    end
-                                                    if spawnTable[count+2]~=0 then
-                                                      spawnTable[count+2].isGrown=true
-                                                    end
-                                                    if spawnTable[count+3]~=0 then
-                                                      spawnTable[count+3].isGrown=true
-                                                    end
-                                                    if spawnTable[count+4]~=0 then
-                                                      spawnTable[count+4].isGrown=true
-                                                    end
-                                                    if spawnTable[count+5]~=0 then
-                                                      spawnTable[count+5].isGrown=true
-                                                    end       
-                                                    count=count+6  
-                               elseif stateFourGrow >=5 and state == 5 then
-                                            if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          if spawnTable[count+1]~=0 then
-                                            spawnTable[count+1].isGrown=true
-                                          end
-                                          if spawnTable[count+2]~=0 then
-                                            spawnTable[count+2].isGrown=true
-                                          end
-                                          if spawnTable[count+3]~=0 then
-                                            spawnTable[count+3].isGrown=true
-                                          end
-                                        if spawnTable[count+4]~=0 then
-                                              spawnTable[count+4].isGrown=true
-                                            end
-                
-                                          count=count+5 
-                                if stateFourGrow >=4 and state == 5 then
-                                            if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          if spawnTable[count+1]~=0 then
-                                            spawnTable[count+1].isGrown=true
-                                          end
-                                          if spawnTable[count+2]~=0 then
-                                            spawnTable[count+2].isGrown=true
-                                          end
-                                          if spawnTable[count+3]~=0 then
-                                            spawnTable[count+3].isGrown=true
-                                          end
-
-                                          count=count+4
-                                elseif stateFourGrow >=3 and state == 5 then     
-                                          if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          if spawnTable[count+1]~=0 then
-                                            spawnTable[count+1].isGrown=true
-                                          end
-                                          if spawnTable[count+2]~=0 then
-                                            spawnTable[count+2].isGrown=true
-                                          end
-                                          count=count+3
-                                elseif stateFourGrow >=2 and state == 5 then   
-                                        if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          if spawnTable[count+1]~=0 then
-                                            spawnTable[count+1].isGrown=true
-                                          end
-                                          count=count+2
-                                elseif stateFourGrow >=1 and state == 5 or state == 4 then
-                                        if spawnTable[count]~=0 then
-                                            spawnTable[count].isGrown=true
-                                          end
-                                          count=count+1
-                                end      
-
-                            end 
-                             
-                         end        
-                          --     print("stateFourGrow    :".. stateFourGrow)   
-                           --     print("COUNT           :" .. count)
-
-                       end
-                            
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
                         end
                         count = count + 2
                     elseif stateFourGrow >= 1 then
@@ -2489,7 +1822,6 @@ end
 
 
 local function setupVariables()
-<<<<<<< HEAD
     w1 = 1;w2 = 1;w3 = 1
     k1 = 0;k2 = 0;k3 = 0
     r1 = 1;r2 = 0;r3 = 0
@@ -2584,94 +1916,6 @@ local function setupVariables()
     lightningIcon12:toBack()
     lightningIcon13:toBack()
     lightningIcon14:toBack()                                 
-=======
-      w1=1;w2=1;w3=1
-      k1=0;k2=0;k3=0
-      r1=1;r2=0;r3=0
-      o1=1;o2=.502;o3=0
-      y1=1;y2=1;y3=0
-      g1=0;g2=.4;g3=0
-      b1=0;b2=0;b3=1 
-
-      mapGroup = display.newGroup()
-
-      map = display.newImage( "images/newmap_export_nopolar.png", 2031, 851)
-      map.alpha = 1
-      map.anchorX=0
-      map.anchorY=0
-      map.name="map"
-      map.x=0
-      map.y=0
-
-      mapGroup:insert(map)
-
-   levels = {
-               { speed=1, timeVar=2550},{ speed=1.5, timeVar=1700},{ speed=2, timeVar=1250},{ speed=2.5, timeVar=1000},{ speed=3, timeVar=910},{ speed=3.5, timeVar=750},
-               { speed=4, timeVar=700},{ speed=4.5, timeVar=600},{ speed=5, timeVar=550},{ speed=5.5, timeVar=450},{ speed=6, timeVar=420},{ speed=6.5, timeVar=400},
-               { speed=7, timeVar=380},{ speed=7.5, timeVar=365},{ speed=8, timeVar=345},{ speed=8.5, timeVar=335},{ speed=9, timeVar=305},{ speed=9.5, timeVar=280},
-               { speed=10, timeVar=260},{ speed=10.5, timeVar=240},{ speed=11, timeVar=220},{ speed=11.5, timeVar=200},{ speed=12, timeVar=190},{ speed=12.5, timeVar=185},
-               { speed=13, timeVar=175},{ speed=13.5, timeVar=170},{ speed=14, timeVar=170},{ speed=14.5, timeVar=165},{ speed=15, timeVar=165},{ speed=15.5, timeVar=160},
-               { speed=16, timeVar=155},{ speed=16.5, timeVar=155},{ speed=17, timeVar=150},{ speed=17.5, timeVar=145},{ speed=18, timeVar=145},{ speed=19, timeVar=140},
-               { speed=20, timeVar=135},{ speed=21, timeVar=125},{ speed=22, timeVar=120},{ speed=23, timeVar=110}}          
-
-
-      lightningIcon1 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon1.x = 20
-      lightningIcon1.y = lightningY
-      lightningIcon2 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon2.x = 60
-      lightningIcon2.y = lightningY
-      lightningIcon3 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon3.x = 100
-      lightningIcon3.y = lightningY
-      lightningIcon4 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon4.x = 140
-      lightningIcon4.y = lightningY
-      lightningIcon5 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon5.x = 180
-      lightningIcon5.y = lightningY
-      lightningIcon6 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon6.x = 220
-      lightningIcon6.y = lightningY
-      lightningIcon7 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon7.x = 260
-      lightningIcon7.y = lightningY
-      lightningIcon8 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon8.x = 300
-      lightningIcon8.y = lightningY
-      lightningIcon9 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon9.x = 340
-      lightningIcon9.y = lightningY
-      lightningIcon10 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon10.x = 380
-      lightningIcon10.y = lightningY
-      lightningIcon11 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon11.x = 420
-      lightningIcon11.y = lightningY
-      lightningIcon12 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon12.x = 460
-      lightningIcon12.y = lightningY
-      lightningIcon13 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon13.x = 500
-      lightningIcon13.y = lightningY
-      lightningIcon14 = display.newImage( "images/lightningbolt_sm.png", 18, 31)              
-      lightningIcon14.x = 540
-      lightningIcon14.y = lightningY   
-      lightningIcon1:toBack()
-      lightningIcon2:toBack()
-      lightningIcon3:toBack()
-      lightningIcon4:toBack()
-      lightningIcon5:toBack()   
-      lightningIcon6:toBack()
-      lightningIcon7:toBack()
-      lightningIcon8:toBack()
-      lightningIcon9:toBack()
-      lightningIcon10:toBack()  
-      lightningIcon11:toBack()
-      lightningIcon12:toBack()
-      lightningIcon13:toBack()
-      lightningIcon14:toBack()                                 
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
 end
 
 
@@ -2697,7 +1941,6 @@ function objTouch(self, e)
     if e.phase == "began" and e.target.isPaletteActive == true then
 -- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isTopLeft)
 
-<<<<<<< HEAD
         if lookupCode(code, e.target) == 0 then   --You are Dead --color does not match 
 
             if bonusText ~= nil then
@@ -2722,45 +1965,12 @@ function objTouch(self, e)
                         spawnTable[i].isGrown = false 
                         spawnTable[i].isPaletteActive = false
 						-- spawnTable[i]:removeEventListener("enterFrame", moveObject)
-=======
-            if lookupCode(code,e.target)==0 then   --You are Dead --color does not match 
-              
-              if bonusText ~= nil then
-                  bonusText:removeSelf()
-                  --bonusText:Remove()
-                  bonusText=nil
-              end
-              
-              if deadText==nil then
-                deadText = display.newEmbossedText( "DEAD", _W*(4/5), _H*(2/3), "PTMono-Bold", 38 )
-                deadText:setFillColor( .86, .1, .2)
-                deadText:setEmbossColor( scoreboardColor )
-              end       
-              if gotoDeath==true then
-                    self:toFront()  
-                    self.isPaletteActive=false
-                    self:removeEventListener("touch",objTouch)
-                    
-                    -- Death Palette Animation
-                    for i = 1, #spawnTable do
-                            if spawnTable[i]~=0 then
-                            spawnTable[i].isGrown= false 
-                            spawnTable[i].isPaletteActive=false
-                           -- spawnTable[i]:removeEventListener("enterFrame", moveObject)
-                            end
-                            if spawnTable[i]~=0 and spawnTable[i]~=e.target then
-                    
-                            spawnTable[i]:removeEventListener("touch",objTouch)
-                            transition.to( spawnTable[i], { time=500, rotation=400, xScale=0.01, yScale=0.01, onComplete=removePalette   }) 
-                            end
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
                     end
                     if spawnTable[i] ~= 0 and spawnTable[i] ~= e.target then
 
                         spawnTable[i]:removeEventListener("touch", objTouch)
                         transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette}) 
                     end
-<<<<<<< HEAD
                 end
                 numDeaths = 1
                 transition.to(e.target, {time = 700, rotation = 400, x = _W / 2, y = _H / 2, xScale = 8, yScale = 8, onComplete = endGame })
@@ -2845,75 +2055,6 @@ function objTouch(self, e)
 					--bonusText:Remove()
                     bonusText = nil
                 end
-=======
-                end     
-                currColor=e.target.type
-    --BONUS SCORE
-                if currColor==prevColor then
-                   spread=spread+1
-                   if bonusText ~= nil then
-                       bonusText:removeSelf()
-                       --bonusText:Remove()
-                       bonusText=nil
-                   end
-                   text="+"..spread
-                   
-                   bonusText = display.newEmbossedText( text, _W*(1/5), _H*(1/3), "PTMono-Bold", 38 )
-                   bonusText:setFillColor( 1, .9, .4)
-                   bonusText:setEmbossColor( scoreboardColor )
-                   
-                   --SAM: CFText (advanced color classes), to be re-worked and implemented later
-                   
-                   --bonusText = CFText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
-                  
-                   if motion~=nil then
-                     timer.cancel(motion)
-                     motion=nil
-                   end
-                   if spread==2 then
-                          bonusImplode:setSequence("2x")
-                   elseif spread==3 then
-                          bonusImplode:setSequence("3x")
-                   elseif spread==4 then
-                          bonusImplode:setSequence("4x")
-                   elseif spread==5 then
-                          bonusImplode:setSequence("5x")
-                   elseif spread==6 then
-                          bonusImplode:setSequence("6x")
-                   elseif spread==7 then
-                          bonusImplode:setSequence("7x")
-                   elseif spread==8 then
-                          bonusImplode:setSequence("8x")
-                   elseif spread==9 then
-                          bonusImplode:setSequence("9x")                       
-                   end 
-                   bonusImplode.alpha=1
-                   bonusImplode:toFront()
-                   bonusImplode:play()
-                   bonusImplode.x = _W*(4/5)
-                   bonusImplode.y = _H/2
-                   motion= timer.performWithDelay(800,cancelTimerBonusImplode,1)      
-                else
-                   spread=1
-                   currColor=nil
-                   prevColor=nil
-                   if bonusText~=nil then
-                       bonusText:removeSelf()
-                       --SAM: CFText
-                       --bonusText:Remove()
-                       bonusText=nil
-                   end
-                end
-                prevColor=e.target.type     
-                scoreText.text = score + spread
-                
-                --SAM: CFText
-                --scoreText:Text(score+spread)
-
-                score=score+spread
-                lightningScore=lightningScore+spread
-                trackLightningScore()
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
             end
             prevColor = e.target.type     
             scoreText.text = score + spread
@@ -2961,7 +2102,6 @@ function scene:show(e)
 end
 
 function scene:hide(e)
-<<<<<<< HEAD
     print("HIDE")
     if e.phase == "will" then
         display.remove(background)
@@ -2999,38 +2139,6 @@ function scene:hide(e)
         Runtime:removeEventListener("enterFrame", boundaryCheck)
         Runtime:removeEventListener("enterFrame", moveObject) 
         composer.removeScene("game", false)
-=======
-  print("HIDE")
-  if e.phase == "will" then
-    display.remove(background)
-    display.remove(scoreText)
-    display.remove(speedText)
-    display.remove(flag)
-    -- what about mask applied to fxGroup
-    display.remove(fxGroup)
-    display.remove(deadText)
-    display.remove(piece)
-    display.remove(map)
-    display.remove(topBar)
-    display.remove(lowBar)
-    display.remove(infoPic)
-    display.remove(lightningIcon1)
-    display.remove(lightningIcon2)
-    display.remove(lightningIcon3)
-    display.remove(lightningIcon4)
-    display.remove(lightningIcon5)
-    display.remove(lightningIcon6)
-    display.remove(lightningIcon7)
-    display.remove(lightningIcon8)
-    display.remove(lightningIcon9)
-    display.remove(lightningIcon10) 
-    display.remove(lightningIcon11)
-    display.remove(lightningIcon12)
-    display.remove(lightningIcon13)
-    display.remove(lightningIcon14) 
-    if timerSpeed~=nil then
-      timer.cancel(timerSpeed)
->>>>>>> bacfda359236236c3777ed713a6da2c74fbc6c8b
     end
 end
 
