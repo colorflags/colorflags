@@ -194,7 +194,7 @@ local countryOutlineTest
 
 local fxGroup
 local fxBG
-
+local fxAnim
 -- SAM: redunant
 
 --countryOutline.fill = { 1, 0, 0.5, 0.3 }
@@ -578,7 +578,7 @@ local function boundaryCheck (e)
                         end 
                         if deadText == nil then
 
-                            deadText = display.newEmbossedText("DEAD", _W * (4 / 5), _H * (2 / 3), "PTMono-Bold", 38)
+                            deadText = display.newEmbossedText("Dead", _W * (4 / 5), _H * (2 / 3), "PTMono-Bold", 38)
                             deadText:setFillColor(1, .9, .4)
                             deadText:setEmbossColor(scoreboardColor)
                         end
@@ -1191,6 +1191,12 @@ local function countries()
         countryOutlineTest = nil
     end
 	
+	if(fxAnim ~= nil) then
+		timer.cancel(fxAnim)
+		transition.cancel(fxBG)
+		fxAnim = nil
+	end
+	
 	if(mask ~= nil) then
         fxGroup:setMask(nil)
         mask = nil
@@ -1287,19 +1293,17 @@ local function countries()
     fxBG.rotation = 0
 
     local function animateCountry()
-        --[[
-        transition.to( fxBG.fill.effect, { delay=50, time=250, intensity=3, onComplete=
-            function() transition.to(fxBG.fill.effect, { time=400, intensity=1}) end
-        })
-        ]]--
-        transition.to(fxBG.fill.effect, {time = 10, angle = 0, onComplete =
-                       function() transition.to(fxBG.fill.effect, {time = 1390, angle = 20, transition = easing.continuousLoop}) end
-            })
-        transition.to(fxBG, {tag = "moveNeedle", delay = 50, time = 1350, rotation = fxBG.rotation + 90, transition = easing.inOutQuad})
+		transition.to(fxBG.fill.effect, {time = 10, angle = 0, onComplete = 
+			function() transition.to(fxBG.fill.effect, {time = 1390, angle = 20, transition = 	
+				easing.continuousLoop}) 
+			end 
+		}) 
+		transition.to(fxBG, {tag = "moveNeedle", delay = 50, time = 1350, rotation = fxBG.rotation + 90, transition = easing.inOutQuad})
+		transition.cancel(fxBG)
     end
-
-    timer.performWithDelay(1400, animateCountry, 0)
-    animateCountry()
+	
+	fxAnim = timer.performWithDelay(1400, animateCountry, 0)
+    --animateCountry()
 
 	
     fxGroup.x = (map.x) - (map.x - country.coords.x - (countryOutline.width / 2))
@@ -1355,10 +1359,10 @@ local function countries()
 		flag.x = _W/2
 		flag.y = _H/2
 	elseif(flagScaleStyle == 2) then
-			flag.width = 500
-			flag.height = 333
-			flag.xScale = .2
-			flag.yScale = .2 * .7
+		flag.width = 500
+		flag.height = 333
+		flag.xScale = .2
+		flag.yScale = .2 * .7
 		flag.anchorX = 1
 		flag.anchorY = 0.5
 		if(flagScalePos == 0) then
