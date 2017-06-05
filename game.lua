@@ -1,3 +1,5 @@
+--require('mobdebug').start()
+
 -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html 
 local CFText = require("cf_text")
@@ -1195,61 +1197,62 @@ local function countryTextScale()
    timer.performWithDelay(500,deleteCountryText,1)
 end 
 
+--SAMTEMP
+local usToCanada = 1
 local function countries(test)
-    local e = math.random(55)
+
+    local largerCountries = {2, 3, 6, 7, 9, 55}
+    local e = largerCountries[math.random(table.getn(largerCountries))]
+    
+    if usToCanada == 1 then
+        e = 55
+        usToCanada = 2 
+    else
+        e = 7
+        usToCanada = 1
+    end
+  
     country = CFGameSettings:getItemByID(e)
     --print("country : ", e)
     --print(country.name)
-    if(countryOutline ~= nil) then
-        countryOutline:removeSelf()
-        countryOutline = nil
+    
+    function destroyStuff()
+        
+        if(countryOutline ~= nil) then
+            countryOutline:removeSelf()
+            countryOutline = nil
+        end
+        
+        print(mapGroup.numChildren)
+        if(mapGroup) then
+            for j=mapGroup.numChildren, 1, -1 do
+                if(mapGroup[j].id == "fxGroup") then
+                    for k=mapGroup[j].numChildren, 1, -1 do
+                        local child = mapGroup[j][k]
+                        print("fxGroup item")
+                        print(child.fill)
+                        child:removeSelf()
+                        child = nil
+                    end
+                    print("remove group: ", mapGroup[j].id )
+                    mapGroup[j]:removeSelf()
+                end
+            end
+        end
     end
 
+    destroyStuff()
+    
     countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
     countryOutline:scale(0.5, 0.5)
-    --countryOutline.fill = { 1, 0, 0.5, 0.3 }
-    --countryOutline.fill = paint
-    --countryOutline:setFillColor()
-    --countryOutline.x = _W/2
-    --countryOutline.y = _H/2
-    --countryOutline.anchorX=.5
-    --countryOutline.anchorY=.5
-    --countryOutline.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
-    --countryOutline.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
-
-    -- TEMP: alternative styles
-    --countryOutline.x=-country.coords.x-(countryOutline.width/2)
-    --countryOutline.y=-country.coords.y-(countryOutline.height/2)
-    --[[  
-    if(circ ~= nil) then
-        circ:removeSelf()
-        circ = nil
-    end
-    circ = display.newCircle( 0, 0, 64 )
-    circ:setFillColor(1,0,0,1)
-    ]]--
-
+    
+    newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
     newTex:draw(countryOutline)
     newTex:invalidate()
-    --[[
-    fxGroup = display.newGroup() 
-    fxGroup.x = _W/2
-    fxGroup.y = _H/2
-    local fxBG = display.newRect(0, 0, countryOutline.width, countryOutline.height)
-    fxBG:setFillColor(0, 0, 1, 1)
-    fxBG.anchorX=.5
-    fxBG.anchorY=.5
-    
-    local fxDot = display.newCircle(fxBG.x, fxBG.y, fxBG.width/4)
-    fxDot:setFillColor(1, 1, 1, 1)
-    fxDot.anchorX=.5
-    fxDot.anchorY=.5
-    
-    fxGroup:insert(fxBG)
-    fxGroup:insert(fxDot)
-    ]]--
 
     local fxGroup = display.newGroup()
+    fxGroup.id = "fxGroup"
+    
     local fxSize
     if(countryOutline.width > countryOutline.height) then 
         fxSize = math.ceil(countryOutline.width)+120
@@ -1274,54 +1277,36 @@ local function countries(test)
     fxBG.fill.scaleX = 0.5 * scaleFactorX
     fxBG.fill.scaleY = 0.5 * scaleFactorY
     fxBG.fill.effect = "filter.straighten"
-
     fxBG.fill.effect.width = 10
     fxBG.fill.effect.height = 50
     fxBG.fill.effect.angle = 20
-    --fxBG.fill.effect = "filter.pixelate"
-    --fxBG.fill.effect.numPixels = 16
-    --fxBG.fill.effect = "filter.bulge"
-    --fxBG.fill.effect.intensity = 3.0
     fxBG.rotation = 0
 
-    local function animateCountry()
-        --[[
-        transition.to( fxBG.fill.effect, { delay=50, time=250, intensity=3, onComplete=
-            function() transition.to(fxBG.fill.effect, { time=400, intensity=1}) end
-        })
-        ]]--
-        transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
-            function() transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop}) end
-        })
-        transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad} )
-    end
- 
-    timer.performWithDelay( 1400, animateCountry, 0 )
-    animateCountry()
-
-    --fxGroup.x = _W/2
-    --fxGroup.y = _H/2
     fxGroup.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
     fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
     fxGroup:insert(fxBG)
-    -- just to preview effect (uncomment to center DisplayObject on screen)
-    --fxBG.x = _W/2
-    --fxBG.y = _H/2    
-
-    --mask = display.newImageRect(newTex.filename, newTex.baseDir, display.contentWidth, display.contentHeight)
-    --local path = system.pathForFile( newTex.filename )
-    --print(path)
+    
     mask = graphics.newMask(newTex.filename, newTex.baseDir)
     fxGroup:setMask(mask)
     canvasObj.alpha = 0
-    --mask.x = circ.x + (20*2)
-    --canvasObj.x = circ.x + (20*3)
-
-    mapGroup:insert(fxGroup)
-
+    
     xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
     yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
+    
+    --TEST
+--    countryOutline.x = country.coords.x+(countryOutline.width/2)
+--    countryOutline.y = country.coords.y+(countryOutline.height/2)
+    
+    mapGroup:insert(fxGroup)
+    
     print("xCoord", xCoord, "yCoord", yCoord)
+    
+    local function animateCountry()
+        transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
+            function() transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop}) end
+        })
+        transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad } )
+    end
     
     info="images/infoBrazil.png"
     
@@ -1436,7 +1421,6 @@ local function newFlag()
                 --TEMP: alternative styles
                 --countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
                 mapTimer=transition.to( mapGroup, { time=500, x=xCoord, y=yCoord })                     
-                --mapTimer=transition.to( countryOutline, { time=1500, x=_W/2, y=_H/2 })                     
                 --mapTimer=transition.to( countryOutline, { time=1500, x=_W/2, y=_H/2 })                     
                 flagTimer=transition.to( flag, { delay=500, time=1000, alpha=.2, xScale=.2, yScale=.2*(.5)})  
                 paceTimer=timer.performWithDelay(900,delayPace,1)         
