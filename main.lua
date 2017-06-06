@@ -55,7 +55,7 @@ local backgroundColor={255,255,255}
 
 audioCanPlay=true
 
-
+ -- MIKE: Should we just keep this in game.lua
  heightModeTop=35
  heightModeLow=_H-35
  lightningY=90

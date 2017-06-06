@@ -1,11 +1,9 @@
---require('mobdebug').start()
-
 -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html 
 local CFText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
-local gotoDeath = false    --for testing purposes. if true, go to GameOver screen.
+local gotoDeath = true    --for testing purposes. if true, go to GameOver screen.
 local lightningCount = 1  --correct default is set to 1, bump up to test for more lightnings
 local state = 1
 local stateFour = 0
@@ -16,13 +14,6 @@ local levels
 local score = 0
 local numDeaths = 0
 local idx = 3
-
---SAM: checks if game just started
-local countriesCompleted = 0
-
-local flagScaleStyle = 2
-local flagScalePos = 0 -- used only when flagScaleStyle = 2
-
 local infoPic
 local code
 local info
@@ -86,8 +77,6 @@ local flag
 local random
 
 local deadText = nil
-local speedTextDesc
-local scoreTextDesc
 local bonusText
 local scoreText
 local speedText
@@ -196,7 +185,7 @@ local countryOutlineTest
 
 local fxGroup
 local fxBG
-local fxAnim
+
 -- SAM: redunant
 
 --countryOutline.fill = { 1, 0, 0.5, 0.3 }
@@ -234,23 +223,11 @@ local scoreboardColor =
     shadow = {r = 0, g = 0, b = 0}
 }
 
-speedTextDesc = display.newEmbossedText("speed:", 2, _H/2 - 20, "PTMono-Bold", 18)
-speedTextDesc:setFillColor(.2, .9, .4)
-speedTextDesc:setEmbossColor(scoreboardColor)
-speedTextDesc.anchorX = 0
-speedTextDesc.anchorY = 1
-
-speedText = display.newEmbossedText(speed, speedTextDesc.x + (speedTextDesc.width/2), speedTextDesc.y + 5, "PTMono-Bold", 22)
+speedText = display.newEmbossedText(speed, _W * (1 / 5), _H / 2, "PTMono-Bold", 38)
 speedText:setFillColor(.2, .9, .4)
 speedText:setEmbossColor(scoreboardColor)
 
-scoreTextDesc = display.newEmbossedText("score:", 2, (_H/2) + 30, "PTMono-Bold", 18)
-scoreTextDesc:setFillColor(.2, .9, .4)
-scoreTextDesc:setEmbossColor(scoreboardColor)
-scoreTextDesc.anchorX = 0
-scoreTextDesc.anchorY = 1
-
-scoreText = display.newEmbossedText(score, scoreTextDesc.x + (scoreTextDesc.width/2), scoreTextDesc.y + 5, "PTMono-Bold", 22)
+scoreText = display.newEmbossedText(score, _W * (4 / 5), _H / 2, "PTMono-Bold", 38)
 scoreText:setFillColor(.2, .9, .4)
 scoreText:setEmbossColor(scoreboardColor)
 
@@ -580,7 +557,7 @@ local function boundaryCheck (e)
                         end 
                         if deadText == nil then
 
-                            deadText = display.newEmbossedText("Dead", _W * (4 / 5), _H * (2 / 3), "PTMono-Bold", 38)
+                            deadText = display.newEmbossedText("DEAD", _W * (4 / 5), _H * (2 / 3), "PTMono-Bold", 38)
                             deadText:setFillColor(1, .9, .4)
                             deadText:setEmbossColor(scoreboardColor)
                         end
@@ -1172,62 +1149,81 @@ local function countryTextScale()
     timer.performWithDelay(500, deleteCountryText, 1)
 end 
 
---SAMTEMP
-local usToCanada = 1
-local function countries(test)
-
-    local largerCountries = {2, 3, 6, 7, 9, 55}
-    local e = largerCountries[math.random(table.getn(largerCountries))]
-    
-    if usToCanada == 1 then
-        e = 55
-        usToCanada = 2 
-    else
-        e = 7
-        usToCanada = 1
-    end
-  
+local function countries()
+	print(count)
+    local e = math.random(55)
+	local e = 2 --SAM: temp
     country = CFGameSettings:getItemByID(e)
-    --print("country : ", e)
-    --print(country.name)
-    
-    function destroyStuff()
-        
-        if(countryOutline ~= nil) then
-            countryOutline:removeSelf()
-            countryOutline = nil
-        end
-        
-        print(mapGroup.numChildren)
-        if(mapGroup) then
-            for j=mapGroup.numChildren, 1, -1 do
-                if(mapGroup[j].id == "fxGroup") then
-                    for k=mapGroup[j].numChildren, 1, -1 do
-                        local child = mapGroup[j][k]
-                        print("fxGroup item")
-                        print(child.fill)
-                        child:removeSelf()
-                        child = nil
-                    end
-                    print("remove group: ", mapGroup[j].id )
-                    mapGroup[j]:removeSelf()
-                end
-            end
-        end
+	--print("country : ", e)
+	--print(country.name)
+    if(countryOutline ~= nil) then
+        countryOutline:removeSelf()
+        countryOutline = nil
     end
-
-    destroyStuff()
-    
-    countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
+	
+	if(countryOutlineTest ~= nil) then
+        countryOutlineTest:removeSelf()
+        countryOutlineTest = nil
+    end
+	
+	if(fxGroup ~= nil) then
+        fxGroup:removeSelf()
+        fxGroup = nil
+    end
+	
+	if(fxBG ~= nil) then
+        fxBG:removeSelf()
+        fxBG = nil
+    end
+	
+    countryOutline = display.newSprite(countryOutlineSheet, {frames = {countryOutlineSheetCoords:getFrameIndex(country.name)}})
+	-- SAM: why scale? look below at fxGroup
     countryOutline:scale(0.5, 0.5)
+	
+	countryOutlineTest = display.newSprite(countryOutlineSheet, {frames = {countryOutlineSheetCoords:getFrameIndex(country.name)}})
+	countryOutlineTest.alpha = 0
+	-- SAM: why no scale?
+    --countryOutlineTest:scale(0.5, 0.5)
+	countryOutlineTest.x = (map.x) - (map.x - country.coords.x - (countryOutline.width / 2))
+	countryOutlineTest.y = (map.y) - (map.y - country.coords.y - (countryOutline.height / 2))
+	--countryOutlineTest.x = _W/2
+	--countryOutlineTest.y = _H/2
+	
+	-- TEMP: alternative styles
+	--countryOutline.x=-country.coords.x-(countryOutline.width/2)
+	--countryOutline.y=-country.coords.y-(countryOutline.height/2)
     
-    newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
+	--[[  
+    if(circ ~= nil) then
+        circ:removeSelf()
+        circ = nil
+    end
+    circ = display.newCircle( 0, 0, 64 )
+    circ:setFillColor(1,0,0,1)
+    ]]--
+	
+    --[[
+    fxGroup = display.newGroup() 
+    fxGroup.x = _W/2
+    fxGroup.y = _H/2
+    local fxBG = display.newRect(0, 0, countryOutline.width, countryOutline.height)
+    fxBG:setFillColor(0, 0, 1, 1)
+    fxBG.anchorX=.5
+    fxBG.anchorY=.5
+    
+    local fxDot = display.newCircle(fxBG.x, fxBG.y, fxBG.width/4)
+    fxDot:setFillColor(1, 1, 1, 1)
+    fxDot.anchorX=.5
+    fxDot.anchorY=.5
+    
+    fxGroup:insert(fxBG)
+    fxGroup:insert(fxDot)
+    ]]--
+
     newTex:draw(countryOutline)
     newTex:invalidate()
-
-    local fxGroup = display.newGroup()
-    fxGroup.id = "fxGroup"
-    
+	
+	fxGroup = display.newGroup()
     local fxSize
     if(countryOutline.width > countryOutline.height) then 
         fxSize = math.ceil(countryOutline.width) + 120
@@ -1255,67 +1251,64 @@ local function countries(test)
     fxBG.fill.scaleX = .5 * scaleFactorX
     fxBG.fill.scaleY = .5 * scaleFactorY
     fxBG.fill.effect = "filter.straighten"
+
     fxBG.fill.effect.width = 10
     fxBG.fill.effect.height = 50
     fxBG.fill.effect.angle = 20
+	--fxBG.fill.effect = "filter.pixelate"
+	--fxBG.fill.effect.numPixels = 16
+	--fxBG.fill.effect = "filter.bulge"
+	--fxBG.fill.effect.intensity = 3.0
     fxBG.rotation = 0
 
-    fxGroup.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
-    fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
+    local function animateCountry()
+        --[[
+        transition.to( fxBG.fill.effect, { delay=50, time=250, intensity=3, onComplete=
+            function() transition.to(fxBG.fill.effect, { time=400, intensity=1}) end
+        })
+        ]]--
+        transition.to(fxBG.fill.effect, {time = 10, angle = 0, onComplete =
+                       function() transition.to(fxBG.fill.effect, {time = 1390, angle = 20, transition = easing.continuousLoop}) end
+            })
+        transition.to(fxBG, {tag = "moveNeedle", delay = 50, time = 1350, rotation = fxBG.rotation + 90, transition = easing.inOutQuad})
+    end
+
+    timer.performWithDelay(1400, animateCountry, 0)
+    animateCountry()
+
+	
+    fxGroup.x = (map.x) - (map.x - country.coords.x - (countryOutline.width / 2))
+    fxGroup.y = (map.y) - (map.y - country.coords.y - (countryOutline.height / 2))
     fxGroup:insert(fxBG)
-    
+	-- just to preview effect (uncomment to center DisplayObject on screen)
+	--fxBG.x = _W/2
+	--fxBG.y = _H/2    
+	
     mask = graphics.newMask(newTex.filename, newTex.baseDir)
     fxGroup:setMask(mask)
     canvasObj.alpha = 0
-    
-    mapGroup:insert(fxGroup)
+	--mask.x = circ.x + (20*2)
+	--canvasObj.x = circ.x + (20*3)
 
-    xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
-    yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
-    
-
+    --mapGroup:insert(fxGroup)
+	
+	xCoord = (_W / 2) - country.coords.x - (countryOutline.width / 2)
+    yCoord = (_H / 2) - country.coords.y - (countryOutline.height / 2)
+	
+	print("countryOutlineTest.x", countryOutlineTest.x, "countryOutlineTest.y", countryOutlineTest.y)
+	print("fxGroup.x", fxGroup.x, "fxGroup.y", fxGroup.y)
+	
+	print("_W", _W, "_H", _H)
     print("xCoord", xCoord, "yCoord", yCoord)
 
-    local function animateCountry()
-        transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
-            function() transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop}) end
-        })
-        transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad } )
-    end
-    
-    info="images/infoBrazil.png"
-    
-    flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
-    flag:setSequence(country.name)
-    flag.anchorX = 0.5 ; flag.anchorY = 0.5
-    
-	if(flagScaleStyle == 0) then
-		flag.width = 200
-		flag.height = 100
-		flag.anchorX = 0.5
-		flag.anchorY = 0.5
-		flag.x = _W/2
-		flag.y = _H/2
-	elseif(flagScaleStyle == 1) then
-		flag.anchorX = 0.5
-		flag.anchorY = 0.5
-		flag.x = _W/2
-		flag.y = _H/2
-	elseif(flagScaleStyle == 2) then
-		flag.width = 500
-		flag.height = 333
-		flag.xScale = .2
-		flag.yScale = .2 * .7
-		flag.anchorX = 1
-		flag.anchorY = 0.5
-		if(flagScalePos == 0) then
-			flag.x = _W
-			flag.y = _H/2
-		end		
-	end
+    info = "images/infoBrazil.png"
 
+    flag = display.newSprite(nationalFlags1Sheet, nationalFlagsSeq, 100, 10)
+    flag:setSequence(country.name)
+    flag.anchorX = 0.5
+	flag.anchorY = 0.5
     code = country.code
-    
+    flag.x = _W / 2 ;  flag.y = _H / 2
     if(country.colors.r) then
         r1 = country.colors.r.r
         r2 = country.colors.r.g
@@ -1380,51 +1373,68 @@ local function removeFlag()
     flag:removeSelf()
     flag  = nil
 end            
---MIKE: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ?? Maybe merge all functions pertaining to newFlag and flag enlargement into one neat function
+--MIKE: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ??
 local function finishScale()
     topBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
 	topBar:setFillColor(0, 0, 0)
 	topBar.yScale = -1
+
+
 	topBar.anchorX = 0.5
     topBar.anchorY = 1
+	
     topBar.x = _W / 2
 	topBar.y = -30
+
     topBar.alpha = 0
     topBar:toFront()
     topBar:setSequence("top")
     topBar:play()
-    transition.to(topBar, {time = 1300, alpha = .3, y = -35})
+         
+	topBar2 = transition.to(topBar, {time = 1300, alpha = .7, y = -35})
     
 	lowBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
     lowBar:setFillColor(0, 0, 0)
+	
 	lowBar.anchorX = 0.5	
     lowBar.anchorY = 1
+    
 	lowBar.x = _W / 2
 	lowBar.y = _H + 30
     lowBar.alpha = 0
     topBar:toFront()
     lowBar:setSequence("btm")
     lowBar:play()
-	transition.to(lowBar, {time = 1300, alpha = .3, y = _H + 35})
+    
+    lowBar2 = transition.to(lowBar, {time = 1300, alpha = .7, y = _H + 35}) 
+
+	--SAM: text anchors
+	speedText.anchorX = 0
+	speedText.anchorY = 1
+	scoreText.anchorX = 1
+	scoreText.anchorY = 1
 	
-	--MIKE: removed flag2Timer assignment of transition to, is this okay?
-	if(flagScaleStyle == 0) then
-		transition.to( flag, { time=1000, alpha = 1, xScale=1, yScale=1})
-	elseif(flagScaleStyle == 1) then
-		transition.to(flag, {time = 1000, alpha = 1, xScale = .2, yScale = .2 * .7, onComplete =
-			function()	   
-			end
-		})
-	elseif(flagScaleStyle == 2) then
-		if(countriesCompleted == 0) then
-			transition.to(flag, {time = 1000, alpha = 1})
-		end
-	end
+	speedText.x = 2
+    speedText.y = (lowBar.y - lowBar.height) + 10
 	
+	scoreText.x = _W - 2 
+    scoreText.y = (lowBar.y - lowBar.height) + 10
+	
+    flag2Timer = transition.to(flag, {time = 1000, alpha = 1, xScale = .2, yScale = .2 * .7, onComplete =
+           function()
+				flag.strokeWidth = 2
+				flag:setStrokeColor(0, 0, 0)
+                flag.x = 2 + ((flag.width * flag.xScale) * .5)
+                --flag.y = (lowBar.y - lowBar.height) - ((flag.height * flag.yScale) * .5)
+				--speedText.x = flag.x - ((flag.width * flag.xScale) / 2)
+				--speedText.y = flag.y + ((flag.height * flag.yScale) / 2)
+				--scoreText.x = flag.x + ((flag.width * flag.xScale) / 2)
+				--scoreText.y = flag.y + ((flag.height * flag.yScale) / 2)
+            end
+        })
     flagLightningReady = timer.performWithDelay(1000, lightningEnable, 1)
+
     timerSpeed = timer.performWithDelay(9500, speedUp, 1)
-			
-	countriesCompleted = countriesCompleted + 1
 end
 
 local function newFlag()
@@ -1455,8 +1465,13 @@ local function newFlag()
     countryText:toFront()
     timer.performWithDelay(2000, countryTextScale, 1)
 
-	--FLAG SCALING STARTS HERE
-    
+	--SAM: redundant
+    flag.alpha = 0
+	--delay start of color squares
+    flag:scale(0, 0)
+	--to change flag location
+	--flag.x = 0
+
     if state == 4 then
         sideTimer = timer.performWithDelay(1500, finishScale, 1)
 		--countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
@@ -1471,47 +1486,27 @@ local function newFlag()
         paceTimer = timer.performWithDelay(0, delayPace, 1)       
     elseif state == 2 or state == 1 then
         sideTimer = timer.performWithDelay(1500, finishScale, 1)
-        paceTimer=timer.performWithDelay(900,delayPace,1)    
-        
-        transition.to( map, { time=1500, alpha=1 }) 
-        mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
 		--TEMP: alternative styles
 		--countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
         
---		mapGroup.xScale = .5
---		mapGroup.yScale = .5
---		mapGroup.x = xCoord*.5 + (_W*.25)
---		mapGroup.y = yCoord*.5 + (_H*.25)
+		--mapGroup.xScale = .5
+		--mapGroup.yScale = .5
+		--mapGroup.x = xCoord*.5 + (_W*.25)
+		--mapGroup.y = yCoord*.5 + (_H*.25)
 
 		-- with scale
---		mapTimer = transition.to(mapGroup, {time = 500, x=xCoord*.5+(_W*.25), y=yCoord*.5+(_H*.25), xScale = .5, yScale = .5})
-        
-        --SAM: what is this?
-
-		if(countriesCompleted == 0) then
-			-- without scale
---			mapTimer = transition.to(map, {time = 1500, alpha = 1, x=xCoord, y=yCoord})
---			transition.to(fxGroup, {time = 1500, alpha = 1, x=_W/2, y=_H/2})
-		end
+		--mapTimer = transition.to(mapGroup, {time = 500, x=xCoord*.5+(_W*.25), y=yCoord*.5+(_H*.25), xScale = .5, yScale = .5})
 
 		-- without scale
---		mapTimer = transition.to(mapGroup, {time = 1500, x=xCoord, y=yCoord})
---		transition.to(fxGroup, {time = 1500, x=_W/2, y=_H/2})
-        
-		if(flagScaleStyle == 0) then
-			flagTimer=transition.to( flag, { time=1500, alpha = .2, xScale=.2, yScale=.2})  
-		elseif(flagScaleStyle == 1) then
-			flagTimer = transition.to(flag, {delay = 500, time = 1000, alpha = .2, xScale = .075, yScale = .075 * .7})
-		elseif(flagScaleStyle == 2) then
-		end
-   
-    end      
-	--SAM: redundant push toFront() ?
-	speedTextDesc:toFront()
-	speedText:toFront()
-	scoreTextDesc:toFront()
+		mapTimer = transition.to(map, {time = 500, x=xCoord, y=yCoord})
+		transition.to(fxGroup, {time = 500, x=_W/2, y=_H/2})
+		
+        flagTimer = transition.to(flag, {delay = 500, time = 1000, alpha = .2, xScale = .2, yScale = .2 * (.5)})  
+        paceTimer = timer.performWithDelay(900, delayPace, 1)         
+    end  
+    flag:toFront()        
+    speedText:toFront()
     scoreText:toFront()
-    --flag:toFront()     
 end    
 
 local function readyObject ()
@@ -1767,23 +1762,25 @@ local function setupVariables()
     mapGroup = display.newGroup()
 
     map = display.newImage("images/newmap_export_nopolar.png", 2031, 851)
-    map.alpha = 0
+    map.alpha = 1
     map.anchorX = 0
     map.anchorY = 0
     map.name = "map"
     map.x = 0
     map.y = 0
+
+	
 	
 	mapGroup:insert(map)
-	--[[
+	
 	mapMask = graphics.newMask("images/mask.png")
 	mapGroup:setMask(mapMask)
 	
-	mapGroup.maskScaleX = 200
-	mapGroup.maskScaleY = 75
+	mapGroup.maskScaleX = 100
+	mapGroup.maskScaleY = 100
 	mapGroup.maskX = _W/2
 	mapGroup.maskY = _H/2
-	]]--
+	
     levels = {
         {speed = 1, timeVar = 2550}, {speed = 1.5, timeVar = 1700}, {speed = 2, timeVar = 1250}, {speed = 2.5, timeVar = 1000}, {speed = 3, timeVar = 910}, {speed = 3.5, timeVar = 750},
         {speed = 4, timeVar = 700}, {speed = 4.5, timeVar = 600}, {speed = 5, timeVar = 550}, {speed = 5.5, timeVar = 450}, {speed = 6, timeVar = 420}, {speed = 6.5, timeVar = 400},
@@ -1884,7 +1881,7 @@ function objTouch(self, e)
             end
 
             if deadText == nil then
-                deadText = display.newEmbossedText("DEAD", _W * (4/5), _H/2, "PTMono-Bold", 38)
+                deadText = display.newEmbossedText("DEAD", _W * (4 / 5), _H * (2 / 3), "PTMono-Bold", 38)
                 deadText:setFillColor(.86, .1, .2)
                 deadText:setEmbossColor(scoreboardColor)
             end       
@@ -2039,11 +2036,8 @@ function scene:hide(e)
     print("HIDE")
     if e.phase == "will" then
         display.remove(background)
-
-		display.remove(speedTextDesc)
-		display.remove(speedText)
-		display.remove(scoreTextDesc)
-		display.remove(scoreText)
+        display.remove(scoreText)
+        display.remove(speedText)
         display.remove(flag)
 		-- what about mask applied to fxGroup
         display.remove(fxGroup)
