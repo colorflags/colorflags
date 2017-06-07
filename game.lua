@@ -1,5 +1,3 @@
---require('mobdebug').start()
-
 -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html 
 local CFText = require("cf_text")
@@ -789,160 +787,161 @@ local function spawnPalette(params)
     return object
 end
 
-local function createPalette ()
-    local e = math.random(7)
-    local spawns   
-    if state == 4 then
-        stateFour = stateFour + 1  
-        if stateFour >= 1 then
-            print("ONE")
-            if e == 1 then
-                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
-            elseif e == 2 then
-                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false}) 
-            elseif e == 3 then
-                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
-            elseif e == 4 then
-                spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
-            elseif e == 5 then
-                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
-            elseif e == 6 then
-                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})         
-            elseif e == 7 then
-                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})  
-            end
-        end   
-        if stateFour >= 2 then  
-            print("TWO")
-            local f = math.random(7)  
-            if f == 1 then
-                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
-            elseif f == 2 then
-                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true}) 
-            elseif f == 3 then
-                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
-            elseif f == 4 then
-                spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
-            elseif f == 5 then
-                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
-            elseif f == 6 then
-                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})         
-            elseif f == 7 then
-                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})  
-            end
-        end
-        if stateFour >= 3 then 
-            print("THREE")
-            local g = math.random(7) 
-            if g == 1 then
-                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = true})
-            elseif g == 2 then
-                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = true}) 
-            elseif g == 3 then
-                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = true})
-            elseif g == 4 then
-                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = true})
-            elseif g == 5 then
-                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = true})
-            elseif g == 6 then
-                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = true})         
-            elseif g == 7 then
-                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = true})  
-            end
-        end
-        if stateFour >= 4 then
-            print("FOUR")
-            local h = math.random(7)
-            if h == 1 then
-                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = false})
-            elseif h == 2 then
-                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = false}) 
-            elseif h == 3 then
-                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = false})
-            elseif h == 4 then
-                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = false})
-            elseif h == 5 then
-                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = false})
-            elseif h == 6 then
-                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = false})         
-            elseif h == 7 then
-                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = false})  
-            end
-        end     
+--SAM: moved above readyObject()
 
-    else  
+--local function createPalette ()
+--    local e = math.random(7)
+--    local spawns   
+--    if state == 4 then
+--        stateFour = stateFour + 1  
+--        if stateFour >= 1 then
+--            print("ONE")
+--            if e == 1 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
+--            elseif e == 2 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false}) 
+--            elseif e == 3 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
+--            elseif e == 4 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
+--            elseif e == 5 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
+--            elseif e == 6 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})         
+--            elseif e == 7 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})  
+--            end
+--        end   
+--        if stateFour >= 2 then  
+--            print("TWO")
+--            local f = math.random(7)  
+--            if f == 1 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
+--            elseif f == 2 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true}) 
+--            elseif f == 3 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
+--            elseif f == 4 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
+--            elseif f == 5 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
+--            elseif f == 6 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})         
+--            elseif f == 7 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})  
+--            end
+--        end
+--        if stateFour >= 3 then 
+--            print("THREE")
+--            local g = math.random(7) 
+--            if g == 1 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = true})
+--            elseif g == 2 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = true}) 
+--            elseif g == 3 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = true})
+--            elseif g == 4 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = true})
+--            elseif g == 5 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = true})
+--            elseif g == 6 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = true})         
+--            elseif g == 7 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = true})  
+--            end
+--        end
+--        if stateFour >= 4 then
+--            print("FOUR")
+--            local h = math.random(7)
+--            if h == 1 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = false})
+--            elseif h == 2 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = false}) 
+--            elseif h == 3 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = false})
+--            elseif h == 4 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = false})
+--            elseif h == 5 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = false})
+--            elseif h == 6 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = false})         
+--            elseif h == 7 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = false})  
+--            end
+--        end     
 
-        if e == 1 then
-            spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
-        elseif e == 2 then
-            spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false}) 
-        elseif e == 3 then
-            spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
-        elseif e == 4 then
-            spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
-        elseif e == 5 then
-            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
-        elseif e == 6 then
-            spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})         
-        elseif e == 7 then
-            spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})  
-        end
+--    else  
 
-        local f = math.random(7)  
-        if f == 1 then
-            spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
-        elseif f == 2 then
-            spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true}) 
-        elseif f == 3 then
-            spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
-        elseif f == 4 then
-            spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
-        elseif f == 5 then
-            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
-        elseif f == 6 then
-            spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})         
-        elseif f == 7 then
-            spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})  
-        end
-        if state == 3 then
-            local g = math.random(7) 
-            if g == 1 then
-                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = false})
-            elseif g == 2 then
-                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = false}) 
-            elseif g == 3 then
-                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = false})
-            elseif g == 4 then
-                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = false})
-            elseif g == 5 then
-                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = false})
-            elseif g == 6 then
-                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = false})         
-            elseif g == 7 then
-                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = false})  
-            end
+--        if e == 1 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
+--        elseif e == 2 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false}) 
+--        elseif e == 3 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
+--        elseif e == 4 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
+--        elseif e == 5 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
+--        elseif e == 6 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})         
+--        elseif e == 7 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})  
+--        end
 
-            local h = math.random(7)
+--        local f = math.random(7)  
+--        if f == 1 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
+--        elseif f == 2 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true}) 
+--        elseif f == 3 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
+--        elseif f == 4 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
+--        elseif f == 5 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
+--        elseif f == 6 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})         
+--        elseif f == 7 then
+--            spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})  
+--        end
+--        if state == 3 then
+--            local g = math.random(7) 
+--            if g == 1 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = false})
+--            elseif g == 2 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = false}) 
+--            elseif g == 3 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = false})
+--            elseif g == 4 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = false})
+--            elseif g == 5 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = false})
+--            elseif g == 6 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = false})         
+--            elseif g == 7 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = false})  
+--            end
 
-            if h == 1 then
-                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = true})
-            elseif h == 2 then
-                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = true}) 
-            elseif h == 3 then
-                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = true})
-            elseif h == 4 then
-                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = true})
-            elseif h == 5 then
-                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = true})
-            elseif h == 6 then
-                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = true})         
-            elseif h == 7 then
-                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = true})  
-            end
-        end
-    end
+--            local h = math.random(7)
 
-end
+--            if h == 1 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = true})
+--            elseif h == 2 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = true}) 
+--            elseif h == 3 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = true})
+--            elseif h == 4 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = true})
+--            elseif h == 5 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = true})
+--            elseif h == 6 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = true})         
+--            elseif h == 7 then
+--                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = true})  
+--            end
+--        end
+--    end
+--end
 
 local function lightningIcons() 
     if lightningCount == 0 then
@@ -1459,60 +1458,218 @@ local function newFlag()
     
     if state == 4 then
         sideTimer = timer.performWithDelay(1500, finishScale, 1)
-		--countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
         mapTimer = transition.to(map, {time = 1500, x = xCoord, y = yCoord})                     
         flagTimer = transition.to(flag, {time = 1500, xScale = .2, yScale = .2})  
         paceTimer = timer.performWithDelay(900, delayPace, 1)
     elseif state == 3 then
+--        sideTimer = timer.performWithDelay(1500, finishScale, 1)
+--        mapTimer = transition.to(map, {time = 2000, x = xCoord, y = yCoord})                     
+--        flagTimer = transition.to(flag, {time = 2000, xScale = .2, yScale = .2})  
+--        paceTimer = timer.performWithDelay(0, delayPace, 1)
+
         sideTimer = timer.performWithDelay(1500, finishScale, 1)
-		--CountryTraceTimer=transition.to( CountryTrace, { time=2000, x=_W/2, y=_H/2 }) 
-        mapTimer = transition.to(map, {time = 2000, x = xCoord, y = yCoord})                     
-        flagTimer = transition.to(flag, {time = 2000, xScale = .2, yScale = .2})  
-        paceTimer = timer.performWithDelay(0, delayPace, 1)       
+        paceTimer=timer.performWithDelay(900,delayPace,1)    
+        transition.to( map, { time=1500, alpha=1 }) 
+        mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
     elseif state == 2 or state == 1 then
         sideTimer = timer.performWithDelay(1500, finishScale, 1)
         paceTimer=timer.performWithDelay(900,delayPace,1)    
-        
         transition.to( map, { time=1500, alpha=1 }) 
         mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
-		--TEMP: alternative styles
-		--countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
-        
+    end
+    
+--    TEMP: alternative styles
+--    countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
+    
 --		mapGroup.xScale = .5
 --		mapGroup.yScale = .5
 --		mapGroup.x = xCoord*.5 + (_W*.25)
 --		mapGroup.y = yCoord*.5 + (_H*.25)
 
-		-- with scale
+--     with scale
 --		mapTimer = transition.to(mapGroup, {time = 500, x=xCoord*.5+(_W*.25), y=yCoord*.5+(_H*.25), xScale = .5, yScale = .5})
-        
-        --SAM: what is this?
+    
+--    SAM: what is this?
 
-		if(countriesCompleted == 0) then
-			-- without scale
+--    if(countriesCompleted == 0) then
+--         without scale
 --			mapTimer = transition.to(map, {time = 1500, alpha = 1, x=xCoord, y=yCoord})
 --			transition.to(fxGroup, {time = 1500, alpha = 1, x=_W/2, y=_H/2})
-		end
+--    end
 
-		-- without scale
+--     without scale
 --		mapTimer = transition.to(mapGroup, {time = 1500, x=xCoord, y=yCoord})
 --		transition.to(fxGroup, {time = 1500, x=_W/2, y=_H/2})
-        
-		if(flagScaleStyle == 0) then
-			flagTimer=transition.to( flag, { time=1500, alpha = .2, xScale=.2, yScale=.2})  
-		elseif(flagScaleStyle == 1) then
-			flagTimer = transition.to(flag, {delay = 500, time = 1000, alpha = .2, xScale = .075, yScale = .075 * .7})
-		elseif(flagScaleStyle == 2) then
-		end
-   
-    end      
+    
+    if(flagScaleStyle == 0) then
+        flagTimer=transition.to( flag, { time=1500, alpha = .2, xScale=.2, yScale=.2})  
+    elseif(flagScaleStyle == 1) then
+        flagTimer = transition.to(flag, {delay = 500, time = 1000, alpha = .2, xScale = .075, yScale = .075 * .7})
+    elseif(flagScaleStyle == 2) then
+    end
+
+
 	--SAM: redundant push toFront() ?
 	speedTextDesc:toFront()
 	speedText:toFront()
 	scoreTextDesc:toFront()
     scoreText:toFront()
     --flag:toFront()     
-end    
+end
+
+local function createPalette ()
+    local e = math.random(7)
+    local spawns   
+    if state == 4 then
+        stateFour = stateFour + 1  
+        if stateFour >= 1 then
+            print("ONE")
+            if e == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
+            elseif e == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false}) 
+            elseif e == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
+            elseif e == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
+            elseif e == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
+            elseif e == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})         
+            elseif e == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})  
+            end
+        end   
+        if stateFour >= 2 then  
+            print("TWO")
+            local f = math.random(7)  
+            if f == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
+            elseif f == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true}) 
+            elseif f == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
+            elseif f == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
+            elseif f == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
+            elseif f == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})         
+            elseif f == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})  
+            end
+        end
+        if stateFour >= 3 then 
+            print("THREE")
+            local g = math.random(7) 
+            if g == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = true})
+            elseif g == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = true}) 
+            elseif g == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = true})
+            elseif g == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = true})
+            elseif g == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = true})
+            elseif g == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = true})         
+            elseif g == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = true})  
+            end
+        end
+        if stateFour >= 4 then
+            print("FOUR")
+            local h = math.random(7)
+            if h == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = false})
+            elseif h == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = false}) 
+            elseif h == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = false})
+            elseif h == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = false})
+            elseif h == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = false})
+            elseif h == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = false})         
+            elseif h == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = false})  
+            end
+        end     
+
+    else  
+
+        if e == 1 then
+            spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
+        elseif e == 2 then
+            spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false}) 
+        elseif e == 3 then
+            spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
+        elseif e == 4 then
+            spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
+        elseif e == 5 then
+            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
+        elseif e == 6 then
+            spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})         
+        elseif e == 7 then
+            spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})  
+        end
+
+        local f = math.random(7)  
+        if f == 1 then
+            spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
+        elseif f == 2 then
+            spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true}) 
+        elseif f == 3 then
+            spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
+        elseif f == 4 then
+            spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
+        elseif f == 5 then
+            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
+        elseif f == 6 then
+            spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})         
+        elseif f == 7 then
+            spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})  
+        end
+        if state == 3 then
+            local g = math.random(7) 
+            if g == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = false})
+            elseif g == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = false}) 
+            elseif g == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = false})
+            elseif g == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = false})
+            elseif g == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = false})
+            elseif g == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = false})         
+            elseif g == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = false})  
+            end
+
+            local h = math.random(7)
+
+            if h == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = true})
+            elseif h == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = true}) 
+            elseif h == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = true})
+            elseif h == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = true})
+            elseif h == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = true})
+            elseif h == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = true})         
+            elseif h == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = true})  
+            end
+        end
+    end
+end
 
 local function readyObject ()
     if paceRect.x > 85 then
@@ -1564,7 +1721,7 @@ local function readyObject ()
                         spawnTable[count + 2].isGrown = true
                     end
                     if spawnTable[count + 3] ~= 0 then
-                        spawnTable[count + 3].isGrown = tue
+                        spawnTable[count + 3].isGrown = true
                     end
                     count = count + 4
                 elseif state == 4 then
