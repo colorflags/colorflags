@@ -25,8 +25,10 @@ local tableView
 function scene:createScene( event )
 	local group = self.view
 
+    local pickerCountry
+
 	local xAnchor, yAnchor
-	
+    
 	if not isGraphicsV1 then
 		xAnchor = display.contentCenterX
 		yAnchor = display.contentCenterY
@@ -108,7 +110,7 @@ function scene:createScene( event )
 	-- Listen for tableView events
 	local function tableViewListener( event )
 		local phase = event.phase
-		local direction = event.direction
+        local direction = event.direction
 		
 		if "began" == phase then
 			--print( "Began" )
@@ -176,7 +178,6 @@ function scene:createScene( event )
 		end
 	end
 
-	
 	-- Handle touches on the row
 	local function onRowTouch( event )
 		local phase = event.phase
@@ -187,7 +188,10 @@ function scene:createScene( event )
 		elseif "swipeLeft" == phase then
 			print( "Swiped left on row with id: ", row.id )
 		elseif "tap" == phase then
-			print( "Tapped on row with id:", row.id )
+            
+            parent.countryPicker(row.id)
+            
+            print( "Tapped on row with id:", row.id )
 		elseif "press" == phase then
 			print( "Pressed row with id: ", row.id )
 			
@@ -239,22 +243,23 @@ function scene:createScene( event )
 			end
 		end
 	end
-    	
+    
+    
+    --SAM
 	-- Create a tableView
 	tableView = widget.newTableView
 	{
 		top = 40,
 		left = 0,
-		x = _W-((_W/3)/2),
+		x = ((_W/4)/2) + 4,
 		y = _H/2,
-		width = _W/3, 
+		width = _W/4, 
 		height = _H/2,
 		backgroundColor = backColor,
 		onRowRender = onRowRender,
 		onRowTouch = onRowTouch,
 	}
 	group:insert( tableView )
-    tableView:toBack()
     
     local countriesLength = CFGameSettings:getLength()
     print("number of countries", countriesLength)
@@ -274,11 +279,10 @@ function scene:createScene( event )
 
 		local lineColor = tableSeparatorColor;
 		
-		-- Make some rows categories
-		---[[
+		--SAM: catagories not needed
+        --[[
 		if i == 1 or i == 4 or i == 8 or i == 22 or i == 28 or i == 35 or i == 45 then
 			isCategory = true
-			
 			rowHeight = 24
 			--rowHeight = 47
 			
@@ -288,8 +292,8 @@ function scene:createScene( event )
 				--	default = { 150, 160, 180, 200 },
 				--}
 			end
-			
 		end
+        ]]--
 
         print(CFGameSettings:getItemByID(i).name)
 
@@ -366,12 +370,16 @@ function scene:createScene( event )
 			tableView:deleteAllRows() --No rows after execution
 		end, 1 )
 	end
+    
+    --SAM: is this necessary?
+    return group
 end
 
 function scene:show( event )
     local sceneGroup=self.view
     if event.phase=="will" then
-    elseif event.phase == "did" then
+elseif event.phase == "did" then
+        --SAM: get parent class
         parent = event.parent
     end
 end

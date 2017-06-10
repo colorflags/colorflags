@@ -218,6 +218,7 @@ canvasObj.y = display.contentCenterY
 local circ
 local mask
 
+--SAM: is this needed?
 local function myImplodeListener(event)
     local thisSprite = event.target
     if (event.phase == "ended") then
@@ -2206,7 +2207,7 @@ function scene:hide(e)
         display.remove(fxGroup)
         display.remove(deadText)
         display.remove(piece)
-        display.remove(map)
+        display.remove(mapGroup)
         display.remove(topBar)
         display.remove(lowBar)
         display.remove(infoPic)
