@@ -8,10 +8,6 @@ local CreateText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
 
-scene.countryPicker = function(targetCountry)
-    print(targetCountry)
-end
-
 local xBtn
 local fwBtn
 
@@ -374,18 +370,18 @@ end
 
 
 local usToCanada = 1
-local function countries(test)
+local function countries(e)
 
-    local largerCountries = {2, 3, 6, 7, 9, 55}
-    local e = largerCountries[math.random(table.getn(largerCountries))]
+--    local largerCountries = {2, 3, 6, 7, 9, 55}
+--    local e = largerCountries[math.random(table.getn(largerCountries))]
     
-    if usToCanada == 1 then
-        e = 55
-        usToCanada = 2 
-    else
-        e = 7
-        usToCanada = 1
-    end
+--    if usToCanada == 1 then
+--        e = 55
+--        usToCanada = 2 
+--    else
+--        e = 7
+--        usToCanada = 1
+--    end
   
     country = CFGameSettings:getItemByID(e)
     --print("country : ", e)
@@ -566,7 +562,7 @@ local function countries(test)
     bobby = audio.play(music, {loops = -1})
 end
 
-local function newFlag()
+local function newFlag(e)
     music = nil
     if deadText ~= nil then
         display.remove(deadText)
@@ -579,7 +575,7 @@ local function newFlag()
             currColor = nil
         end
     end
-    countries()
+    countries(e)
     if infoMode == true then
         infoPic = display.newImage(info, 165, 77)
         infoPic.x = _W / 6
@@ -711,8 +707,12 @@ local countryPickerOpts = {
         pickerCountry = "choose a country"
     }
 }    
-composer.showOverlay("tableView", countryPickerOpts)
+composer.showOverlay("_tableview", countryPickerOpts)
 
+scene.countryPicker = function(targetCountry)
+    print(targetCountry)
+    newFlag(targetCountry)
+end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
@@ -771,7 +771,7 @@ function scene:show(e)
         Runtime:addEventListener("enterFrame", readyObject)  
 --        setTimer=timer.performWithDelay(20000, setFlag, 0)
 --        timer.performWithDelay(15000, checkMemory,0)
-        newFlag()
+        newFlag(1)
     end
 end
 

@@ -1,11 +1,12 @@
--- Copyright (C) 2013 Corona Inc. All Rights Reserved.
--- File: newTableView unit test.
+
+-- Abstract: widget.newTableView() unit test
+-- Code is MIT licensed; see https://www.coronalabs.com/links/code/license
+---------------------------------------------------------------------------------------
 
 local widget = require( "widget" )
 local composer = require( "composer" )
 local scene = composer.newScene()
 
---SAM.. for passing clicks to parent!
 local parent
 
 --Forward reference for test function timer
@@ -22,37 +23,25 @@ end
 
 local tableView
 
-function scene:createScene( event )
+function scene:create( event )
 	local group = self.view
-
+	
 	local xAnchor, yAnchor
-    
+	
 	if not isGraphicsV1 then
 		xAnchor = display.contentCenterX
 		yAnchor = display.contentCenterY
-        print("not graphicsV1")
-        --print(xAnchor, yAnchor)
 	else
 		xAnchor = 0
 		yAnchor = 0
 	end
-	
+    
     local function touchToParent(e)
         parent:buttonHit(e)
         return true
     end
-    --[[
-    local background = display.newRect(0,0,580,320)
-    background:setFillColor( 0,1,1 )
-    background.alpha = 0
-    background.anchorX=0.5
-    background.anchorY=0.5
-    background.x=_W/2 ;background.y=_H/2
 	
-    background.isHitTestable = true
-    background:addEventListener("tap", touchToParent)
-    ]]--
-    local fontColor = 0
+	local fontColor = 0
 	local backColor = { 1 }
 	--[[
     local background = display.newRect( xAnchor, yAnchor, display.contentWidth, display.contentHeight )
@@ -75,7 +64,7 @@ function scene:createScene( event )
 	end
 	group:insert( background )
 	
-    local backButtonPosition = 5
+	local backButtonPosition = 5
 	local backButtonSize = 34
 	
 	-- Button to return to unit test listing
@@ -92,7 +81,7 @@ function scene:createScene( event )
 	}
 	returnToListing.x = display.contentCenterX
 	group:insert( returnToListing )
-    ]]--
+	]]--
 	----------------------------------------------------------------------------------------------------------------
 	--										START OF UNIT TEST
 	----------------------------------------------------------------------------------------------------------------
@@ -108,7 +97,7 @@ function scene:createScene( event )
 	-- Listen for tableView events
 	local function tableViewListener( event )
 		local phase = event.phase
-        local direction = event.direction
+		local direction = event.direction
 		
 		if "began" == phase then
 			--print( "Began" )
@@ -116,6 +105,8 @@ function scene:createScene( event )
 			--print( "Moved" )
 		elseif "ended" == phase then
 			--print( "Ended" )
+		elseif "stopped" == phase then
+			--print( "Stopped" )
 		end
 		
 		if event.limitReached then
@@ -133,9 +124,10 @@ function scene:createScene( event )
 		return true
 	end
 
+
 	local noCategories = 0
 
-	-- Handle row rendering ... render when scrolling?
+	-- Handle row rendering
 	local function onRowRender( event )
 		local phase = event.phase
 		local row = event.row
@@ -143,21 +135,25 @@ function scene:createScene( event )
 		--print( "Rendering row with id:", row.id )
 		--print( #tableView._view._rows )
         print(row.index)
-		local rowTitleText = row.id
-		
-        if row.isCategory then
+		local rowTitleText = row.name
+		print("row name:", row.name)
+        
+		if row.isCategory then
 			noCategories = noCategories + 1
 			rowTitleText = "Category"
 		end
 		
 		local rowTitle
 		if USE_IOS7_THEME and not row.isCategory then
-			rowTitle = display.newText( row, rowTitleText, 0, 0, "HelveticaNeue-Light", 17 )
+			rowTitle = display.newText( row, rowTitleText, 0, 0, native.systemFont, 17 )
 		elseif USE_IOS7_THEME and row.isCategory then
-			rowTitle = display.newText( row, rowTitleText, 0, 0, "HelveticaNeue", 14 )
+			rowTitle = display.newText( row, rowTitleText, 0, 0, native.systemFontBold, 14 )
 		else
 			rowTitle = display.newText( row, rowTitleText, 0, 0, nil, 14 )
 		end
+
+		
+		
 		
 		rowTitle.x = ( rowTitle.contentWidth * 0.5 + 15 )
 		rowTitle.y = row.contentHeight * 0.5
@@ -165,31 +161,30 @@ function scene:createScene( event )
 		rowTitle:setFillColor( 0, 0, 0 )
 		
 		if not row.isCategory then
-            
 			--print( row.index )
 			local spinner = widget.newSpinner{}
 			spinner.x = row.x + ( row.contentWidth * 0.5 ) - ( spinner.contentWidth * 0.5 )
 			spinner.y = row.contentHeight * 0.5
 			spinner:scale( 0.5, 0.5 )
-			row:insert( spinner ) 
+--			row:insert( spinner ) 
 			--spinner:start()
 		end
+		
 	end
 
+	
 	-- Handle touches on the row
 	local function onRowTouch( event )
 		local phase = event.phase
 		local row = event.target
-		
+        
 		if "swipeRight" == phase then
 			print( "Swiped right on row with index: ", row.index )
 		elseif "swipeLeft" == phase then
 			print( "Swiped left on row with id: ", row.id )
 		elseif "tap" == phase then
-            
-            parent.countryPicker(row.id)
-            
-            print( "Tapped on row with id:", row.id )
+            parent.countryPicker(row.id)            
+			print( "Tapped on row with id:", row.id )
 		elseif "press" == phase then
 			print( "Pressed row with id: ", row.id )
 			
@@ -227,6 +222,7 @@ function scene:createScene( event )
 							--	default = { 150, 160, 180, 200 },
 							--}
 						end
+
 						-- Insert the row into the tableView
 						tableView:insertRow
 						{
@@ -241,9 +237,7 @@ function scene:createScene( event )
 			end
 		end
 	end
-    
-    
-    --SAM
+	
 	-- Create a tableView
 	tableView = widget.newTableView
 	{
@@ -256,14 +250,15 @@ function scene:createScene( event )
 		backgroundColor = backColor,
 		onRowRender = onRowRender,
 		onRowTouch = onRowTouch,
+		listener = tableViewListener,
 	}
 	group:insert( tableView )
-    
+	
     local countriesLength = CFGameSettings:getLength()
     print("number of countries", countriesLength)
-
-    -- create rows from countries in cf_game_settings
-    for i = 1, countriesLength do
+    
+	-- Create 200 rows
+	for i = 1, countriesLength do
 		local isCategory = false
 		local rowHeight = 40
 		local rowColor = nil
@@ -277,40 +272,20 @@ function scene:createScene( event )
 
 		local lineColor = tableSeparatorColor;
 		
-		--SAM: catagories not needed
-        --[[
-		if i == 1 or i == 4 or i == 8 or i == 22 or i == 28 or i == 35 or i == 45 then
-			isCategory = true
-			rowHeight = 24
-			--rowHeight = 47
-			
-			if not USE_IOS7_THEME then
-				--rowColor = 
-				--{ 
-				--	default = { 150, 160, 180, 200 },
-				--}
-			end
-		end
-        ]]--
-
-        print(CFGameSettings:getItemByID(i).name)
-
 		local rowParams = {
 		rowIdentifier = "testing"..i,
 		}
-
-        
 		-- Insert the row into the tableView
 		tableView:insertRow
 		{
-			id = CFGameSettings:getItemByID(i).id,
-			isCategory = isCategory,
-			rowHeight = rowHeight,
-			rowColor = rowColor,
-			lineColor = lineColor,
-			params = rowParams
+            id = CFGameSettings:getItemByID(i).id,            
+            name = CFGameSettings:getItemByID(i).name,
+            isCategory = isCategory,
+            rowHeight = rowHeight,
+            rowColor = rowColor,
+            lineColor = lineColor,
+            params = "a"
 		}
-        
 	end
 	
 	----------------------------------------------------------------------------------------------------------------
@@ -368,9 +343,6 @@ function scene:createScene( event )
 			tableView:deleteAllRows() --No rows after execution
 		end, 1 )
 	end
-    
-    --SAM: is this necessary?
-    return group
 end
 
 function scene:show( event )
@@ -382,21 +354,26 @@ elseif event.phase == "did" then
     end
 end
 
-function scene:didExitScene( event )
-	--Cancel test timer if active
-	if testTimer ~= nil then
-		timer.cancel( testTimer )
-		testTimer = nil
-	end
+function scene:hide( event )
+	if ( "did" == event.phase ) then
+		--Cancel test timer if active
+		if testTimer ~= nil then
+			timer.cancel( testTimer )
+			testTimer = nil
+		end
 	
-	composer.removeAll()
+		composer.removeHidden( false )
+	end
 end
 
-scene:addEventListener( "create", function(event) scene:createScene(event) end )
+--scene:addEventListener( "create", function(event) scene:createScene(event) end )
+--scene:addEventListener( "hide", function(event) print("hide"); if event.phase == 'did' then scene:didExitScene(event) end end )
 
 --SAM.. for passing clicks to parent!
 scene:addEventListener("show", scene)
 
-scene:addEventListener( "hide", function(event) print("hide"); if event.phase == 'did' then scene:didExitScene(event) end end )
+scene:addEventListener( "create", scene )
+scene:addEventListener( "hide", scene )
+
 
 return scene
