@@ -8,6 +8,8 @@ local CreateText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
 
+local activeCountry
+
 local xBtn
 local fwBtn
 
@@ -159,7 +161,7 @@ local nationalFlagsSeq = {
     {name = "southafrica", sheet = nationalFlags2Sheet, frames = {21}},    
     {name = "southkorea", sheet = nationalFlags2Sheet, frames = {22}},    
     {name = "spain", sheet = nationalFlags2Sheet, frames = {23}},    
-    {name = "sriLanka", sheet = nationalFlags2Sheet, frames = {24}},    
+    {name = "srilanka", sheet = nationalFlags2Sheet, frames = {24}},    
     {name = "sweden", sheet = nationalFlags3Sheet, frames = {1}}, 
     {name = "switzerland", sheet = nationalFlags3Sheet, frames = {2}}, 
 	-- SAM: Taiwan flag out of order in sprite/atlas because originally named Republic of China
@@ -264,7 +266,6 @@ background.name = "background"
 background.x = _W / 2 ;background.y = _H / 2
 background:toBack()
 
-
 -- New
 local function myTouchListener(event)
     currentObject = event.target
@@ -281,6 +282,7 @@ local function myTouchListener(event)
             currentObject:setSequence("xBtn")
         end
 
+        --SAM: canQuit is a bad variable name. This var controls access to both back AND quit buttons. Remove feature?
         if touchInsideBtn == true and canQuit == true then 
 
             print("touch OFF. inside")
@@ -289,7 +291,7 @@ local function myTouchListener(event)
             if(currentObject.name == "xBtn") then
                 composer.gotoScene ( "menu", { effect = defaultTransition } )
             elseif(currentObject.name == "fwBtn") then
-                setTheFlag=true
+                setTheFlag = true
             end
 
         elseif touchInsideBtn == false then
@@ -348,8 +350,8 @@ local function doFunction(e)
 end
 
 local function finishScale()
-  transition.to( xBtn, { time=250, alpha=1 }) 
-  transition.to( fwBtn, { time=250, alpha=1 }) 
+--  transition.to( xBtn, { time=250, alpha=1 }) 
+--  transition.to( fwBtn, { time=250, alpha=1 }) 
   xBtn:toFront()
   fwBtn:toFront()   
   canQuit=true
@@ -608,7 +610,7 @@ local function newFlag(e)
         transition.to( map, { time=1500, alpha=1 }) 
         mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
     elseif state == 2 or state == 1 then
-        sideTimer = timer.performWithDelay(1500, finishScale, 1)
+        sideTimer = timer.performWithDelay(100, finishScale, 1)
         paceTimer=timer.performWithDelay(900,delayPace,1)    
         transition.to( map, { time=1500, alpha=1 }) 
         mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
@@ -652,25 +654,45 @@ local function removeFlag()
 end            
 
 local function readyObject(e)
+    if setTheFlag==true then     --START A NEW FLAG 
+            print("ga")
+        if activeCountry < CFGameSettings:getLength() then
+            activeCountry = activeCountry + 1
+        else
+            activeCountry = 1
+        end
+        
+        newFlag(activeCountry)
+        setTheFlag=false        
+        
+        --SAM: old shit. Delete?
+        --[[
+        transition.to( xBtn, { time=250, alpha=0 }) 
+        transition.to( fwBtn, { time=250, alpha=0 }) 
 
-  if setTheFlag==true then     --START A NEW FLAG 
-    transition.to( xBtn, { time=250, alpha=0 }) 
-    transition.to( fwBtn, { time=250, alpha=0 }) 
-
-  canQuit=false
-  transition.to( piece, { time=490, alpha=0,onComplete=killPiece})
-    setTheFlag=false
-
-  
-    if infoMode == true then
-     infoTimer=transition.to(infoPic, {time=500, alpha=0}) 
+        canQuit=false
+        transition.to( piece, { time=490, alpha=0,onComplete=killPiece})
+        if infoMode == true then
+            infoTimer=transition.to(infoPic, {time=500, alpha=0}) 
+        end
+        flagRemoveTimer=transition.to( flag, { time=500, alpha=0, onComplete=removeFlag   })    --remove flag
+        newFlagTimer=timer.performWithDelay(600,newFlag)
+        ]]--
     end
-
-    flagRemoveTimer=transition.to( flag, { time=500, alpha=0, onComplete=removeFlag   })    --remove flag
-    newFlagTimer=timer.performWithDelay(600,newFlag)
-
-  end
 end    
+
+local function nextFlag()
+    if setTheFlag==true then     --START A NEW FLAG 
+        if activeCountry < CFGameSettings:getLength() then
+            activeCountry = activeCountry + 1
+        else
+            activeCountry = 1
+        end
+
+        newFlag(activeCountry)
+        setTheFlag=false   
+    end
+end
 
 --local function setupVariables()
 --    mapGroup = display.newGroup()
@@ -686,32 +708,19 @@ end
 --	mapGroup:insert(map)
 --end
 
-
---local function countryPicker()
---    local countryPickerOpts = {
---        isModal = true,
---        effect = "fade",
---        time = 1400,
---        params = {
---            pickerCountry = "hiiiiiiii"
---        }
---    }    
---    composer.showOverlay("tableView", countryPickerOpts)
---end
-
 local countryPickerOpts = {
     isModal = true,
     effect = "fade",
-    time = 1400,
+    time = 0,
     params = {
         pickerCountry = "choose a country"
     }
 }    
 composer.showOverlay("_tableview", countryPickerOpts)
 
-scene.countryPicker = function(targetCountry)
-    print(targetCountry)
-    newFlag(targetCountry)
+scene.countryPicker = function(chosenWithCountryPicker)
+    activeCountry = chosenWithCountryPicker
+    newFlag(activeCountry)
 end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
@@ -771,7 +780,9 @@ function scene:show(e)
         Runtime:addEventListener("enterFrame", readyObject)  
 --        setTimer=timer.performWithDelay(20000, setFlag, 0)
 --        timer.performWithDelay(15000, checkMemory,0)
-        newFlag(1)
+        
+        activeCountry = math.random(CFGameSettings:getLength())
+        newFlag(activeCountry)
     end
 end
 

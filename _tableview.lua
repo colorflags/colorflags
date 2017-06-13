@@ -162,10 +162,10 @@ function scene:create( event )
 		
 		if not row.isCategory then
 			--print( row.index )
-			local spinner = widget.newSpinner{}
-			spinner.x = row.x + ( row.contentWidth * 0.5 ) - ( spinner.contentWidth * 0.5 )
-			spinner.y = row.contentHeight * 0.5
-			spinner:scale( 0.5, 0.5 )
+--			local spinner = widget.newSpinner{}
+--			spinner.x = row.x + ( row.contentWidth * 0.5 ) - ( spinner.contentWidth * 0.5 )
+--			spinner.y = row.contentHeight * 0.5
+--			spinner:scale( 0.5, 0.5 )
 --			row:insert( spinner ) 
 			--spinner:start()
 		end
@@ -183,13 +183,14 @@ function scene:create( event )
 		elseif "swipeLeft" == phase then
 			print( "Swiped left on row with id: ", row.id )
 		elseif "tap" == phase then
-            parent.countryPicker(row.id)            
+            parent.countryPicker(row.id)           
 			print( "Tapped on row with id:", row.id )
 		elseif "press" == phase then
+--            parent.countryPicker(row.id)            
 			print( "Pressed row with id: ", row.id )
 			
 			-- Set the row's default/over color's
-			--row:setRowColor( { default = { 255, 0, 0 }, over = { 0, 0, 255 } } )
+--			row:setRowColor( { default = { 255, 0, 0 }, over = { 0, 0, 255 } } )
 			print( row.params.rowIdentifier )
 						
 		elseif "cancelled" == phase then
@@ -197,7 +198,7 @@ function scene:create( event )
 		
 		elseif "release" == phase then
 			print( "Released row with index: ", row.index )
-			
+            parent.countryPicker(row.id)			
 			-- Test removing all rows and re-adding 20 more
 			if TEST_REMOVE_AND_RECREATE then
 				timer.performWithDelay( 500, function()
