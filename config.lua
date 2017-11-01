@@ -32,7 +32,7 @@ if string.sub(system.getInfo("model"),1,4) == "iPad" then
             }
         }
     }
-
+--iPhone 5
 elseif string.sub(system.getInfo("model"),1,2) == "iP" and display.pixelHeight > 960 then
     application = 
     {
@@ -85,13 +85,16 @@ elseif string.sub(system.getInfo("model"),1,2) == "iP" then
             }
         }
     }
+--Android (Galaxy S5)
 elseif display.pixelHeight / display.pixelWidth > 1.72 then
     application = 
     {
         content =
         {
-            width = 320,
-            height = 570,
+--            width = display.pixelWidth/3,
+--            height = display.pixelHeight/3,
+            width = 360,
+            height = 640,
             scale = "letterBox",
             xAlign = "center",
             yAlign = "center",

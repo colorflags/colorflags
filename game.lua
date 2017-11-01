@@ -261,7 +261,7 @@ scoreText:setEmbossColor(scoreboardColor)
 --scoreText = CFText.new( score, "Arial Rounded MT Bold", 30, _W*(4/5), _H/2 )
 --scoreText:ToFront()
 
-local background = display.newRect(0, 0, 580, 320)
+local background = display.newRect(0, 0, _W, _H)
 background:setFillColor(1, 1, 1)
 background.anchorX = 0.5
 background.anchorY = 0.5
@@ -1219,7 +1219,14 @@ local function countries(test)
     destroyStuff()
     
     countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
-    countryOutline:scale(0.5, 0.5)
+    --[[SAM: countryOutline scaling ]]--
+    countryOutlineWidthMultiplier = display.pixelHeight/display.contentWidth
+    countryOutlineHeightMultiplier = display.pixelWidth/display.contentHeight
+    print("pixelHeight / contentWidth: ", countryOutlineWidthMultiplier)
+    print("pixelWidth / contentHeight: ", countryOutlineHeightMultiplier)    
+    countryOutline:scale(1/countryOutlineWidthMultiplier, 1/countryOutlineHeightMultiplier)
+    
+
     
     newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
     newTex:draw(countryOutline)
@@ -1239,7 +1246,9 @@ local function countries(test)
 	fxBG = display.newCircle(0, 0, fxSize)
     fxBG.anchorX = .5
     fxBG.anchorY = .5
-
+    
+    --[[ What does this scaleFactorX and scaleFactorY do?
+    ]]--
     local scaleFactorX = 1
 	local scaleFactorY = 1
 	
@@ -1249,6 +1258,8 @@ local function countries(test)
         scaleFactorX = fxBG.height / fxBG.width
     end
 
+
+    
     display.setDefault("textureWrapX", "repeat")
     display.setDefault("textureWrapY", "mirroredRepeat")
     fxBG.fill = {type = "image", filename = "images/fxgroup.png"}
@@ -1479,16 +1490,19 @@ local function newFlag()
         mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
     end
     
+--[[SAM: countryOutline scaling ]]--    
 --    TEMP: alternative styles
 --    countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 }) 
-    
+
+--[[SAM: countryOutline scaling ]]--
 --		mapGroup.xScale = .5
 --		mapGroup.yScale = .5
 --		mapGroup.x = xCoord*.5 + (_W*.25)
 --		mapGroup.y = yCoord*.5 + (_H*.25)
 
+--[[SAM: countryOutline scaling ]]--
 --     with scale
---		mapTimer = transition.to(mapGroup, {time = 500, x=xCoord*.5+(_W*.25), y=yCoord*.5+(_H*.25), xScale = .5, yScale = .5})
+--		mapTimer = transition.to(map, {time = 500, x=xCoord*.5+(_W*.25), y=yCoord*.5+(_H*.25), xScale = .5, yScale = .5})
     
 --    SAM: what is this?
 
@@ -1933,6 +1947,7 @@ local function setupVariables()
     map.y = 0
 	
 	mapGroup:insert(map)
+    
 	--[[
 	mapMask = graphics.newMask("images/mask.png")
 	mapGroup:setMask(mapMask)
@@ -1942,6 +1957,7 @@ local function setupVariables()
 	mapGroup.maskX = _W/2
 	mapGroup.maskY = _H/2
 	]]--
+    
     levels = {
         {speed = 1, timeVar = 2550}, {speed = 1.5, timeVar = 1700}, {speed = 2, timeVar = 1250}, {speed = 2.5, timeVar = 1000}, {speed = 3, timeVar = 910}, {speed = 3.5, timeVar = 750},
         {speed = 4, timeVar = 700}, {speed = 4.5, timeVar = 600}, {speed = 5, timeVar = 550}, {speed = 5.5, timeVar = 450}, {speed = 6, timeVar = 420}, {speed = 6.5, timeVar = 400},

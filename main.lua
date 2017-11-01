@@ -40,6 +40,9 @@ local composer=require("composer")
 
 display.setStatusBar( display.HiddenStatusBar )
 
+--_W = display.pixelWidth
+--_H = display.pixelHeight
+
 _W = display.contentWidth; -- Get the width of the screen
 _H = display.contentHeight; -- Get the height of the screen
 

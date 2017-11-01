@@ -1,3 +1,6 @@
+print(display.pixelWidth)
+print(display.pixelHeight)
+
 --menu.lua
 local composer=require("composer")
 local scene = composer.newScene()
@@ -111,11 +114,9 @@ local startBtnsAboutSheet = graphics.newImageSheet( "images/menu-btns.png", star
 local function myTouchListener( event )
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
-    print(currentObject.name) 
     if event.phase == "began" then
-        print("touch ON. inside")          
+        print("touch ON. inside")    
     elseif event.phase == "ended" or event.phase == "cancelled" then
-        
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
         if currentObject.name == "pg" then
             currentObject:setSequence("playgame")
@@ -129,6 +130,7 @@ local function myTouchListener( event )
         -- currentObject:setFrame(1)
         print(touchInsideBtn, isLoading)  
         if touchInsideBtn == true and isLoading == false then 
+
             print("touch OFF. inside")
             -- composer.removeScene("start")
             
@@ -157,7 +159,7 @@ local function doFunction(e)
             e.x > currentObject.contentBounds.xMax or
             e.y < currentObject.contentBounds.yMin or 
             e.y > currentObject.contentBounds.yMax then 
-            
+        
             if(isBtnAnim) then
                 if currentObject.name == "pg" then
                     currentObject:setSequence("playgame")
@@ -166,7 +168,7 @@ local function doFunction(e)
                 elseif currentObject.name == "abt" then
                     currentObject:setSequence("about")
                 end
-            else 
+            else
                 if currentObject.name == "pg" then
                     currentObject:setFrame(1)
                 elseif currentObject.name == "opt" then
@@ -177,9 +179,15 @@ local function doFunction(e)
             end
             -- redundant ??
             -- currentObject:setFrame(1)
+            if(touchInsideBtn == true) then
+                currentObject:scale(.9, .9)
+                print("finger down, outside button: ", currentObject.name)
+            end            
             touchInsideBtn = false
         else
             if touchInsideBtn == false then
+                print("finger down, inside button: ", currentObject.name)
+                currentObject:scale(1.1, 1.1)
                 if(isBtnAnim) then
                     if currentObject.name == "pg" then
                         currentObject:setSequence("playgame_anim")
@@ -189,7 +197,7 @@ local function doFunction(e)
                         currentObject:setSequence("about_anim")
                     end
                     currentObject:play()
-                else
+                else                  
                     if currentObject.name == "pg" then
                         currentObject:setFrame(2)
                     elseif currentObject.name == "opt" then
@@ -264,7 +272,7 @@ end
 function scene:create( event )
   local sceneGroup=self.view
   print("a")
-  titleLogo = display.newImageRect( "images/start-menuWTF.png", 568, 320 )
+  titleLogo = display.newImageRect( "images/start-menuWTF.png", _W, _H )
   titleLogo.anchorX=0.5
   titleLogo.anchorY=0.5
   titleLogo.x = _W/2
@@ -289,38 +297,38 @@ function scene:create( event )
   startBtnsPlayGame = display.newSprite(btnsSheet, btnsSeq)
   startBtnsPlayGame.name = "pg"
   startBtnsPlayGame:addEventListener( "touch", myTouchListener )
-  startBtnsPlayGame.anchorY = 0
+  startBtnsPlayGame.anchorY = .5
   startBtnsPlayGame.x=_W/2
   startBtnsPlayGame.y=offsetStartBtns
   startBtnsPlayGame:setSequence( "playgame" )
   startBtnsPlayGame:setFrame( 1 )
-  startBtnsPlayGame.alpha=0.98
+--  startBtnsPlayGame.alpha=0.98
   startBtnsPlayGame.gotoScene="start"
-  startBtnsPlayGame:scale(.8,.8)
+--  startBtnsPlayGame:scale(.8,.8)
 
   startBtnsOptions= display.newSprite(btnsSheet, btnsSeq)
   startBtnsOptions.name = "opt"
   startBtnsOptions:addEventListener( "touch", myTouchListener )
-  startBtnsOptions.anchorY = 0
+  startBtnsOptions.anchorY = .5
   startBtnsOptions.x=_W/2
   startBtnsOptions.y=offsetStartBtns+btnSpacing
   startBtnsOptions:setSequence( "options" )
   startBtnsOptions:setFrame( 1 )
-  startBtnsOptions.alpha=.98
+--  startBtnsOptions.alpha=.98
   startBtnsOptions.gotoScene="options"
-  startBtnsOptions:scale(.8,.8)
+--  startBtnsOptions:scale(.8,.8)
 
   startBtnsAbout= display.newSprite(btnsSheet, btnsSeq)
   startBtnsAbout.name = "abt"
   startBtnsAbout:addEventListener( "touch", myTouchListener )
-  startBtnsAbout.anchorY = 0
+  startBtnsAbout.anchorY = .5
   startBtnsAbout.x=_W/2
   startBtnsAbout.y=offsetStartBtns+(btnSpacing*2)
   startBtnsAbout:setSequence( "about" )
   startBtnsAbout:setFrame( 1 )
-  startBtnsAbout.alpha=0.98
+--  startBtnsAbout.alpha=0.98
   startBtnsAbout.gotoScene="about"
-  startBtnsAbout:scale(.8,.8)
+--  startBtnsAbout:scale(.8,.8)
 
   sceneGroup:insert(titleLogo) -- BACKGROUND NOT TITLE !!! CHANGE NAME
   sceneGroup:insert(menuColorFlags) 
