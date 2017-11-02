@@ -83,15 +83,43 @@ local mapGroup
 local flag
 local random
 
-local deadText = nil
-local speedTextDesc
-local scoreTextDesc
 local bonusText
-local scoreText
+
+local speedTextGroup
 local speedText
-local countryText
+local speedTextDesc
+local speedDecreaseBtnGroup
+local speedIncreaseBtnGroup
+local speedDecreaseBtnFill
+local speedIncreaseBtnFill
+local speedDecreaseBtnSym
+local speedIncreaseBtnSym
+
+local scoreTextGroup
+local scoreText
+local scoreTextDesc
+local scoreDecreaseBtnGroup
+local scoreIncreaseBtnGroup
+local scoreDecreaseBtnFill
+local scoreIncreaseBtnFill
+local scoreDecreaseBtnSym
+local scoreIncreaseBtnSym
+
+local modeTextGroup
+local modeText
+local modeTextDesc
+local modeDecreaseBtnGroup
+local modeIncreaseBtnGroup
+local modeDecreaseBtnFill
+local modeIncreaseBtnFill
+local modeDecreaseBtnSym
+local modeIncreaseBtnSym
+
+local deathText1 = nil
+local deathText2 = nil
 
 local country
+local countryText
 
 local nationalFlags1Coords = require("lua-sheets.national-flags1")
 local nationalFlags1Sheet = graphics.newImageSheet("images/national-flags1.png", nationalFlags1Coords:getSheet())
@@ -227,31 +255,129 @@ local function myImplodeListener(event)
     end
 end
 
-local scoreboardColor = 
+local background = display.newRect(0, 0, _W, _H)
+background:setFillColor(1, 1, 1)
+background.anchorX = 0.5
+background.anchorY = 0.5
+background.name = "background"
+background.x = _W / 2 ;background.y = _H / 2
+background:toBack()
+
+local function setupScoreboard()
+
+    local scoreboardColor = 
        {
     highlight = {r = 1, g = 1, b = 1},
     shadow = {r = 0, g = 0, b = 0}
-}
+    }
 
-speedTextDesc = display.newEmbossedText("speed:", 2, _H/2 - 20, "PTMono-Bold", 18)
-speedTextDesc:setFillColor(.2, .9, .4)
-speedTextDesc:setEmbossColor(scoreboardColor)
-speedTextDesc.anchorX = 0
-speedTextDesc.anchorY = 1
+    local speedTextGroupAnchorX = 2
+    local speedTextGroupAnchorY = _H/2 - 20
+    
+    speedTextGroup = display.newGroup()
+    
+    speedTextDesc = display.newEmbossedText("speed:", speedTextGroupAnchorX, speedTextGroupAnchorY, "PTMono-Bold", 18)
+    speedTextDesc:setFillColor(.2, .9, .4)
+    speedTextDesc:setEmbossColor(scoreboardColor)
+    speedTextDesc.anchorX = 0
+    speedTextDesc.anchorY = 1
+    speedTextGroup:insert(speedTextDesc)
 
-speedText = display.newEmbossedText(speed, speedTextDesc.x + (speedTextDesc.width/2), speedTextDesc.y + 5, "PTMono-Bold", 22)
-speedText:setFillColor(.2, .9, .4)
-speedText:setEmbossColor(scoreboardColor)
+    speedText = display.newEmbossedText(speed, speedTextGroupAnchorX + (speedTextDesc.width/2), speedTextGroupAnchorY, "PTMono-Bold", 22)
+    speedText:setFillColor(.2, .9, .4)
+    speedText:setEmbossColor(scoreboardColor)
+    speedText.anchorY = 0
+    speedTextGroup:insert(speedText)
 
-scoreTextDesc = display.newEmbossedText("score:", 2, (_H/2) + 30, "PTMono-Bold", 18)
-scoreTextDesc:setFillColor(.2, .9, .4)
-scoreTextDesc:setEmbossColor(scoreboardColor)
-scoreTextDesc.anchorX = 0
-scoreTextDesc.anchorY = 1
+    speedDecreaseBtnGroup = display.newGroup()
+    speedDecreaseBtnFill = display.newRoundedRect(speedDecreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) - 6, speedTextGroupAnchorY - speedTextDesc.height, 10, 10, 1)
+    speedDecreaseBtnFill:setFillColor(.4, .4, .4)
+    speedDecreaseBtnFill.anchorY = 1
+    speedDecreaseBtnSym = display.newText(speedDecreaseBtnGroup, "-", speedDecreaseBtnFill.x, speedDecreaseBtnFill.y - (speedDecreaseBtnFill.height/2), "PTMono-Bold", 14)    
+    speedDecreaseBtnSym.anchorX = .5
+    speedDecreaseBtnSym.anchorY = .5
+    speedTextGroup:insert(speedDecreaseBtnGroup)
 
-scoreText = display.newEmbossedText(score, scoreTextDesc.x + (scoreTextDesc.width/2), scoreTextDesc.y + 5, "PTMono-Bold", 22)
-scoreText:setFillColor(.2, .9, .4)
-scoreText:setEmbossColor(scoreboardColor)
+    speedIncreaseBtnGroup = display.newGroup()
+    speedIncreaseBtnFill = display.newRoundedRect(speedIncreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) + 6, speedTextGroupAnchorY - speedTextDesc.height, 10, 10, 1)
+    speedIncreaseBtnFill:setFillColor(.4, .4, .4)
+    speedIncreaseBtnFill.anchorY = 1
+    speedDecreaseBtnSym = display.newText(speedIncreaseBtnGroup, "+", speedIncreaseBtnFill.x, speedIncreaseBtnFill.y - (speedIncreaseBtnFill.height/2), "PTMono-Bold", 14)    
+    speedDecreaseBtnSym.anchorX = .5
+    speedDecreaseBtnSym.anchorY = .5    
+    speedTextGroup:insert(speedIncreaseBtnGroup)
+
+    local scoreTextGroupAnchorX = 2
+    local scoreTextGroupAnchorY = (_H/2) + 45
+    
+    scoreTextGroup = display.newGroup()
+    scoreTextDesc = display.newEmbossedText("score:", scoreTextGroupAnchorX, scoreTextGroupAnchorY, "PTMono-Bold", 18)
+    scoreTextDesc:setFillColor(.2, .9, .4)
+    scoreTextDesc:setEmbossColor(scoreboardColor)
+    scoreTextDesc.anchorX = 0
+    scoreTextDesc.anchorY = 1
+    scoreTextGroup:insert(scoreTextDesc)
+
+    scoreText = display.newEmbossedText(score, scoreTextGroupAnchorX + (scoreTextDesc.width/2), scoreTextGroupAnchorY, "PTMono-Bold", 22)
+    scoreText:setFillColor(.2, .9, .4)
+    scoreText:setEmbossColor(scoreboardColor)
+    scoreText.anchorY = 0
+    scoreTextGroup:insert(scoreText)
+    
+    scoreDecreaseBtnGroup = display.newGroup()
+    scoreDecreaseBtnFill = display.newRoundedRect(scoreDecreaseBtnGroup, scoreTextGroupAnchorX + (scoreTextDesc.width/2) - 6, scoreTextGroupAnchorY - scoreTextDesc.height, 10, 10, 1)
+    scoreDecreaseBtnFill:setFillColor(.4, .4, .4)
+    scoreDecreaseBtnFill.anchorY = 1
+    scoreDecreaseBtnSym = display.newText(scoreDecreaseBtnGroup, "-", scoreDecreaseBtnFill.x, scoreDecreaseBtnFill.y - (scoreDecreaseBtnFill.height/2), "PTMono-Bold", 14)    
+    scoreDecreaseBtnSym.anchorX = .5
+    scoreDecreaseBtnSym.anchorY = .5
+    scoreTextGroup:insert(scoreDecreaseBtnGroup)
+
+    scoreIncreaseBtnGroup = display.newGroup()
+    scoreIncreaseBtnFill = display.newRoundedRect(scoreIncreaseBtnGroup, scoreTextGroupAnchorX + (scoreTextDesc.width/2) + 6, scoreTextGroupAnchorY - scoreTextDesc.height, 10, 10, 1)
+    scoreIncreaseBtnFill:setFillColor(.4, .4, .4)
+    scoreIncreaseBtnFill.anchorY = 1
+    scoreDecreaseBtnSym = display.newText(scoreIncreaseBtnGroup, "+", scoreIncreaseBtnFill.x, scoreIncreaseBtnFill.y - (scoreIncreaseBtnFill.height/2), "PTMono-Bold", 14)    
+    scoreDecreaseBtnSym.anchorX = .5
+    scoreDecreaseBtnSym.anchorY = .5    
+    scoreTextGroup:insert(scoreIncreaseBtnGroup)
+    
+--    print("speedTextGroup width: ", speedTextGroup.width)
+    local modeTextGroupAnchorX = 2 + 75
+    local modeTextGroupAnchorY = (_H/2) - 20
+    
+    modeTextGroup = display.newGroup()
+    modeTextDesc = display.newEmbossedText("mode:", modeTextGroupAnchorX, modeTextGroupAnchorY, "PTMono-Bold", 18)
+    modeTextDesc:setFillColor(.2, .9, .4)
+    modeTextDesc:setEmbossColor(scoreboardColor)
+    modeTextDesc.anchorX = 0
+    modeTextDesc.anchorY = 1
+    modeTextGroup:insert(modeTextDesc)
+
+    modeText = display.newEmbossedText("???", modeTextGroupAnchorX + (modeTextDesc.width/2), modeTextGroupAnchorY, "PTMono-Bold", 22)
+    modeText:setFillColor(.2, .9, .4)
+    modeText:setEmbossColor(scoreboardColor)
+    modeText.anchorY = 0
+    modeTextGroup:insert(modeText)
+    
+    modeDecreaseBtnGroup = display.newGroup()
+    modeDecreaseBtnFill = display.newRoundedRect(modeDecreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) - 6, modeTextGroupAnchorY - modeTextDesc.height, 10, 10, 1)
+    modeDecreaseBtnFill:setFillColor(.4, .4, .4)
+    modeDecreaseBtnFill.anchorY = 1
+    modeDecreaseBtnSym = display.newText(modeDecreaseBtnGroup, "-", modeDecreaseBtnFill.x, modeDecreaseBtnFill.y - (modeDecreaseBtnFill.height/2), "PTMono-Bold", 14)    
+    modeDecreaseBtnSym.anchorX = .5
+    modeDecreaseBtnSym.anchorY = .5
+    modeTextGroup:insert(modeDecreaseBtnGroup)
+
+    modeIncreaseBtnGroup = display.newGroup()
+    modeIncreaseBtnFill = display.newRoundedRect(modeIncreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) + 6, modeTextGroupAnchorY - modeTextDesc.height, 10, 10, 1)
+    modeIncreaseBtnFill:setFillColor(.4, .4, .4)
+    modeIncreaseBtnFill.anchorY = 1
+    modeDecreaseBtnSym = display.newText(modeIncreaseBtnGroup, "+", modeIncreaseBtnFill.x, modeIncreaseBtnFill.y - (modeIncreaseBtnFill.height/2), "PTMono-Bold", 14)    
+    modeDecreaseBtnSym.anchorX = .5
+    modeDecreaseBtnSym.anchorY = .5    
+    modeTextGroup:insert(modeIncreaseBtnGroup)    
+end
 
 --SAM: CFText (advanced color classes), to be re-worked and implemented later
 
@@ -260,14 +386,6 @@ scoreText:setEmbossColor(scoreboardColor)
 
 --scoreText = CFText.new( score, "Arial Rounded MT Bold", 30, _W*(4/5), _H/2 )
 --scoreText:ToFront()
-
-local background = display.newRect(0, 0, _W, _H)
-background:setFillColor(1, 1, 1)
-background.anchorX = 0.5
-background.anchorY = 0.5
-background.name = "background"
-background.x = _W / 2 ;background.y = _H / 2
-background:toBack()
 
 local function speedUp()
     if idx ~= #levels then
@@ -489,79 +607,7 @@ local function boundaryElimination(e)
         end
     end   
 end
---[[
-local function boundaryCheck (e)
-  local temp
-  if #spawnTable >0 then  
-    for i = 1, #spawnTable do
-      if spawnTable[i]~=0 and spawnTable[i] ~=nil then
-          if spawnTable[i].x < -40 or spawnTable[i].x > _W+40 then
-            if lookupCode(code,spawnTable[i])==0 then
-                  spawnTable[i].dead=false 
-            elseif lookupCode(code,spawnTable[i])==1 then    --Out of bound and Palette Matches flag. GameOver
 
-                   if bonusText ~= nil then
-                     bonusText:Remove()
-                     bonusText=nil
-                   end 
-                   if deadText==nil then
-                     deadText = display.newText("DEAD", _W*(4/5), _H*(2/3), native.systemFont, 28)
-                     deadText:setFillColor( 1, 0, 0 )
-                   end
-                   if gotoDeath==true then
-                               paceRect.isMoving=false
-                               spawnTable[i].dead=true
-                               spawnTable[i]:toFront() 
-                               spawnTable[i].isPaletteActive=false
-                               spawnTable[i]:removeEventListener("touch",objTouch)
-                               Runtime:removeEventListener("enterFrame", boundaryCheck)
-                               Runtime:removeEventListener("enterFrame", moveObject)
-                               numDeaths=numDeaths+1
-                                        
-                   
-                         
-                              if state==3 and spawnTable[i].dead~=true  then
-                                transition.to(spawnTable[i], {time=300,alpha=0})
-                              end                                                  
-                              if spawnTable[i].isLeft==true or spawnTable[i].isBottomLeft==true then
-                                    temp=spawnTable[i].x
-                                    if state ==1 or state == 3 then
-                                      transition.to(spawnTable[i], {time=2000,x=temp+90})
-                                    elseif state == 2 then
-                                      transition.to(spawnTable[i], {time=2000,x=temp-90})
-                                    end  
-                              else
-                                    temp=spawnTable[i].x
-                                    if state == 1 or state == 3 then
-                                      transition.to(spawnTable[i], {time=2000,x=temp-90}) 
-                                    elseif state == 2 then
-                                      transition.to(spawnTable[i], {time=2000,x=temp+90}) 
-                                    end  
-                              end 
-                        
-                               if state ~= 3 and spawnTable[i]~=0 then
-                                      if spawnTable[i].isGrown==false then
-                                        spawnTable[i]:removeSelf()
-                                        spawnTable[i]=0
-                                      end
-                              end
-                     
-                   timer.performWithDelay(2000,boundaryElimination,1)
-                   return
-                   end
-            spawnTable[i]:removeEventListener("touch",objTouch)
-            spawnTable[i]:removeSelf()
-            spawnTable[i]=0
-       
-
-                            
-                         end
-        end
-      end 
-    end
-  end
-end  
---]]
 local function boundaryCheck (e)
     local temp
     local breakLoop = false
@@ -577,11 +623,11 @@ local function boundaryCheck (e)
 							--bonusText:Remove()
                             bonusText = nil
                         end 
-                        if deadText == nil then
-
-                            deadText = display.newEmbossedText("Dead", _W * (4 / 5), _H * (2 / 3), "PTMono-Bold", 38)
-                            deadText:setFillColor(1, .9, .4)
-                            deadText:setEmbossColor(scoreboardColor)
+                        if deathText1 == nil then
+                            --[[SAM: dead case 1, pad representative of flag's color reached edge]]--
+                            deathText1 = display.newEmbossedText("death scenario 1: pad representative of flag's color reached edge", _W/2, _H * (2 / 3), "PTMono-Bold", 14)
+                            deathText1:setFillColor(1, .9, .4)
+                            deathText1:setEmbossColor(scoreboardColor)
                         end
                         if gotoDeath == true then
                             paceRect.isMoving = false
@@ -653,6 +699,7 @@ local function paletteGrow(self)
 end  
 
 local function spawnPalette(params)
+    print(params.type)
     local object = display.newRoundedRect(0, 0, 80, 60, 3)
 
     object.isPaletteActive = true
@@ -1419,6 +1466,7 @@ local function finishScale()
 	transition.to(lowBar, {time = 1300, alpha = .3, y = _H + 35})
 	
 	--MIKE: removed flag2Timer assignment of transition to, is this okay?
+    --SAM: Delete all this scaling and position bullshit and start from scratch
 	if(flagScaleStyle == 0) then
 		transition.to( flag, { time=1000, alpha = 1, xScale=1, yScale=1})
 	elseif(flagScaleStyle == 1) then
@@ -1440,16 +1488,24 @@ end
 
 local function newFlag()
     music = nil
-    if deadText ~= nil then
-        display.remove(deadText)
-        if bonusText ~= nil then
-            bonusText:removeSelf()
-			--bonusText:Remove()
-            bonusText = nil
-            spread = 1
-            prevColor = nil
-            currColor = nil
-        end
+    if deathText1 ~= nil then
+        display.remove(deathText1)
+        deathText1 = nil
+    end
+    if deathText2 ~= nil then
+        display.remove(deathText2)
+        deathText2 = nil
+    end
+    if bonusText ~= nil then
+        bonusText:removeSelf()
+        bonusText = nil
+        --SAM: delete?
+        --bonusText:Remove()
+
+        --SAM: delete?            
+        spread = 1
+        prevColor = nil
+        currColor = nil
     end
     countries()
     if infoMode == true then
@@ -1467,6 +1523,8 @@ local function newFlag()
     timer.performWithDelay(2000, countryTextScale, 1)
 
 	--FLAG SCALING STARTS HERE
+    print("which state???")
+    modeText.text = state
     
     if state == 4 then
         sideTimer = timer.performWithDelay(1500, finishScale, 1)
@@ -1614,7 +1672,6 @@ local function createPalette ()
         end     
 
     else  
-
         if e == 1 then
             spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
         elseif e == 2 then
@@ -2057,10 +2114,11 @@ function objTouch(self, e)
                 bonusText = nil
             end
 
-            if deadText == nil then
-                deadText = display.newEmbossedText("DEAD", _W * (4/5), _H/2, "PTMono-Bold", 38)
-                deadText:setFillColor(.86, .1, .2)
-                deadText:setEmbossColor(scoreboardColor)
+            if deathText2 == nil then
+                --[[SAM: dead case 2, selected color not present in flag]]--
+                deathText2 = display.newEmbossedText("death scenario 2: color of selected pad not founded in flag", _W/2, _H * (2 / 3) + 20, "PTMono-Bold", 14)
+                deathText2:setFillColor(.86, .1, .2)
+                deathText2:setEmbossColor(scoreboardColor)
             end       
             if gotoDeath == true then
                 self:toFront()  
@@ -2189,6 +2247,7 @@ function scene:show(e)
         print("SHOWWILL")
 
         setupVariables()
+        setupScoreboard()
         random = math.randomseed(os.time())
         paceRect = display.newRect(0, 0, 80, 60)
         paceRect:setFillColor(1, 0, 0)
@@ -2221,7 +2280,8 @@ function scene:hide(e)
         display.remove(flag)
 		-- what about mask applied to fxGroup
         display.remove(fxGroup)
-        display.remove(deadText)
+        display.remove(deathText1)
+        display.remove(deathText2)
         display.remove(piece)
         display.remove(mapGroup)
         display.remove(topBar)
