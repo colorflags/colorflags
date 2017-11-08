@@ -1,0 +1,1 @@
+#marker-rule: /function (\w+)/||%1||Function
