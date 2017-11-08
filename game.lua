@@ -15,7 +15,8 @@ local score = 0
 local numDeaths = 0
 local idx = 3
 
---SAM: checks if game just started
+-- checks if game just started
+
 local countriesCompleted = 0
 
 local flagScaleStyle = 2
