@@ -15,7 +15,7 @@ local startBtnsAbout
 local currentObject
 local isLoading = false
 local touchInsideBtn = false
-local isBtnAnim = false
+local isBtnAnim = true
 
 music=nil
 bobby=nil

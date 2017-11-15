@@ -4,25 +4,17 @@
 local CFText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
-
---SAM: var to handle death
---SAM: var to handle animations
-
 local gotoDeath = false
 local lightningCount = 1
-local state = 1
+local state = 5
 local stateFour = 0
 local stateFourGrow = 0
-
+local speed = 2
+local timeVar = 1250
+local levels
 local score = 0
 local numDeaths = 0
-
-local levelsArrayArray
-local speedTableIndex = 3
-local speed
-local timeVar
--- local speed = 1
---local timeVar = 1250
+local idx = 3
 
 -- checks if game just started
 local countriesCompleted = 0
@@ -268,139 +260,6 @@ background.name = "background"
 background.x = _W / 2 ;background.y = _H / 2
 background:toBack()
 
-local function setupVariables()
-    w1 = 1;w2 = 1;w3 = 1
-    k1 = 0;k2 = 0;k3 = 0
-    r1 = 1;r2 = 0;r3 = 0
-    o1 = 1;o2 = .502;o3 = 0
-    y1 = 1;y2 = 1;y3 = 0
-    g1 = 0;g2 = .4;g3 = 0
-    b1 = 0;b2 = 0;b3 = 1
-
-    mapGroup = display.newGroup()
-
-    map = display.newImage("images/newmap_export_nopolar.png", 2031, 851)
-    map.alpha = 0
-    map.anchorX = 0
-    map.anchorY = 0
-    map.name = "map"
-    map.x = 0
-    map.y = 0
-
-	mapGroup:insert(map)
-
-	--[[
-	mapMask = graphics.newMask("images/mask.png")
-	mapGroup:setMask(mapMask)
-
-	mapGroup.maskScaleX = 200
-	mapGroup.maskScaleY = 75
-	mapGroup.maskX = _W/2
-	mapGroup.maskY = _H/2
-	]]--
-
-    -- SAM: better name for variables speed and timeVar
-    levelsArray = {
-        {speed = 1, timeVar = 2550},
-        {speed = 2, timeVar = 1700},
-        {speed = 3, timeVar = 1250},
-        {speed = 4, timeVar = 1000},
-        {speed = 5, timeVar = 910},
-        {speed = 6, timeVar = 750},
-        {speed = 7, timeVar = 700},
-        {speed = 8, timeVar = 600},
-        {speed = 9, timeVar = 550},
-        {speed = 10, timeVar = 450},
-        {speed = 11, timeVar = 420},
-        {speed = 12, timeVar = 400},
-        {speed = 13, timeVar = 380},
-        {speed = 14, timeVar = 365},
-        {speed = 15, timeVar = 345},
-        {speed = 16, timeVar = 335},
-        {speed = 17, timeVar = 305},
-        {speed = 18, timeVar = 280},
-        {speed = 19, timeVar = 260},
-        {speed = 20, timeVar = 240},
-        {speed = 21, timeVar = 220},
-        {speed = 22, timeVar = 200},
-        {speed = 23, timeVar = 190},
-        {speed = 24, timeVar = 185},
-        {speed = 25, timeVar = 175},
-        {speed = 26, timeVar = 170},
-        {speed = 27, timeVar = 170},
-        {speed = 28, timeVar = 165},
-        {speed = 29, timeVar = 165},
-        {speed = 30, timeVar = 160},
-        {speed = 31, timeVar = 155},
-        {speed = 32, timeVar = 155},
-        {speed = 33, timeVar = 150},
-        {speed = 34, timeVar = 145},
-        {speed = 35, timeVar = 145},
-        {speed = 36, timeVar = 140},
-        {speed = 37, timeVar = 135},
-        {speed = 38, timeVar = 125},
-        {speed = 39, timeVar = 120},
-        {speed = 40, timeVar = 110}
-    }
-
-    lightningIcon1 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon1.x = 20
-    lightningIcon1.y = lightningY
-    lightningIcon2 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon2.x = 60
-    lightningIcon2.y = lightningY
-    lightningIcon3 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon3.x = 100
-    lightningIcon3.y = lightningY
-    lightningIcon4 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon4.x = 140
-    lightningIcon4.y = lightningY
-    lightningIcon5 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon5.x = 180
-    lightningIcon5.y = lightningY
-    lightningIcon6 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon6.x = 220
-    lightningIcon6.y = lightningY
-    lightningIcon7 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon7.x = 260
-    lightningIcon7.y = lightningY
-    lightningIcon8 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon8.x = 300
-    lightningIcon8.y = lightningY
-    lightningIcon9 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon9.x = 340
-    lightningIcon9.y = lightningY
-    lightningIcon10 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon10.x = 380
-    lightningIcon10.y = lightningY
-    lightningIcon11 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon11.x = 420
-    lightningIcon11.y = lightningY
-    lightningIcon12 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon12.x = 460
-    lightningIcon12.y = lightningY
-    lightningIcon13 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon13.x = 500
-    lightningIcon13.y = lightningY
-    lightningIcon14 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon14.x = 540
-    lightningIcon14.y = lightningY
-    lightningIcon1:toBack()
-    lightningIcon2:toBack()
-    lightningIcon3:toBack()
-    lightningIcon4:toBack()
-    lightningIcon5:toBack()
-    lightningIcon6:toBack()
-    lightningIcon7:toBack()
-    lightningIcon8:toBack()
-    lightningIcon9:toBack()
-    lightningIcon10:toBack()
-    lightningIcon11:toBack()
-    lightningIcon12:toBack()
-    lightningIcon13:toBack()
-    lightningIcon14:toBack()
-end
-
 local function setupScoreboard()
 
     local scoreboardColor = {
@@ -408,11 +267,44 @@ local function setupScoreboard()
         shadow = {r = 0, g = 0, b = 0}
     }
 
-    local scoreboardOffsetFromLeft = 5
-    local scoreboardOffsetFromEachOther = 80
+    local speedTextGroupAnchorX = 2
+    local speedTextGroupAnchorY = _H/2 - 20
 
-    local scoreTextGroupAnchorX = scoreboardOffsetFromLeft
-    local scoreTextGroupAnchorY = _H/2
+    speedTextGroup = display.newGroup()
+
+    speedTextDesc = display.newEmbossedText("speed:", speedTextGroupAnchorX, speedTextGroupAnchorY, "PTMono-Bold", 18)
+    speedTextDesc:setFillColor(.2, .9, .4)
+    speedTextDesc:setEmbossColor(scoreboardColor)
+    speedTextDesc.anchorX = 0
+    speedTextDesc.anchorY = 1
+    speedTextGroup:insert(speedTextDesc)
+
+    speedText = display.newEmbossedText(speed, speedTextGroupAnchorX + (speedTextDesc.width/2), speedTextGroupAnchorY, "PTMono-Bold", 22)
+    speedText:setFillColor(.2, .9, .4)
+    speedText:setEmbossColor(scoreboardColor)
+    speedText.anchorY = 0
+    speedTextGroup:insert(speedText)
+
+    speedDecreaseBtnGroup = display.newGroup()
+    speedDecreaseBtnFill = display.newRoundedRect(speedDecreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) - 6, speedTextGroupAnchorY - speedTextDesc.height, 10, 10, 1)
+    speedDecreaseBtnFill:setFillColor(.4, .4, .4)
+    speedDecreaseBtnFill.anchorY = 1
+    speedDecreaseBtnSym = display.newText(speedDecreaseBtnGroup, "-", speedDecreaseBtnFill.x, speedDecreaseBtnFill.y - (speedDecreaseBtnFill.height/2), "PTMono-Bold", 14)
+    speedDecreaseBtnSym.anchorX = .5
+    speedDecreaseBtnSym.anchorY = .5
+    speedTextGroup:insert(speedDecreaseBtnGroup)
+
+    speedIncreaseBtnGroup = display.newGroup()
+    speedIncreaseBtnFill = display.newRoundedRect(speedIncreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) + 6, speedTextGroupAnchorY - speedTextDesc.height, 10, 10, 1)
+    speedIncreaseBtnFill:setFillColor(.4, .4, .4)
+    speedIncreaseBtnFill.anchorY = 1
+    speedDecreaseBtnSym = display.newText(speedIncreaseBtnGroup, "+", speedIncreaseBtnFill.x, speedIncreaseBtnFill.y - (speedIncreaseBtnFill.height/2), "PTMono-Bold", 14)
+    speedDecreaseBtnSym.anchorX = .5
+    speedDecreaseBtnSym.anchorY = .5
+    speedTextGroup:insert(speedIncreaseBtnGroup)
+
+    local scoreTextGroupAnchorX = 2
+    local scoreTextGroupAnchorY = (_H/2) + 45
 
     scoreTextGroup = display.newGroup()
     scoreTextDesc = display.newEmbossedText("score:", scoreTextGroupAnchorX, scoreTextGroupAnchorY, "PTMono-Bold", 18)
@@ -446,46 +338,10 @@ local function setupScoreboard()
     scoreDecreaseBtnSym.anchorY = .5
     scoreTextGroup:insert(scoreIncreaseBtnGroup)
 
-    local speedTextGroupAnchorX = scoreboardOffsetFromLeft + scoreboardOffsetFromEachOther
-    local speedTextGroupAnchorY = _H/2
-
-    speedTextGroup = display.newGroup()
-
-    speedTextDesc = display.newEmbossedText("speed:", speedTextGroupAnchorX, speedTextGroupAnchorY, "PTMono-Bold", 18)
-    speedTextDesc:setFillColor(.2, .9, .4)
-    speedTextDesc:setEmbossColor(scoreboardColor)
-    speedTextDesc.anchorX = 0
-    speedTextDesc.anchorY = 1
-    speedTextGroup:insert(speedTextDesc)
-
-    speedText = display.newEmbossedText("???", speedTextGroupAnchorX + (speedTextDesc.width/2), speedTextGroupAnchorY, "PTMono-Bold", 22)
-    speedText:setFillColor(.2, .9, .4)
-    speedText:setEmbossColor(scoreboardColor)
-    speedText.anchorY = 0
-    speedTextGroup:insert(speedText)
-
-    speedDecreaseBtnGroup = display.newGroup()
-    speedDecreaseBtnFill = display.newRoundedRect(speedDecreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) - 6, speedTextGroupAnchorY - speedTextDesc.height, 10, 10, 1)
-    speedDecreaseBtnFill:setFillColor(.4, .4, .4)
-    speedDecreaseBtnFill.anchorY = 1
-    speedDecreaseBtnSym = display.newText(speedDecreaseBtnGroup, "-", speedDecreaseBtnFill.x, speedDecreaseBtnFill.y - (speedDecreaseBtnFill.height/2), "PTMono-Bold", 14)
-    speedDecreaseBtnSym.anchorX = .5
-    speedDecreaseBtnSym.anchorY = .5
-    speedTextGroup:insert(speedDecreaseBtnGroup)
-
-    speedIncreaseBtnGroup = display.newGroup()
-    speedIncreaseBtnFill = display.newRoundedRect(speedIncreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) + 6, speedTextGroupAnchorY - speedTextDesc.height, 10, 10, 1)
-    speedIncreaseBtnFill:setFillColor(.4, .4, .4)
-    speedIncreaseBtnFill.anchorY = 1
-    speedDecreaseBtnSym = display.newText(speedIncreaseBtnGroup, "+", speedIncreaseBtnFill.x, speedIncreaseBtnFill.y - (speedIncreaseBtnFill.height/2), "PTMono-Bold", 14)
-    speedDecreaseBtnSym.anchorX = .5
-    speedDecreaseBtnSym.anchorY = .5
-    speedTextGroup:insert(speedIncreaseBtnGroup)
-
     -- print("speedTextGroup width: ", speedTextGroup.width)
 
-    local modeTextGroupAnchorX = scoreboardOffsetFromLeft + (scoreboardOffsetFromEachOther*2)
-    local modeTextGroupAnchorY = _H/2
+    local modeTextGroupAnchorX = 2 + 75
+    local modeTextGroupAnchorY = (_H/2) - 20
 
     modeTextGroup = display.newGroup()
     modeTextDesc = display.newEmbossedText("mode:", modeTextGroupAnchorX, modeTextGroupAnchorY, "PTMono-Bold", 18)
@@ -532,7 +388,7 @@ local function setupScoreboard()
 
     for i = 1, #deathScenario2Array do
         deathScenario2Array[i]:setFillColor(246/255, 81/255, 0)
-        deathScenario2Array[i]:setEmbossColor(deathScenario2Color)
+        -- deathScenario2Array[i]:setEmbossColor(deathScenario2Color)
         deathScenario2Array[i].alpha = 0
     end
 end
@@ -545,14 +401,16 @@ end
 --scoreText = CFText.new( score, "Arial Rounded MT Bold", 30, _W*(4/5), _H/2 )
 --scoreText:ToFront()
 
--- SAM: combine functions speedUp() and resetSpawnTable()
 local function speedUp()
-    if speedTableIndex ~= #levelsArray then
-        speedTableIndex = speedTableIndex + 1
-        speed = levelsArray[speedTableIndex].speed
-        timeVar = levelsArray[speedTableIndex].timeVar
+    if idx ~= #levels then
+        idx = idx + 1
+        speed = levels[idx].speed
+        timeVar = levels[idx].timeVar
         speedText.text = speed
         speedText:toFront()
+		--SAM: CFText
+		--speedText:Text(speed)
+		--speedText:ToFront()
     elseif finalChallenge == false then
         finalChallenge = true
     end
@@ -574,23 +432,24 @@ local function resetSpawnTable()
         bonusText = nil
     end
 	--decide what state is next
-    if state == 1 then
+    if state == 4 then
+        state = 4
+        idx = idx + 1
+    elseif state == 3 then
+        if finalChallenge == false then
+            state = 1
+            idx = (idx) * 2
+        end
+    elseif state == 1 then
         state = 2
-        --speedTableIndex = speedTableIndex + 1
+        idx = idx + 1
     elseif state == 2 then
         state = 3
-        --speedTableIndex = speedTableIndex / 2 - 1
-        --speedTableIndex = math.round(speedTableIndex)
-    elseif state == 3 then
-        state = 1
-        --speedTableIndex = (speedTableIndex) * 2
+        idx = idx / 2 - 1
+        idx = math.round(idx)
     end
-
-
-    --ERROR: crashes, let the game run
-    -- speed = levels[speedTableIndex].speed
-    -- timeVar = levels[speedTableIndex].timeVar
-
+    speed = levels[idx].speed
+    timeVar = levels[idx].timeVar
 	--SAM: CFText
     speedText.text = speed
     speedText:toFront()
@@ -730,7 +589,7 @@ local function boundaryElimination(e)
 			--Pallets player lost with.  Fling them at the screen
         elseif spawnTable[i] ~= 0 and spawnTable[i].dead == true  then
 
-            if state == 3 then
+            if state == 4 then
 
                 transition.to(spawnTable[i], {time = 900, rotation = 400, x = _W / 2, y = _H / 2, xScale = 6, yScale = 6, onComplete = endGame })
             else
@@ -819,22 +678,28 @@ local function boundaryCheck(e)
                                             spawnTable[i].dead = false
                                         end
                                     end
-                                    if state == 3 and spawnTable[i].dead ~= true  then
-                                        transition.to(spawnTable[i], {time = 300, alpha = 0})
-                                    end
-                                    if spawnTable[i].isTopLeft == true or spawnTable[i].isBottomLeft == true then
+                                    if state == 4 then
                                         temp = spawnTable[i].x
-                                        if state == 1 or state == 3 then
-                                            transition.to(spawnTable[i], {time = 2000, x = temp + 90})
-                                        elseif state == 2 then
-                                            transition.to(spawnTable[i], {time = 2000, x = temp - 90})
-                                        end
+                                        transition.to(spawnTable[i], {time = 2000, x = temp + 90})
+
                                     else
-                                        temp = spawnTable[i].x
-                                        if state == 1 or state == 3 then
-                                            transition.to(spawnTable[i], {time = 2000, x = temp - 90})
-                                        elseif state == 2 then
-                                            transition.to(spawnTable[i], {time = 2000, x = temp + 90})
+                                        if state == 3 and spawnTable[i].dead ~= true  then
+                                            transition.to(spawnTable[i], {time = 300, alpha = 0})
+                                        end
+                                        if spawnTable[i].isTopLeft == true or spawnTable[i].isBottomLeft == true then
+                                            temp = spawnTable[i].x
+                                            if state == 1 or state == 3 then
+                                                transition.to(spawnTable[i], {time = 2000, x = temp + 90})
+                                            elseif state == 2 then
+                                                transition.to(spawnTable[i], {time = 2000, x = temp - 90})
+                                            end
+                                        else
+                                            temp = spawnTable[i].x
+                                            if state == 1 or state == 3 then
+                                                transition.to(spawnTable[i], {time = 2000, x = temp - 90})
+                                            elseif state == 2 then
+                                                transition.to(spawnTable[i], {time = 2000, x = temp + 90})
+                                            end
                                         end
                                     end
                                 end
@@ -878,14 +743,10 @@ local function boundaryCheck(e)
                                             end
                                         elseif state == 3 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
-                                                if spawnTable[i].corner == "TopLeft" then
+                                                if spawnTable[i].isTopLeft == true and spawnTable[i].isBottomRight == nil then
                                                     transition.to( deathScenario2Array[1], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[1], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-                                                elseif spawnTable[i].corner == "TopRight" then
+                                                elseif not spawnTable[i].isTopLeft and spawnTable[i].isBottomRight == nil then
                                                     transition.to( deathScenario2Array[2], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[2], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-                                                elseif spawnTable[i].corner == "BottomLeft" then
-                                                    transition.to( deathScenario2Array[3], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[3], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-                                                elseif spawnTable[i].corner == "BottomRight" then
-                                                    transition.to( deathScenario2Array[4], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[4], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
                                                 end
 
                                                 spawnTable[i]:removeEventListener("touch", objTouch)
@@ -914,6 +775,7 @@ local function spawnPalette(params)
 --    print(params.type)
 
     local object = display.newRoundedRect(0, 0, 80, 60, 3)
+
     object.isPaletteActive = true
     object.isGrown = false
     object.anchorY = 0.5 ; object.anchorX = 0.5
@@ -942,7 +804,38 @@ local function spawnPalette(params)
             object.x = 0 + 40
             object.y = heightModeTop
         end
+
+    --SAM: understand this! Rename these variable names because they awful and confusing as fuck!
     elseif state == 3 then
+        if object.isTopLeft == false then
+            object.x = _W / 2 + 40
+            object.y = heightModeTop
+        elseif object.isTopLeft == true then
+            object.x = _W / 2 - 40
+            object.y = heightModeTop
+        elseif object.isBottomLeft == false then
+            object.x = _W / 2 + 40
+            object.y = heightModeLow
+        elseif object.isBottomLeft == true then
+            object.x = _W / 2 - 40
+            object.y = heightModeLow
+        end
+    elseif state == 4 then
+
+        object.x = _W - 40
+        if object.isTopLeft == false then
+			--   print(object.index)
+            object.y = _H * (1 / 5) - 20
+        elseif object.isTopLeft == true then
+            object.y = _H * (2 / 5) - 10
+        elseif object.isBottomLeft == true then
+            object.y = _H * (3 / 5) + 10
+        elseif object.isBottomLeft == false then
+            object.y = _H * (4 / 5) + 20
+        end
+
+    elseif state == 5 then
+        print("spawning")
         if object.corner == "TopRight" then
             object.x = _W / 2 + 40
             object.y = heightModeTop
@@ -1011,6 +904,24 @@ local function spawnPalette(params)
             end
         end
     elseif state == 3 then
+        if object.index == 1 or object.index == 2 or object.index == 3 or object.index == 4 then
+            transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
+        else
+            transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
+            if spawnTable[object.index - 4] ~= 0 then
+                spawnTable[object.index - 4]:toFront()
+            end
+        end
+    elseif state == 4 then
+        if object.index == 1 or object.index == 3 or object.index == 6 or object.index == 10 then
+            transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
+        else
+            transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
+			--    if spawnTable[object.index-4]~=0 then
+			--     spawnTable[object.index-4]:toFront()
+			--  end
+        end
+    elseif state == 5 then
         if object.index == 1 or object.index == 2 or object.index == 3 or object.index == 4 then
             transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
         else
@@ -1163,8 +1074,10 @@ function lightningStrike(self)
             bonusText = nil
         end
 
-        bonusText = display.newEmbossedText("+" .. spread, scoreText.x, scoreText.y, "PTMono-Bold", 14)
-        bonusText:setFillColor(0, 0, 0)
+        text = "+" .. spread
+
+        bonusText = display.newEmbossedText(text, _W * (1 / 5), _H * (1 / 3), "PTMono-Bold", 38)
+        bonusText:setFillColor(1, .9, .4)
         bonusText:setEmbossColor(scoreboardColor)
 
 		--SAM: CFText
@@ -1440,8 +1353,8 @@ local function countries(test)
 end
 
 local function killBars()
-    killLowTimer = transition.to(lowBar, {time = 800, alpha = 0})
-    killTopTimer = transition.to(topBar, {time = 800, alpha = 0})
+    killLowTimer = transition.to(lowBar, {time = 800, y = _H, alpha = 0})
+    killTopTimer = transition.to(topBar, {time = 800, y = 0, alpha = 0})
 end
 
 local function countryTrace()
@@ -1467,7 +1380,7 @@ local function finishScale()
     topBar:toFront()
     topBar:setSequence("top")
     topBar:play()
-    transition.to(topBar, {time = 1300, alpha = .6, y = -35})
+    transition.to(topBar, {time = 1300, alpha = .3, y = -35})
 
 	lowBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
     lowBar:setFillColor(0, 0, 0)
@@ -1479,27 +1392,17 @@ local function finishScale()
     topBar:toFront()
     lowBar:setSequence("btm")
     lowBar:play()
-	transition.to(lowBar, {time = 1300, alpha = .6, y = _H + 35})
+	transition.to(lowBar, {time = 1300, alpha = .3, y = _H + 35})
 
 	transition.to(flag, {time = 1000, alpha = 1})
 
     flagLightningReady = timer.performWithDelay(1000, lightningEnable, 1)
-    -- SAM: delete this? used for offsetting when speedUp() occurs - can happen in during midst of a country
-    -- timerSpeed = timer.performWithDelay(9500, speedUp, 1)
+    timerSpeed = timer.performWithDelay(9500, speedUp, 1)
 
 	countriesCompleted = countriesCompleted + 1
 end
 
 local function newFlag()
-    if countriesCompleted == 0 then
-        speed = levelsArray[speedTableIndex].speed
-        timeVar = levelsArray[speedTableIndex].timeVar
-        speedText.text = speed
-        speedText:toFront()
-    else
-        speedUp()
-    end
-
     music = nil
 
     if bonusText ~= nil then
@@ -1532,10 +1435,33 @@ local function newFlag()
     print("which state???")
     modeText.text = state
 
-    sideTimer = timer.performWithDelay(1500, finishScale, 1)
-    paceTimer=timer.performWithDelay(900,delayPace,1)
-    transition.to( map, { time=1500, alpha=1 })
-    mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
+    --SAM: reorder these
+    if state == 5 then
+        sideTimer = timer.performWithDelay(1500, finishScale, 1)
+        paceTimer=timer.performWithDelay(900,delayPace,1)
+        transition.to( map, { time=1500, alpha=1 })
+        mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
+    elseif state == 4 then
+        sideTimer = timer.performWithDelay(1500, finishScale, 1)
+        mapTimer = transition.to(map, {time = 1500, x = xCoord, y = yCoord})
+        flagTimer = transition.to(flag, {time = 1500, xScale = .2, yScale = .2})
+        paceTimer = timer.performWithDelay(900, delayPace, 1)
+    elseif state == 3 then
+--        sideTimer = timer.performWithDelay(1500, finishScale, 1)
+--        mapTimer = transition.to(map, {time = 2000, x = xCoord, y = yCoord})
+--        flagTimer = transition.to(flag, {time = 2000, xScale = .2, yScale = .2})
+--        paceTimer = timer.performWithDelay(0, delayPace, 1)
+
+        sideTimer = timer.performWithDelay(1500, finishScale, 1)
+        paceTimer=timer.performWithDelay(900,delayPace,1)
+        transition.to( map, { time=1500, alpha=1 })
+        mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
+    elseif state == 2 or state == 1 then
+        sideTimer = timer.performWithDelay(1500, finishScale, 1)
+        paceTimer=timer.performWithDelay(900,delayPace,1)
+        transition.to( map, { time=1500, alpha=1 })
+        mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
+    end
 
 --[[SAM: countryOutline scaling ]]--
 --    TEMP: alternative styles
@@ -1553,7 +1479,6 @@ local function newFlag()
 
 --    SAM: what is this?
 
-    -- SAM: this sort of countriesCompleted == 0 checking should be done in countries()
 --    if(countriesCompleted == 0) then
 --         without scale
 --			mapTimer = transition.to(map, {time = 1500, alpha = 1, x=xCoord, y=yCoord})
@@ -1567,9 +1492,86 @@ local function newFlag()
 end
 
 local function createPalette ()
+    local e = math.random(7)
     local spawns
-    if state == 1 or state == 2 then
-        local e = math.random(7)
+    if state == 4 then
+        stateFour = stateFour + 1
+        if stateFour >= 1 then
+            print("ONE")
+            if e == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
+            elseif e == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false})
+            elseif e == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
+            elseif e == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
+            elseif e == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
+            elseif e == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})
+            elseif e == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})
+            end
+        end
+        if stateFour >= 2 then
+            print("TWO")
+            local f = math.random(7)
+            if f == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
+            elseif f == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true})
+            elseif f == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
+            elseif f == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
+            elseif f == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
+            elseif f == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})
+            elseif f == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})
+            end
+        end
+        if stateFour >= 3 then
+            print("THREE")
+            local g = math.random(7)
+            if g == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = true})
+            elseif g == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = true})
+            elseif g == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = true})
+            elseif g == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = true})
+            elseif g == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = true})
+            elseif g == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = true})
+            elseif g == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = true})
+            end
+        end
+        if stateFour >= 4 then
+            print("FOUR")
+            local h = math.random(7)
+            if h == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = false})
+            elseif h == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = false})
+            elseif h == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = false})
+            elseif h == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = false})
+            elseif h == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = false})
+            elseif h == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = false})
+            elseif h == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = false})
+            end
+        end
+    elseif state == 1 or state == 2 then
         if e == 1 then
             spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
         elseif e == 2 then
@@ -1603,9 +1605,45 @@ local function createPalette ()
             spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})
         end
     elseif state == 3 then
+        local g = math.random(7)
+        if g == 1 then
+            spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = false})
+        elseif g == 2 then
+            spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = false})
+        elseif g == 3 then
+            spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = false})
+        elseif g == 4 then
+            spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = false})
+        elseif g == 5 then
+            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = false})
+        elseif g == 6 then
+            spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = false})
+        elseif g == 7 then
+            spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = false})
+        end
+
+        local h = math.random(7)
+
+        if h == 1 then
+            spawns = spawnPalette({objTable = spawnTable, type = "white", isBottomLeft = true})
+        elseif h == 2 then
+            spawns = spawnPalette({objTable = spawnTable, type = "black", isBottomLeft = true})
+        elseif h == 3 then
+            spawns = spawnPalette({objTable = spawnTable, type = "red", isBottomLeft = true})
+        elseif h == 4 then
+            spawns = spawnPalette({objTable = spawnTable, type = "orange", isBottomLeft = true})
+        elseif h == 5 then
+            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isBottomLeft = true})
+        elseif h == 6 then
+            spawns = spawnPalette({objTable = spawnTable, type = "green", isBottomLeft = true})
+        elseif h == 7 then
+            spawns = spawnPalette({objTable = spawnTable, type = "blue", isBottomLeft = true})
+        end
+    elseif state == 5 then
         for i = 1, 4 do
             local random = math.random(7)
             local cornersArray = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
+            print(i)
             if random == 1 then
                 spawns = spawnPalette({objTable = spawnTable, type = "white", corner = cornersArray[i]})
             elseif random == 2 then
@@ -1663,7 +1701,8 @@ local function readyObject ()
                         spawnTable[count + 1].isGrown = true
                     end
                     count = count + 2
-                elseif state == 3 then --SAM: this should be state == 3
+
+                elseif state == 5 then
                     if spawnTable[count] ~= 0 then
                         spawnTable[count].isGrown = true
                     end
@@ -1677,6 +1716,143 @@ local function readyObject ()
                         spawnTable[count + 3].isGrown = true
                     end
                     count = count + 4
+                elseif state == 5 then
+                    if spawnTable[count] ~= 0 then
+                        spawnTable[count].isGrown = true
+                    end
+                    if spawnTable[count + 1] ~= 0 then
+                        spawnTable[count + 1].isGrown = true
+                    end
+                    if spawnTable[count + 2] ~= 0 then
+                        spawnTable[count + 2].isGrown = true
+                    end
+                    if spawnTable[count + 3] ~= 0 then
+                        spawnTable[count + 3].isGrown = true
+                    end
+                    count = count + 4
+                end
+                if state == 4 then
+                    stateFourGrow = stateFourGrow + 1
+                    if stateFourGrow >= 4 then
+                        if spawnTable[count] ~= 0 then
+                            spawnTable[count].isGrown = true
+                        end
+                        if spawnTable[count + 1] ~= 0 then
+                            spawnTable[count + 1].isGrown = true
+                        end
+                        if spawnTable[count + 2] ~= 0 then
+                            spawnTable[count + 2].isGrown = true
+                        end
+                        if spawnTable[count + 3] ~= 0 then
+                            spawnTable[count + 3].isGrown = true
+                        end
+                        count = count + 4
+                    elseif stateFourGrow >= 3 then
+                        if spawnTable[count] ~= 0 then
+                            spawnTable[count].isGrown = true
+                        end
+                        if spawnTable[count + 1] ~= 0 then
+                            spawnTable[count + 1].isGrown = true
+                        end
+                        if spawnTable[count + 2] ~= 0 then
+                            spawnTable[count + 2].isGrown = true
+                        end
+                        count = count + 3
+                    elseif stateFourGrow >= 2 then
+                        if spawnTable[count] ~= 0 then
+                            spawnTable[count].isGrown = true
+                        end
+                        if spawnTable[count + 1] ~= 0 then
+                            spawnTable[count + 1].isGrown = true
+                        end
+                        count = count + 2
+                    elseif stateFourGrow >= 1 then
+                        if spawnTable[count] ~= 0 then
+                            spawnTable[count].isGrown = true
+                        end
+                        count = count + 1
+                    elseif state == 5 then
+                        stateFourGrow = stateFourGrow + 1
+                        if stateFourGrow >= 6 and state == 5 then
+                            if spawnTable[count] ~= 0 then
+                                spawnTable[count].isGrown = true
+                            end
+                            if spawnTable[count + 1] ~= 0 then
+                                spawnTable[count + 1].isGrown = true
+                            end
+                            if spawnTable[count + 2] ~= 0 then
+                                spawnTable[count + 2].isGrown = true
+                            end
+                            if spawnTable[count + 3] ~= 0 then
+                                spawnTable[count + 3].isGrown = true
+                            end
+                            if spawnTable[count + 4] ~= 0 then
+                                spawnTable[count + 4].isGrown = true
+                            end
+                            if spawnTable[count + 5] ~= 0 then
+                                spawnTable[count + 5].isGrown = true
+                            end
+                            count = count + 6
+                        elseif stateFourGrow >= 5 and state == 5 then
+                            if spawnTable[count] ~= 0 then
+                                spawnTable[count].isGrown = true
+                            end
+                            if spawnTable[count + 1] ~= 0 then
+                                spawnTable[count + 1].isGrown = true
+                            end
+                            if spawnTable[count + 2] ~= 0 then
+                                spawnTable[count + 2].isGrown = true
+                            end
+                            if spawnTable[count + 3] ~= 0 then
+                                spawnTable[count + 3].isGrown = true
+                            end
+                            if spawnTable[count + 4] ~= 0 then
+                                spawnTable[count + 4].isGrown = true
+                            end
+                            count = count + 5
+                            if stateFourGrow >= 4 and state == 5 then
+                                if spawnTable[count] ~= 0 then
+                                    spawnTable[count].isGrown = true
+                                end
+                                if spawnTable[count + 1] ~= 0 then
+                                    spawnTable[count + 1].isGrown = true
+                                end
+                                if spawnTable[count + 2] ~= 0 then
+                                    spawnTable[count + 2].isGrown = true
+                                end
+                                if spawnTable[count + 3] ~= 0 then
+                                    spawnTable[count + 3].isGrown = true
+                                end
+                                count = count + 4
+                            elseif stateFourGrow >= 3 and state == 5 then
+                                if spawnTable[count] ~= 0 then
+                                    spawnTable[count].isGrown = true
+                                end
+                                if spawnTable[count + 1] ~= 0 then
+                                    spawnTable[count + 1].isGrown = true
+                                end
+                                if spawnTable[count + 2] ~= 0 then
+                                    spawnTable[count + 2].isGrown = true
+                                end
+                                count = count + 3
+                            elseif stateFourGrow >= 2 and state == 5 then
+                                if spawnTable[count] ~= 0 then
+                                    spawnTable[count].isGrown = true
+                                end
+                                if spawnTable[count + 1] ~= 0 then
+                                    spawnTable[count + 1].isGrown = true
+                                end
+                                count = count + 2
+                            elseif stateFourGrow >= 1 and state == 5 or state == 4 then
+                                if spawnTable[count] ~= 0 then
+                                    spawnTable[count].isGrown = true
+                                end
+                                count = count + 1
+                            end
+                        end
+                    end
+					--     print("stateFourGrow    :".. stateFourGrow)
+					--     print("COUNT           :" .. count)
                 end
             end
         end
@@ -1719,6 +1895,27 @@ local function moveObject (e)
         if #spawnTable > 0 then
             for i = 1, #spawnTable do
                 if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
+                    if spawnTable[i].isTopLeft == true or spawnTable[i].isBottomLeft == true then
+                        spawnTable[i].x = spawnTable[i].x - speed
+                    elseif spawnTable[i].isTopLeft == false or spawnTable[i].isBottomLeft == false then
+                        spawnTable[i].x = spawnTable[i].x + speed
+                    end
+                end
+            end
+        end
+    elseif state == 4 then
+        if #spawnTable > 0 then
+            for i = 1, #spawnTable do
+				--       if spawnTable[i]~=0 then
+                if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
+                    spawnTable[i].x = spawnTable[i].x - speed
+                end
+            end
+        end
+    elseif state == 5 then
+        if #spawnTable > 0 then
+            for i = 1, #spawnTable do
+                if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
                     if spawnTable[i].corner == "TopLeft" or spawnTable[i].corner == "BottomLeft" then
                         spawnTable[i].x = spawnTable[i].x - speed
                     elseif spawnTable[i].corner == "TopRight" or spawnTable[i].corner == "BottomRight" then
@@ -1728,7 +1925,108 @@ local function moveObject (e)
             end
         end
     end
+
 end
+
+
+local function setupVariables()
+    w1 = 1;w2 = 1;w3 = 1
+    k1 = 0;k2 = 0;k3 = 0
+    r1 = 1;r2 = 0;r3 = 0
+    o1 = 1;o2 = .502;o3 = 0
+    y1 = 1;y2 = 1;y3 = 0
+    g1 = 0;g2 = .4;g3 = 0
+    b1 = 0;b2 = 0;b3 = 1
+
+    mapGroup = display.newGroup()
+
+    map = display.newImage("images/newmap_export_nopolar.png", 2031, 851)
+    map.alpha = 0
+    map.anchorX = 0
+    map.anchorY = 0
+    map.name = "map"
+    map.x = 0
+    map.y = 0
+
+	mapGroup:insert(map)
+
+	--[[
+	mapMask = graphics.newMask("images/mask.png")
+	mapGroup:setMask(mapMask)
+
+	mapGroup.maskScaleX = 200
+	mapGroup.maskScaleY = 75
+	mapGroup.maskX = _W/2
+	mapGroup.maskY = _H/2
+	]]--
+
+    levels = {
+        {speed = 1, timeVar = 2550}, {speed = 1.5, timeVar = 1700}, {speed = 2, timeVar = 1250}, {speed = 2.5, timeVar = 1000}, {speed = 3, timeVar = 910}, {speed = 3.5, timeVar = 750},
+        {speed = 4, timeVar = 700}, {speed = 4.5, timeVar = 600}, {speed = 5, timeVar = 550}, {speed = 5.5, timeVar = 450}, {speed = 6, timeVar = 420}, {speed = 6.5, timeVar = 400},
+        {speed = 7, timeVar = 380}, {speed = 7.5, timeVar = 365}, {speed = 8, timeVar = 345}, {speed = 8.5, timeVar = 335}, {speed = 9, timeVar = 305}, {speed = 9.5, timeVar = 280},
+        {speed = 10, timeVar = 260}, {speed = 10.5, timeVar = 240}, {speed = 11, timeVar = 220}, {speed = 11.5, timeVar = 200}, {speed = 12, timeVar = 190}, {speed = 12.5, timeVar = 185},
+        {speed = 13, timeVar = 175}, {speed = 13.5, timeVar = 170}, {speed = 14, timeVar = 170}, {speed = 14.5, timeVar = 165}, {speed = 15, timeVar = 165}, {speed = 15.5, timeVar = 160},
+        {speed = 16, timeVar = 155}, {speed = 16.5, timeVar = 155}, {speed = 17, timeVar = 150}, {speed = 17.5, timeVar = 145}, {speed = 18, timeVar = 145}, {speed = 19, timeVar = 140},
+        {speed = 20, timeVar = 135}, {speed = 21, timeVar = 125}, {speed = 22, timeVar = 120}, {speed = 23, timeVar = 110}}
+
+    lightningIcon1 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon1.x = 20
+    lightningIcon1.y = lightningY
+    lightningIcon2 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon2.x = 60
+    lightningIcon2.y = lightningY
+    lightningIcon3 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon3.x = 100
+    lightningIcon3.y = lightningY
+    lightningIcon4 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon4.x = 140
+    lightningIcon4.y = lightningY
+    lightningIcon5 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon5.x = 180
+    lightningIcon5.y = lightningY
+    lightningIcon6 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon6.x = 220
+    lightningIcon6.y = lightningY
+    lightningIcon7 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon7.x = 260
+    lightningIcon7.y = lightningY
+    lightningIcon8 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon8.x = 300
+    lightningIcon8.y = lightningY
+    lightningIcon9 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon9.x = 340
+    lightningIcon9.y = lightningY
+    lightningIcon10 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon10.x = 380
+    lightningIcon10.y = lightningY
+    lightningIcon11 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon11.x = 420
+    lightningIcon11.y = lightningY
+    lightningIcon12 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon12.x = 460
+    lightningIcon12.y = lightningY
+    lightningIcon13 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon13.x = 500
+    lightningIcon13.y = lightningY
+    lightningIcon14 = display.newImage("images/lightningbolt_sm.png", 18, 31)
+    lightningIcon14.x = 540
+    lightningIcon14.y = lightningY
+    lightningIcon1:toBack()
+    lightningIcon2:toBack()
+    lightningIcon3:toBack()
+    lightningIcon4:toBack()
+    lightningIcon5:toBack()
+    lightningIcon6:toBack()
+    lightningIcon7:toBack()
+    lightningIcon8:toBack()
+    lightningIcon9:toBack()
+    lightningIcon10:toBack()
+    lightningIcon11:toBack()
+    lightningIcon12:toBack()
+    lightningIcon13:toBack()
+    lightningIcon14:toBack()
+end
+
 
 local bonusTimer
 local eventTimer
