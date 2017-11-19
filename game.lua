@@ -17,12 +17,11 @@ local stateFourGrow = 0
 local score = 0
 local numDeaths = 0
 
+local constantSpeed = true
 local levelsArrayArray
 local speedTableIndex = 3
 local speed
 local timeVar
--- local speed = 1
---local timeVar = 1250
 
 -- checks if game just started
 local countriesCompleted = 0
@@ -385,20 +384,35 @@ local function setupVariables()
     lightningIcon14 = display.newImage("images/lightningbolt_sm.png", 18, 31)
     lightningIcon14.x = 540
     lightningIcon14.y = lightningY
-    lightningIcon1:toBack()
-    lightningIcon2:toBack()
-    lightningIcon3:toBack()
-    lightningIcon4:toBack()
-    lightningIcon5:toBack()
-    lightningIcon6:toBack()
-    lightningIcon7:toBack()
-    lightningIcon8:toBack()
-    lightningIcon9:toBack()
-    lightningIcon10:toBack()
-    lightningIcon11:toBack()
-    lightningIcon12:toBack()
-    lightningIcon13:toBack()
-    lightningIcon14:toBack()
+    lightningIcon1.alpha = 0
+    lightningIcon2.alpha = 0
+    lightningIcon3.alpha = 0
+    lightningIcon4.alpha = 0
+    lightningIcon5.alpha = 0
+    lightningIcon6.alpha = 0
+    lightningIcon7.alpha = 0
+    lightningIcon8.alpha = 0
+    lightningIcon9.alpha = 0
+    lightningIcon10.alpha = 0
+    lightningIcon11.alpha = 0
+    lightningIcon12.alpha = 0
+    lightningIcon13.alpha = 0
+    lightningIcon14.alpha = 0
+
+    -- lightningIcon1:toBack()
+    -- lightningIcon2:toBack()
+    -- lightningIcon3:toBack()
+    -- lightningIcon4:toBack()
+    -- lightningIcon5:toBack()
+    -- lightningIcon6:toBack()
+    -- lightningIcon7:toBack()
+    -- lightningIcon8:toBack()
+    -- lightningIcon9:toBack()
+    -- lightningIcon10:toBack()
+    -- lightningIcon11:toBack()
+    -- lightningIcon12:toBack()
+    -- lightningIcon13:toBack()
+    -- lightningIcon14:toBack()
 end
 
 local function setupScoreboard()
@@ -568,11 +582,13 @@ local function resetSpawnTable()
     firstObject = true
     currColor = nil    --reset bonus score states for new flag
     prevColor = nil
+
+    -- SAM: bonusText activity
     if bonusText ~= nil then
         bonusText:removeSelf()
-		--bonusText:Remove()
         bonusText = nil
     end
+
 	--decide what state is next
     if state == 1 then
         state = 2
@@ -791,9 +807,10 @@ local function boundaryCheck(e)
                     if lookupCode(code, spawnTable[i]) == 1 then    --Out of bound and Palette Matches flag. GameOver
 
                         breakLoop = true
+
+                        -- SAM: bonusText activity
                         if bonusText ~= nil then
                             bonusText:removeSelf()
-							--bonusText:Remove()
                             bonusText = nil
                         end
 
@@ -1026,48 +1043,48 @@ end
 
 local function lightningIcons()
     if lightningCount == 0 then
-        lightningIcon1:toBack()
+        lightningIcon1.alpha = 0
     elseif lightningCount == 1 then
-        lightningIcon1:toFront()
-        lightningIcon2:toBack()
+        lightningIcon1.alpha = 1
+        lightningIcon2.alpha = 0
     elseif lightningCount == 2 then
-        lightningIcon2:toFront()
-        lightningIcon3:toBack()
+        lightningIcon2.alpha = 1
+        lightningIcon3.alpha = 0
     elseif lightningCount == 3 then
-        lightningIcon3:toFront()
-        lightningIcon4:toBack()
+        lightningIcon3.alpha = 1
+        lightningIcon4.alpha = 0
     elseif lightningCount == 4 then
-        lightningIcon4:toFront()
-        lightningIcon5:toBack()
+        lightningIcon4.alpha = 1
+        lightningIcon5.alpha = 0
     elseif lightningCount == 5 then
-        lightningIcon5:toFront()
-        lightningIcon6:toBack()
+        lightningIcon5.alpha = 1
+        lightningIcon6.alpha = 0
     elseif lightningCount == 6 then
-        lightningIcon6:toFront()
-        lightningIcon7:toBack()
+        lightningIcon6.alpha = 1
+        lightningIcon7.alpha = 0
     elseif lightningCount == 7 then
-        lightningIcon7:toFront()
-        lightningIcon8:toBack()
+        lightningIcon7.alpha = 1
+        lightningIcon8.alpha = 0
     elseif lightningCount == 8 then
-        lightningIcon8:toFront()
-        lightningIcon9:toBack()
+        lightningIcon8.alpha = 1
+        lightningIcon9.alpha = 0
     elseif lightningCount == 9 then
-        lightningIcon9:toFront()
-        lightningIcon10:toBack()
+        lightningIcon9.alpha = 1
+        lightningIcon10.alpha = 0
     elseif lightningCount == 10 then
-        lightningIcon10:toFront()
-        lightningIcon11:toBack()
+        lightningIcon10.alpha = 1
+        lightningIcon11.alpha = 0
     elseif lightningCount == 11 then
-        lightningIcon11:toFront()
-        lightningIcon12:toBack()
+        lightningIcon11.alpha = 1
+        lightningIcon12.alpha = 0
     elseif lightningCount == 12 then
-        lightningIcon12:toFront()
-        lightningIcon13:toBack()
+        lightningIcon12.alpha = 1
+        lightningIcon13.alpha = 0
     elseif lightningCount == 13 then
-        lightningIcon13:toFront()
-        lightningIcon14:toBack()
+        lightningIcon13.alpha = 1
+        lightningIcon14.alpha = 0
     elseif lightningCount == 14 then
-        lightningIcon14:toFront()
+        lightningIcon14.alpha = 1
     end
 end
 
@@ -1156,19 +1173,28 @@ function lightningStrike(self)
 	--bonus score
     if currColor == prevColor then
         spread = spread + 1
+
+        -- SAM: bonusText activity
         if bonusText ~= nil then
             bonusText:removeSelf()
-			--SAM: CFText
-			--bonusText:Remove()
             bonusText = nil
         end
 
-        bonusText = display.newEmbossedText("+" .. spread, scoreText.x, scoreText.y, "PTMono-Bold", 14)
-        bonusText:setFillColor(0, 0, 0)
-        bonusText:setEmbossColor(scoreboardColor)
+        local bonusTextTemp = display.newText("+" .. spread, scoreText.x, scoreText.y - scoreText.height, "PTMono-Bold", 14)
+        bonusTextTemp:setFillColor(0, 0, 0)
 
-		--SAM: CFText
-		--bonusText = CFText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
+        local bonusTextFadeDir = math.random(10,20)
+        if math.random() > .5 then
+            bonusTextFadeDir = -bonusTextFadeDir
+        end
+        transition.to(bonusTextTemp, {time=400, size=25, alpha=.5, x=bonusTextTemp.x+bonusTextFadeDir, y=bonusTextTemp.y-14, onComplete=function()
+            bonusTextTemp.alpha = 0
+            bonusTextTemp:removeSelf()
+            bonusTextTemp = nil
+        end})
+
+        -- SAM: disable bonusImplode for now...
+        --[[
         if motion ~= nil then
             timer.cancel(motion)
             motion = nil
@@ -1196,21 +1222,21 @@ function lightningStrike(self)
         bonusImplode.x = _W * (4 / 5)
         bonusImplode.y = _H / 2
         motion = timer.performWithDelay(800, cancelTimerBonusImplode, 1)
+        ]]--
     else
         spread = 1
         currColor = nil
         prevColor = nil
+
+        -- SAM: bonusText activity
         if bonusText ~= nil then
             bonusText:removeSelf()
-			--bonusText:Remove()
             bonusText = nil
         end
     end
     prevColor = self.type
 
     scoreText.text = score + spread
-	--SAM: CFText
-	--scoreText:Text(score+spread)
 
     score = score + spread
     lightningScore = lightningScore + spread
@@ -1224,11 +1250,8 @@ end
 local function delayPace()
     paceRect.isMoving = true
     if speedText ~= 0 and speedText ~= nil then
-		--SAM: CFText
         speedText.text = speed
         speedText:toFront()
-		--speedText:Text(speed)
-		--speedText:ToFront()
     end
 end
 
@@ -1250,24 +1273,14 @@ local function countryTextScale()
     timer.performWithDelay(500, deleteCountryText, 1)
 end
 
---SAMTEMP
-local usToCanada = 1
 local function countries(test)
+    -- local largerCountries = {2, 3, 6, 7, 9, 55}
+    -- local e = largerCountries[math.random(table.getn(largerCountries))]
 
-    local largerCountries = {2, 3, 6, 7, 9, 55}
-    local e = largerCountries[math.random(table.getn(largerCountries))]
-
-    if usToCanada == 1 then
-        e = 55
-        usToCanada = 2
-    else
-        e = 7
-        usToCanada = 1
-    end
+    -- USA
+    e = 55
 
     country = CFGameSettings:getItemByID(e)
-    --print("country : ", e)
-    --print(country.name)
 
     function destroyStuff()
 
@@ -1336,8 +1349,6 @@ local function countries(test)
         scaleFactorX = fxBG.height / fxBG.width
     end
 
-
-
     display.setDefault("textureWrapX", "repeat")
     display.setDefault("textureWrapY", "mirroredRepeat")
     fxBG.fill = {type = "image", filename = "images/fxgroup.png"}
@@ -1361,7 +1372,6 @@ local function countries(test)
 
     xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
     yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
-
 
     print("xCoord", xCoord, "yCoord", yCoord)
 
@@ -1491,7 +1501,7 @@ local function finishScale()
 end
 
 local function newFlag()
-    if countriesCompleted == 0 then
+    if countriesCompleted == 0 or constantSpeed == true then
         speed = levelsArray[speedTableIndex].speed
         timeVar = levelsArray[speedTableIndex].timeVar
         speedText.text = speed
@@ -1502,17 +1512,17 @@ local function newFlag()
 
     music = nil
 
+    -- SAM: bonusText activity
     if bonusText ~= nil then
         bonusText:removeSelf()
         bonusText = nil
-        --SAM: delete?
-        --bonusText:Remove()
 
         --SAM: delete?
         spread = 1
         prevColor = nil
         currColor = nil
     end
+
     countries()
     if infoMode == true then
         infoPic = display.newImage(info, 165, 77)
@@ -1570,6 +1580,19 @@ local function createPalette ()
     local spawns
     if state == 1 or state == 2 then
         local e = math.random(7)
+
+        -- SAM: put helper in new function. pass f to this function if debug mode (testingModeVar) is true. Add other countries
+        if country.code == "rbw" then
+            local randomColorOfFlag = math.random()
+            if randomColorOfFlag < 1/3 then
+                e = 1
+            elseif randomColorOfFlag < 2/3 then
+                e = 3
+            else
+                e = 7
+            end
+        end
+
         if e == 1 then
             spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
         elseif e == 2 then
@@ -1587,6 +1610,19 @@ local function createPalette ()
         end
 
         local f = math.random(7)
+
+        -- SAM: put helper in new function. pass f to this function if debug mode (testingModeVar) is true. Add other countries
+        if country.code == "rbw" then
+            local randomColorOfFlag = math.random()
+            if randomColorOfFlag < 1/3 then
+                f = 1
+            elseif randomColorOfFlag < 2/3 then
+                f = 3
+            else
+                f = 7
+            end
+        end
+
         if f == 1 then
             spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
         elseif f == 2 then
@@ -1754,9 +1790,9 @@ function objTouch(self, e)
 
         if lookupCode(code, e.target) == 0 then   --You are Dead --color does not match
 
+            -- SAM: bonusText activity
             if bonusText ~= nil then
                 bonusText:removeSelf()
-				--bonusText:Remove()
                 bonusText = nil
             end
 
@@ -1809,25 +1845,34 @@ function objTouch(self, e)
 			--BONUS SCORE
             if currColor == prevColor then
                 spread = spread + 1
+
+                -- SAM: bonusText activity
                 if bonusText ~= nil then
                     bonusText:removeSelf()
-					--bonusText:Remove()
                     bonusText = nil
                 end
-                text = "+" .. spread
 
-                bonusText = display.newEmbossedText(text, _W * (1 / 5), _H * (1 / 3), "PTMono-Bold", 38)
-                bonusText:setFillColor(1, .9, .4)
-                bonusText:setEmbossColor(scoreboardColor)
+                local bonusTextTemp = display.newText("+" .. spread, scoreText.x, scoreText.y - scoreText.height, "PTMono-Bold", 14)
+                bonusTextTemp:setFillColor(0, 0, 0)
+
+                local bonusTextFadeDir = math.random(10,20)
+                if math.random() > .5 then
+                    bonusTextFadeDir = -bonusTextFadeDir
+                end
+                transition.to(bonusTextTemp, {time=400, size=25, alpha=.5, x=bonusTextTemp.x+bonusTextFadeDir, y=bonusTextTemp.y-14, onComplete=function()
+                    bonusTextTemp.alpha = 0
+                    bonusTextTemp:removeSelf()
+                    bonusTextTemp = nil
+                end})
 
 				--SAM: CFText (advanced color classes), to be re-worked and implemented later
-
 				--bonusText = CFText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
 
                 if motion ~= nil then
                     timer.cancel(motion)
                     motion = nil
                 end
+
                 if spread == 2 then
                     bonusImplode:setSequence("2x")
                 elseif spread == 3 then
@@ -1851,14 +1896,15 @@ function objTouch(self, e)
                 bonusImplode.x = _W * (4 / 5)
                 bonusImplode.y = _H / 2
                 motion = timer.performWithDelay(800, cancelTimerBonusImplode, 1)
+
             else
                 spread = 1
                 currColor = nil
                 prevColor = nil
+
+                -- SAM: bonusText activity
                 if bonusText ~= nil then
                     bonusText:removeSelf()
-					--SAM: CFText
-					--bonusText:Remove()
                     bonusText = nil
                 end
             end
