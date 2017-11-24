@@ -1341,7 +1341,7 @@ local function countries(test)
 
     --SAM: Should i put this outside the countries() function?
     function destroyStuff()
-        
+
         if(countryOutline ~= nil) then
             countryOutline:removeSelf()
             countryOutline = nil

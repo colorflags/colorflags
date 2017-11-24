@@ -365,110 +365,112 @@ local function countryScale()
    timer.performWithDelay(500,deleteText,1)
 end
 
+-- SAM: better name for this
+local function countries(test)
+    -- local largerCountries = {2, 3, 6, 7, 9, 55}
+    -- local e = largerCountries[math.random(table.getn(largerCountries))]
 
-local usToCanada = 1
-local function countries(e)
+    -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
+    local randomCountry = math.random(CFGameSettings:getLength())
+    country = CFGameSettings:getItemByID(randomCountry)
 
---    local largerCountries = {2, 3, 6, 7, 9, 55}
---    local e = largerCountries[math.random(table.getn(largerCountries))]
+    print("current country: ", country.name)
 
---    if usToCanada == 1 then
---        e = 55
---        usToCanada = 2
---    else
---        e = 7
---        usToCanada = 1
---    end
+    inclusiveColorsArray = adherenceToFlagColors(0)
 
-    country = CFGameSettings:getItemByID(e)
-    --print("country : ", e)
-    --print(country.name)
-    function countryFX()
-        function destroyStuff()
+    --SAM: Should i put this outside the countries() function?
+    function destroyStuff()
 
-            if(countryOutline ~= nil) then
-                countryOutline:removeSelf()
-                countryOutline = nil
-            end
+        if(countryOutline ~= nil) then
+            countryOutline:removeSelf()
+            countryOutline = nil
+        end
 
-            print(mapGroup.numChildren)
-            if(mapGroup) then
-                for j=mapGroup.numChildren, 1, -1 do
-                    if(mapGroup[j].id == "fxGroup") then
-                        for k=mapGroup[j].numChildren, 1, -1 do
-                            local child = mapGroup[j][k]
-                            print("fxGroup item")
-                            print(child.fill)
-                            child:removeSelf()
-                            child = nil
-                        end
-                        print("remove group: ", mapGroup[j].id )
-                        mapGroup[j]:removeSelf()
+        -- print(mapGroup.numChildren)
+        if(mapGroup) then
+            for j=mapGroup.numChildren, 1, -1 do
+                if(mapGroup[j].id == "fxGroup") then
+                    for k=mapGroup[j].numChildren, 1, -1 do
+                        local child = mapGroup[j][k]
+                        print("fxGroup item")
+                        print(child.fill)
+                        child:removeSelf()
+                        child = nil
                     end
+                    print("remove group: ", mapGroup[j].id )
+                    mapGroup[j]:removeSelf()
                 end
             end
         end
-
-        destroyStuff()
-
-        countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
-        countryOutline:scale(0.5, 0.5)
-
-        newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
-        newTex:draw(countryOutline)
-        newTex:invalidate()
-
-        local fxGroup = display.newGroup()
-        fxGroup.id = "fxGroup"
-
-        local fxSize
-        if(countryOutline.width > countryOutline.height) then
-            fxSize = math.ceil(countryOutline.width) + 120
-        else
-            fxSize = math.ceil(countryOutline.height) + 120
-        end
-
-        -- SAM: local?
-        fxBG = display.newCircle(0, 0, fxSize)
-        fxBG.anchorX = .5
-        fxBG.anchorY = .5
-
-        local scaleFactorX = 1
-        local scaleFactorY = 1
-
-        if (fxBG.width > fxBG.height) then
-            scaleFactorY = fxBG.width / fxBG.height
-        else
-            scaleFactorX = fxBG.height / fxBG.width
-        end
-
-        display.setDefault("textureWrapX", "repeat")
-        display.setDefault("textureWrapY", "mirroredRepeat")
-        fxBG.fill = {type = "image", filename = "images/fxgroup.png"}
-        fxBG.fill.scaleX = .5 * scaleFactorX
-        fxBG.fill.scaleY = .5 * scaleFactorY
-        fxBG.fill.effect = "filter.straighten"
-        fxBG.fill.effect.width = 10
-        fxBG.fill.effect.height = 50
-        fxBG.fill.effect.angle = 20
-        fxBG.rotation = 0
-
-        fxGroup.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
-        fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
-        fxGroup:insert(fxBG)
-
-        mask = graphics.newMask(newTex.filename, newTex.baseDir)
-        fxGroup:setMask(mask)
-        canvasObj.alpha = 0
-
-        mapGroup:insert(fxGroup)
-
-        xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
-        yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
     end
-    countryFX()
 
-    print("xCoord", xCoord, "yCoord", yCoord)
+    destroyStuff()
+
+    countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
+    --SAM: countryOutline scaling
+    countryOutlineWidthMultiplier = display.pixelHeight/display.contentWidth
+    countryOutlineHeightMultiplier = display.pixelWidth/display.contentHeight
+    -- print("pixelHeight / contentWidth: ", countryOutlineWidthMultiplier)
+    -- print("pixelWidth / contentHeight: ", countryOutlineHeightMultiplier)
+    countryOutline:scale(1/countryOutlineWidthMultiplier, 1/countryOutlineHeightMultiplier)
+
+
+
+    newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
+    newTex:draw(countryOutline)
+    newTex:invalidate()
+
+    local fxGroup = display.newGroup()
+    fxGroup.id = "fxGroup"
+
+    local fxSize
+    if(countryOutline.width > countryOutline.height) then
+        fxSize = math.ceil(countryOutline.width) + 120
+    else
+        fxSize = math.ceil(countryOutline.height) + 120
+    end
+
+	-- SAM: local?
+	fxBG = display.newCircle(0, 0, fxSize)
+    fxBG.anchorX = .5
+    fxBG.anchorY = .5
+
+    --[[ What does this scaleFactorX and scaleFactorY do?
+    ]]--
+    local scaleFactorX = 1
+	local scaleFactorY = 1
+
+    if (fxBG.width > fxBG.height) then
+        scaleFactorY = fxBG.width / fxBG.height
+    else
+        scaleFactorX = fxBG.height / fxBG.width
+    end
+
+    display.setDefault("textureWrapX", "repeat")
+    display.setDefault("textureWrapY", "mirroredRepeat")
+    fxBG.fill = {type = "image", filename = "images/fxgroup.png"}
+    fxBG.fill.scaleX = .5 * scaleFactorX
+    fxBG.fill.scaleY = .5 * scaleFactorY
+    fxBG.fill.effect = "filter.straighten"
+    fxBG.fill.effect.width = 10
+    fxBG.fill.effect.height = 50
+    fxBG.fill.effect.angle = 20
+    fxBG.rotation = 0
+
+    fxGroup.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
+    fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
+    fxGroup:insert(fxBG)
+
+    mask = graphics.newMask(newTex.filename, newTex.baseDir)
+    fxGroup:setMask(mask)
+    canvasObj.alpha = 0
+
+    mapGroup:insert(fxGroup)
+
+    xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
+    yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
+
+    --print("xCoord", xCoord, "yCoord", yCoord)
 
     local function animateCountry()
         transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
@@ -483,30 +485,15 @@ local function countries(e)
     flag:setSequence(country.name)
     flag.anchorX = 0.5 ; flag.anchorY = 0.5
 
-	if(flagScaleStyle == 0) then
-		flag.width = 200
-		flag.height = 100
-		flag.anchorX = 0.5
-		flag.anchorY = 0.5
-		flag.x = _W/2
-		flag.y = _H/2
-	elseif(flagScaleStyle == 1) then
-		flag.anchorX = 0.5
-		flag.anchorY = 0.5
-		flag.x = _W/2
-		flag.y = _H/2
-	elseif(flagScaleStyle == 2) then
-		flag.width = 500
-		flag.height = 333
-		flag.xScale = .2
-		flag.yScale = .2 * .7
-		flag.anchorX = 1
-		flag.anchorY = 0.5
-		if(flagScalePos == 0) then
-			flag.x = _W
-			flag.y = _H/2
-		end
-	end
+    flag.width = 500
+    flag.height = 333
+    flag.xScale = .2
+    flag.yScale = .2 * .7
+    flag.anchorX = 1
+    flag.anchorY = 0.5
+
+    flag.x = _W
+    flag.y = _H/2
 
     code = country.code
 
@@ -514,47 +501,50 @@ local function countries(e)
         r1 = country.colors.r.r
         r2 = country.colors.r.g
         r3 = country.colors.r.b
-        print(r1, r2, r3)
+        -- print(r1, r2, r3)
     end
     if(country.colors.w) then
         w1 = country.colors.w.r
         w2 = country.colors.w.g
         w3 = country.colors.w.b
-        print(w1, w2, w3)
+        -- print(w1, w2, w3)
     end
     if(country.colors.y) then
         y1 = country.colors.y.r
         y2 = country.colors.y.g
         y3 = country.colors.y.b
-        print(y1, y2, y3)
+        -- print(y1, y2, y3)
     end
     if(country.colors.g) then
         g1 = country.colors.g.r
         g2 = country.colors.g.g
         g3 = country.colors.g.b
-        print(g1, g2, g3)
+        -- print(g1, g2, g3)
     end
     if(country.colors.b) then
         b1 = country.colors.b.r
         b2 = country.colors.b.g
         b3 = country.colors.b.b
-        print(b1, b2, b3)
+        -- print(b1, b2, b3)
     end
     if(country.colors.o) then
         o1 = country.colors.o.r
         o2 = country.colors.o.g
         o3 = country.colors.o.b
-        print(o1, o2, o3)
+        -- print(o1, o2, o3)
     end
     if(country.colors.k) then
         k1 = country.colors.k.r
         k2 = country.colors.k.g
         k3 = country.colors.k.b
-        print(k1, k2, k3)
+        -- print(k1, k2, k3)
     end
 
 	-- if check.. when first flag appear. there will be no music. !!!
-    audio.stop(bobby)
+    if countriesCompleted ~= 0 then
+        audio.stop(bobby)
+    end
+
     music = audio.loadStream("anthems/" .. country.name .. ".mp3")
     bobby = audio.play(music, {loops = -1})
 end
