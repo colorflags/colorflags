@@ -4,9 +4,6 @@ local CFText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
 
---SAM: var to handle death
---SAM: var to handle animations
-
 --effects createPalette()
 local adherenceToFlagColorsBool = true
 local inclusiveColorsArray = {}
@@ -19,6 +16,8 @@ local codeLetterToColorKey = {
     g = "green",
     b = "blue"
 }
+--SAM: var to handle death
+--SAM: var to handle animations
 
 local gotoDeath = false
 local lightningCount = 1
@@ -1525,6 +1524,7 @@ local function removeFlag()
     flag:removeSelf()
     flag  = nil
 end
+
 --MIKE: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ?? Maybe merge all functions pertaining to newFlag and flag enlargement into one neat function
 local function finishScale()
     topBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)

@@ -13,7 +13,7 @@ local activeCountry
 local xBtn
 local fwBtn
 
-local canQuit=false
+local canSkip = false
 local currentObject
 local touchInsideBtn = false
 local isBtnAnim = false
@@ -277,15 +277,20 @@ local function myTouchListener(event)
             currentObject:setSequence("xBtn")
         end
 
-        --SAM: canQuit is a bad variable name. This var controls access to both back AND quit buttons. Remove feature?
-        if touchInsideBtn == true and canQuit == true then
+        --SAM: canSkip is a bad variable name. This var controls access to both back AND quit buttons. Remove feature?
+        if touchInsideBtn == true then
 
             print("touch OFF. inside")
             -- composer.removeScene("start")
 
             if(currentObject.name == "xBtn") then
+                -- print("sideTimer:", sideTimer)
+                if sideTimer then
+                    timer.cancel(sideTimer)
+                end
+
                 composer.gotoScene ( "menu", { effect = defaultTransition } )
-            elseif(currentObject.name == "fwBtn") then
+            elseif(currentObject.name == "fwBtn" and canSkip == true) then
                 setTheFlag = true
             end
 
@@ -344,14 +349,6 @@ local function doFunction(e)
     end
 end
 
-local function finishScale()
---  transition.to( xBtn, { time=250, alpha=1 })
---  transition.to( fwBtn, { time=250, alpha=1 })
-  xBtn:toFront()
-  fwBtn:toFront()
-  canQuit=true
-end
-
 local function infoAppear()
    transition.to(infoPic, {time=500, alpha=1})
 end
@@ -376,7 +373,6 @@ local function countries(test)
 
     print("current country: ", country.name)
 
-    inclusiveColorsArray = adherenceToFlagColors(0)
 
     --SAM: Should i put this outside the countries() function?
     function destroyStuff()
@@ -481,7 +477,7 @@ local function countries(test)
 
     info="images/infoBrazil.png"
 
-    flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
+    flag = display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
     flag:setSequence(country.name)
     flag.anchorX = 0.5 ; flag.anchorY = 0.5
 
@@ -494,51 +490,7 @@ local function countries(test)
 
     flag.x = _W
     flag.y = _H/2
-
-    code = country.code
-
-    if(country.colors.r) then
-        r1 = country.colors.r.r
-        r2 = country.colors.r.g
-        r3 = country.colors.r.b
-        -- print(r1, r2, r3)
-    end
-    if(country.colors.w) then
-        w1 = country.colors.w.r
-        w2 = country.colors.w.g
-        w3 = country.colors.w.b
-        -- print(w1, w2, w3)
-    end
-    if(country.colors.y) then
-        y1 = country.colors.y.r
-        y2 = country.colors.y.g
-        y3 = country.colors.y.b
-        -- print(y1, y2, y3)
-    end
-    if(country.colors.g) then
-        g1 = country.colors.g.r
-        g2 = country.colors.g.g
-        g3 = country.colors.g.b
-        -- print(g1, g2, g3)
-    end
-    if(country.colors.b) then
-        b1 = country.colors.b.r
-        b2 = country.colors.b.g
-        b3 = country.colors.b.b
-        -- print(b1, b2, b3)
-    end
-    if(country.colors.o) then
-        o1 = country.colors.o.r
-        o2 = country.colors.o.g
-        o3 = country.colors.o.b
-        -- print(o1, o2, o3)
-    end
-    if(country.colors.k) then
-        k1 = country.colors.k.r
-        k2 = country.colors.k.g
-        k3 = country.colors.k.b
-        -- print(k1, k2, k3)
-    end
+    -- flag.y = _H/2 + math.random(100)
 
 	-- if check.. when first flag appear. there will be no music. !!!
     if countriesCompleted ~= 0 then
@@ -549,20 +501,37 @@ local function countries(test)
     bobby = audio.play(music, {loops = -1})
 end
 
+
+--MIKE: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ?? Maybe merge all functions pertaining to newFlag and flag enlargement into one neat function
+local function finishScale()
+    canSkip=true
+
+    transition.to(flag, {time = 1000, alpha = 1})
+
+    flagLightningReady = timer.performWithDelay(1000, lightningEnable, 1)
+    --SAM: delete this? used for offsetting when speedUp() occurs - can happen in during midst of a country
+    -- timerSpeed = timer.performWithDelay(9500, speedUp, 1)
+
+    countriesCompleted = countriesCompleted + 1
+end
+
+
 local function newFlag(e)
+
     music = nil
-    if deadText ~= nil then
-        display.remove(deadText)
-        if bonusText ~= nil then
-            bonusText:removeSelf()
-			--bonusText:Remove()
-            bonusText = nil
-            spread = 1
-            prevColor = nil
-            currColor = nil
-        end
+
+    if countriesCompleted > 0 then
+        print(type(flag)) -- flag var type seems to be a table?
+        flag:removeSelf()
+        flag = nil
     end
+
     countries(e)
+
+    xBtn:toFront()
+    fwBtn:toFront()
+
+    --[[
     if infoMode == true then
         infoPic = display.newImage(info, 165, 77)
         infoPic.x = _W / 6
@@ -576,44 +545,30 @@ local function newFlag(e)
     countryText:setFillColor(0, 0, 0)
     countryText:toFront()
     timer.performWithDelay(2000, countryTextScale, 1)
+    ]]--
 
-	--FLAG SCALING STARTS HERE
+    sideTimer = timer.performWithDelay(1500, finishScale, 1)
+    paceTimer=timer.performWithDelay(900,delayPace,1)
+    transition.to( map, { time=1500, alpha=1 })
+    mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
 
-    if state == 4 then
-        sideTimer = timer.performWithDelay(1500, finishScale, 1)
-        mapTimer = transition.to(map, {time = 1500, x = xCoord, y = yCoord})
-        flagTimer = transition.to(flag, {time = 1500, xScale = .2, yScale = .2})
-        paceTimer = timer.performWithDelay(900, delayPace, 1)
-    elseif state == 3 then
---        sideTimer = timer.performWithDelay(1500, finishScale, 1)
---        mapTimer = transition.to(map, {time = 2000, x = xCoord, y = yCoord})
---        flagTimer = transition.to(flag, {time = 2000, xScale = .2, yScale = .2})
---        paceTimer = timer.performWithDelay(0, delayPace, 1)
-
-        sideTimer = timer.performWithDelay(1500, finishScale, 1)
-        paceTimer=timer.performWithDelay(900,delayPace,1)
-        transition.to( map, { time=1500, alpha=1 })
-        mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
-    elseif state == 2 or state == 1 then
-        sideTimer = timer.performWithDelay(100, finishScale, 1)
-        paceTimer=timer.performWithDelay(900,delayPace,1)
-        transition.to( map, { time=1500, alpha=1 })
-        mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
-    end
-
+--[[SAM: countryOutline scaling ]]--
 --    TEMP: alternative styles
 --    countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 })
 
+--[[SAM: countryOutline scaling ]]--
 --		mapGroup.xScale = .5
 --		mapGroup.yScale = .5
 --		mapGroup.x = xCoord*.5 + (_W*.25)
 --		mapGroup.y = yCoord*.5 + (_H*.25)
 
+--[[SAM: countryOutline scaling ]]--
 --     with scale
---		mapTimer = transition.to(mapGroup, {time = 500, x=xCoord*.5+(_W*.25), y=yCoord*.5+(_H*.25), xScale = .5, yScale = .5})
+--		mapTimer = transition.to(map, {time = 500, x=xCoord*.5+(_W*.25), y=yCoord*.5+(_H*.25), xScale = .5, yScale = .5})
 
 --    SAM: what is this?
 
+    -- SAM: this sort of countriesCompleted == 0 checking should be done in countries()
 --    if(countriesCompleted == 0) then
 --         without scale
 --			mapTimer = transition.to(map, {time = 1500, alpha = 1, x=xCoord, y=yCoord})
@@ -624,18 +579,6 @@ local function newFlag(e)
 --		mapTimer = transition.to(mapGroup, {time = 1500, x=xCoord, y=yCoord})
 --		transition.to(fxGroup, {time = 1500, x=_W/2, y=_H/2})
 
-    if(flagScaleStyle == 0) then
-        flagTimer=transition.to( flag, { time=1500, alpha = .2, xScale=.2, yScale=.2})
-    elseif(flagScaleStyle == 1) then
-        flagTimer = transition.to(flag, {delay = 500, time = 1000, alpha = .2, xScale = .075, yScale = .075 * .7})
-    elseif(flagScaleStyle == 2) then
-    end
-
-end
-
-local function removeFlag()
-              flagGroup:removeSelf()
-              flagGroup = nil
 end
 
 local function readyObject(e)
@@ -649,24 +592,11 @@ local function readyObject(e)
 
         newFlag(activeCountry)
         setTheFlag=false
-
-        --SAM: old shit. Delete?
-        --[[
-        transition.to( xBtn, { time=250, alpha=0 })
-        transition.to( fwBtn, { time=250, alpha=0 })
-
-        canQuit=false
-        transition.to( piece, { time=490, alpha=0,onComplete=killPiece})
-        if infoMode == true then
-            infoTimer=transition.to(infoPic, {time=500, alpha=0})
-        end
-        flagRemoveTimer=transition.to( flag, { time=500, alpha=0, onComplete=removeFlag   })    --remove flag
-        newFlagTimer=timer.performWithDelay(600,newFlag)
-        ]]--
     end
 end
 
 local function nextFlag()
+    -- flag:removeSelf()
     if setTheFlag==true then     --START A NEW FLAG
         if activeCountry < CFGameSettings:getLength() then
             activeCountry = activeCountry + 1
@@ -710,6 +640,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
+
     local margins = 6
     fwBtn = display.newSprite(btnsSheet, btnsSeq)
     fwBtn:setSequence("fwBtn")
@@ -765,7 +696,7 @@ function scene:show(e)
         Runtime:addEventListener("enterFrame", readyObject)
 --        setTimer=timer.performWithDelay(20000, setFlag, 0)
 --        timer.performWithDelay(15000, checkMemory,0)
-
+        print("when does this happen")
         activeCountry = math.random(CFGameSettings:getLength())
         newFlag(activeCountry)
     end
@@ -782,8 +713,6 @@ function scene:hide(e)
     --composer.removeScene("tableView")
     display.remove(background)
     display.remove(flag)
-    display.remove(flagGroup)
-    display.remove(mapGroup)
     display.remove(xBtn)
     display.remove(fwBtn)
     display.remove(countryText)
@@ -797,7 +726,7 @@ function scene:hide(e)
 end
 
 function scene:destroy(e)
-  print("DESTROY")
+    print("DESTROY")
 end
 
 scene:addEventListener( "create", scene)

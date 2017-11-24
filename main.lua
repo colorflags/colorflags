@@ -144,7 +144,7 @@ if showSplash==true then
 elseif showSplash==false then
         display.remove(splash1)
     display.remove(splash2)
-     composer.gotoScene( "game", {effect = defaultTransition})
+     composer.gotoScene( "cruise", {effect = defaultTransition})
 end
 
 
