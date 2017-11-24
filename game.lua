@@ -1,12 +1,24 @@
 -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html
-
 local CFText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
 
 --SAM: var to handle death
 --SAM: var to handle animations
+
+--effects createPalette()
+local adherenceToFlagColorsBool = true
+local inclusiveColorsArray = {}
+local codeLetterToColorKey = {
+    w = "white",
+    k = "black",
+    r = "red",
+    o = "orange",
+    y = "yellow",
+    g = "green",
+    b = "blue"
+}
 
 local gotoDeath = false
 local lightningCount = 1
@@ -18,7 +30,7 @@ local score = 0
 local numDeaths = 0
 
 local constantSpeed = true
-local levelsArrayArray
+local levelsArray
 local speedTableIndex = 3
 local speed
 local timeVar
@@ -122,6 +134,7 @@ local modeIncreaseBtnSym
 
 local deathScenario2Array = {}
 
+-- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
 local country
 local countryText
 
@@ -178,7 +191,7 @@ local nationalFlagsSeq = {
     {name = "southafrica", sheet = nationalFlags2Sheet, frames = {21}},
     {name = "southkorea", sheet = nationalFlags2Sheet, frames = {22}},
     {name = "spain", sheet = nationalFlags2Sheet, frames = {23}},
-    {name = "sriLanka", sheet = nationalFlags2Sheet, frames = {24}},
+    {name = "srilanka", sheet = nationalFlags2Sheet, frames = {24}},
     {name = "sweden", sheet = nationalFlags3Sheet, frames = {1}},
     {name = "switzerland", sheet = nationalFlags3Sheet, frames = {2}},
 	-- SAM: Taiwan flag out of order in sprite/atlas because originally named Republic of China
@@ -227,8 +240,8 @@ local countryOutlineTest
 local fxGroup
 local fxBG
 local fxAnim
--- SAM: redunant
 
+--SAM: redunant?
 --countryOutline.fill = { 1, 0, 0.5, 0.3 }
 --countryOutline.anchorX=.5
 --countryOutline.anchorY=.5
@@ -871,7 +884,7 @@ local function boundaryCheck(e)
                                         if state == 1 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
                                                 if spawnTable[i].isTopLeft then
-                                                    print("FUCKING CUNT")
+                                                    -- print("FUCKING CUNT")
                                                     transition.to( deathScenario2Array[1], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[1], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
                                                 elseif not spawnTable[i].isBottomRight then
                                                     transition.to( deathScenario2Array[4], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[4], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
@@ -937,6 +950,7 @@ local function spawnPalette(params)
     object.objTable = params.objTable   --Set the objects table to a table passed in by parameters
     object.index = #object.objTable + 1    --Automatically set the table index to be inserted into the next available table index
     object.myName = "Object: " .. object.index  --Give the object a custom name
+    --SAM: eradicate this isTopLeft and isBottomLeft business
     object.isTopLeft = params.isTopLeft
     object.isBottomLeft = params.isBottomLeft
     object.corner = params.corner
@@ -1273,23 +1287,67 @@ local function countryTextScale()
     timer.performWithDelay(500, deleteCountryText, 1)
 end
 
+local function adherenceToFlagColors(e)
+    local result
+
+    -- SAM: if inclusiveColorsArray == nil then... no need to pass in number! just set inclusiveColorsArray = nil after each flag
+    if(e == 0) then
+        result = function()
+            local dataArray = {}
+            -- SET
+            -- local countryColors = {}
+            local flagColorCount = 0
+            for k, v in pairs(country.colors) do
+                -- print(k, v.r)
+                flagColorCount = flagColorCount + 1
+                dataArray[flagColorCount] = { k, {v.r, v.g, v.b} }
+            end
+            return dataArray
+        end
+        return result()
+    else
+        result = function()
+            local randomColorIndex = math.random(table.getn(inclusiveColorsArray))
+            local randomColorArray = inclusiveColorsArray[randomColorIndex][2]
+            local colors = {}
+
+            for i = 1, #randomColorArray do
+                colors[i] = randomColorArray[i]
+            end
+
+            -- print("chose { " .. inclusiveColorsArray[randomColorIndex][1] .. " } from codes")
+            -- print("r = " .. colors[1], "g = " .. colors[2], "b = " .. colors[3])
+
+            --only need to pass in color code
+            return inclusiveColorsArray[randomColorIndex][1]
+        end
+        return result()
+    end
+
+end
+
+-- SAM: better name for this
 local function countries(test)
     -- local largerCountries = {2, 3, 6, 7, 9, 55}
     -- local e = largerCountries[math.random(table.getn(largerCountries))]
 
-    -- USA
-    e = 55
+    -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
+    local randomCountry = math.random(CFGameSettings:getLength())
+    country = CFGameSettings:getItemByID(randomCountry)
 
-    country = CFGameSettings:getItemByID(e)
+    print("current country: ", country.name)
 
+    inclusiveColorsArray = adherenceToFlagColors(0)
+
+    --SAM: Should i put this outside the countries() function?
     function destroyStuff()
-
+        
         if(countryOutline ~= nil) then
             countryOutline:removeSelf()
             countryOutline = nil
         end
 
-        print(mapGroup.numChildren)
+        -- print(mapGroup.numChildren)
         if(mapGroup) then
             for j=mapGroup.numChildren, 1, -1 do
                 if(mapGroup[j].id == "fxGroup") then
@@ -1310,11 +1368,11 @@ local function countries(test)
     destroyStuff()
 
     countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
-    --[[SAM: countryOutline scaling ]]--
+    --SAM: countryOutline scaling
     countryOutlineWidthMultiplier = display.pixelHeight/display.contentWidth
     countryOutlineHeightMultiplier = display.pixelWidth/display.contentHeight
-    print("pixelHeight / contentWidth: ", countryOutlineWidthMultiplier)
-    print("pixelWidth / contentHeight: ", countryOutlineHeightMultiplier)
+    -- print("pixelHeight / contentWidth: ", countryOutlineWidthMultiplier)
+    -- print("pixelWidth / contentHeight: ", countryOutlineHeightMultiplier)
     countryOutline:scale(1/countryOutlineWidthMultiplier, 1/countryOutlineHeightMultiplier)
 
 
@@ -1373,7 +1431,7 @@ local function countries(test)
     xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
     yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
 
-    print("xCoord", xCoord, "yCoord", yCoord)
+    --print("xCoord", xCoord, "yCoord", yCoord)
 
     local function animateCountry()
         transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
@@ -1404,47 +1462,50 @@ local function countries(test)
         r1 = country.colors.r.r
         r2 = country.colors.r.g
         r3 = country.colors.r.b
-        print(r1, r2, r3)
+        -- print(r1, r2, r3)
     end
     if(country.colors.w) then
         w1 = country.colors.w.r
         w2 = country.colors.w.g
         w3 = country.colors.w.b
-        print(w1, w2, w3)
+        -- print(w1, w2, w3)
     end
     if(country.colors.y) then
         y1 = country.colors.y.r
         y2 = country.colors.y.g
         y3 = country.colors.y.b
-        print(y1, y2, y3)
+        -- print(y1, y2, y3)
     end
     if(country.colors.g) then
         g1 = country.colors.g.r
         g2 = country.colors.g.g
         g3 = country.colors.g.b
-        print(g1, g2, g3)
+        -- print(g1, g2, g3)
     end
     if(country.colors.b) then
         b1 = country.colors.b.r
         b2 = country.colors.b.g
         b3 = country.colors.b.b
-        print(b1, b2, b3)
+        -- print(b1, b2, b3)
     end
     if(country.colors.o) then
         o1 = country.colors.o.r
         o2 = country.colors.o.g
         o3 = country.colors.o.b
-        print(o1, o2, o3)
+        -- print(o1, o2, o3)
     end
     if(country.colors.k) then
         k1 = country.colors.k.r
         k2 = country.colors.k.g
         k3 = country.colors.k.b
-        print(k1, k2, k3)
+        -- print(k1, k2, k3)
     end
 
 	-- if check.. when first flag appear. there will be no music. !!!
-    audio.stop(bobby)
+    if countriesCompleted ~= 0 then
+        audio.stop(bobby)
+    end
+
     music = audio.loadStream("anthems/" .. country.name .. ".mp3")
     bobby = audio.play(music, {loops = -1})
 end
@@ -1538,8 +1599,8 @@ local function newFlag()
     countryText:toFront()
     timer.performWithDelay(2000, countryTextScale, 1)
 
-	--FLAG SCALING STARTS HERE
-    print("which state???")
+	--SAM: FLAG SCALING STARTS HERE
+    -- print("which state???")
     modeText.text = state
 
     sideTimer = timer.performWithDelay(1500, finishScale, 1)
@@ -1576,86 +1637,77 @@ local function newFlag()
 
 end
 
-local function createPalette ()
+local function createPalette()
     local spawns
     if state == 1 or state == 2 then
-        local e = math.random(7)
+        if adherenceToFlagColorsBool == true then
+            local codeLetter
 
-        -- SAM: put helper in new function. pass f to this function if debug mode (testingModeVar) is true. Add other countries
-        if country.code == "rbw" then
-            local randomColorOfFlag = math.random()
-            if randomColorOfFlag < 1/3 then
-                e = 1
-            elseif randomColorOfFlag < 2/3 then
-                e = 3
-            else
-                e = 7
+            codeLetter = adherenceToFlagColors(1)
+            spawns = spawnPalette({objTable = spawnTable, type = codeLetterToColorKey[codeLetter], isTopLeft = false})
+            codeLetter = adherenceToFlagColors(1)
+            spawns = spawnPalette({objTable = spawnTable, type = codeLetterToColorKey[codeLetter], isTopLeft = true})
+        else
+            --SAM: eradicate this isTopLeft and isBottomLeft business
+            local e = math.random(7)
+            if e == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
+            elseif e == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false})
+            elseif e == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
+            elseif e == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
+            elseif e == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
+            elseif e == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})
+            elseif e == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})
             end
-        end
-
-        if e == 1 then
-            spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
-        elseif e == 2 then
-            spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false})
-        elseif e == 3 then
-            spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
-        elseif e == 4 then
-            spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
-        elseif e == 5 then
-            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
-        elseif e == 6 then
-            spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})
-        elseif e == 7 then
-            spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})
-        end
-
-        local f = math.random(7)
-
-        -- SAM: put helper in new function. pass f to this function if debug mode (testingModeVar) is true. Add other countries
-        if country.code == "rbw" then
-            local randomColorOfFlag = math.random()
-            if randomColorOfFlag < 1/3 then
-                f = 1
-            elseif randomColorOfFlag < 2/3 then
-                f = 3
-            else
-                f = 7
+            --SAM: eradicate this isTopLeft and isBottomLeft business
+            local f = math.random(7)
+            if f == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
+            elseif f == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true})
+            elseif f == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
+            elseif f == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
+            elseif f == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
+            elseif f == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})
+            elseif f == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})
             end
-        end
-
-        if f == 1 then
-            spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
-        elseif f == 2 then
-            spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true})
-        elseif f == 3 then
-            spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
-        elseif f == 4 then
-            spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
-        elseif f == 5 then
-            spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
-        elseif f == 6 then
-            spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})
-        elseif f == 7 then
-            spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})
         end
     elseif state == 3 then
+        local cornersArray = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
         for i = 1, 4 do
-            local random = math.random(7)
-            local cornersArray = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
-            if random == 1 then
-                spawns = spawnPalette({objTable = spawnTable, type = "white", corner = cornersArray[i]})
-            elseif random == 2 then
-                spawns = spawnPalette({objTable = spawnTable, type = "black", corner = cornersArray[i]})
-            elseif random == 3 then
-                spawns = spawnPalette({objTable = spawnTable, type = "red", corner = cornersArray[i]})
-            elseif random == 4 then
-                spawns = spawnPalette({objTable = spawnTable, type = "orange", corner = cornersArray[i]})
-            elseif random == 5 then
-                spawns = spawnPalette({objTable = spawnTable, type = "yellow", corner = cornersArray[i]})
-            elseif random == 6 then
-                spawns = spawnPalette({objTable = spawnTable, type = "green", corner = cornersArray[i]})
-            elseif random == 7 then
-                spawns = spawnPalette({objTable = spawnTable, type = "blue", corner = cornersArray[i]})
+            if adherenceToFlagColorsBool == true then
+                local codeLetter
+
+                codeLetter = adherenceToFlagColors(1)
+                spawns = spawnPalette({objTable = spawnTable, type = codeLetterToColorKey[codeLetter], corner = cornersArray[i]})
+            else
+                local random = math.random(7)
+                if random == 1 then
+                    spawns = spawnPalette({objTable = spawnTable, type = "white", corner = cornersArray[i]})
+                elseif random == 2 then
+                    spawns = spawnPalette({objTable = spawnTable, type = "black", corner = cornersArray[i]})
+                elseif random == 3 then
+                    spawns = spawnPalette({objTable = spawnTable, type = "red", corner = cornersArray[i]})
+                elseif random == 4 then
+                    spawns = spawnPalette({objTable = spawnTable, type = "orange", corner = cornersArray[i]})
+                elseif random == 5 then
+                    spawns = spawnPalette({objTable = spawnTable, type = "yellow", corner = cornersArray[i]})
+                elseif random == 6 then
+                    spawns = spawnPalette({objTable = spawnTable, type = "green", corner = cornersArray[i]})
+                elseif random == 7 then
+                    spawns = spawnPalette({objTable = spawnTable, type = "blue", corner = cornersArray[i]})
+                end
             end
         end
     end
@@ -1925,12 +1977,13 @@ end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
-    print("CREATE")
+    --SAM: determine objects to be managed by scene:create()
+    -- print("CREATE")
 end
 
 function scene:show(e)
     if (e.phase == "will") then
-        print("SHOWWILL")
+        -- print("SHOWWILL")
 
         setupVariables()
         setupScoreboard()
@@ -1955,7 +2008,7 @@ function scene:show(e)
 end
 
 function scene:hide(e)
-    print("HIDE")
+    -- print("HIDE")
     if e.phase == "will" then
         display.remove(background)
 
@@ -1995,7 +2048,8 @@ function scene:hide(e)
 end
 
 function scene:destroy(e)
-    print("DESTROY")
+    --SAM: determine objects to be managed by scene:destroy()
+    -- print("DESTROY")
 end
 
 scene:addEventListener("create", scene)

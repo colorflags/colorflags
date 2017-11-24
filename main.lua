@@ -50,7 +50,7 @@ defaultTransition="crossFade"
 
 overrideScore=true  --set true to test gameover.lua
 
-local showSplash = false    --set false to skip mageegames splash 
+local showSplash = false    --set false to skip mageegames splash
 
 local fontFace
 local backgrounImage=nil
@@ -69,25 +69,25 @@ local splash1 = display.newImageRect( "images/MMG1.png", 580, 320 )
     splash1.anchorX=0.5
     splash1.anchorY=0.5
     splash1.x = _W/2
-    splash1.y = _H/2 
+    splash1.y = _H/2
     splash1:toFront()
 
 local splash2 = display.newImageRect( "images/MMG2.png", 580, 320 )
     splash2.anchorX=0.5
     splash2.anchorY=0.5
     splash2.x = _W/2
-    splash2.y = _H/2 
+    splash2.y = _H/2
     splash2.alpha=0
     splash2:toFront()
 
 local function eraseSplash()
     display.remove(splash1)
     display.remove(splash2)
- composer.gotoScene( "menu", {effect = defaultTransition} )   
+ composer.gotoScene( "menu", {effect = defaultTransition} )
 end
 
 local function fadeSplash()
-    check1=transition.to(splash2, {time=1500,alpha=1})  
+    check1=transition.to(splash2, {time=1500,alpha=1})
     timer.performWithDelay(2500,eraseSplash,1)
 end
 
@@ -104,12 +104,12 @@ function playSound(audioObj,chn)
 	if audioCanPlay then
 		chnUsed = audio.play(audioObj,{channel=chn})
     end
-    return chnUsed		
+    return chnUsed
 end
 
 function makeTextButton(txt,x,y,opts)
 	local options  = opts or {}
-    
+
     if environment=="simulator" then
       fontFace = options.fontFace or "Helvetica"
     elseif environment=="device" then
@@ -145,10 +145,9 @@ elseif showSplash==false then
         display.remove(splash1)
     display.remove(splash2)
      composer.gotoScene( "game", {effect = defaultTransition})
-end    
+end
 
 
 
-  -- composer.removeScene("main",false)  
+  -- composer.removeScene("main",false)
 --composer.gotoScene("menu")
-
