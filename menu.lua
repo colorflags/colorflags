@@ -180,14 +180,16 @@ local function doFunction(e)
             -- redundant ??
             -- currentObject:setFrame(1)
             if(touchInsideBtn == true) then
-                currentObject:scale(.9, .9)
+                currentObject.xScale = 1
+                currentObject.yScale = 1
                 print("finger down, outside button: ", currentObject.name)
             end
             touchInsideBtn = false
         else
             if touchInsideBtn == false then
                 print("finger down, inside button: ", currentObject.name)
-                currentObject:scale(1.1, 1.1)
+                currentObject.xScale = 1.05
+                currentObject.yScale = 1.05
                 if(isBtnAnim) then
                     if currentObject.name == "pg" then
                         currentObject:setSequence("playgame_anim")
@@ -351,6 +353,9 @@ function scene:create( event )
 end
 
 function scene:focusMenu()
+    print("re-focus menu.lua")
+    startBtnsPlayGame.xScale = 1
+    startBtnsPlayGame.yScale = 1
     isLoading = false
     touchInsideBtn = false
     isBtnAnim = false

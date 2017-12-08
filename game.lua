@@ -4,8 +4,18 @@ local CFText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
 
+-- audio stuff
+
+local music
+local bobby
+
+local SFXShortL = audio.loadSound( "sfx/shortL.wav" )
+local SFXShortR = audio.loadSound( "sfx/shortR.wav" )
+local offsetPaletteDeathSFX = 20
+local paletteDeathsInCluster = 0
+
 --effects createPalette()
-local adherenceToFlagColorsBool = true
+local adherenceToFlagColorsBool = false
 local inclusiveColorsArray = {}
 local codeLetterToColorKey = {
     w = "white",
@@ -19,7 +29,7 @@ local codeLetterToColorKey = {
 --SAM: var to handle death
 --SAM: var to handle animations
 
-local gotoDeath = false
+local gotoDeath = true
 local lightningCount = 1
 local state = 1
 local stateFour = 0
@@ -45,8 +55,8 @@ local infoTimer
 local spawnTable = {}   --Create a table to hold our spawns
 local lineTable = {} --Table for deleting lighning lines
 local lineTableCount = 0
-local currColor = "first"
-local prevColor = "first"
+local currentColor = "first"
+local previousColor = "first"
 local motion
 local choice = 0
 local timerSpeed
@@ -93,9 +103,15 @@ local lightningIcon14
 local lightningScore = 0
 local lightningMultiplier = 1
 local line
+--SAM: what is paceRect used for
 local paceRect
 local map
 local mapGroup
+
+local flagFrameOptions
+-- rename to flagFrame
+local testFrame
+
 local flag
 local random
 
@@ -228,8 +244,13 @@ local bonusImplodeSeq = {
 
 }
 
+local bonusShatterBool = false
 local bonusImplode = display.newSprite(bonusImplodeSheet1, bonusImplodeSeq)
 bonusImplode.alpha = 0 --start with 0
+
+local lightningIconsCoords = require("lua-sheets.new-lightning-icons")
+local lightningIconsSheet = graphics.newImageSheet("images/new-lightning-icons.png", lightningIconsCoords:getSheet())
+-- local lightningIcons = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
 
 local countryOutlineSheetCoords = require("lua-sheets.country_outline")
 local countryOutlineSheet = graphics.newImageSheet("images/country_outline_mask.png", countryOutlineSheetCoords:getSheet())
@@ -354,62 +375,76 @@ local function setupVariables()
         {speed = 40, timeVar = 110}
     }
 
-    lightningIcon1 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon1.x = 20
-    lightningIcon1.y = lightningY
-    lightningIcon2 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon2.x = 60
-    lightningIcon2.y = lightningY
-    lightningIcon3 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon3.x = 100
-    lightningIcon3.y = lightningY
-    lightningIcon4 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon4.x = 140
-    lightningIcon4.y = lightningY
-    lightningIcon5 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon5.x = 180
-    lightningIcon5.y = lightningY
-    lightningIcon6 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon6.x = 220
-    lightningIcon6.y = lightningY
-    lightningIcon7 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon7.x = 260
-    lightningIcon7.y = lightningY
-    lightningIcon8 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon8.x = 300
-    lightningIcon8.y = lightningY
-    lightningIcon9 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon9.x = 340
-    lightningIcon9.y = lightningY
-    lightningIcon10 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon10.x = 380
-    lightningIcon10.y = lightningY
-    lightningIcon11 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon11.x = 420
-    lightningIcon11.y = lightningY
-    lightningIcon12 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon12.x = 460
-    lightningIcon12.y = lightningY
-    lightningIcon13 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon13.x = 500
-    lightningIcon13.y = lightningY
-    lightningIcon14 = display.newImage("images/lightningbolt_sm.png", 18, 31)
-    lightningIcon14.x = 540
-    lightningIcon14.y = lightningY
-    lightningIcon1.alpha = 0
-    lightningIcon2.alpha = 0
-    lightningIcon3.alpha = 0
-    lightningIcon4.alpha = 0
-    lightningIcon5.alpha = 0
-    lightningIcon6.alpha = 0
-    lightningIcon7.alpha = 0
-    lightningIcon8.alpha = 0
-    lightningIcon9.alpha = 0
-    lightningIcon10.alpha = 0
-    lightningIcon11.alpha = 0
-    lightningIcon12.alpha = 0
-    lightningIcon13.alpha = 0
-    lightningIcon14.alpha = 0
+    -- flag.anchorX = 0.5 ; flag.anchorY = 0.5
+    --
+    -- flag.width = 500
+    -- flag.height = 333
+    -- flag.xScale = .2
+    -- flag.yScale = .2 * .7
+    -- flag.anchorX = 1
+    -- flag.anchorY = 0.5
+    --
+    -- flag.x = _W
+    -- flag.y = _H/2
+
+    flagFrameOptions = {
+        x = _W,
+        y = _H/2,
+        width = 500,
+        height = 333,
+        xScale = .2,
+        yScale = .2 * .7,
+        anchorX = 1,
+        anchorY = .5,
+        flagPadding = 1,
+        flagOffset = .5
+    }
+
+    -- rename testFrame to flagFrame
+    testFrame = display.newRect(
+        flagFrameOptions.x,
+        flagFrameOptions.y,
+        flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding,
+        flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding
+    )
+
+    testFrame.anchorX = flagFrameOptions.anchorX
+    testFrame.anchorY = flagFrameOptions.anchorY
+    testFrame:setFillColor(0, 0, 0)
+
+    -- flagFrameAnchorX and flagFrameAnchorY are derived from flagFrameOptions (used by testFrame) to place GUI objects pertaining and bound to flag area
+    -- flagFrameAnchorX and flagFrameAnchorY set to the top-left corner of this flag area (flag, flagFrame, and lightningIcons)
+    local flagFrameAnchorX = flagFrameOptions.x - ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) - 12) -- 12 to offset an extra amount from left-side of the flagFrame
+
+    local flagFrameAnchorY = (flagFrameOptions.y - ((flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding) / 2) - 6)
+    local lightningIconPaddingLeft = ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) / 5) -- 5 in this case, represents the # of lightningIcons
+    -- local lightningIconPaddingBottom
+
+    lightningIcon1 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon1.x = flagFrameAnchorX
+    lightningIcon1.y = flagFrameAnchorY
+
+    lightningIcon2 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon2.x = flagFrameAnchorX + (lightningIconPaddingLeft)
+    lightningIcon2.y = flagFrameAnchorY
+
+    lightningIcon3 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon3.x = flagFrameAnchorX + (lightningIconPaddingLeft * 2)
+    lightningIcon3.y = flagFrameAnchorY
+
+    lightningIcon4 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon4.x = flagFrameAnchorX + (lightningIconPaddingLeft * 3)
+    lightningIcon4.y = flagFrameAnchorY
+
+    lightningIcon5 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon5.x = flagFrameAnchorX + (lightningIconPaddingLeft * 4)
+    lightningIcon5.y = flagFrameAnchorY
+
+    lightningIcon1.alpha = .2
+    lightningIcon2.alpha = .2
+    lightningIcon3.alpha = .2
+    lightningIcon4.alpha = .2
+    lightningIcon5.alpha = .2
 
     -- lightningIcon1:toBack()
     -- lightningIcon2:toBack()
@@ -591,9 +626,10 @@ local function resetSpawnTable()
     end
     spawnTable = {}
     count = 1
+    -- same as countriesCompleted counted?
     firstObject = true
-    currColor = nil    --reset bonus score states for new flag
-    prevColor = nil
+    currentColor = nil    --reset bonus score states for new flag
+    previousColor = nil
 
     -- SAM: bonusText activity
     if bonusText ~= nil then
@@ -643,6 +679,10 @@ local function lookupCode(code, spawn)
         if spawn.type == "blue" or spawn.type == "white" then
             return 1
         end
+    elseif code == "bwy" then
+        if spawn.type == "blue" or spawn.type == "white" or spawn.type == "yellow" then
+            return 1
+        end
     elseif code == "rw" then
         if spawn.type == "red" or spawn.type == "white" then
             return 1
@@ -652,19 +692,23 @@ local function lookupCode(code, spawn)
             return 1
         end
     elseif code == "rg" then
-        if spawn.type == "red" or spawn.type == "orange" then
+        if spawn.type == "red" or spawn.type == "green" then
             return 1
         end
     elseif code == "yb" then
         if spawn.type == "yellow" or spawn.type == "blue" then
             return 1
         end
+    elseif code == "bkw" then
+        if spawn.type == "blue" or spawn.type == "black" or spawn.type == "white" then
+            return 1
+        end
     elseif code == "ryb" then
         if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "blue" then
             return 1
         end
-    elseif code == "rbw" then
-        if spawn.type == "red" or spawn.type == "blue" or spawn.type == "white" then
+    elseif code == "rwb" then
+        if spawn.type == "red" or spawn.type == "white" or spawn.type == "blue" then
             return 1
         end
     elseif code == "ryk" then
@@ -709,26 +753,6 @@ local function lookupCode(code, spawn)
         end
     elseif code == "rygbwk" then
         if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "green" or spawn.type == "blue" or spawn.type == "white" or spawn.type == "black" then
-            return 1
-        end
-    elseif code == 1 then
-        if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "blue" then
-            return 1
-        end
-    elseif code == 2 then
-        if spawn.type == "red" or spawn.type == "white" or spawn.type == "blue" then
-            return 1
-        end
-    elseif code == 3 then
-        if spawn.type == "yellow" or spawn.type == "white" or spawn.type == "blue" or spawn.type == "green" then
-            return 1
-        end
-    elseif code == 4 then
-        if spawn.type == "red" or spawn.type == "white" then
-            return 1
-        end
-    elseif code == 5 then
-        if spawn.type == "red" or spawn.type == "white" or spawn.type == "green" then
             return 1
         end
     end
@@ -885,8 +909,33 @@ local function boundaryCheck(e)
                                                 if spawnTable[i].isTopLeft then
                                                     -- print("FUCKING CUNT")
                                                     transition.to( deathScenario2Array[1], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[1], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
+
+                                                    if paletteDeathsInCluster == 0 then
+                                                        local playPaletteDeathL = audio.play( SFXShortL, { onComplete=function(event)
+                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
+                                                            print(paletteDeathsInCluster)
+                                                        end })
+                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
+                                                    elseif paletteDeathsInCluster > 0 then
+                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
+                                                            local playPaletteDeathR = audio.play( SFXShortL )
+                                                        end )
+                                                    end
+
                                                 elseif not spawnTable[i].isBottomRight then
                                                     transition.to( deathScenario2Array[4], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[4], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
+
+                                                    if paletteDeathsInCluster == 0 then
+                                                        local playPaletteDeathR = audio.play( SFXShortR, { onComplete=function(event)
+                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
+                                                            print(paletteDeathsInCluster)
+                                                        end })
+                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
+                                                    elseif paletteDeathsInCluster > 0 then
+                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
+                                                            local playPaletteDeathR = audio.play( SFXShortR )
+                                                        end )
+                                                    end
                                                 end
 
                                                 spawnTable[i]:removeEventListener("touch", objTouch)
@@ -897,8 +946,32 @@ local function boundaryCheck(e)
                                             if lookupCode(code, spawnTable[i]) == 1 then
                                                 if spawnTable[i].isTopLeft then
                                                     transition.to( deathScenario2Array[2], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[2], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
+
+                                                    if paletteDeathsInCluster == 0 then
+                                                        local playPaletteDeathL = audio.play( SFXShortL, { onComplete=function(event)
+                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
+                                                            print(paletteDeathsInCluster)
+                                                        end })
+                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
+                                                    elseif paletteDeathsInCluster > 0 then
+                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
+                                                            local playPaletteDeathR = audio.play( SFXShortL )
+                                                        end )
+                                                    end
                                                 elseif not spawnTable[i].isBottomRight then
                                                     transition.to( deathScenario2Array[3], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[3], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
+
+                                                    if paletteDeathsInCluster == 0 then
+                                                        local playPaletteDeathR = audio.play( SFXShortR, { onComplete=function(event)
+                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
+                                                            print(paletteDeathsInCluster)
+                                                        end })
+                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
+                                                    elseif paletteDeathsInCluster > 0 then
+                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
+                                                            local playPaletteDeathR = audio.play( SFXShortR )
+                                                        end )
+                                                    end
                                                 end
 
                                                 spawnTable[i]:removeEventListener("touch", objTouch)
@@ -1055,49 +1128,23 @@ local function spawnPalette(params)
 end
 
 local function lightningIcons()
+    local lightningIconActivatedOpacity = .2
     if lightningCount == 0 then
-        lightningIcon1.alpha = 0
+        lightningIcon1.alpha = lightningIconActivatedOpacity
     elseif lightningCount == 1 then
         lightningIcon1.alpha = 1
-        lightningIcon2.alpha = 0
+        lightningIcon2.alpha = lightningIconActivatedOpacity
     elseif lightningCount == 2 then
         lightningIcon2.alpha = 1
-        lightningIcon3.alpha = 0
+        lightningIcon3.alpha = lightningIconActivatedOpacity
     elseif lightningCount == 3 then
         lightningIcon3.alpha = 1
-        lightningIcon4.alpha = 0
+        lightningIcon4.alpha = lightningIconActivatedOpacity
     elseif lightningCount == 4 then
         lightningIcon4.alpha = 1
-        lightningIcon5.alpha = 0
+        lightningIcon5.alpha = lightningIconActivatedOpacity
     elseif lightningCount == 5 then
         lightningIcon5.alpha = 1
-        lightningIcon6.alpha = 0
-    elseif lightningCount == 6 then
-        lightningIcon6.alpha = 1
-        lightningIcon7.alpha = 0
-    elseif lightningCount == 7 then
-        lightningIcon7.alpha = 1
-        lightningIcon8.alpha = 0
-    elseif lightningCount == 8 then
-        lightningIcon8.alpha = 1
-        lightningIcon9.alpha = 0
-    elseif lightningCount == 9 then
-        lightningIcon9.alpha = 1
-        lightningIcon10.alpha = 0
-    elseif lightningCount == 10 then
-        lightningIcon10.alpha = 1
-        lightningIcon11.alpha = 0
-    elseif lightningCount == 11 then
-        lightningIcon11.alpha = 1
-        lightningIcon12.alpha = 0
-    elseif lightningCount == 12 then
-        lightningIcon12.alpha = 1
-        lightningIcon13.alpha = 0
-    elseif lightningCount == 13 then
-        lightningIcon13.alpha = 1
-        lightningIcon14.alpha = 0
-    elseif lightningCount == 14 then
-        lightningIcon14.alpha = 1
     end
 end
 
@@ -1123,9 +1170,10 @@ local function flagRotate1()
     transition.to(flag, {time = 40, rotation = 10, onComplete = flagRotate2})
 end
 
-local function lightningButton(e)
-
-    if lightningCount > 0 and e.phase == "began" and paceRect.isMoving == true then
+local function lightningButton(flagTouchEvent)
+    -- what happend when you use lightning and no matching palettes are on-screen?
+    print(flagTouchEvent)
+    if lightningCount > 0 and flagTouchEvent and paceRect.isMoving == true then
         lineTable = {}
         lineTableCount = 0
         lightningCount = lightningCount - 1
@@ -1151,23 +1199,37 @@ local function lightningButton(e)
 end
 
 local function lightningEnable()
-
+    --SAM: we can just keep this running rather than removing it and adding it again whenever lightningCount changes from 0
+    -- add animation (flag shakes) when you have no lightning to use
     if lightningCount > 0 then
-        flag:addEventListener("touch", lightningButton)
+        flag:addEventListener("tap", lightningButton)
         lightningIcons()
     else
-        flag:removeEventListener("touch", lightningButton)
+        flag:removeEventListener("tap", lightningButton)
     end
 end
 
 
-local function trackLightningScore ()
+local function trackLightningScore()
+    print("spread from trackLightningScore:", spread)
+    -- SAM: my lightning tracker. keeping things simple
+    if spread == 0 then
+        lightningScore = 0
+    elseif spread >= 2 and lightningCount <= 4 then
+        -- SAM: do we no longer need lightningScore?
+        lightningScore = lightningScore + 1
+        lightningCount = lightningCount + 1
+    end
+    print("lightningCount from trackLightningScore:", lightningCount)
+    lightningIcons()
+    --[[ SAM: Mike's trackLightningScore methods
     if lightningScore >= 10 then
         lightningScore = score - (10 * lightningMultiplier)
         lightningCount = lightningCount + 1
-        lightningIcons()
         lightningMultiplier = lightningMultiplier + 1
+        lightningIcons()
     end
+    ]]--
 end
 
 function lightningStrike(self)
@@ -1182,9 +1244,9 @@ function lightningStrike(self)
             transition.to(self, {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
         end
     end
-    currColor = self.type
+    currentColor = self.type
 	--bonus score
-    if currColor == prevColor then
+    if currentColor == previousColor then
         spread = spread + 1
 
         -- SAM: bonusText activity
@@ -1238,8 +1300,8 @@ function lightningStrike(self)
         ]]--
     else
         spread = 1
-        currColor = nil
-        prevColor = nil
+        currentColor = nil
+        previousColor = nil
 
         -- SAM: bonusText activity
         if bonusText ~= nil then
@@ -1247,13 +1309,18 @@ function lightningStrike(self)
             bonusText = nil
         end
     end
-    prevColor = self.type
+    previousColor = self.type
+
+
 
     scoreText.text = score + spread
-
     score = score + spread
-    lightningScore = lightningScore + spread
-    trackLightningScore()
+
+    -- SAM: bonuses and additional lightningStrikes derived from using lightningStrikes
+    -- for now, turn this off.
+
+    -- lightningScore = lightningScore + spread
+    -- trackLightningScore()
 end
 
 local function setFlag()
@@ -1333,6 +1400,7 @@ local function countries(test)
     -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
     local randomCountry = math.random(CFGameSettings:getLength())
     country = CFGameSettings:getItemByID(randomCountry)
+    -- country = CFGameSettings:getItemByID(12)
 
     print("current country: ", country.name)
 
@@ -1443,8 +1511,8 @@ local function countries(test)
 
     flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
     flag:setSequence(country.name)
-    flag.anchorX = 0.5 ; flag.anchorY = 0.5
-
+    flag.x = _W - flagFrameOptions.flagOffset
+    flag.y = _H/2
     flag.width = 500
     flag.height = 333
     flag.xScale = .2
@@ -1452,8 +1520,12 @@ local function countries(test)
     flag.anchorX = 1
     flag.anchorY = 0.5
 
-    flag.x = _W
-    flag.y = _H/2
+    -- SAM: figure out a better solution for this! Groups (flag, flagFrame, and lightningIcons)?
+    lightningIcon1:toFront()
+    lightningIcon2:toFront()
+    lightningIcon3:toFront()
+    lightningIcon4:toFront()
+    lightningIcon5:toFront()
 
     code = country.code
 
@@ -1506,7 +1578,9 @@ local function countries(test)
     end
 
     music = audio.loadStream("anthems/" .. country.name .. ".mp3")
-    bobby = audio.play(music, {loops = -1})
+    bobby = audio.play(music, {loops=-1, onComplete=function(event)
+        print("finished streaming ANTHEM on channel ", event.channel)
+    end})
 end
 
 local function killBars()
@@ -1575,13 +1649,14 @@ local function newFlag()
 
     -- SAM: bonusText activity
     if bonusText ~= nil then
+        print("bonusText from ", "newFlag()")
         bonusText:removeSelf()
         bonusText = nil
 
         --SAM: delete?
         spread = 1
-        prevColor = nil
-        currColor = nil
+        previousColor = nil
+        currentColor = nil
     end
 
     countries()
@@ -1893,11 +1968,12 @@ function objTouch(self, e)
                     transition.to(e.target, {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
                 end
             end
-            currColor = e.target.type
+            currentColor = e.target.type
 			--BONUS SCORE
-            if currColor == prevColor then
+            if currentColor == previousColor then
+                print("match!")
+                -- spread = spread + 1
                 spread = spread + 1
-
                 -- SAM: bonusText activity
                 if bonusText ~= nil then
                     bonusText:removeSelf()
@@ -1917,42 +1993,41 @@ function objTouch(self, e)
                     bonusTextTemp = nil
                 end})
 
-				--SAM: CFText (advanced color classes), to be re-worked and implemented later
-				--bonusText = CFText.new( text, "Arial Rounded MT Bold", 30, _W*(4/5), _H*(1/3) )
-
                 if motion ~= nil then
                     timer.cancel(motion)
                     motion = nil
                 end
 
-                if spread == 2 then
-                    bonusImplode:setSequence("2x")
-                elseif spread == 3 then
-                    bonusImplode:setSequence("3x")
-                elseif spread == 4 then
-                    bonusImplode:setSequence("4x")
-                elseif spread == 5 then
-                    bonusImplode:setSequence("5x")
-                elseif spread == 6 then
-                    bonusImplode:setSequence("6x")
-                elseif spread == 7 then
-                    bonusImplode:setSequence("7x")
-                elseif spread == 8 then
-                    bonusImplode:setSequence("8x")
-                elseif spread == 9 then
-                    bonusImplode:setSequence("9x")
+                if bonusShatterBool == true then
+                    if spread == 2 then
+                        bonusImplode:setSequence("2x")
+                    elseif spread == 3 then
+                        bonusImplode:setSequence("3x")
+                    elseif spread == 4 then
+                        bonusImplode:setSequence("4x")
+                    elseif spread == 5 then
+                        bonusImplode:setSequence("5x")
+                    elseif spread == 6 then
+                        bonusImplode:setSequence("6x")
+                    elseif spread == 7 then
+                        bonusImplode:setSequence("7x")
+                    elseif spread == 8 then
+                        bonusImplode:setSequence("8x")
+                    elseif spread == 9 then
+                        bonusImplode:setSequence("9x")
+                    end
+                    bonusImplode.alpha = 1
+                    bonusImplode:toFront()
+                    bonusImplode:play()
+                    bonusImplode.x = _W * (4 / 5)
+                    bonusImplode.y = _H / 2
+                    motion = timer.performWithDelay(800, cancelTimerBonusImplode, 1)
                 end
-                bonusImplode.alpha = 1
-                bonusImplode:toFront()
-                bonusImplode:play()
-                bonusImplode.x = _W * (4 / 5)
-                bonusImplode.y = _H / 2
-                motion = timer.performWithDelay(800, cancelTimerBonusImplode, 1)
 
             else
-                spread = 1
-                currColor = nil
-                prevColor = nil
+                spread = 0
+                currentColor = nil
+                previousColor = nil
 
                 -- SAM: bonusText activity
                 if bonusText ~= nil then
@@ -1960,15 +2035,15 @@ function objTouch(self, e)
                     bonusText = nil
                 end
             end
-            prevColor = e.target.type
-            scoreText.text = score + spread
 
-			--SAM: CFText
-			--scoreText:Text(score+spread)
+            previousColor = e.target.type
 
-            score = score + spread
-            lightningScore = lightningScore + spread
+            score = score + 1 + spread
+            scoreText.text = score
+
+            -- lightningScore = lightningScore + spread
             trackLightningScore()
+
         end
     end
     return true
@@ -2012,11 +2087,13 @@ function scene:hide(e)
     if e.phase == "will" then
         display.remove(background)
 
-		display.remove(speedTextDesc)
-		display.remove(speedText)
-		display.remove(scoreTextDesc)
-		display.remove(scoreText)
+        display.remove(speedTextGroup)
+        display.remove(scoreTextGroup)
+        display.remove(modeTextGroup)
+
         display.remove(flag)
+        display.remove(testFrame)
+
 		-- what about mask applied to fxGroup
         display.remove(fxGroup)
         display.remove(piece)

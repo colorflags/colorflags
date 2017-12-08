@@ -62,8 +62,8 @@ local isBtnAnim = false
 music=nil
 bobby=nil
 
-audio.stop( )            
-music = audio.loadStream( 'magee_music/magee_gameover_2.mp3' ) 
+audio.stop( )
+music = audio.loadStream( 'magee_music/magee_gameover_2.mp3' )
 bobby = audio.play(music,{loops=-1})
 
 -- local flagHeights = {24, 23, -46}
@@ -84,7 +84,7 @@ local niceTrySpriteCoords = require("lua-sheets.opts-nicetry")
 local niceTrySheet = graphics.newImageSheet( "images/opts-nicetry.png", niceTrySpriteCoords:getSheet() )
 
 local niceTrySeq = {
-    { name = "nicetry", frames={1,2,3,4,5,6,7,8,9}, time=680, loopCount=0},    
+    { name = "nicetry", frames={1,2,3,4,5,6,7,8,9}, time=680, loopCount=0},
 
 }
 
@@ -99,7 +99,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("Again4"),
             btnsSheetCoords:getFrameIndex("Again1")
         },
-        time = 500 
+        time = 500
     },
     {
         name = "again_anim",
@@ -109,7 +109,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("Again4"),
             btnsSheetCoords:getFrameIndex("Again5")
         },
-        time = 500 
+        time = 500
     },
     {
         name = "share",
@@ -117,7 +117,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("Share4"),
             btnsSheetCoords:getFrameIndex("Share1")
         },
-        time = 500 
+        time = 500
     },
     {
         name = "share_anim",
@@ -127,7 +127,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("Share4"),
             btnsSheetCoords:getFrameIndex("Share5")
         },
-        time = 500 
+        time = 500
     },
     {
         name = "quit",
@@ -135,7 +135,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("Quit4"),
             btnsSheetCoords:getFrameIndex("Quit1")
         },
-        time = 500 
+        time = 500
     },
     {
         name = "quit_anim",
@@ -145,7 +145,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("Quit4"),
             btnsSheetCoords:getFrameIndex("Quit5")
         },
-        time = 500 
+        time = 500
     },
 }
 
@@ -208,7 +208,7 @@ function selectRandomFlags()
     end
     shuffle(worldFlags)
 
-    for i=1, 8 do 
+    for i=1, 8 do
         local randomFlagSeq={
             {name="randomflagseq1",frames={worldFlags[i],(worldFlags[i]+1),(worldFlags[i]+2),(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4),(worldFlags[i]+3), (worldFlags[i]+2), (worldFlags[i]+1)},time=860},
 
@@ -220,13 +220,13 @@ function selectRandomFlags()
             {name="randomflagseq5",frames={worldFlags[i]+2,(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4),(worldFlags[i]+3),(worldFlags[i]+2),(worldFlags[i]+1)},time=896}
         }
 
-    
+
     -- ["Flag_of_Ireland1"] = 127,
     -- ["Flag_of_Ireland2"] = 128,
     -- ["Flag_of_Ireland3"] = 129,
     -- ["Flag_of_Ireland4"] = 130,
     -- ["Flag_of_Ireland5"] = 131,
-    -- ["Flag_of_Ireland6"] = 132,        
+    -- ["Flag_of_Ireland6"] = 132,
 
         if i==1 then
             -- Big Flag
@@ -235,16 +235,16 @@ function selectRandomFlags()
             randomFlag1:setSequence("randomflagseq1")
             randomFlag1:setFrame( math.random(1,5) )
 
-            randomFlag1:play() 
+            randomFlag1:play()
         end
         if i==2 then
-            -- Big Flag          
+            -- Big Flag
             randomFlag2=display.newSprite(flagWave40Sheet,randomFlagSeq)
             randomFlag2.x=flagX[2]+21; randomFlag2.y=(_H/2)+flagHeights[3]
             randomFlag2:setSequence("randomflagseq1")
             randomFlag2:setFrame( math.random(1,2) )
 
-            randomFlag2:play() 
+            randomFlag2:play()
         end
         if i==3 then
             -- Med Flag
@@ -255,10 +255,10 @@ function selectRandomFlags()
             randomFlag3.alpha=0.65
 
 
-            randomFlag3:play() 
+            randomFlag3:play()
         end
         if i==4 then
-            -- Med Flag          
+            -- Med Flag
             randomFlag4=display.newSprite(flagWave34Sheet,randomFlagSeq)
             randomFlag4.x=flagX[4]+18; randomFlag4.y=(_H/2)+flagHeights[2]
             randomFlag4:setSequence("randomflagseq1")
@@ -266,40 +266,40 @@ function selectRandomFlags()
             randomFlag4.alpha=0.65
             randomFlag4:setFrame( 2 )
 
-            randomFlag4:play() 
+            randomFlag4:play()
         end
         if i==5 then
             -- Small Flag
             -- randomFlag5=display.newSprite(flagWave34Sheet,randomFlagSeq)
             -- randomFlag5.x=flagX[5]+23; randomFlag5.y=(_H/2)+flagHeights[1]
-            -- randomFlag5:setSequence( "randomflagseq".. math.random(1,1) )            
-            -- randomFlag5:play() 
+            -- randomFlag5:setSequence( "randomflagseq".. math.random(1,1) )
+            -- randomFlag5:play()
         end
         if i==6 then
             -- Small Flag
             -- randomFlag6=display.newSprite(flagWave34Sheet,randomFlagSeq)
             -- randomFlag6.x=flagX[6]+23; randomFlag6.y=(_H/2)+flagHeights[1]
-            -- randomFlag6:setSequence( "randomflagseq".. math.random(1,1) )            
-            -- randomFlag6:play() 
-        end  
+            -- randomFlag6:setSequence( "randomflagseq".. math.random(1,1) )
+            -- randomFlag6:play()
+        end
         if i==7 then
-            -- Big Flag          
+            -- Big Flag
             randomFlag7=display.newSprite(flagWave40Sheet,randomFlagSeq)
             randomFlag7.x=flagX[7]+21; randomFlag7.y=(_H/2)+flagHeights[3]
-            randomFlag7:setSequence("randomflagseq1") 
+            randomFlag7:setSequence("randomflagseq1")
             randomFlag7:setFrame( math.random(1,5) )
 
-            randomFlag7:play() 
+            randomFlag7:play()
         end
         if i==8 then
-            -- Big Flag          
+            -- Big Flag
             randomFlag8=display.newSprite(flagWave40Sheet,randomFlagSeq)
             randomFlag8.x=flagX[8]+21; randomFlag8.y=(_H/2)+flagHeights[3]
-            randomFlag8:setSequence("randomflagseq1")    
+            randomFlag8:setSequence("randomflagseq1")
             randomFlag8:setFrame( math.random(1,2) )
 
-            randomFlag8:play() 
-        end                                                    
+            randomFlag8:play()
+        end
     end
 end
 
@@ -313,8 +313,8 @@ end
 --       flag4Animation.y=20
 --       flag4Animation:play()
 
-  
- 
+
+
 
 -- local function buttonHit(event)
 --   local goto = event.target.gotoScene
@@ -325,11 +325,11 @@ end
 local function myTouchListener( event )
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
-    
+
     if event.phase == "began" then
-        -- print("touch ON. inside")          
+        -- print("touch ON. inside")
     elseif event.phase == "ended" or event.phase == "cancelled" then
-        
+
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
         if currentObject.name == "again" then
             currentObject:setSequence("again")
@@ -338,37 +338,37 @@ local function myTouchListener( event )
         elseif currentObject.name == "quit" then
             currentObject:setSequence("quit")
         end
-        
-        -- redundant ?? 
+
+        -- redundant ??
         -- currentObject:setFrame(1)
-        
-        if touchInsideBtn == true and isLoading == false then 
+
+        if touchInsideBtn == true and isLoading == false then
             -- print("touch OFF. inside")
             -- composer.removeScene("start")
-            
+
             -- prevents scenes from firing twice!!
             isLoading = true
-            
+
             local goto = currentObject.gotoScene
             composer.gotoScene( goto, { effect = defaultTransition } )
-            
+
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
         end
-        
+
         currentObject = nil
         display.getCurrentStage():setFocus(nil)
         touchInsideBtn = false
     end
 end
- 
+
 local function doFunction(e)
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
             e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or 
-            e.y > currentObject.contentBounds.yMax then 
-            
+            e.y < currentObject.contentBounds.yMin or
+            e.y > currentObject.contentBounds.yMax then
+
             if(isBtnAnim) then
                 if currentObject.name == "again" then
                     currentObject:setSequence("again")
@@ -377,7 +377,7 @@ local function doFunction(e)
                 elseif currentObject.name == "quit" then
                     currentObject:setSequence("quit")
                 end
-            else 
+            else
                 if currentObject.name == "again" then
                     currentObject:setFrame(1)
                 elseif currentObject.name == "share" then
@@ -416,12 +416,12 @@ local function doFunction(e)
 end
 
  local function scrollCloudsBG(self, event)
-    
+
     if self.x < -284 then -- 477
       self.x = _W/2+566 -- 480
-       
+
     else
-     
+
 
       self.x = self.x - self.speed
     end
@@ -436,7 +436,7 @@ end
 
       self.x = self.x - self.speed
     end
-  end  
+  end
 
 local function cloudCirculate(self)
     local myPusa=self.name
@@ -488,7 +488,7 @@ local function setScene()
     bg:setFillColor(0,.6,1)
     bg.x = _W/2
     bg.y = _H/2
-    
+
     --[[
     local group = display.newGroup()
 
@@ -505,7 +505,7 @@ local function setScene()
     brickCracks.fill.effect.color2 = {0,0,1}
     brickCracks.fill.effect.center_and_radiuses = {0.5,0.5,0.5,.75}
     brickCracks.fill.effect.aspectRatio = 1
-    
+
     local mask = graphics.newMask("images/mask.png")
     group:setMask(mask)
 
@@ -607,7 +607,7 @@ killScreen.fill.effect.progress = 0.5
     flagPole8.anchorX=0.5
     flagPole8.anchorY=1
     flagPole8.name="flagPole8"
-    flagPole8.x=flagX[8] ;flagPole8.y=_H/2+66      
+    flagPole8.x=flagX[8] ;flagPole8.y=_H/2+66
 
     -- fab=display.newSprite(myImageSheet2,fabSeq)
 
@@ -686,7 +686,7 @@ local function noHighScore()
   cloudsFG1.speed = 2
   cloudsFG2 = display.newImage( "images/clouds_fg4_large.png", 568, 350 )
   cloudsFG2.name="cloudsFG2"
-  -- cloudsFG2:setFillColor( 1, 1, 0 )  
+  -- cloudsFG2:setFillColor( 1, 1, 0 )
   cloudsFG2.x=_W/2+(_W-offsetCloudFG) ;cloudsFG2.y=_H/2
   cloudsFG2.speed = 2
 
@@ -736,7 +736,7 @@ local function scoreSave(tempScore)
       return false
    end
 end
- 
+
 local function scoreLoad()
    local path = system.pathForFile( "CFscorefile.txt", system.DocumentsDirectory )
    local contents = ""
@@ -752,7 +752,7 @@ local function scoreLoad()
    end
    return nil
 end
- 
+
 local function scoreCheck()
 
     local loadedHighScore=scoreLoad()
@@ -770,12 +770,12 @@ local function scoreCheck()
          newHighScore()
       end
     end
-end    
- 
+end
+
 -- transition.to( self, { time=4000, y=200, transition=easing.continuousLoop } )
 
 local function shakeText()
- 
+
      if shakeTextRight == true then
         transition.to( scoreText, { time=150, rotation=-10 , onComplete=shakeText } )
         shakeTextRight=false
@@ -786,10 +786,10 @@ local function shakeText()
 
 end
 
-function scene:create(e)  
+function scene:create(e)
 end
 
-function scene:show(e) 
+function scene:show(e)
   if e.phase == "will" then
 
         if overrideScore==true then
@@ -799,22 +799,22 @@ function scene:show(e)
           gameScore=e.params.saveScore
         end
 
-        local color = 
+        local color =
         {
             highlight = { r=1, g=1, b=1 },
             shadow = { r=0, g=0, b=0 }
         }
-        
+
         --align to center of "share" btn
         scoreText = display.newEmbossedText( gameScore, _W/2+20, _H/2,"PTMono-Bold", 38 )
         scoreText:setFillColor( 1, .9, .4)
         scoreText:setEmbossColor( color )
 
         shakeText()
-        self.view:insert(scoreText) 
+        self.view:insert(scoreText)
 
         if overrideScore== true then
-          if highScore>gameScore then 
+          if highScore>gameScore then
          newHighScore()
           elseif highScore<=gameScore then
           noHighScore()
