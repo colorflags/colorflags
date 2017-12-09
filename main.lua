@@ -1,9 +1,3 @@
------------------------------------------------------------------------------------------
---
--- main.lua
---
------------------------------------------------------------------------------------------
-
 --local storyboard = require "storyboard"
 --storyboard.purgeOnSceneChange = true
 
@@ -40,9 +34,9 @@ local composer=require("composer")
 
 display.setStatusBar( display.HiddenStatusBar )
 
+-- SAM: delete?
 --_W = display.pixelWidth
 --_H = display.pixelHeight
-
 _W = display.contentWidth; -- Get the width of the screen
 _H = display.contentHeight; -- Get the height of the screen
 
@@ -56,6 +50,14 @@ local fontFace
 local backgrounImage=nil
 local backgroundColor={255,255,255}
 
+_G.musicMenu = audio.loadStream( "magee_music/magee_main.mp3" ) -- rename magee_main.mp3 to magee_menu.mp3
+_G.musicGameOver = audio.loadStream( "magee_music/magee_gameover_2.mp3" )
+
+audio.reserveChannels( 2 )
+_G.audioReservedChannel1 = nil
+_G.audioReservedChannel2 = nil
+
+-- SAM: what is this?
 audioCanPlay=true
 
  -- MIKE: Should we just keep this in game.lua
@@ -93,12 +95,14 @@ end
 
 --composer.recycleOnSceneChange = true
 
+-- SAM: cool, test this out. Do we still need it?
 function checkMemory(e)
   collectgarbage();
   print("Memory usage " .. collectgarbage("count"));
   print("Texture memory usage " .. system.getInfo("textureMemoryUsed")/1024/1024 .. "MB")
 end
 
+-- SAM: what is this?
 function playSound(audioObj,chn)
 	local chnUsed
 	if audioCanPlay then

@@ -1,9 +1,25 @@
-print(display.pixelWidth)
-print(display.pixelHeight)
-
 --menu.lua
 local composer=require("composer")
 local scene = composer.newScene()
+
+audio.stop()
+
+-- audio.stop( 2 )
+audioReservedChannel2 = nil
+
+music=nil
+bobby=nil
+
+if(audioReservedChannel1 == nil) then
+    audioReservedChannel1 = audio.play(musicMenu, {channel=1,loops=-1})
+end
+
+-- audio.stop( )
+-- music = audio.loadStream( "magee_music/magee_main.mp3" )
+-- bobby = audio.play(music,{loops=-1})
+
+soundOn=false
+
 local whiteBackground
 local titleLogo
 local menuColorFlags
@@ -17,21 +33,21 @@ local isLoading = false
 local touchInsideBtn = false
 local isBtnAnim = true
 
-music=nil
-bobby=nil
-
-audio.stop( )
-music = audio.loadStream( "magee_music/magee_main.mp3" )
-bobby = audio.play(music,{loops=-1})
-
-soundOn=false
-
 local colorFlagsSpriteCoords = require("lua-sheets.title-menu")
 local colorFlagsSheet = graphics.newImageSheet( "images/title-menu.png", colorFlagsSpriteCoords:getSheet() )
 
 local colorFlagsSeq = {
     { name = "colorflags", frames={1,2,3,4,5,6,7,8,9}, time=500, loopCount=0},
 }
+
+-- local btnsPlayGame
+-- local btnsPlayGameSheetCoords = require("lua-sheets.btns_playgame")
+-- local btnsPlayGameSheet = graphics.newImageSheet("images/btns_playgame.png", btnsPlayGameSheetCoords:getSheet())
+-- btnsPlayGame = display.newSprite( btnsPlayGameSheet, {frames={2}} )
+-- btnsPlayGame.anchorY = .5
+-- btnsPlayGame.x=_W/4
+-- btnsPlayGame.y=_H - _H/4
+-- btnsPlayGame:setFrame( 1 )
 
 -- GLOBALIZE
 local btnsSheetCoords = require("lua-sheets.buttons")

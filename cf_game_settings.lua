@@ -231,11 +231,10 @@ CFGameSettings = class(function(c)
     countries["India"] = {
         id = 22,
         name = "india",
-        code = "ogbw",
+        code = "ogw",
         colors = {
             o = CFColor(255,153,51),
             g = CFColor(18,136,7),
-            b = CFColor(0,0,0),
             w = CFColor(255,255,255)
         },
         coords = { x = 1341, y = 272 }
@@ -574,7 +573,7 @@ CFGameSettings = class(function(c)
         colors = {
             r = CFColor(255,0,0),
             g = CFColor(0,115,47),
-            y = CFColor(255,255,255),
+            w = CFColor(255,255,255),
             k = CFColor(0,0,0)
         },
         coords = { x = 1247, y = 334 }

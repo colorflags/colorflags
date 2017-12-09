@@ -8,6 +8,11 @@ local CreateText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
 
+audio.stop( 1 )
+audioReservedChannel1 = nil
+audio.stop( 2 )
+audioReservedChannel2 = nil
+
 local activeCountry
 
 local xBtn
@@ -253,7 +258,7 @@ local btnsSeq = {
 local menuSpriteCoords = require("lua-sheets.playgame-menu")
 local menuStartSheet = graphics.newImageSheet( "images/playgame-menu.png", menuSpriteCoords:getSheet() )
 
-local background = display.newRect(0, 0, 580, 320)
+local background = display.newRect(0, 0, _W, _H)
 background:setFillColor(1, 1, 1)
 background.anchorX = 0.5
 background.anchorY = 0.5
@@ -498,7 +503,9 @@ local function countries(test)
     end
 
     music = audio.loadStream("anthems/" .. country.name .. ".mp3")
-    bobby = audio.play(music, {loops = -1})
+    bobby = audio.play(music, {loops=-1, onComplete=function(event)
+        print("finished streaming ANTHEM on channel ", event.channel)
+    end})
 end
 
 

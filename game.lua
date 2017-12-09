@@ -4,11 +4,17 @@ local CFText = require("cf_text")
 local composer = require("composer")
 local scene = composer.newScene()
 
--- audio stuff
+-- stop audioReservedChannel1. set it to nil?
+audio.stop( 1 )
+audioReservedChannel1 = nil
+audio.stop( 2 )
+audioReservedChannel2 = nil
 
+-- audio stuff
 local music
 local bobby
 
+-- SAM: SFXShortL to sfxShortL
 local SFXShortL = audio.loadSound( "sfx/shortL.wav" )
 local SFXShortR = audio.loadSound( "sfx/shortR.wav" )
 local offsetPaletteDeathSFX = 20
