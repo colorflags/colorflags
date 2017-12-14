@@ -24,14 +24,10 @@ local whiteBackground
 local titleLogo
 local menuColorFlags
 
-local startBtnsPlayGame
-local startBtnsOptions
-local startBtnsAbout
-
 local currentObject
 local isLoading = false
 local touchInsideBtn = false
-local isBtnAnim = true
+local isBtnAnim = false
 
 local colorFlagsSpriteCoords = require("lua-sheets.title-menu")
 local colorFlagsSheet = graphics.newImageSheet( "images/title-menu.png", colorFlagsSpriteCoords:getSheet() )
@@ -65,10 +61,10 @@ local btnsSeq = {
     {
         name = "playgame_anim",
         frames = {
+            btnsSheetCoords:getFrameIndex("PlayGame1"),
             btnsSheetCoords:getFrameIndex("PlayGame2"),
             btnsSheetCoords:getFrameIndex("PlayGame3"),
-            btnsSheetCoords:getFrameIndex("PlayGame4"),
-            btnsSheetCoords:getFrameIndex("PlayGame5")
+            btnsSheetCoords:getFrameIndex("PlayGame4")
         },
         time = 500
     },
@@ -120,13 +116,19 @@ local startBtnSeq = {
     { name = "about", frames={1,2}, time=500 }
 }
 
-local startBtnsSpriteCoords = require("lua-sheets.menu-btns")
+local btnsPlayGame
+local btnsPlayGameSheetCoords = require("lua-sheets.btns_playgame")
+local btnsPlayGameSheet = graphics.newImageSheet("images/btns_playgame.png", btnsPlayGameSheetCoords:getSheet())
 
-local startBtnsPlayGameSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
-local startBtnsOptionsSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
-local startBtnsAboutSheet = graphics.newImageSheet( "images/menu-btns.png", startBtnsSpriteCoords:getSheet() )
+local btnsOptions
+local btnsOptionsSheetCoords = require("lua-sheets.btns_options")
+local btnsOptionsSheet = graphics.newImageSheet("images/btns_options.png", btnsOptionsSheetCoords:getSheet())
 
--- New
+local btnsAbout
+local btnsAboutSheetCoords = require("lua-sheets.btns_about")
+local btnsAboutSheet = graphics.newImageSheet("images/btns_about.png", btnsAboutSheetCoords:getSheet())
+
+-- SAM: needs work
 local function myTouchListener( event )
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
@@ -134,12 +136,15 @@ local function myTouchListener( event )
         print("touch ON. inside")
     elseif event.phase == "ended" or event.phase == "cancelled" then
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "pg" then
-            currentObject:setSequence("playgame")
-        elseif currentObject.name == "opt" then
-            currentObject:setSequence("options")
-        elseif currentObject.name == "abt" then
-            currentObject:setSequence("about")
+        if currentObject.name == "playgame" then
+            -- currentObject:setSequence("playgame")
+            currentObject:setFrame(2)
+        elseif currentObject.name == "options" then
+            -- currentObject:setSequence("options")
+            currentObject:setFrame(2)
+        elseif currentObject.name == "about" then
+            -- currentObject:setSequence("about")
+            currentObject:setFrame(2)
         end
 
         -- redundant ??
@@ -154,7 +159,7 @@ local function myTouchListener( event )
             isLoading = true
             print("going to..")
             local goto = currentObject.gotoScene
-            if goto == "start" and event.target == startBtnsPlayGame then
+            if goto == "start" and event.target == btnsPlayGame then
                 composer.showOverlay( goto, { isModal= true})
             else
                 composer.gotoScene ( goto, { effect = defaultTransition } )
@@ -169,6 +174,7 @@ local function myTouchListener( event )
     end
 end
 
+-- SAM: needs work
 local function doFunction(e)
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
@@ -177,24 +183,24 @@ local function doFunction(e)
             e.y > currentObject.contentBounds.yMax then
 
             if(isBtnAnim) then
-                if currentObject.name == "pg" then
+                if currentObject.name == "playgame" then
                     currentObject:setSequence("playgame")
-                elseif currentObject.name == "opt" then
+                elseif currentObject.name == "options" then
                     currentObject:setSequence("options")
-                elseif currentObject.name == "abt" then
+                elseif currentObject.name == "about" then
                     currentObject:setSequence("about")
                 end
             else
-                if currentObject.name == "pg" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "opt" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "abt" then
-                    currentObject:setFrame(1)
+                if currentObject.name == "playgame" then
+                    currentObject:setFrame(4)
+                elseif currentObject.name == "options" then
+                    currentObject:setFrame(4)
+                elseif currentObject.name == "about" then
+                    currentObject:setFrame(4)
                 end
             end
-            -- redundant ??
-            -- currentObject:setFrame(1)
+            currentObject:setFrame(2)
+            -- SAM: wtf. how is this working? do some testing.
             if(touchInsideBtn == true) then
                 currentObject.xScale = 1
                 currentObject.yScale = 1
@@ -204,8 +210,8 @@ local function doFunction(e)
         else
             if touchInsideBtn == false then
                 print("finger down, inside button: ", currentObject.name)
-                currentObject.xScale = 1.05
-                currentObject.yScale = 1.05
+                currentObject.xScale = 1.01
+                currentObject.yScale = 1.01
                 if(isBtnAnim) then
                     if currentObject.name == "pg" then
                         currentObject:setSequence("playgame_anim")
@@ -216,12 +222,12 @@ local function doFunction(e)
                     end
                     currentObject:play()
                 else
-                    if currentObject.name == "pg" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "opt" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "abt" then
-                        currentObject:setFrame(2)
+                    if currentObject.name == "playgame" then
+                        currentObject:setFrame(4)
+                    elseif currentObject.name == "options" then
+                        currentObject:setFrame(4)
+                    elseif currentObject.name == "about" then
+                        currentObject:setFrame(4)
                     end
                 end
             end
@@ -231,42 +237,30 @@ local function doFunction(e)
 end
 
 local function prepareMenu()
-   titleLogo.alpha=1
-    transition.to(startBtnsPlayGame, {time=0,alpha=.98})
-    transition.to(startBtnsOptions, {time=0,alpha=.98})
-    transition.to(startBtnsAbout, {time=0,alpha=.98})
-
-      -- startBtnsAbout:addEventListener("tap",tapBtn)
-      -- startBtnsPlayGame:addEventListener("tap",tapBtn)
-      -- startBtnsOptions:addEventListener("tap",tapBtn)
-
-
-  --   startBtnsAbout.alpha=0
---  startBtnsOptions.alpha=0
- -- startBtnsPlayGame.alpha=0
-
+    titleLogo.alpha=1
+    transition.to(btnsPlayGame, {time=0,alpha=.98})
+    transition.to(btnsOptions, {time=0,alpha=.98})
+    transition.to(btnsAbout, {time=0,alpha=.98})
 end
 
 
 function addFunction()
-
-  startBtnsAbout.alpha=1
-    startBtnsPlayGame.alpha=1
-      startBtnsOptions.alpha=1
-
- ---       startBtnsAbout:addEventListener("touch",doFunction)
-  --    startBtnsPlayGame:addEventListener("touch",doFunction)
-   --   startBtnsOptions:addEventListener("touch",doFunction)
+    btnsPlayGame.alpha=1
+    btnsOptions.alpha=1
+    btnsAbout.alpha=1
+    -- btnsPlayGame:addEventListener("touch",doFunction)
+    -- btnsOptions:addEventListener("touch",doFunction)
+    -- btnsAbout:addEventListener("touch",doFunction)
 end
 
 -- MIKE: are we going to use this removeFunction() ??
 function removeFunction()
-  startBtnsAbout.alpha=0
-    startBtnsPlayGame.alpha=0
-      startBtnsOptions.alpha=0
-     -- startBtnsAbout:removeEventListener("touch",doFunction)
-   --   startBtnsPlayGame:removeEventListener("touch",doFunction)
-   --   startBtnsOptions:removeEventListener("touch",doFunction)
+    btnsPlayGame.alpha=0
+    btnsOptions.alpha=0
+    btnsAbout.alpha=0
+    -- btnsPlayGame:removeEventListener("touch",doFunction)
+    -- btnsOptions:removeEventListener("touch",doFunction)
+    -- btnsAbout:removeEventListener("touch",doFunction)
 end
 
 --local function checkMemory(e)
@@ -288,90 +282,105 @@ function animationPop(event)
 end
 
 function scene:create( event )
-  local sceneGroup=self.view
-  print("a")
+    local sceneGroup=self.view
+    print("a")
 
-  whiteBackground = display.newRect( _W/2, _H/2, _W, _H )
-  whiteBackground:setFillColor(1, 1, 1)
+    whiteBackground = display.newRect( _W/2, _H/2, _W, _H )
+    whiteBackground:setFillColor(1, 1, 1)
 
-  titleLogo = display.newImageRect( "images/menu_background.png", _W, _H )
-  -- titleLogo = display.newImageRect( "images/start-menuWTF.png", _W, _H )
-  titleLogo.anchorX=0.5
-  titleLogo.anchorY=0.5
-  titleLogo.x = _W/2
-  titleLogo.y = _H/2
-  titleLogo.alpha=0.98
+    titleLogo = display.newImageRect( "images/menu_background.png", _W, _H )
+    -- titleLogo = display.newImageRect( "images/start-menuWTF.png", _W, _H )
+    titleLogo.anchorX=0.5
+    titleLogo.anchorY=0.5
+    titleLogo.x = _W/2
+    titleLogo.y = _H/2
+    titleLogo.alpha=0.98
 
-  -- Taken directly from options.lua
+    -- Taken directly from options.lua
 
-  menuColorFlags = display.newSprite(colorFlagsSheet,colorFlagsSeq)
-  menuColorFlags.anchorY = 0
-  menuColorFlags.x=_W/2
-  menuColorFlags.y=0
-  menuColorFlags:setSequence("colorflags")
-  menuColorFlags.alpha = 0.88
-  menuColorFlags:play()
+    menuColorFlags = display.newSprite(colorFlagsSheet,colorFlagsSeq)
+    menuColorFlags.anchorY = 0
+    menuColorFlags.x=_W/2
+    menuColorFlags.y=0
+    menuColorFlags:setSequence("colorflags")
+    menuColorFlags.alpha = 0.88
+    menuColorFlags:play()
 
-  menuColorFlags:addEventListener("sprite", animationPop)
+    menuColorFlags:addEventListener("sprite", animationPop)
 
-  local offsetStartBtns = _H/2.2
-  local btnSpacing = 58
+    -- rename
+    local offsetStartBtns = _H/1.5
+    -- local offsetStartBtns = _H/3 + ((_H/2)/2)
 
-  startBtnsPlayGame = display.newSprite(btnsSheet, btnsSeq)
-  startBtnsPlayGame.name = "pg"
-  startBtnsPlayGame:addEventListener( "touch", myTouchListener )
-  startBtnsPlayGame.anchorY = .5
-  startBtnsPlayGame.x=_W/2
-  startBtnsPlayGame.y=offsetStartBtns
-  startBtnsPlayGame:setSequence( "playgame" )
-  startBtnsPlayGame:setFrame( 1 )
---  startBtnsPlayGame.alpha=0.98
-  startBtnsPlayGame.gotoScene="start"
---  startBtnsPlayGame:scale(.8,.8)
+    local tempSeq = {
+        {
+            name = "playgame_anim",
+            frames = {
+                btnsPlayGameSheetCoords:getFrameIndex("PlayGame1"),
+                btnsPlayGameSheetCoords:getFrameIndex("PlayGame2"),
+                btnsPlayGameSheetCoords:getFrameIndex("PlayGame3"),
+                btnsPlayGameSheetCoords:getFrameIndex("PlayGame4")
+            },
+            time = 500
+        },
+    }
 
-  startBtnsOptions= display.newSprite(btnsSheet, btnsSeq)
-  startBtnsOptions.name = "opt"
-  startBtnsOptions:addEventListener( "touch", myTouchListener )
-  startBtnsOptions.anchorY = .5
-  startBtnsOptions.x=_W/2
-  startBtnsOptions.y=offsetStartBtns+btnSpacing
-  startBtnsOptions:setSequence( "options" )
-  startBtnsOptions:setFrame( 1 )
---  startBtnsOptions.alpha=.98
-  startBtnsOptions.gotoScene="options"
---  startBtnsOptions:scale(.8,.8)
+    btnsPlayGame = display.newSprite( btnsPlayGameSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+    btnsPlayGame.name = "playgame"
+    btnsPlayGame:addEventListener( "touch", myTouchListener )
+    btnsPlayGame.anchorY = .5
+    btnsPlayGame.x = _W/2
+    btnsPlayGame.y = offsetStartBtns
+    btnsPlayGame:setFrame(2)
+    --  btnsPlayGame.alpha=0.98
+    btnsPlayGame.gotoScene="start"
+    --  btnsPlayGame:scale(.8,.8)
 
-  startBtnsAbout= display.newSprite(btnsSheet, btnsSeq)
-  startBtnsAbout.name = "abt"
-  startBtnsAbout:addEventListener( "touch", myTouchListener )
-  startBtnsAbout.anchorY = .5
-  startBtnsAbout.x=_W/2
-  startBtnsAbout.y=offsetStartBtns+(btnSpacing*2)
-  startBtnsAbout:setSequence( "about" )
-  startBtnsAbout:setFrame( 1 )
---  startBtnsAbout.alpha=0.98
-  startBtnsAbout.gotoScene="about"
---  startBtnsAbout:scale(.8,.8)
+    local btnSpacing = btnsPlayGame.height + 4
 
-  sceneGroup:insert(whiteBackground)
-  sceneGroup:insert(titleLogo) -- SAM: BACKGROUND NOT TITLE !!! CHANGE NAME
-  sceneGroup:insert(menuColorFlags)
-  sceneGroup:insert(startBtnsPlayGame)
-  sceneGroup:insert(startBtnsOptions)
-  sceneGroup:insert(startBtnsAbout)
+    btnsOptions = display.newSprite( btnsOptionsSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+    btnsOptions.name = "options"
+    btnsOptions:addEventListener( "touch", myTouchListener )
+    btnsOptions.anchorY = .5
+    btnsOptions.x = _W/2
+    btnsOptions.y = offsetStartBtns+btnSpacing
+    -- btnsOptions:setSequence("options")
+    btnsOptions:setFrame(2)
+    --  btnsOptions.alpha=.98
+    btnsOptions.gotoScene = "options"
+    --  btnsOptions:scale(.8,.8)
 
-   --startBtnsAbout:addEventListener("touch",myTouchListener)
-   startBtnsAbout:addEventListener("touch",doFunction)
-   --startBtnsPlayGame:addEventListener("touch",myTouchListener)
-   startBtnsPlayGame:addEventListener("touch",doFunction)
-   --startBtnsOptions:addEventListener("touch",myTouchListener)
-   startBtnsOptions:addEventListener("touch",doFunction)
+    btnsAbout = display.newSprite( btnsAboutSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+    btnsAbout.name = "about"
+    btnsAbout:addEventListener( "touch", myTouchListener )
+    btnsAbout.anchorY = .5
+    btnsAbout.x = _W/2
+    btnsAbout.y = offsetStartBtns+(btnSpacing*2)
+    -- btnsAbout:setSequence("about")
+    btnsAbout:setFrame(2)
+    --  btnsAbout.alpha=0.98
+    btnsAbout.gotoScene = "about"
+    --  btnsAbout:scale(.8,.8)
+
+    sceneGroup:insert(whiteBackground)
+    sceneGroup:insert(titleLogo) -- SAM: BACKGROUND NOT TITLE !!! CHANGE NAME
+    sceneGroup:insert(menuColorFlags)
+    sceneGroup:insert(btnsPlayGame)
+    sceneGroup:insert(btnsOptions)
+    sceneGroup:insert(btnsAbout)
+
+    --btnsPlayGame:addEventListener("touch",myTouchListener)
+    btnsPlayGame:addEventListener("touch",doFunction)
+    --btnsOptions:addEventListener("touch",myTouchListener)
+    btnsOptions:addEventListener("touch",doFunction)
+    --btnsAbout:addEventListener("touch",myTouchListener)
+    btnsAbout:addEventListener("touch",doFunction)
 end
 
 function scene:focusMenu()
     print("re-focus menu.lua")
-    startBtnsPlayGame.xScale = 1
-    startBtnsPlayGame.yScale = 1
+    btnsPlayGame.xScale = 1
+    btnsPlayGame.yScale = 1
     isLoading = false
     touchInsideBtn = false
     isBtnAnim = false

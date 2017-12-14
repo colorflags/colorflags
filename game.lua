@@ -35,7 +35,8 @@ local codeLetterToColorKey = {
 --SAM: var to handle death
 --SAM: var to handle animations
 
-local gotoDeath = true
+local topBottomBars = false
+local gotoDeath = false
 local lightningCount = 1
 local state = 1
 local stateFour = 0
@@ -1618,7 +1619,6 @@ local function finishScale()
     topBar:toFront()
     topBar:setSequence("top")
     topBar:play()
-    transition.to(topBar, {time = 1300, alpha = .6, y = -35})
 
 	lowBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
     lowBar:setFillColor(0, 0, 0)
@@ -1627,10 +1627,14 @@ local function finishScale()
 	lowBar.x = _W / 2
 	lowBar.y = _H + 30
     lowBar.alpha = 0
-    topBar:toFront()
+    lowBar:toFront()
     lowBar:setSequence("btm")
     lowBar:play()
-	transition.to(lowBar, {time = 1300, alpha = .6, y = _H + 35})
+
+    if topBottomBars == true then
+        transition.to(topBar, {time = 1300, alpha = .6, y = -35})
+        transition.to(lowBar, {time = 1300, alpha = .6, y = _H + 35})
+    end
 
 	transition.to(flag, {time = 1000, alpha = 1})
 

@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:0f67c2694cdb9c56e4e5cd227f0700e0:fb55a3c6f277be2de60f3e8132c6d463:c5884ac85bc0e25745132c46775f4a7c$
+-- $TexturePacker:SmartUpdate:0b05be8cc35db8c50f4e884713076c93:fadfbc870d42decd454b16010cc29010:56be0cc7c017c3b328dcf4c6a825c3de$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -15,50 +15,50 @@ SheetInfo.sheet =
     frames = {
     
         {
-            -- PlayGame1
-            x=2,
-            y=39,
-            width=174,
-            height=33,
+            -- Again1
+            x=594,
+            y=4,
+            width=192,
+            height=64,
 
         },
         {
-            -- PlayGame2
-            x=180,
-            y=2,
-            width=176,
-            height=34,
+            -- Again2
+            x=202,
+            y=4,
+            width=192,
+            height=66,
 
         },
         {
-            -- PlayGame3
-            x=180,
-            y=38,
-            width=176,
-            height=34,
+            -- Again3
+            x=398,
+            y=4,
+            width=192,
+            height=66,
 
         },
         {
-            -- PlayGame4
-            x=2,
-            y=2,
-            width=176,
-            height=35,
+            -- Again4
+            x=4,
+            y=4,
+            width=194,
+            height=66,
 
         },
     },
     
-    sheetContentWidth = 361,
+    sheetContentWidth = 790,
     sheetContentHeight = 74
 }
 
 SheetInfo.frameIndex =
 {
 
-    ["PlayGame1"] = 1,
-    ["PlayGame2"] = 2,
-    ["PlayGame3"] = 3,
-    ["PlayGame4"] = 4,
+    ["Again1"] = 1,
+    ["Again2"] = 2,
+    ["Again3"] = 3,
+    ["Again4"] = 4,
 }
 
 function SheetInfo:getSheet()
