@@ -35,8 +35,12 @@ local codeLetterToColorKey = {
 --SAM: var to handle death
 --SAM: var to handle animations
 
-local topBottomBars = false
-local gotoDeath = false
+local debugOptions = {}
+debugOptions.topBottomBars = false
+debugOptions.gotoDeath = false
+debugOptions.constantSpeed = true
+debugOptions.brazilToCanada = true
+
 local lightningCount = 1
 local state = 1
 local stateFour = 0
@@ -45,7 +49,6 @@ local stateFourGrow = 0
 local score = 0
 local numDeaths = 0
 
-local constantSpeed = true
 local levelsArray
 local speedTableIndex = 3
 local speed
@@ -114,6 +117,9 @@ local line
 local paceRect
 local map
 local mapGroup
+local waterGroup
+local newGroup
+local zoomMultiplier=1
 
 local flagFrameOptions
 -- rename to flagFrame
@@ -299,6 +305,7 @@ local function myImplodeListener(event)
     end
 end
 
+-- change to newImageRect()
 local background = display.newRect(0, 0, _W, _H)
 background:setFillColor(1, 1, 1)
 background.anchorX = 0.5
@@ -306,6 +313,8 @@ background.anchorY = 0.5
 background.name = "background"
 background.x = _W / 2 ;background.y = _H / 2
 background:toBack()
+
+local water
 
 local function setupVariables()
     w1 = 1;w2 = 1;w3 = 1
@@ -316,27 +325,111 @@ local function setupVariables()
     g1 = 0;g2 = .4;g3 = 0
     b1 = 0;b2 = 0;b3 = 1
 
-    mapGroup = display.newGroup()
+    local paletteBar = display.newImageRect( "images/palette_bar.png", _W, _H )
+    paletteBar.x = _W/2
+    paletteBar.y = _H/2
 
-    map = display.newImage("images/newmap_export_nopolar.png", 2031, 851)
-    map.alpha = 0
+    waterGroup = display.newGroup()
+    local water = display.newRect( display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight )
+
+    display.setDefault( "textureWrapX", "repeat" )
+    display.setDefault( "textureWrapY", "repeat" )
+    water.alpha = 1
+
+    water.fill = { type = "image", filename = "images/water.png"}
+    water.fill.scaleX = 32/display.actualContentWidth
+    water.fill.scaleY = 32/display.actualContentHeight
+
+    display.setDefault( "textureWrapX", "clampToEdge" )
+    display.setDefault( "textureWrapY", "clampToEdge" )
+
+    water.texOffsetX = 0
+    water.texOffsetY = 0
+    water.lastT = system.getTimer()
+    water.rateX = 1
+    water.rateY = -1
+
+    function water.enterFrame( self )
+    	local curT 	= system.getTimer()
+    	local dt 	= curT - self.lastT
+    	self.lastT 	= curT
+
+    	local dOffsetX = dt * self.rateX / 20000
+    	local dOffsetY = dt * self.rateY / 50000
+
+    	self.texOffsetX = self.texOffsetX + dOffsetX
+    	self.texOffsetY = self.texOffsetY + dOffsetY
+
+    	--
+    	-- Keep values in bounds [-1, 1]
+    	--
+    	if( dOffsetX >= 0 ) then
+    		while(self.texOffsetX > 1) do
+    			self.texOffsetX = self.texOffsetX - 2
+    		end
+    	else
+    		while(self.texOffsetX < -1) do
+    			self.texOffsetX = self.texOffsetX + 2
+    		end
+    	end
+    	if( dOffsetY >= 0 ) then
+    		while(self.texOffsetY > 1) do
+    			self.texOffsetY = self.texOffsetY - 2
+    		end
+    	else
+    		while(self.texOffsetY < -1) do
+    			self.texOffsetY = self.texOffsetY + 2
+    		end
+    	end
+
+    	self.fill.x = self.texOffsetX
+    	self.fill.y = self.texOffsetY
+    end
+
+    Runtime:addEventListener( "enterFrame", water )
+    waterGroup:insert(water)
+
+	local waterMask = graphics.newMask("images/map_mask_1.png")
+	waterGroup:setMask(waterMask)
+
+	-- waterGroup.maskScaleX = 200
+	waterGroup.maskScaleY = 1.01
+	waterGroup.maskX = _W/2
+	waterGroup.maskY = _H/2
+
+    -- ['@1x'] = {2031, 851},
+    -- ['@2x'] = {4062, 1702},
+    -- ['@4x'] = {8124, 3404}
+
+    mapDimensions = CFGameScaleComponents:getItemByID(1)
+
+    testWidth = mapDimensions.dimensions['@1x'].width
+    testHeight = mapDimensions.dimensions['@1x'].height
+
+    mapGroup = display.newGroup()
+    map = display.newImageRect("images/newmap2017.png", 2031, 851)
+    map.alpha = 1
     map.anchorX = 0
     map.anchorY = 0
     map.name = "map"
     map.x = 0
     map.y = 0
-
 	mapGroup:insert(map)
 
-	--[[
-	mapMask = graphics.newMask("images/mask.png")
-	mapGroup:setMask(mapMask)
+    newGroup = display.newGroup()
+    newGroup:insert(mapGroup)
 
-	mapGroup.maskScaleX = 200
-	mapGroup.maskScaleY = 75
-	mapGroup.maskX = _W/2
-	mapGroup.maskY = _H/2
-	]]--
+	local mapMask = graphics.newMask("images/map_mask_1.png")
+
+    newGroup:setMask(mapMask)
+	newGroup.maskScaleY = 1.01
+	newGroup.maskX = _W/2
+	newGroup.maskY = _H/2
+
+    -- mapGroup:setMask(mapMask)
+	-- mapGroup.maskScaleY = 1.01
+	-- mapGroup.maskX = _W/2
+	-- mapGroup.maskY = _H/2
 
     -- SAM: better name for variables speed and timeVar
     levelsArray = {
@@ -859,7 +952,7 @@ local function boundaryCheck(e)
 
 --                        print("isBottomLeft: ", spawnTable[i].isBottomRight)
 
-                        if gotoDeath == true then
+                        if debugOptions.gotoDeath == true then
                             paceRect.isMoving = false
                             spawnTable[i]:toFront()
                             Runtime:removeEventListener("enterFrame", boundaryCheck)
@@ -907,7 +1000,7 @@ local function boundaryCheck(e)
                             end
                             timer.performWithDelay(2000, boundaryElimination, 1)
                             return --SAM: why?
-                        elseif gotoDeath == false then
+                        elseif debugOptions.gotoDeath == false then
                             for i = 1, #spawnTable do
                                 if spawnTable[i] ~= 0 then
                                     if spawnTable[i].x < -40 or spawnTable[i].x > _W + 40 then
@@ -920,7 +1013,7 @@ local function boundaryCheck(e)
                                                     if paletteDeathsInCluster == 0 then
                                                         local playPaletteDeathL = audio.play( SFXShortL, { onComplete=function(event)
                                                             paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            print(paletteDeathsInCluster)
+                                                            -- print(paletteDeathsInCluster)
                                                         end })
                                                         paletteDeathsInCluster = paletteDeathsInCluster + 1
                                                     elseif paletteDeathsInCluster > 0 then
@@ -935,7 +1028,7 @@ local function boundaryCheck(e)
                                                     if paletteDeathsInCluster == 0 then
                                                         local playPaletteDeathR = audio.play( SFXShortR, { onComplete=function(event)
                                                             paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            print(paletteDeathsInCluster)
+                                                            -- print(paletteDeathsInCluster)
                                                         end })
                                                         paletteDeathsInCluster = paletteDeathsInCluster + 1
                                                     elseif paletteDeathsInCluster > 0 then
@@ -957,7 +1050,7 @@ local function boundaryCheck(e)
                                                     if paletteDeathsInCluster == 0 then
                                                         local playPaletteDeathL = audio.play( SFXShortL, { onComplete=function(event)
                                                             paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            print(paletteDeathsInCluster)
+                                                            -- print(paletteDeathsInCluster)
                                                         end })
                                                         paletteDeathsInCluster = paletteDeathsInCluster + 1
                                                     elseif paletteDeathsInCluster > 0 then
@@ -971,7 +1064,7 @@ local function boundaryCheck(e)
                                                     if paletteDeathsInCluster == 0 then
                                                         local playPaletteDeathR = audio.play( SFXShortR, { onComplete=function(event)
                                                             paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            print(paletteDeathsInCluster)
+                                                            -- print(paletteDeathsInCluster)
                                                         end })
                                                         paletteDeathsInCluster = paletteDeathsInCluster + 1
                                                     elseif paletteDeathsInCluster > 0 then
@@ -1023,6 +1116,11 @@ local function spawnPalette(params)
 --    print(params.type)
 
     local object = display.newRoundedRect(0, 0, 80, 60, 3)
+
+    -- temp, look into shadow
+    -- object.strokeWidth = 2
+    -- object:setStrokeColor( .1, .1, .1 )
+
     object.isPaletteActive = true
     object.isGrown = false
     object.anchorY = 0.5 ; object.anchorX = 0.5
@@ -1401,13 +1499,27 @@ end
 
 -- SAM: better name for this
 local function countries(test)
-    -- local largerCountries = {2, 3, 6, 7, 9, 55}
+    -- to debugOptions
+    -- local largerCountries = {2, 3, 6, 7, 9, 39, 55}
     -- local e = largerCountries[math.random(table.getn(largerCountries))]
+
+    if debugOptions.brazilToCanada == true then
+        if country == nil then
+            e = 6
+        else
+            if country.name == "brazil" then
+                e = 7
+            else
+                e = 6
+            end
+        end
+    end
 
     -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
     local randomCountry = math.random(CFGameSettings:getLength())
-    country = CFGameSettings:getItemByID(randomCountry)
-    -- country = CFGameSettings:getItemByID(12)
+    -- country = CFGameSettings:getItemByID(randomCountry)
+    -- country = CFGameSettings:getItemByID(2)
+    country = CFGameSettings:getItemByID(e)
 
     print("current country: ", country.name)
 
@@ -1442,20 +1554,31 @@ local function countries(test)
     destroyStuff()
 
     countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
-    --SAM: countryOutline scaling
+    print(countryOutline.width)
+    -- SAM: zoom to country
+    if countryOutline.width < _W/2 and countryOutline.height < _H/3 then
+        zoomMultiplier = 1.25
+    elseif countryOutline.width < _W and countryOutline.height < _H/2 then
+        zoomMultiplier = 1
+    elseif countryOutline.width < _W and countryOutline.height < _H then
+        zoomMultiplier = .75
+    elseif countryOutline.width > _W and countryOutline.height > _H then
+        zoomMultiplier = .5
+    end
+
+    -- SAM: countryOutline scaling
     countryOutlineWidthMultiplier = display.pixelHeight/display.contentWidth
     countryOutlineHeightMultiplier = display.pixelWidth/display.contentHeight
     -- print("pixelHeight / contentWidth: ", countryOutlineWidthMultiplier)
     -- print("pixelWidth / contentHeight: ", countryOutlineHeightMultiplier)
     countryOutline:scale(1/countryOutlineWidthMultiplier, 1/countryOutlineHeightMultiplier)
 
-
-
     newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
     newTex:draw(countryOutline)
     newTex:invalidate()
 
-    local fxGroup = display.newGroup()
+    -- SAM: originally a local variable
+    fxGroup = display.newGroup()
     fxGroup.id = "fxGroup"
 
     local fxSize
@@ -1496,16 +1619,33 @@ local function countries(test)
     fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
     fxGroup:insert(fxBG)
 
+    -- SAM: explain this. Do i need this?
     mask = graphics.newMask(newTex.filename, newTex.baseDir)
     fxGroup:setMask(mask)
     canvasObj.alpha = 0
 
     mapGroup:insert(fxGroup)
 
-    xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
-    yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
+    -- (2031/2) - 958 - (?/2)
+    -- (851/2) - 225 - (?/2)
+    -- xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
+    -- yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
+    -- (2031/2) - (958*1.5) - ((?*1.5)/2)
+    -- (851/2) - (225*1.5) - ((?*1.5)/2)
+    xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
+    yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
 
-    --print("xCoord", xCoord, "yCoord", yCoord)
+    print("_W:", _W, "_H:", _H)
+    -- print("fxGroup.x:", fxGroup.x)
+    -- print("fxGroup.y:", fxGroup.y)
+
+    -- focus on these, fxGroup is being placed at proper locations.
+    print("xCoord:", xCoord)
+    print("yCoord:", yCoord)
+    -- xCoord=xCoord*.75
+    -- yCoord=yCoord*.75
+
+    -- print("xCoord", xCoord, "yCoord", yCoord)
 
     local function animateCountry()
         transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
@@ -1606,7 +1746,7 @@ local function removeFlag()
     flag  = nil
 end
 
---MIKE: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ?? Maybe merge all functions pertaining to newFlag and flag enlargement into one neat function
+-- SAM: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ?? Maybe merge all functions pertaining to newFlag and flag enlargement into one neat function
 local function finishScale()
     topBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
 	topBar:setFillColor(0, 0, 0)
@@ -1631,7 +1771,7 @@ local function finishScale()
     lowBar:setSequence("btm")
     lowBar:play()
 
-    if topBottomBars == true then
+    if debugOptions.topBottomBars == true then
         transition.to(topBar, {time = 1300, alpha = .6, y = -35})
         transition.to(lowBar, {time = 1300, alpha = .6, y = _H + 35})
     end
@@ -1646,7 +1786,7 @@ local function finishScale()
 end
 
 local function newFlag()
-    if countriesCompleted == 0 or constantSpeed == true then
+    if countriesCompleted == 0 or debugOptions.constantSpeed == true then
         speed = levelsArray[speedTableIndex].speed
         timeVar = levelsArray[speedTableIndex].timeVar
         speedText.text = speed
@@ -1690,24 +1830,29 @@ local function newFlag()
 
     sideTimer = timer.performWithDelay(1500, finishScale, 1)
     paceTimer=timer.performWithDelay(900,delayPace,1)
-    transition.to( map, { time=1500, alpha=1 })
-    mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
+    -- transition.to( map, { time=1500, alpha=1 })
+
+    -- mapGroup.x=xCoord
+    -- mapGroup.y=yCoord
+    -- mapGroup.xScale=1*zoomMultiplier
+    -- mapGroup.yScale=1*zoomMultiplier
+
+    -- mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
+    mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord, xScale=1*zoomMultiplier, yScale=1*zoomMultiplier})
 
 --[[SAM: countryOutline scaling ]]--
 --    TEMP: alternative styles
 --    countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 })
 
 --[[SAM: countryOutline scaling ]]--
---		mapGroup.xScale = .5
---		mapGroup.yScale = .5
+		-- mapGroup.xScale = .5
+		-- mapGroup.yScale = .5
 --		mapGroup.x = xCoord*.5 + (_W*.25)
 --		mapGroup.y = yCoord*.5 + (_H*.25)
 
 --[[SAM: countryOutline scaling ]]--
 --     with scale
 --		mapTimer = transition.to(map, {time = 500, x=xCoord*.5+(_W*.25), y=yCoord*.5+(_H*.25), xScale = .5, yScale = .5})
-
---    SAM: what is this?
 
     -- SAM: this sort of countriesCompleted == 0 checking should be done in countries()
 --    if(countriesCompleted == 0) then
@@ -1933,7 +2078,7 @@ function objTouch(self, e)
                 bonusText = nil
             end
 
-            if gotoDeath == true then
+            if debugOptions.gotoDeath == true then
                 self:toFront()
                 self.isPaletteActive = false
                 self:removeEventListener("touch", objTouch)

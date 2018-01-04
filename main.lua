@@ -2,7 +2,10 @@
 --storyboard.purgeOnSceneChange = true
 
 require("cf_game_settings")
+require("cf_game_scale_components")
+
 CFGameSettings = CFGameSettings()
+CFGameScaleComponents = CFGameScaleComponents()
 
 -- Override Corona's core widget libraries with the files contained in this project's subdirectory.
 -- Argument "name" will be set to the name of the library being loaded by the require() function.
@@ -27,7 +30,6 @@ package.preload.widget_tableview = onRequireWidgetLibrary
 -- For xcode console output
 io.output():setvbuf( "no" )
 
-
 local composer=require("composer")
 
 --composer.gotoScene( "unitTestListing" )
@@ -37,8 +39,11 @@ display.setStatusBar( display.HiddenStatusBar )
 -- SAM: delete?
 --_W = display.pixelWidth
 --_H = display.pixelHeight
-_W = display.contentWidth; -- Get the width of the screen
-_H = display.contentHeight; -- Get the height of the screen
+_G._W = display.contentWidth; -- Get the width of the screen
+_G._H = display.contentHeight; -- Get the height of the screen
+
+_G.scaleSuffix = display.imageSuffix
+-- print(scaleSuffix)
 
 defaultTransition="crossFade"
 
@@ -148,7 +153,7 @@ if showSplash==true then
 elseif showSplash==false then
         display.remove(splash1)
     display.remove(splash2)
-     composer.gotoScene( "menu", {effect = defaultTransition})
+     composer.gotoScene( "game", {effect = defaultTransition})
 end
 
 
