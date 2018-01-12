@@ -369,11 +369,8 @@ function scene:create( event )
     sceneGroup:insert(btnsOptions)
     sceneGroup:insert(btnsAbout)
 
-    --btnsPlayGame:addEventListener("touch",myTouchListener)
     btnsPlayGame:addEventListener("touch",doFunction)
-    --btnsOptions:addEventListener("touch",myTouchListener)
     btnsOptions:addEventListener("touch",doFunction)
-    --btnsAbout:addEventListener("touch",myTouchListener)
     btnsAbout:addEventListener("touch",doFunction)
 end
 
