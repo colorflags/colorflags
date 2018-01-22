@@ -13,6 +13,10 @@ audioReservedChannel1 = nil
 audio.stop( 2 )
 audioReservedChannel2 = nil
 
+-- audio stuff
+local music
+local bobby
+
 local activeCountry
 
 local xBtn
@@ -258,6 +262,19 @@ local btnsSeq = {
 local menuSpriteCoords = require("lua-sheets.playgame-menu")
 local menuStartSheet = graphics.newImageSheet( "images/playgame-menu.png", menuSpriteCoords:getSheet() )
 
+local countryOutlineSheetCoords = require("lua-sheets.country_outline_mask")
+local countryOutlineSheet = graphics.newImageSheet("images/country_outline_mask.png", countryOutlineSheetCoords:getSheet())
+local countryOutline
+
+local paletteBarSheetCoords = require("lua-sheets.palette_bar")
+local paletteBarSheet = graphics.newImageSheet("images/palette_bar.png", paletteBarSheetCoords:getSheet())
+local paletteBarTop
+local paletteBarBtm
+
+local fxGroup
+local fxBG
+local fxAnim
+
 local background = display.newRect(0, 0, _W, _H)
 background:setFillColor(1, 1, 1)
 background.anchorX = 0.5
@@ -265,6 +282,295 @@ background.anchorY = 0.5
 background.name = "background"
 background.x = _W / 2 ;background.y = _H / 2
 background:toBack()
+
+local newTex = graphics.newTexture({type = "canvas", width = display.contentWidth, height = display.contentHeight})
+
+local canvasObj = display.newImageRect(
+    newTex.filename,  -- "filename" property required
+    newTex.baseDir,   -- "baseDir" property required
+    display.contentWidth,
+    display.contentHeight
+)
+canvasObj.x = display.contentCenterX
+canvasObj.y = display.contentCenterY
+
+--SAM: for masked effects! noise generator
+local circ
+local mask
+
+--SAM: is this needed?
+local function myImplodeListener(event)
+    local thisSprite = event.target
+    if (event.phase == "ended") then
+        thisSprite.alpha = 0
+        thisSprite:pause()
+    end
+end
+
+local function round(val, n)
+   if (n) then
+      return math.floor( (val * 10^n) + 0.5) / (10^n)
+   else
+      return math.floor(val+0.5)
+   end
+end
+
+-- change to newImageRect()
+local background = display.newRect(0, 0, _W, _H)
+background:setFillColor(1, 1, 1)
+background.anchorX = 0.5
+background.anchorY = 0.5
+background.name = "background"
+background.x = _W / 2 ;background.y = _H / 2
+background:toBack()
+
+local water
+local function setupVariables()
+    w1 = 1;w2 = 1;w3 = 1
+    k1 = 0;k2 = 0;k3 = 0
+    r1 = 1;r2 = 0;r3 = 0
+    o1 = 1;o2 = .502;o3 = 0
+    y1 = 1;y2 = 1;y3 = 0
+    g1 = 0;g2 = .4;g3 = 0
+    b1 = 0;b2 = 0;b3 = 1
+
+    paletteBarTop = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_top")}} )
+    paletteBarBtm = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_btm")}} )
+
+    if platform == "ios" then
+        paletteBarTop.x = _W/2
+        paletteBarTop.y = 0
+        paletteBarTop.anchorX = .5
+        paletteBarTop.anchorY = 0
+
+        paletteBarBtm.x = _W/2
+        paletteBarBtm.y = _H
+        paletteBarBtm.anchorX = .5
+        paletteBarBtm.anchorY = 1
+    elseif platform == "android" then
+        paletteBarTop.width = _W
+        paletteBarTop.x = _W/2
+        paletteBarTop.y = 0
+        paletteBarTop.anchorX = .5
+        paletteBarTop.anchorY = 0
+
+        paletteBarBtm.width = _W
+        paletteBarBtm.x = _W/2
+        paletteBarBtm.y = _H
+        paletteBarBtm.anchorX = .5
+        paletteBarBtm.anchorY = 1
+    end
+
+    waterGroup = display.newGroup()
+    local water = display.newRect( display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight )
+
+    display.setDefault( "textureWrapX", "repeat" )
+    display.setDefault( "textureWrapY", "repeat" )
+    water.alpha = 1
+
+    water.fill = { type = "image", filename = "images/water.png"}
+    water.fill.scaleX = 32/display.actualContentWidth
+    water.fill.scaleY = 32/display.actualContentHeight
+
+    display.setDefault( "textureWrapX", "clampToEdge" )
+    display.setDefault( "textureWrapY", "clampToEdge" )
+
+    water.texOffsetX = 0
+    water.texOffsetY = 0
+    water.lastT = system.getTimer()
+    water.rateX = 1
+    water.rateY = -1
+
+    function water.enterFrame( self )
+    	local curT 	= system.getTimer()
+    	local dt 	= curT - self.lastT
+    	self.lastT 	= curT
+
+    	local dOffsetX = dt * self.rateX / 20000
+    	local dOffsetY = dt * self.rateY / 50000
+
+    	self.texOffsetX = self.texOffsetX + dOffsetX
+    	self.texOffsetY = self.texOffsetY + dOffsetY
+
+    	--
+    	-- Keep values in bounds [-1, 1]
+    	--
+    	if( dOffsetX >= 0 ) then
+    		while(self.texOffsetX > 1) do
+    			self.texOffsetX = self.texOffsetX - 2
+    		end
+    	else
+    		while(self.texOffsetX < -1) do
+    			self.texOffsetX = self.texOffsetX + 2
+    		end
+    	end
+    	if( dOffsetY >= 0 ) then
+    		while(self.texOffsetY > 1) do
+    			self.texOffsetY = self.texOffsetY - 2
+    		end
+    	else
+    		while(self.texOffsetY < -1) do
+    			self.texOffsetY = self.texOffsetY + 2
+    		end
+    	end
+
+    	self.fill.x = self.texOffsetX
+    	self.fill.y = self.texOffsetY
+    end
+
+    Runtime:addEventListener( "enterFrame", water )
+    waterGroup:insert(water)
+
+    -- rename?
+	local waterMask = graphics.newMask("images/map_mask.png")
+	waterGroup:setMask(waterMask)
+    waterGroup.maskX = _W/2
+    waterGroup.maskY = _H/2
+
+    -- do this math one time in this function, reuse
+    if platform == "ios" then
+        waterGroup.maskScaleY = 1.01
+    elseif platform == "android" then
+        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+        -- alignMask will be 1.23
+        -- print(alignMask)
+        waterGroup.maskScaleY = alignMask
+    end
+
+    -- ['@1x'] = {2031, 851},
+    -- ['@2x'] = {4062, 1702},
+    -- ['@4x'] = {8124, 3404}
+
+    mapDimensions = CFGameScaleComponents:getItemByID(1)
+
+    testWidth = mapDimensions.dimensions['@1x'].width
+    testHeight = mapDimensions.dimensions['@1x'].height
+
+    mapGroup = display.newGroup()
+    map = display.newImageRect("images/worldmap_2017_300.png", 8191, 4084)
+    map.alpha = 1
+    map.anchorX = 0
+    map.anchorY = 0
+    map.name = "map"
+    map.x = 0
+    map.y = 0
+	mapGroup:insert(map)
+    mapGroup.xScale = 1 * zoomMultiplier
+    mapGroup.yScale = 1 * zoomMultiplier
+
+    newGroup = display.newGroup()
+    newGroup:insert(mapGroup)
+
+	local mapMask = graphics.newMask("images/map_mask.png")
+
+    newGroup:setMask(mapMask)
+	newGroup.maskX = _W/2
+	newGroup.maskY = _H/2
+
+    -- do this math one time in this function, reuse
+    if platform == "ios" then
+        newGroup.maskScaleY = 1.01
+    elseif platform == "android" then
+        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+        -- alignMask will be 1.23
+        -- print(alignMask)
+        newGroup.maskScaleY = alignMask
+    end
+
+    -- mapGroup:setMask(mapMask)
+	-- mapGroup.maskScaleY = 1.01
+	-- mapGroup.maskX = _W/2
+	-- mapGroup.maskY = _H/2
+
+    -- SAM: better name for variables speed and timeVar
+    levelsArray = {
+        {speed = 1, timeVar = 2550},
+        {speed = 2, timeVar = 1700},
+        {speed = 3, timeVar = 1250},
+        {speed = 4, timeVar = 1000},
+        {speed = 5, timeVar = 910},
+        {speed = 6, timeVar = 750},
+        {speed = 7, timeVar = 700},
+        {speed = 8, timeVar = 600},
+        {speed = 9, timeVar = 550},
+        {speed = 10, timeVar = 450},
+        {speed = 11, timeVar = 420},
+        {speed = 12, timeVar = 400},
+        {speed = 13, timeVar = 380},
+        {speed = 14, timeVar = 365},
+        {speed = 15, timeVar = 345},
+        {speed = 16, timeVar = 335},
+        {speed = 17, timeVar = 305},
+        {speed = 18, timeVar = 280},
+        {speed = 19, timeVar = 260},
+        {speed = 20, timeVar = 240},
+        {speed = 21, timeVar = 220},
+        {speed = 22, timeVar = 200},
+        {speed = 23, timeVar = 190},
+        {speed = 24, timeVar = 185},
+        {speed = 25, timeVar = 175},
+        {speed = 26, timeVar = 170},
+        {speed = 27, timeVar = 170},
+        {speed = 28, timeVar = 165},
+        {speed = 29, timeVar = 165},
+        {speed = 30, timeVar = 160},
+        {speed = 31, timeVar = 155},
+        {speed = 32, timeVar = 155},
+        {speed = 33, timeVar = 150},
+        {speed = 34, timeVar = 145},
+        {speed = 35, timeVar = 145},
+        {speed = 36, timeVar = 140},
+        {speed = 37, timeVar = 135},
+        {speed = 38, timeVar = 125},
+        {speed = 39, timeVar = 120},
+        {speed = 40, timeVar = 110}
+    }
+
+    -- flag.anchorX = 0.5 ; flag.anchorY = 0.5
+    --
+    -- flag.width = 500
+    -- flag.height = 333
+    -- flag.xScale = .2
+    -- flag.yScale = .2 * .7
+    -- flag.anchorX = 1
+    -- flag.anchorY = 0.5
+    --
+    -- flag.x = _W
+    -- flag.y = _H/2
+
+    flagFrameOptions = {
+        x = _W,
+        y = _H/2,
+        width = 500,
+        height = 333,
+        xScale = .2,
+        yScale = .2 * .7,
+        anchorX = 1,
+        anchorY = .5,
+        flagPadding = 1,
+        flagOffset = .5
+    }
+
+    -- rename testFrame to flagFrame
+    testFrame = display.newRect(
+        flagFrameOptions.x,
+        flagFrameOptions.y,
+        flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding,
+        flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding
+    )
+
+    testFrame.anchorX = flagFrameOptions.anchorX
+    testFrame.anchorY = flagFrameOptions.anchorY
+    testFrame:setFillColor(0, 0, 0)
+
+    -- flagFrameAnchorX and flagFrameAnchorY are derived from flagFrameOptions (used by testFrame) to place GUI objects pertaining and bound to flag area
+    -- flagFrameAnchorX and flagFrameAnchorY set to the top-left corner of this flag area (flag, flagFrame, and lightningIcons)
+    local flagFrameAnchorX = flagFrameOptions.x - ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) - 12) -- 12 to offset an extra amount from left-side of the flagFrame
+
+    local flagFrameAnchorY = (flagFrameOptions.y - ((flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding) / 2) - 6)
+end
 
 -- New
 local function myTouchListener(event)

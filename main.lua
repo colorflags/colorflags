@@ -7,6 +7,16 @@ require("cf_game_scale_components")
 CFGameSettings = CFGameSettings()
 CFGameScaleComponents = CFGameScaleComponents()
 
+_G.platform = system.getInfo( "platform" )
+if platform == "android" then
+	native.setProperty( "androidSystemUiVisibility", "immersiveSticky" )
+end
+
+print("pixelHeight: " .. display.pixelHeight, "pixelWidth: " .. display.pixelWidth)
+
+_G.pixelRatio = display.pixelHeight / display.pixelWidth
+print("pixel ratio: " .. pixelRatio)
+
 -- Override Corona's core widget libraries with the files contained in this project's subdirectory.
 -- Argument "name" will be set to the name of the library being loaded by the require() function.
 local function onRequireWidgetLibrary(name)
@@ -39,11 +49,15 @@ display.setStatusBar( display.HiddenStatusBar )
 -- SAM: delete?
 --_W = display.pixelWidth
 --_H = display.pixelHeight
-_G._W = display.contentWidth; -- Get the width of the screen
-_G._H = display.contentHeight; -- Get the height of the screen
-
+_G._W = display.contentWidth -- Get the width of the screen
+_G._H = display.contentHeight -- Get the height of the screen
+_G.fps = display.fps
 _G.scaleSuffix = display.imageSuffix
 -- print(scaleSuffix)
+
+print("width: " .. _W, "height: " .. _H)
+
+print("actualContentWidth: " .. display.actualContentWidth, "actualContentHeight: " .. display.actualContentHeight)
 
 defaultTransition="crossFade"
 
@@ -64,13 +78,6 @@ _G.audioReservedChannel2 = nil
 
 -- SAM: what is this?
 audioCanPlay=true
-
- -- MIKE: Should we just keep this in game.lua
- heightModeTop=35
- heightModeLow=_H-35
- lightningY=90
- infoMode=true
-
 
 local splash1 = display.newImageRect( "images/MMG1.png", 580, 320 )
     splash1.anchorX=0.5

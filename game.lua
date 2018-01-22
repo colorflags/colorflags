@@ -1,4 +1,4 @@
--- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
+ -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html
 local CFText = require("cf_text")
 local composer = require("composer")
@@ -38,9 +38,27 @@ local codeLetterToColorKey = {
 local debugOptions = {}
 debugOptions.gotoDeath = false
 debugOptions.constantSpeed = true
-debugOptions.cycleModes = true
+debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
 debugOptions.brazilToCanada = false -- make this into array with a variety of sets - changing between 2 or more countries in sequence
+
+local gameMechanics = {}
+gameMechanics.playCountryDuration = 20000
+gameMechanics.transitionToCountryDuration = 50
+gameMechanics.firstPaletteDelay = 10
+gameMechanics.countriesSpawned = 0
+gameMechanics.overrideFlag = false
+gameMechanics.heightModeTop = 35
+gameMechanics.heightModeLow = _H - 35
+-- lightningY=90
+-- infoMode=true
+
+-- FPS
+if fps == 30 then
+    gameMechanics.paletteSpawnDelay = 85
+else
+    gameMechanics.paletteSpawnDelay = 42.5
+end
 
 local lightningCount = 1
 -- rename state to mode
@@ -61,6 +79,8 @@ local countriesCompleted = 0
 
 local infoPic
 local code
+
+-- MIKE: get rid of all the info related stuff for now. Bring back in CF 2.0
 local info
 local infoMode = false
 local infoTimer
@@ -93,12 +113,21 @@ local killBarsTimer
 local resetSpawnTimer
 local flag3Timer
 
+------------------------------------------------------------------------------------------------------
 -- SAM: declaring these variables first, assigning functions to them later. That way they can be called in any function regardless of how far down it is in the file.
 -- https://forums.coronalabs.com/topic/65415-addeventlistener-listener-cannot-be-nil-nil/
-local newFlag
-local setFlag
+
+local setCountryParameters
+local newCountry
+local moveObject
 local readyObject
+
 local resetSpawnTable
+local setFlag
+local delayPace
+local finishScale
+local onOptionsTap
+------------------------------------------------------------------------------------------------------
 
 local newFlagTimer
 local killLowTimer
@@ -269,7 +298,11 @@ local lightningIconsSheet = graphics.newImageSheet("images/new-lightning-icons.p
 local countryOutlineSheetCoords = require("lua-sheets.country_outline_mask")
 local countryOutlineSheet = graphics.newImageSheet("images/country_outline_mask.png", countryOutlineSheetCoords:getSheet())
 local countryOutline
-local countryOutlineTest
+
+local paletteBarSheetCoords = require("lua-sheets.palette_bar")
+local paletteBarSheet = graphics.newImageSheet("images/palette_bar.png", paletteBarSheetCoords:getSheet())
+local paletteBarTop
+local paletteBarBtm
 
 local fxGroup
 local fxBG
@@ -306,25 +339,39 @@ local function myImplodeListener(event)
     end
 end
 
--- READYOBJ: onOptionsTap (local function...)
-local function onOptionsTap(event)
+local function round(val, n)
+   if (n) then
+      return math.floor( (val * 10^n) + 0.5) / (10^n)
+   else
+      return math.floor(val+0.5)
+   end
+end
+
+-- READYOBJ: onOptionsTap
+onOptionsTap = function(event)
     local optionName = event.target.name
     if optionName == "modeDecrease" or optionName == "modeIncrease" then
-        if flag ~= nil then
-            -- local overrideFlag = {"mode"}
+        if flag ~= nil and debugOptions.cycleModes == false then
+            if optionName == "modeDecrease" then
+                if state > 1 then
+                    state = state - 1
+                else
+                    state = 3
+                end
+            elseif optionName == "modeIncrease" then
+                if state < 3 then
+                    state = state + 1
+                else
+                    state = 1
+                end
+            end
+            -- print("state set in onOptionsTap(): " .. state)
+            -- SAM: rename state to mode
+            modeText.text = state
 
-            -- READYOBJ: call to setFlag() + call to readyObject() + timer on setFlag()
-            -- this is weird having two parts to this game-mechanic
-            -- sets variable setTheFlag
-            newFlag()
             timer.cancel(setFlagTimer)
-            setFlagTimer = timer.performWithDelay(20000, setFlag, 0)
-
-            -- setFlag()
-            -- readyObject(optionName)
-            -- timer.cancel(setFlagTimer)
-            -- setFlagTimer = timer.performWithDelay(20000, setFlag, 0)
-
+            setFlag()
+            gameMechanics.overrideFlag = true
         end
     end
     return true
@@ -349,9 +396,32 @@ local function setupVariables()
     g1 = 0;g2 = .4;g3 = 0
     b1 = 0;b2 = 0;b3 = 1
 
-    local paletteBar = display.newImageRect( "images/palette_bar.png", _W, _H )
-    paletteBar.x = _W/2
-    paletteBar.y = _H/2
+    paletteBarTop = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_top")}} )
+    paletteBarBtm = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_btm")}} )
+
+    if platform == "ios" then
+        paletteBarTop.x = _W/2
+        paletteBarTop.y = 0
+        paletteBarTop.anchorX = .5
+        paletteBarTop.anchorY = 0
+
+        paletteBarBtm.x = _W/2
+        paletteBarBtm.y = _H
+        paletteBarBtm.anchorX = .5
+        paletteBarBtm.anchorY = 1
+    elseif platform == "android" then
+        paletteBarTop.width = _W
+        paletteBarTop.x = _W/2
+        paletteBarTop.y = 0
+        paletteBarTop.anchorX = .5
+        paletteBarTop.anchorY = 0
+
+        paletteBarBtm.width = _W
+        paletteBarBtm.x = _W/2
+        paletteBarBtm.y = _H
+        paletteBarBtm.anchorX = .5
+        paletteBarBtm.anchorY = 1
+    end
 
     waterGroup = display.newGroup()
     local water = display.newRect( display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight )
@@ -413,13 +483,22 @@ local function setupVariables()
     Runtime:addEventListener( "enterFrame", water )
     waterGroup:insert(water)
 
-	local waterMask = graphics.newMask("images/map_mask_1.png")
+    -- rename?
+	local waterMask = graphics.newMask("images/map_mask.png")
 	waterGroup:setMask(waterMask)
+    waterGroup.maskX = _W/2
+    waterGroup.maskY = _H/2
 
-	-- waterGroup.maskScaleX = 200
-	waterGroup.maskScaleY = 1.01
-	waterGroup.maskX = _W/2
-	waterGroup.maskY = _H/2
+    -- do this math one time in this function, reuse
+    if platform == "ios" then
+        waterGroup.maskScaleY = 1.01
+    elseif platform == "android" then
+        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+        -- alignMask will be 1.23
+        -- print(alignMask)
+        waterGroup.maskScaleY = alignMask
+    end
 
     -- ['@1x'] = {2031, 851},
     -- ['@2x'] = {4062, 1702},
@@ -445,12 +524,22 @@ local function setupVariables()
     newGroup = display.newGroup()
     newGroup:insert(mapGroup)
 
-	local mapMask = graphics.newMask("images/map_mask_1.png")
+	local mapMask = graphics.newMask("images/map_mask.png")
 
     newGroup:setMask(mapMask)
-	newGroup.maskScaleY = 1.01
 	newGroup.maskX = _W/2
 	newGroup.maskY = _H/2
+
+    -- do this math one time in this function, reuse
+    if platform == "ios" then
+        newGroup.maskScaleY = 1.01
+    elseif platform == "android" then
+        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+        -- alignMask will be 1.23
+        -- print(alignMask)
+        newGroup.maskScaleY = alignMask
+    end
 
     -- mapGroup:setMask(mapMask)
 	-- mapGroup.maskScaleY = 1.01
@@ -693,8 +782,8 @@ local function setupScoreboard()
     modeDecreaseBtnSym.anchorY = .5
     modeTextGroup:insert(modeIncreaseBtnGroup)
 
-    speedDecreaseBtnGroup:addEventListener("tap", onOptionsTap)
-    speedIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
+    -- speedDecreaseBtnGroup:addEventListener("tap", onOptionsTap)
+    -- speedIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
     modeDecreaseBtnGroup:addEventListener("tap", onOptionsTap)
     modeIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
 
@@ -729,8 +818,8 @@ local function speedUp()
     end
 end
 
--- READYOBJ: resetSpawnTable (assign)
-resetSpawnTable = function(overrideType)
+-- READYOBJ: resetSpawnTable
+resetSpawnTable = function()
     if music ~= nil then
         media.stopSound(music)
         music = nil
@@ -748,7 +837,7 @@ resetSpawnTable = function(overrideType)
         bonusText = nil
     end
 
-    if debugOptions.cycleModes == true and overrideType == nil then
+    if debugOptions.cycleModes == true then
     	--decide what state is next
         if state == 1 then
             state = 2
@@ -763,12 +852,10 @@ resetSpawnTable = function(overrideType)
         end
     end
 
-
     --ERROR: crashes, let the game run
     -- speed = levels[speedTableIndex].speed
     -- timeVar = levels[speedTableIndex].timeVar
 
-	--SAM: CFText
     speedText.text = speed
     speedText:toFront()
 end
@@ -1123,8 +1210,8 @@ end
 
 local function spawnPalette(params)
 
-    --SAM: spawned pad's color
---    print(params.type)
+    -- SAM: spawned pad's color
+    -- print(params.type)
 
     local object = display.newRoundedRect(0, 0, 80, 60, 3)
 
@@ -1148,32 +1235,32 @@ local function spawnPalette(params)
     if state == 1 then
         if object.isTopLeft == false then
             object.x = 0 + 40
-            object.y = heightModeLow
+            object.y = gameMechanics.heightModeLow
         elseif object.isTopLeft == true then
             object.x = _W - 40
-            object.y = heightModeTop
+            object.y = gameMechanics.heightModeTop
         end
     elseif state == 2 then
         if object.isTopLeft == false then
             object.x = _W - 40
-            object.y = heightModeLow
+            object.y = gameMechanics.heightModeLow
         elseif object.isTopLeft == true then
             object.x = 0 + 40
-            object.y = heightModeTop
+            object.y = gameMechanics.heightModeTop
         end
     elseif state == 3 then
         if object.corner == "TopRight" then
             object.x = _W / 2 + 40
-            object.y = heightModeTop
+            object.y = gameMechanics.heightModeTop
         elseif object.corner == "TopLeft" then
             object.x = _W / 2 - 40
-            object.y = heightModeTop
+            object.y = gameMechanics.heightModeTop
         elseif object.corner == "BottomRight" then
             object.x = _W / 2 + 40
-            object.y = heightModeLow
+            object.y = gameMechanics.heightModeLow
         elseif object.corner == "BottomLeft" then
             object.x = _W / 2 - 40
-            object.y = heightModeLow
+            object.y = gameMechanics.heightModeLow
         end
     end
 
@@ -1439,12 +1526,13 @@ function lightningStrike(self)
     -- trackLightningScore()
 end
 
--- READYOBJ: setFlag (assign)
+-- READYOBJ: setFlag
 setFlag = function()
     setTheFlag = true
 end
 
-local function delayPace()
+-- READYOBJ: delayPace
+delayPace = function()
     paceRect.isMoving = true
     if speedText ~= 0 and speedText ~= nil then
         speedText.text = speed
@@ -1526,11 +1614,77 @@ animateCountry = function()
     })
 end
 
+-- READYOBJ: setCountryParameters
+setCountryParameters = function(restartCountry)
 
--- SAM: better name for this
--- READYOBJ: countries (local function...)
-local function countries(overrideType)
-    -- to debugOptions
+    if not debugOptions.constantSpeed then
+        speedUp()
+    end
+
+    if fps == 30 then
+        speed = levelsArray[speedTableIndex].speed
+    else
+        speed = levelsArray[speedTableIndex].speed / 2
+    end
+
+    timeVar = levelsArray[speedTableIndex].timeVar
+    speedText.text = speed
+    speedText:toFront()
+
+
+
+    music = nil
+
+    -- SAM: bonusText activity
+    if bonusText ~= nil then
+        print("bonusText from ", "setCountryParameters()")
+        bonusText:removeSelf()
+        bonusText = nil
+
+        --SAM: delete?
+        spread = 1
+        previousColor = nil
+        currentColor = nil
+    end
+
+
+    -- SAM: rename state to mode
+    -- print("state set in setCountryParameters(): ", state)
+    modeText.text = state
+
+    if restartCountry == nil then
+        newCountry()
+        sideTimer = timer.performWithDelay(gameMechanics.transitionToCountryDuration, finishScale, 1)
+        -- SAM: IMPORTANT, rename paceTimer to something more serious
+        paceTimer = timer.performWithDelay(10, delayPace, 1)
+        mapTimer = transition.to( mapGroup, { time=gameMechanics.transitionToCountryDuration, x=xCoord, y=yCoord, xScale=1*zoomMultiplier, yScale=1*zoomMultiplier})
+    else
+        paceTimer = timer.performWithDelay(10, delayPace, 1)
+    end
+
+    -- delete
+    --[[
+    if infoMode == true then
+        infoPic = display.newImage(info, 165, 77)
+        infoPic.x = _W / 6
+        infoPic.y = _H / 2
+        infoPic.alpha = 0
+        timer.performWithDelay(2000, infoAppear, 1)
+    end
+
+    countryText = display.newText(country, _W / 2, _H / 2, native.systemFont, 50)
+    countryText.anchorX = 0.5
+    countryText.anchorY = 0.5
+    countryText:setFillColor(0, 0, 0)
+    countryText:toFront()
+    timer.performWithDelay(2000, countryTextScale, 1)
+    ]]--
+
+end
+
+-- READYOBJ: newCountry
+newCountry = function()
+    -- largerCountries to debugOptions
     -- local largerCountries = {2, 3, 6, 7, 9, 39, 55}
     -- local e = largerCountries[math.random(table.getn(largerCountries))]
 
@@ -1548,19 +1702,15 @@ local function countries(overrideType)
         country = CFGameSettings:getItemByID(e)
     end
 
-    if overrideType == nil then
-        -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
-        local randomCountry = math.random(CFGameSettings:getLength())
-        country = CFGameSettings:getItemByID(randomCountry)
-        -- country = CFGameSettings:getItemByID(2)
-        -- country = CFGameSettings:getItemByID(e)
-    end
+    -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
+    local randomCountry = math.random(CFGameSettings:getLength())
+    country = CFGameSettings:getItemByID(randomCountry)
 
-    print("current country: ", country.name)
+    -- print("current country: ", country.name)
 
     inclusiveColorsArray = adherenceToFlagColors(0)
 
-    --SAM: Should i put this outside the countries() function?
+    --SAM: should i put this outside the countries() function? Or is no need for it to be in a function?
     function destroyStuff()
 
         if(countryOutline ~= nil) then
@@ -1585,12 +1735,11 @@ local function countries(overrideType)
             end
         end
     end
-
     destroyStuff()
 
     countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
 
-    print("country width:", countryOutline.width, "country height:", countryOutline.height)
+    -- print("country width:", countryOutline.width, "country height:", countryOutline.height)
 
     -- SAM: zoom to country
     --[[
@@ -1605,23 +1754,25 @@ local function countries(overrideType)
     -- print("pixelWidth / contentHeight: ", countryOutlineHeightMultiplier)
     countryOutline:scale(1/countryOutlineWidthMultiplier, 1/countryOutlineHeightMultiplier)
 
-    -- old location for this stuff.. delete?
-    -- newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
-    -- newTex:draw(countryOutline)
-    -- newTex:invalidate()
-
     -- SAM: originally a local variable
     fxGroup = display.newGroup()
     fxGroup.id = "fxGroup"
 
+    -- print("countryOutline.width:" .. countryOutline.width, "countryOutline.height" .. countryOutline.height)
+
     local fxSize
     if(countryOutline.width > countryOutline.height) then
-        fxSize = math.ceil(countryOutline.width * countryOutline.xScale) + 10
+        -- delete?
+        -- fxSize = math.ceil(countryOutline.width * countryOutline.xScale) + 120
+        fxSize = math.ceil(countryOutline.width) + 120
     else
-        fxSize = math.ceil(countryOutline.height * countryOutline.yScale) + 10
+        -- delete?
+        -- fxSize = math.ceil(countryOutline.height * countryOutline.yScale) + 120
+        fxSize = math.ceil(countryOutline.width) + 120
     end
 
-    print("circumference of fxBG:", fxSize)
+    -- print("circumference of fxBG:", fxSize)
+
 	-- SAM: make into local variable? I don't know if there's a visual difference for when fxBG is local vs global. Leave as is until thoroughly tested
 	fxBG = display.newCircle(0, 0, fxSize)
     fxBG.anchorX = .5
@@ -1631,7 +1782,7 @@ local function countries(overrideType)
     local scaleFactorX = 1
 	local scaleFactorY = 1
 
-    print("fxBG width:", fxBG.width, "fxBG height:", fxBG.height)
+    -- print("fxBG width:", fxBG.width, "fxBG height:", fxBG.height)
 
     if (fxBG.width > fxBG.height) then
         scaleFactorY = fxBG.width / fxBG.height
@@ -1661,14 +1812,14 @@ local function countries(overrideType)
     newTex:draw(countryOutline)
     newTex:invalidate()
 
-    -- SAM: explain this. Do i need this?
+    -- SAM: masks fxBG (newCircle) with country outline
     mask = graphics.newMask(newTex.filename, newTex.baseDir)
     fxGroup:setMask(mask)
     canvasObj.alpha = 0
 
     mapGroup:insert(fxGroup)
 
-    -- sends newCircle() to back
+    -- sends newCircle() to back, behind country
     -- fxGroup:toBack()
 
     -- (2031/2) - 958 - (?/2)
@@ -1680,19 +1831,8 @@ local function countries(overrideType)
     xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
     yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
 
-    print("_W:", _W, "_H:", _H)
-    -- print("fxGroup.x:", fxGroup.x)
-    -- print("fxGroup.y:", fxGroup.y)
+    -- print("xCoord:", xCoord, "yCoord:", yCoord)
 
-    -- focus on these, fxGroup is being placed at proper locations.
-    print("xCoord:", xCoord)
-    print("yCoord:", yCoord)
-    -- xCoord=xCoord*.75
-    -- yCoord=yCoord*.75
-
-    -- print("xCoord", xCoord, "yCoord", yCoord)
-
-    -- temp, uncomment
     if(countriesCompleted == 0) then
         animateCountry()
     end
@@ -1789,11 +1929,11 @@ local function removeFlag()
     flag = nil
 end
 
--- SAM: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ?? Maybe merge all functions pertaining to newFlag and flag enlargement into one neat function
+-- SAM: Can we somehow arrange the finishScale() function after the setCountryParameters() function, its importance is pretty relevant to setCountryParameters() ?? Maybe merge all functions pertaining to setCountryParameters and flag enlargement into one neat function
 -- SAM: seems as though the only game-mechanic related part of this function a call to lightningEnable()
 -- no longer using topBar and lowBar
 
-local function finishScale()
+finishScale = function()
     topBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
 	topBar:setFillColor(0, 0, 0)
 	topBar.yScale = -1
@@ -1834,80 +1974,7 @@ local function finishScale()
     -- timerSpeed = timer.performWithDelay(9500, speedUp, 1)
 
 	countriesCompleted = countriesCompleted + 1
-    print("end of finishScale() function")
-end
-
--- SAM: should newFlag be moved towards the top of the file since it is referenced by so many timers? Or atleast place it before countries()
--- rename overrideType to overrideFlag
-
--- READYOBJ: newFlag (assign)
-newFlag = function(overrideType)
-    if countriesCompleted == 0 or debugOptions.constantSpeed == true then
-        speed = levelsArray[speedTableIndex].speed
-        timeVar = levelsArray[speedTableIndex].timeVar
-        speedText.text = speed
-        speedText:toFront()
-    else
-        speedUp()
-    end
-
-    music = nil
-
-    -- SAM: bonusText activity
-    if bonusText ~= nil then
-        print("bonusText from ", "newFlag()")
-        bonusText:removeSelf()
-        bonusText = nil
-
-        --SAM: delete?
-        spread = 1
-        previousColor = nil
-        currentColor = nil
-    end
-
-    if overrideType == "modeDecrease" then
-        if state > 1 then
-            state = state - 1
-        else
-            state = 3
-        end
-    elseif overrideType == "modeIncrease" then
-        if state < 3 then
-            state = state + 1
-        else
-            state = 1
-        end
-    end
-
-    -- rename state to mode
-    modeText.text = state
-
-    if overrideType ~= nil then
-        countries(overrideType)
-        sideTimer = timer.performWithDelay(1500, finishScale, 1)
-        paceTimer=timer.performWithDelay(900,delayPace,1)
-    else
-        countries()
-
-        if infoMode == true then
-            infoPic = display.newImage(info, 165, 77)
-            infoPic.x = _W / 6
-            infoPic.y = _H / 2
-            infoPic.alpha = 0
-            timer.performWithDelay(2000, infoAppear, 1)
-        end
-        countryText = display.newText(country, _W / 2, _H / 2, native.systemFont, 50)
-        countryText.anchorX = 0.5
-        countryText.anchorY = 0.5
-        countryText:setFillColor(0, 0, 0)
-        countryText:toFront()
-        timer.performWithDelay(2000, countryTextScale, 1)
-
-        --SAM: FLAG SCALING STARTS HERE.. OR NOT ANYMORE?
-        sideTimer = timer.performWithDelay(1500, finishScale, 1)
-        paceTimer=timer.performWithDelay(900,delayPace,1)
-        mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord, xScale=1*zoomMultiplier, yScale=1*zoomMultiplier})
-    end
+    -- print("end of finishScale() function")
 end
 
 local function createPalette()
@@ -1986,78 +2053,19 @@ local function createPalette()
     end
 end
 
--- SAM: rename this, calls newFlag and resets the palettes
--- READYOBJ: readyObject (assign)
-readyObject = function(overrideType)
-
-    -- how many override types will i have?
-    if paceRect.x > 85 or overrideType ~= nil then
-        paceRect.x = 0
-        paceRect.isMoving = false
-        if setTheFlag == true then
-            removeFlag()
-
-            -- START A NEW FLAG
-            -- transition.to( countryTrace, { time=490, alpha=0,onComplete=killCountryTrace})
-            setTheFlag = false
-            paceRect.isMoving = false
-            for i = 1, #spawnTable do
-                if spawnTable[i] ~= 0 then
-                    removePalette(spawnTable[i])
-                    -- spawnTable[i].isGrown = false
-                    -- spawnTable[i].isPaletteActive = false
-                    -- transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
-                end
-            end
-
-            -- MIKE: putting a delay on this was causing a crash when testing.
-            -- flag3Timer = transition.to(flag, {time = 500, alpha = 0, onComplete = removeFlag})
-            killBarsTimer = timer.performWithDelay(500, killBars)
-            resetSpawnTimer = timer.performWithDelay(540, resetSpawnTable(overrideType))
-            if infoMode == true then
-                infoTimer = transition.to(infoPic, {time = 500, alpha = 0})
-            end
-            -- SAM: flag timers - calls newFlag()
-            newFlagTimer = timer.performWithDelay(600, newFlag(overrideType))
-        else
-            --CREATE A NEW COLOR SQUARE
-            createPalette()
-            if firstObject == true then
-                firstObject = false
-            elseif firstObject == false then
-                if state == 1 or state == 2 then
-                    if spawnTable[count] ~= 0 then
-						--isGrown means colorPalletes are full size scale=1
-                        spawnTable[count].isGrown = true
-                    end
-                    if spawnTable[count + 1] ~= 0 then
-                        spawnTable[count + 1].isGrown = true
-                    end
-                    count = count + 2
-                elseif state == 3 then --SAM: this should be state == 3
-                    if spawnTable[count] ~= 0 then
-                        spawnTable[count].isGrown = true
-                    end
-                    if spawnTable[count + 1] ~= 0 then
-                        spawnTable[count + 1].isGrown = true
-                    end
-                    if spawnTable[count + 2] ~= 0 then
-                        spawnTable[count + 2].isGrown = true
-                    end
-                    if spawnTable[count + 3] ~= 0 then
-                        spawnTable[count + 3].isGrown = true
-                    end
-                    count = count + 4
-                end
-            end
-        end
+-- READYOBJ: moveObject
+moveObject = function(e)
+    -- print("from moveObject: " .. paceRect.x)
+    if gameMechanics.countriesSpawned == 0 then
+        readyObject(1)
+        return
     end
-end
-
--- READYOBJ: moveObject (local function...)
-local function moveObject (e)
     if paceRect.isMoving == true then
-        paceRect.x = paceRect.x + speed
+        if fps == 30 then
+            paceRect.x = paceRect.x + speed
+        else
+            paceRect.x = paceRect.x + (speed / 2)
+        end
 		--reset PaceRect, call readyObjects() to create a new palette or flag
         readyObject()
     end
@@ -2096,6 +2104,118 @@ local function moveObject (e)
                     elseif spawnTable[i].corner == "TopRight" or spawnTable[i].corner == "BottomRight" then
                         spawnTable[i].x = spawnTable[i].x + speed
                     end
+                end
+            end
+        end
+    end
+end
+
+-- SAM: rename this, calls newFlag and resets the palettes
+-- READYOBJ: readyObject
+readyObject = function(firstCountry)
+    if firstCountry then
+        print("first")
+        gameMechanics.countriesSpawned = gameMechanics.countriesSpawned + 1
+        print("countriesSpawned: " .. gameMechanics.countriesSpawned)
+        setCountryParameters()
+        setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
+        return
+    end
+    -- print("past first country")
+    if paceRect.x > gameMechanics.paletteSpawnDelay or gameMechanics.overrideFlag == true then
+        -- print("new spacing determined when " .. paceRect.x .. " > " .. 85)
+        paceRect.x = 0
+        if setTheFlag == true then
+            if gameMechanics.overrideFlag == true then
+                print("restart")
+                setTheFlag = false
+                paceRect.isMoving = false
+                gameMechanics.overrideFlag = false
+
+                -- removeFlag()
+
+                for i = 1, #spawnTable do
+                    if spawnTable[i] ~= 0 then
+                        removePalette(spawnTable[i])
+                    end
+                end
+
+                resetSpawnTable()
+                setCountryParameters(1)
+                timer.cancel(setFlagTimer)
+                setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
+            else
+                print("normal")
+                setTheFlag = false
+                paceRect.isMoving = false
+                gameMechanics.overrideFlag = false
+
+                removeFlag()
+
+                for i = 1, #spawnTable do
+                    if spawnTable[i] ~= 0 then
+                        removePalette(spawnTable[i])
+
+                        -- MIKE: animations
+                        -- spawnTable[i].isGrown = false
+                        -- spawnTable[i].isPaletteActive = false
+                        -- transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
+                    end
+                end
+
+                -- MIKE: putting a delay on this was causing a crash when testing.
+                -- flag3Timer = transition.to(flag, {time = 500, alpha = 0, onComplete = removeFlag})
+
+                resetSpawnTable()
+                setCountryParameters()
+                timer.cancel(setFlagTimer)
+                setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
+
+                -- MIKE: old timers, trying to make time between flags consistent
+                --[[
+                killBarsTimer = timer.performWithDelay(500, killBars)
+                resetSpawnTimer = timer.performWithDelay(540, resetSpawnTable)
+                if infoMode == true then
+                    infoTimer = transition.to(infoPic, {time = 500, alpha = 0})
+                end
+                -- SAM: flag timers - calls newFlag()
+                newFlagTimer = timer.performWithDelay(600, setCountryParameters)
+                ]]--
+            end
+        else
+            --CREATE A NEW COLOR SQUARE
+            -- print("createPalette()")
+            createPalette()
+
+            -- sooner???
+            -- firstObject = false
+
+            if firstObject == true then
+                firstObject = false
+            elseif firstObject == false then
+                if state == 1 or state == 2 then
+                    if spawnTable[count] ~= 0 then
+						--isGrown means colorPalletes are full size scale=1
+                        spawnTable[count].isGrown = true
+                    end
+                    if spawnTable[count + 1] ~= 0 then
+                        spawnTable[count + 1].isGrown = true
+                    end
+                    count = count + 2
+                elseif state == 3 then --SAM: this should be state == 3
+                    if spawnTable[count] ~= 0 then
+                        spawnTable[count].isGrown = true
+                    end
+                    if spawnTable[count + 1] ~= 0 then
+                        spawnTable[count + 1].isGrown = true
+                    end
+                    if spawnTable[count + 2] ~= 0 then
+                        spawnTable[count + 2].isGrown = true
+                    end
+                    if spawnTable[count + 3] ~= 0 then
+                        spawnTable[count + 3].isGrown = true
+                    end
+                    count = count + 4
                 end
             end
         end
@@ -2282,14 +2402,16 @@ function scene:show(e)
 
     elseif (e.phase == "did") then
         Runtime:addEventListener("enterFrame", boundaryCheck)
+
+        -- READYOBJ: START
+
         Runtime:addEventListener("enterFrame", moveObject)
         system.activate("multitouch")
 
-        -- READYOBJ: call to newFlag() + timer on setFlag()
-        newFlag()
+        -- setCountryParameters()
+        -- setFlag()
         -- SAM: flag timers - length of country/flag duration
         -- originally set to 20000
-        setFlagTimer = timer.performWithDelay(20000, setFlag, 0)
         -- timer.cancel(setFlagTimer)
 		--  timer.performWithDelay(15000, checkMemory,0)
     end
@@ -2319,15 +2441,6 @@ function scene:hide(e)
         display.remove(lightningIcon3)
         display.remove(lightningIcon4)
         display.remove(lightningIcon5)
-        display.remove(lightningIcon6)
-        display.remove(lightningIcon7)
-        display.remove(lightningIcon8)
-        display.remove(lightningIcon9)
-        display.remove(lightningIcon10)
-        display.remove(lightningIcon11)
-        display.remove(lightningIcon12)
-        display.remove(lightningIcon13)
-        display.remove(lightningIcon14)
         if timerSpeed ~= nil then
             timer.cancel(timerSpeed)
         end

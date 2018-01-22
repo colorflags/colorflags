@@ -37,6 +37,8 @@ elseif string.sub(system.getInfo("model"),1,2) == "iP" and display.pixelHeight >
     {
         content =
         {
+            -- SAM: AWESOME!
+            fps = 60,
             width = 320,
             height = 568,
             scale = "letterBox",
@@ -63,7 +65,7 @@ elseif string.sub(system.getInfo("model"),1,2) == "iP" then
     {
         content =
         {
-
+            fps = 60,
             width = 320,
             height = 480,
             scale = "letterBox",
@@ -85,13 +87,14 @@ elseif string.sub(system.getInfo("model"),1,2) == "iP" then
         }
     }
 --Samsung Galaxy
-elseif display.pixelHeight / display.pixelWidth > 1.72 then
+elseif display.pixelHeight / display.pixelWidth > 1.72 and display.pixelHeight / display.pixelWidth < 2 then
     application =
     {
         content =
         {
---            width = display.pixelWidth/3,
---            height = display.pixelHeight/3,
+            -- width = display.pixelWidth/3,
+            -- height = display.pixelHeight/3,
+            fps = 60,
             width = 360,
             height = 640,
             scale = "letterBox",
@@ -101,6 +104,26 @@ elseif display.pixelHeight / display.pixelWidth > 1.72 then
             {
                 ["@2x"] = 1.5, --Samsung Galaxy S3
                 ["@4x"] = 3, -- Samsung Galaxy S5
+            },
+        },
+    }
+elseif display.pixelHeight / display.pixelWidth >= 2 then
+    application =
+    {
+        content =
+        {
+            -- width = display.pixelWidth/3,
+            -- height = display.pixelHeight/3,
+            fps = 60,
+            width = 360,
+            height = 720,
+            scale = "letterBox",
+            xAlign = "center",
+            yAlign = "center",
+            imageSuffix =
+            {
+                ["@2x"] = 1.5, -- i don't know LOL
+                ["@4x"] = 3, -- OnePlus 5T
             },
         },
     }
