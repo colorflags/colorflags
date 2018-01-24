@@ -50,8 +50,6 @@ gameMechanics.countriesSpawned = 0
 gameMechanics.overrideFlag = false
 gameMechanics.heightModeTop = 35
 gameMechanics.heightModeLow = _H - 35
--- lightningY=90
--- infoMode=true
 
 -- FPS
 if fps == 30 then
@@ -59,6 +57,10 @@ if fps == 30 then
 else
     gameMechanics.paletteSpawnDelay = 42.5
 end
+
+-- delete
+-- lightningY=90
+-- infoMode=true
 
 local lightningCount = 1
 -- rename state to mode
@@ -261,6 +263,8 @@ local nationalFlagsSeq = {
     {name = "unitedstates", sheet = nationalFlags3Sheet, frames = {7}}
 }
 
+
+-- REMOVE
 local topBtmBarSpriteCoords = require("lua-sheets.TopBtmBar")
 local topBtmBarSheet = graphics.newImageSheet("images/TopBtmBar.png", topBtmBarSpriteCoords:getSheet())
 
@@ -307,13 +311,6 @@ local paletteBarBtm
 local fxGroup
 local fxBG
 local fxAnim
-
---SAM: redunant?
---countryOutline.fill = { 1, 0, 0.5, 0.3 }
---countryOutline.anchorX=.5
---countryOutline.anchorY=.5
---countryOutline.x = _W/2
---countryOutline.y = _H/2
 
 local newTex = graphics.newTexture({type = "canvas", width = display.contentWidth, height = display.contentHeight})
 
@@ -1630,8 +1627,6 @@ setCountryParameters = function(restartCountry)
     timeVar = levelsArray[speedTableIndex].timeVar
     speedText.text = speed
     speedText:toFront()
-
-
 
     music = nil
 

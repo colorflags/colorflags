@@ -17,6 +17,38 @@ audioReservedChannel2 = nil
 local music
 local bobby
 
+local debugOptions = {}
+debugOptions.gotoDeath = false
+debugOptions.constantSpeed = true
+debugOptions.cycleModes = false
+debugOptions.topBottomBars = false
+debugOptions.brazilToCanada = false -- make this into array with a variety of sets - changing between 2 or more countries in sequence
+
+local gameMechanics = {}
+gameMechanics.playCountryDuration = 5000
+gameMechanics.transitionToCountryDuration = 50
+gameMechanics.firstPaletteDelay = 10
+gameMechanics.countriesSpawned = 0
+gameMechanics.overrideFlag = false
+gameMechanics.heightModeTop = 35
+gameMechanics.heightModeLow = _H - 35
+
+-- FPS
+if fps == 30 then
+    gameMechanics.paletteSpawnDelay = 85
+else
+    gameMechanics.paletteSpawnDelay = 42.5
+end
+
+local setCountryParameters
+local newCountry
+local moveObject
+local readyObject
+
+local setFlag
+local delayPace
+local finishScale
+
 local activeCountry
 
 local xBtn
@@ -28,7 +60,6 @@ local touchInsideBtn = false
 local isBtnAnim = false
 
 local gotoDeath = false    --for testing purposes. if true, go to GameOver screen.
-local lightningCount = 1  --correct default is set to 1, bump up to test for more lightnings
 local state = 1
 local stateFour = 0
 local stateFourGrow = 0
@@ -81,29 +112,21 @@ local flag3Timer
 local newFlagTimer
 local killLowTimer
 local killTopTimer
-local flagLightningReady
-local flagLightningActive = false
 local rotationTimer
-local lightningIcon1
-local lightningIcon2
-local lightningIcon3
-local lightningIcon4
-local lightningIcon5
-local lightningIcon6
-local lightningIcon7
-local lightningIcon8
-local lightningIcon9
-local lightningIcon10
-local lightningIcon11
-local lightningIcon12
-local lightningIcon13
-local lightningIcon14
-local lightningScore = 0
-local lightningMultiplier = 1
-local line
-local paceRect
+
+-- SAM: clear this weird shit up
+local paceRect = {}
+
 local map
 local mapGroup
+local waterGroup
+local newGroup
+local zoomMultiplier = .3
+
+local flagFrameOptions
+-- rename to flagFrame
+local testFrame
+
 local flag
 local random
 
@@ -190,10 +213,9 @@ local topBtmBarSeq = {
     {name = "btm", frames = {6, 7, 8, 9, 10, 1, 2, 3, 4, 5}, time = 1000, loopcount = 0},
 }
 
-local countryOutlineSheetCoords = require("lua-sheets.country_outline")
+local countryOutlineSheetCoords = require("lua-sheets.country_outline_mask")
 local countryOutlineSheet = graphics.newImageSheet("images/country_outline_mask.png", countryOutlineSheetCoords:getSheet())
 local countryOutline
-local countryOutlineTest
 
 local fxGroup
 local fxBG
@@ -274,14 +296,6 @@ local paletteBarBtm
 local fxGroup
 local fxBG
 local fxAnim
-
-local background = display.newRect(0, 0, _W, _H)
-background:setFillColor(1, 1, 1)
-background.anchorX = 0.5
-background.anchorY = 0.5
-background.name = "background"
-background.x = _W / 2 ;background.y = _H / 2
-background:toBack()
 
 local newTex = graphics.newTexture({type = "canvas", width = display.contentWidth, height = display.contentHeight})
 
@@ -673,19 +687,70 @@ local function countryScale()
    timer.performWithDelay(500,deleteText,1)
 end
 
--- SAM: better name for this
-local function countries(test)
-    -- local largerCountries = {2, 3, 6, 7, 9, 55}
+local animateCountryTimer
+local animateCountry
+local function triggerAnimateCountry()
+    animateCountryTimer = timer.performWithDelay( 1000, animateCountry, 1 )
+    -- timer.cancel(animateCountryTimer)
+end
+animateCountry = function()
+    transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
+        function()
+            transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop})
+        end
+    })
+    transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad, onComplete=function()
+            triggerAnimateCountry()
+        end
+    })
+end
+
+-- READYOBJ: setFlag
+setFlag = function()
+    print("never called")
+    setTheFlag = true
+end
+
+-- READYOBJ: delayPace
+delayPace = function()
+    paceRect.isMoving = true
+end
+
+-- READYOBJ: setCountryParameters
+setCountryParameters = function(restartCountry)
+    -- if countriesCompleted > 0 then
+    --     print(type(flag)) -- flag var type seems to be a table?
+    --     flag:removeSelf()
+    --     flag = nil
+    -- end
+
+    xBtn:toFront()
+    fwBtn:toFront()
+
+    music = nil
+
+    newCountry()
+    sideTimer = timer.performWithDelay(gameMechanics.transitionToCountryDuration, finishScale, 1)
+    -- SAM: IMPORTANT, rename paceTimer to something more serious
+    paceTimer = timer.performWithDelay(10, delayPace, 1)
+    mapTimer = transition.to( mapGroup, { time=gameMechanics.transitionToCountryDuration, x=xCoord, y=yCoord, xScale=1*zoomMultiplier, yScale=1*zoomMultiplier})
+end
+
+-- READYOBJ: newCountry
+newCountry = function()
+    -- largerCountries to debugOptions
+    -- local largerCountries = {2, 3, 6, 7, 9, 39, 55}
     -- local e = largerCountries[math.random(table.getn(largerCountries))]
+
+    -- make this into array with a variety of sets - changing between 2 or more countries in sequence
 
     -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
     local randomCountry = math.random(CFGameSettings:getLength())
     country = CFGameSettings:getItemByID(randomCountry)
 
-    print("current country: ", country.name)
+    -- print("current country: ", country.name)
 
-
-    --SAM: Should i put this outside the countries() function?
+    --SAM: should i put this outside the countries() function? Or is no need for it to be in a function?
     function destroyStuff()
 
         if(countryOutline ~= nil) then
@@ -710,42 +775,54 @@ local function countries(test)
             end
         end
     end
-
     destroyStuff()
 
     countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
-    --SAM: countryOutline scaling
+
+    -- print("country width:", countryOutline.width, "country height:", countryOutline.height)
+
+    -- SAM: zoom to country
+    --[[
+    if countryOutline.width < _W/2 and countryOutline.height < _H/2 then
+    end
+    ]]--
+
+    -- SAM: countryOutline scaling
     countryOutlineWidthMultiplier = display.pixelHeight/display.contentWidth
     countryOutlineHeightMultiplier = display.pixelWidth/display.contentHeight
     -- print("pixelHeight / contentWidth: ", countryOutlineWidthMultiplier)
     -- print("pixelWidth / contentHeight: ", countryOutlineHeightMultiplier)
     countryOutline:scale(1/countryOutlineWidthMultiplier, 1/countryOutlineHeightMultiplier)
 
-
-
-    newTex = graphics.newTexture( { type="canvas", width=display.contentWidth, height=display.contentHeight } )
-    newTex:draw(countryOutline)
-    newTex:invalidate()
-
-    local fxGroup = display.newGroup()
+    -- SAM: originally a local variable
+    fxGroup = display.newGroup()
     fxGroup.id = "fxGroup"
+
+    -- print("countryOutline.width:" .. countryOutline.width, "countryOutline.height" .. countryOutline.height)
 
     local fxSize
     if(countryOutline.width > countryOutline.height) then
+        -- delete?
+        -- fxSize = math.ceil(countryOutline.width * countryOutline.xScale) + 120
         fxSize = math.ceil(countryOutline.width) + 120
     else
-        fxSize = math.ceil(countryOutline.height) + 120
+        -- delete?
+        -- fxSize = math.ceil(countryOutline.height * countryOutline.yScale) + 120
+        fxSize = math.ceil(countryOutline.width) + 120
     end
 
-	-- SAM: local?
+    -- print("circumference of fxBG:", fxSize)
+
+	-- SAM: make into local variable? I don't know if there's a visual difference for when fxBG is local vs global. Leave as is until thoroughly tested
 	fxBG = display.newCircle(0, 0, fxSize)
     fxBG.anchorX = .5
     fxBG.anchorY = .5
 
-    --[[ What does this scaleFactorX and scaleFactorY do?
-    ]]--
+    -- SAM: what does this scaleFactorX and scaleFactorY do?
     local scaleFactorX = 1
 	local scaleFactorY = 1
+
+    -- print("fxBG width:", fxBG.width, "fxBG height:", fxBG.height)
 
     if (fxBG.width > fxBG.height) then
         scaleFactorY = fxBG.width / fxBG.height
@@ -753,14 +830,17 @@ local function countries(test)
         scaleFactorX = fxBG.height / fxBG.width
     end
 
+    local tileMultiplier = .9
     display.setDefault("textureWrapX", "repeat")
     display.setDefault("textureWrapY", "mirroredRepeat")
+    -- SAM: rename png, add scaling variants
     fxBG.fill = {type = "image", filename = "images/fxgroup.png"}
-    fxBG.fill.scaleX = .5 * scaleFactorX
-    fxBG.fill.scaleY = .5 * scaleFactorY
+    -- scales the cloud texture
+    fxBG.fill.scaleX = tileMultiplier * 1
+    fxBG.fill.scaleY = tileMultiplier * 1
     fxBG.fill.effect = "filter.straighten"
-    fxBG.fill.effect.width = 10
-    fxBG.fill.effect.height = 50
+    fxBG.fill.effect.width = 20
+    fxBG.fill.effect.height = 1
     fxBG.fill.effect.angle = 20
     fxBG.rotation = 0
 
@@ -768,30 +848,41 @@ local function countries(test)
     fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
     fxGroup:insert(fxBG)
 
+    newTex = graphics.newTexture( { type="canvas", width=fxSize, height=fxSize } )
+    newTex:draw(countryOutline)
+    newTex:invalidate()
+
+    -- SAM: masks fxBG (newCircle) with country outline
     mask = graphics.newMask(newTex.filename, newTex.baseDir)
     fxGroup:setMask(mask)
     canvasObj.alpha = 0
 
     mapGroup:insert(fxGroup)
 
-    xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
-    yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
+    -- sends newCircle() to back, behind country
+    -- fxGroup:toBack()
 
-    --print("xCoord", xCoord, "yCoord", yCoord)
+    -- (2031/2) - 958 - (?/2)
+    -- (851/2) - 225 - (?/2)
+    -- xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
+    -- yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
+    -- (2031/2) - (958*1.5) - ((?*1.5)/2)
+    -- (851/2) - (225*1.5) - ((?*1.5)/2)
+    xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
+    yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
 
-    local function animateCountry()
-        transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
-            function() transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop}) end
-        })
-        transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad } )
+    -- print("xCoord:", xCoord, "yCoord:", yCoord)
+
+    if(countriesCompleted == 0) then
+        animateCountry()
     end
 
     info="images/infoBrazil.png"
 
-    flag = display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
+    flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
     flag:setSequence(country.name)
-    flag.anchorX = 0.5 ; flag.anchorY = 0.5
-
+    flag.x = _W - flagFrameOptions.flagOffset
+    flag.y = _H/2
     flag.width = 500
     flag.height = 333
     flag.xScale = .2
@@ -799,9 +890,50 @@ local function countries(test)
     flag.anchorX = 1
     flag.anchorY = 0.5
 
-    flag.x = _W
-    flag.y = _H/2
-    -- flag.y = _H/2 + math.random(100)
+    code = country.code
+
+    if(country.colors.r) then
+        r1 = country.colors.r.r
+        r2 = country.colors.r.g
+        r3 = country.colors.r.b
+        -- print(r1, r2, r3)
+    end
+    if(country.colors.w) then
+        w1 = country.colors.w.r
+        w2 = country.colors.w.g
+        w3 = country.colors.w.b
+        -- print(w1, w2, w3)
+    end
+    if(country.colors.y) then
+        y1 = country.colors.y.r
+        y2 = country.colors.y.g
+        y3 = country.colors.y.b
+        -- print(y1, y2, y3)
+    end
+    if(country.colors.g) then
+        g1 = country.colors.g.r
+        g2 = country.colors.g.g
+        g3 = country.colors.g.b
+        -- print(g1, g2, g3)
+    end
+    if(country.colors.b) then
+        b1 = country.colors.b.r
+        b2 = country.colors.b.g
+        b3 = country.colors.b.b
+        -- print(b1, b2, b3)
+    end
+    if(country.colors.o) then
+        o1 = country.colors.o.r
+        o2 = country.colors.o.g
+        o3 = country.colors.o.b
+        -- print(o1, o2, o3)
+    end
+    if(country.colors.k) then
+        k1 = country.colors.k.r
+        k2 = country.colors.k.g
+        k3 = country.colors.k.b
+        -- print(k1, k2, k3)
+    end
 
 	-- if check.. when first flag appear. there will be no music. !!!
     if countriesCompleted ~= 0 then
@@ -814,98 +946,69 @@ local function countries(test)
     end})
 end
 
+local function removeFlag()
+    flag:removeSelf()
+    flag = nil
+end
 
 --MIKE: Can we somehow arrange the finishScale() function after the newFlag() function, its importance is pretty relevant to newFlag() ?? Maybe merge all functions pertaining to newFlag and flag enlargement into one neat function
-local function finishScale()
+finishScale = function()
     canSkip=true
 
     transition.to(flag, {time = 1000, alpha = 1})
 
-    flagLightningReady = timer.performWithDelay(1000, lightningEnable, 1)
     --SAM: delete this? used for offsetting when speedUp() occurs - can happen in during midst of a country
     -- timerSpeed = timer.performWithDelay(9500, speedUp, 1)
 
     countriesCompleted = countriesCompleted + 1
 end
 
-
-local function newFlag(e)
-
-    music = nil
-
-    if countriesCompleted > 0 then
-        print(type(flag)) -- flag var type seems to be a table?
-        flag:removeSelf()
-        flag = nil
+-- READYOBJ: moveObject
+moveObject = function(e)
+    if gameMechanics.countriesSpawned == 0 then
+        readyObject(1)
+        return
     end
-
-    countries(e)
-
-    xBtn:toFront()
-    fwBtn:toFront()
-
-    --[[
-    if infoMode == true then
-        infoPic = display.newImage(info, 165, 77)
-        infoPic.x = _W / 6
-        infoPic.y = _H / 2
-        infoPic.alpha = 0
-        timer.performWithDelay(2000, infoAppear, 1)
-    end
-    countryText = display.newText(country, _W / 2, _H / 2, native.systemFont, 50)
-    countryText.anchorX = 0.5
-    countryText.anchorY = 0.5
-    countryText:setFillColor(0, 0, 0)
-    countryText:toFront()
-    timer.performWithDelay(2000, countryTextScale, 1)
-    ]]--
-
-    sideTimer = timer.performWithDelay(1500, finishScale, 1)
-    paceTimer=timer.performWithDelay(900,delayPace,1)
-    transition.to( map, { time=1500, alpha=1 })
-    mapTimer=transition.to( mapGroup, { time=1500, x=xCoord, y=yCoord })
-
---[[SAM: countryOutline scaling ]]--
---    TEMP: alternative styles
---    countryTraceTimer=transition.to( countryTrace, { time=1500, x=_W/2, y=_H/2 })
-
---[[SAM: countryOutline scaling ]]--
---		mapGroup.xScale = .5
---		mapGroup.yScale = .5
---		mapGroup.x = xCoord*.5 + (_W*.25)
---		mapGroup.y = yCoord*.5 + (_H*.25)
-
---[[SAM: countryOutline scaling ]]--
---     with scale
---		mapTimer = transition.to(map, {time = 500, x=xCoord*.5+(_W*.25), y=yCoord*.5+(_H*.25), xScale = .5, yScale = .5})
-
---    SAM: what is this?
-
-    -- SAM: this sort of countriesCompleted == 0 checking should be done in countries()
---    if(countriesCompleted == 0) then
---         without scale
---			mapTimer = transition.to(map, {time = 1500, alpha = 1, x=xCoord, y=yCoord})
---			transition.to(fxGroup, {time = 1500, alpha = 1, x=_W/2, y=_H/2})
---    end
-
---     without scale
---		mapTimer = transition.to(mapGroup, {time = 1500, x=xCoord, y=yCoord})
---		transition.to(fxGroup, {time = 1500, x=_W/2, y=_H/2})
-
+    readyObject()
 end
 
-local function readyObject(e)
-    if setTheFlag==true then     --START A NEW FLAG
-            print("ga")
-        if activeCountry < CFGameSettings:getLength() then
-            activeCountry = activeCountry + 1
-        else
-            activeCountry = 1
-        end
-
-        newFlag(activeCountry)
-        setTheFlag=false
+-- SAM: rename this, calls newFlag and resets the palettes
+-- READYOBJ: readyObject
+readyObject = function(firstCountry)
+    if firstCountry then
+        print("first")
+        gameMechanics.countriesSpawned = gameMechanics.countriesSpawned + 1
+        print("countriesSpawned: " .. gameMechanics.countriesSpawned)
+        setCountryParameters()
+        setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
+        return
     end
+    if setTheFlag == true then
+        print("normal")
+        setTheFlag = false
+        -- gameMechanics.overrideFlag = false
+
+        removeFlag()
+
+        setCountryParameters()
+        timer.cancel(setFlagTimer)
+        -- print(setFlagTimer)
+        setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
+    end
+
+
+    -- SAM: MERGE
+    -- if setTheFlag==true then
+    --         print("ga")
+    --     if activeCountry < CFGameSettings:getLength() then
+    --         activeCountry = activeCountry + 1
+    --     else
+    --         activeCountry = 1
+    --     end
+    --
+    --     newFlag(activeCountry)
+    --     setTheFlag=false
+    -- end
 end
 
 local function nextFlag()
@@ -917,24 +1020,10 @@ local function nextFlag()
             activeCountry = 1
         end
 
-        newFlag(activeCountry)
+        readyObject(activeCountry)
         setTheFlag=false
     end
 end
-
---local function setupVariables()
---    mapGroup = display.newGroup()
-
---    map = display.newImage("images/newmap_export_nopolar.png", 2031, 851)
---    map.alpha = 0
---    map.anchorX = 0
---    map.anchorY = 0
---    map.name = "map"
---    map.x = 0
---    map.y = 0
-
---	mapGroup:insert(map)
---end
 
 local countryPickerOpts = {
     isModal = true,
@@ -984,34 +1073,24 @@ function scene:show(e)
     local sceneGroup = self.view
 
     if (e.phase == "will") then
-        print("SHOWWILL")
---        setupVariables()
+        setupVariables()
 
-        mapGroup = display.newGroup()
-
-        map = display.newImage("images/newmap_export_nopolar.png", 2031, 851)
-        map.alpha = 0
-        map.anchorX = 0
-        map.anchorY = 0
-        map.name = "map"
-        map.x = 0
-        map.y = 0
-
-        mapGroup:insert(map)
-        sceneGroup:insert(mapGroup)
+        sceneGroup:insert(newGroup)
 
 --        TEMP COUNTRY PICKER FOR SAM
---        countryPicker()
+       -- countryPicker()
 
         random = math.randomseed( os.time() )
     elseif (e.phase == "did") then
+        -- READYOBJ: START
+
         system.activate( "multitouch" )
-        Runtime:addEventListener("enterFrame", readyObject)
+        -- Runtime:addEventListener("enterFrame", moveObject)
 --        setTimer=timer.performWithDelay(20000, setFlag, 0)
 --        timer.performWithDelay(15000, checkMemory,0)
-        print("when does this happen")
-        activeCountry = math.random(CFGameSettings:getLength())
-        newFlag(activeCountry)
+        -- print("when does this happen")
+        -- activeCountry = math.random(CFGameSettings:getLength())
+        -- setCountryParameters()
     end
 end
 
@@ -1032,7 +1111,7 @@ function scene:hide(e)
     display.remove(country)
     display.remove(infoPic)
     print("quit")
-    Runtime:removeEventListener("enterFrame", readyObject)
+    Runtime:removeEventListener("enterFrame", moveObject)
 
     composer.removeScene("cruise",false)
   end
