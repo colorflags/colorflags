@@ -40,6 +40,8 @@ else
     gameMechanics.paletteSpawnDelay = 42.5
 end
 
+local cuedCountry = nil
+
 local setCountryParameters
 local newCountry
 local moveObject
@@ -48,6 +50,7 @@ local readyObject
 local setFlag
 local delayPace
 local finishScale
+local nextFlag
 
 local activeCountry
 
@@ -329,6 +332,93 @@ local function round(val, n)
    end
 end
 
+local function myTouchListener(event)
+    currentObject = event.target
+    display.getCurrentStage():setFocus(currentObject)
+    print(currentObject.name)
+    if event.phase == "began" then
+        print("touch ON. inside")
+    elseif event.phase == "ended" or event.phase == "cancelled" then
+
+        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
+        if currentObject.name == "fwBtn" then
+            currentObject:setSequence("fwBtn")
+        elseif currentObject.name == "xBtn" then
+            currentObject:setSequence("xBtn")
+        end
+
+        --SAM: canSkip is a bad variable name. This var controls access to both back AND quit buttons. Remove feature?
+        if touchInsideBtn == true then
+
+            print("touch OFF. inside")
+            -- composer.removeScene("start")
+
+            if(currentObject.name == "xBtn") then
+                -- print("sideTimer:", sideTimer)
+                if sideTimer then
+                    timer.cancel(sideTimer)
+                end
+
+                composer.gotoScene ( "menu", { effect = defaultTransition } )
+            elseif(currentObject.name == "fwBtn" and canSkip == true) then
+                nextFlag()
+            end
+
+        elseif touchInsideBtn == false then
+            -- print("touch OFF outside")
+        end
+
+        currentObject = nil
+        display.getCurrentStage():setFocus(nil)
+        touchInsideBtn = false
+    end
+end
+
+local function doFunction(e)
+    if currentObject ~= nil then
+        if e.x < currentObject.contentBounds.xMin or
+            e.x > currentObject.contentBounds.xMax or
+            e.y < currentObject.contentBounds.yMin or
+            e.y > currentObject.contentBounds.yMax then
+
+            if(isBtnAnim) then
+                if currentObject.name == "fwBtn" then
+                    currentObject:setSequence("fwBtn")
+                elseif currentObject.name == "xBtn" then
+                    currentObject:setSequence("xBtn")
+                end
+            else
+                if currentObject.name == "fwBtn" then
+                    currentObject:setFrame(1)
+                elseif currentObject.name == "xBtn" then
+                    currentObject:setFrame(1)
+                end
+            end
+            -- redundant ??
+            -- currentObject:setFrame(1)
+            touchInsideBtn = false
+        else
+            if touchInsideBtn == false then
+                if(isBtnAnim) then
+                    if currentObject.name == "fwBtn" then
+                        currentObject:setSequence("fwBtn_anim")
+                    elseif currentObject.name == "xBtn" then
+                        currentObject:setSequence("xBtn_anim")
+                    end
+                    currentObject:play()
+                else
+                    if currentObject.name == "fwBtn" then
+                        currentObject:setFrame(2)
+                    elseif currentObject.name == "xBtn" then
+                        currentObject:setFrame(2)
+                    end
+                end
+            end
+            touchInsideBtn = true
+        end
+    end
+end
+--------------------------------
 -- change to newImageRect()
 local background = display.newRect(0, 0, _W, _H)
 background:setFillColor(1, 1, 1)
@@ -374,6 +464,32 @@ local function setupVariables()
         paletteBarBtm.anchorX = .5
         paletteBarBtm.anchorY = 1
     end
+
+    local margins = 6
+    fwBtn = display.newSprite(btnsSheet, btnsSeq)
+    fwBtn:setSequence("fwBtn")
+    fwBtn.type = "fwBtn"
+    fwBtn.name = "fwBtn"
+    fwBtn.xScale = -1
+    fwBtn.anchorX=0
+    fwBtn.anchorY=0
+    fwBtn.x = _W - margins
+    fwBtn.y = _H - fwBtn.height - margins
+
+    xBtn = display.newSprite(btnsSheet, btnsSeq)
+    xBtn:setSequence("xBtn")
+    xBtn.type = "xBtn"
+    xBtn.name = "xBtn"
+    xBtn.anchorX=0
+    xBtn.anchorY=0
+    xBtn.x = 0 + margins
+    xBtn.y = 0 + margins
+    xBtn.gotoScene = "menu"
+
+    fwBtn:addEventListener("touch", myTouchListener)
+    fwBtn:addEventListener("touch", doFunction)
+    xBtn:addEventListener("touch", myTouchListener)
+    xBtn:addEventListener("touch", doFunction)
 
     waterGroup = display.newGroup()
     local water = display.newRect( display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight )
@@ -586,94 +702,6 @@ local function setupVariables()
     local flagFrameAnchorY = (flagFrameOptions.y - ((flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding) / 2) - 6)
 end
 
--- New
-local function myTouchListener(event)
-    currentObject = event.target
-    display.getCurrentStage():setFocus(currentObject)
-    print(currentObject.name)
-    if event.phase == "began" then
-        print("touch ON. inside")
-    elseif event.phase == "ended" or event.phase == "cancelled" then
-
-        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "fwBtn" then
-            currentObject:setSequence("fwBtn")
-        elseif currentObject.name == "xBtn" then
-            currentObject:setSequence("xBtn")
-        end
-
-        --SAM: canSkip is a bad variable name. This var controls access to both back AND quit buttons. Remove feature?
-        if touchInsideBtn == true then
-
-            print("touch OFF. inside")
-            -- composer.removeScene("start")
-
-            if(currentObject.name == "xBtn") then
-                -- print("sideTimer:", sideTimer)
-                if sideTimer then
-                    timer.cancel(sideTimer)
-                end
-
-                composer.gotoScene ( "menu", { effect = defaultTransition } )
-            elseif(currentObject.name == "fwBtn" and canSkip == true) then
-                setTheFlag = true
-            end
-
-        elseif touchInsideBtn == false then
-            -- print("touch OFF outside")
-        end
-
-        currentObject = nil
-        display.getCurrentStage():setFocus(nil)
-        touchInsideBtn = false
-    end
-end
-
-local function doFunction(e)
-    if currentObject ~= nil then
-        if e.x < currentObject.contentBounds.xMin or
-            e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or
-            e.y > currentObject.contentBounds.yMax then
-
-            if(isBtnAnim) then
-                if currentObject.name == "fwBtn" then
-                    currentObject:setSequence("fwBtn")
-                elseif currentObject.name == "xBtn" then
-                    currentObject:setSequence("xBtn")
-                end
-            else
-                if currentObject.name == "fwBtn" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "xBtn" then
-                    currentObject:setFrame(1)
-                end
-            end
-            -- redundant ??
-            -- currentObject:setFrame(1)
-            touchInsideBtn = false
-        else
-            if touchInsideBtn == false then
-                if(isBtnAnim) then
-                    if currentObject.name == "fwBtn" then
-                        currentObject:setSequence("fwBtn_anim")
-                    elseif currentObject.name == "xBtn" then
-                        currentObject:setSequence("xBtn_anim")
-                    end
-                    currentObject:play()
-                else
-                    if currentObject.name == "fwBtn" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "xBtn" then
-                        currentObject:setFrame(2)
-                    end
-                end
-            end
-            touchInsideBtn = true
-        end
-    end
-end
-
 local function infoAppear()
    transition.to(infoPic, {time=500, alpha=1})
 end
@@ -707,7 +735,6 @@ end
 
 -- READYOBJ: setFlag
 setFlag = function()
-    print("never called")
     setTheFlag = true
 end
 
@@ -717,15 +744,15 @@ delayPace = function()
 end
 
 -- READYOBJ: setCountryParameters
-setCountryParameters = function(restartCountry)
+setCountryParameters = function()
     -- if countriesCompleted > 0 then
     --     print(type(flag)) -- flag var type seems to be a table?
     --     flag:removeSelf()
     --     flag = nil
     -- end
 
-    xBtn:toFront()
-    fwBtn:toFront()
+    -- xBtn:toFront()
+    -- fwBtn:toFront()
 
     music = nil
 
@@ -745,9 +772,14 @@ newCountry = function()
     -- make this into array with a variety of sets - changing between 2 or more countries in sequence
 
     -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
-    local randomCountry = math.random(CFGameSettings:getLength())
-    country = CFGameSettings:getItemByID(randomCountry)
-
+    if not cuedCountry then
+        local randomCountry = math.random(CFGameSettings:getLength())
+        country = CFGameSettings:getItemByID(randomCountry)
+    else
+        country = CFGameSettings:getItemByID(cuedCountry)
+    end
+        -- local randomCountry = math.random(CFGameSettings:getLength())
+        -- country = CFGameSettings:getItemByID(randomCountry)
     -- print("current country: ", country.name)
 
     --SAM: should i put this outside the countries() function? Or is no need for it to be in a function?
@@ -966,6 +998,7 @@ end
 -- READYOBJ: moveObject
 moveObject = function(e)
     if gameMechanics.countriesSpawned == 0 then
+        print("hey")
         readyObject(1)
         return
     end
@@ -995,34 +1028,17 @@ readyObject = function(firstCountry)
         -- print(setFlagTimer)
         setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
     end
-
-
-    -- SAM: MERGE
-    -- if setTheFlag==true then
-    --         print("ga")
-    --     if activeCountry < CFGameSettings:getLength() then
-    --         activeCountry = activeCountry + 1
-    --     else
-    --         activeCountry = 1
-    --     end
-    --
-    --     newFlag(activeCountry)
-    --     setTheFlag=false
-    -- end
 end
 
-local function nextFlag()
-    -- flag:removeSelf()
-    if setTheFlag==true then     --START A NEW FLAG
-        if activeCountry < CFGameSettings:getLength() then
-            activeCountry = activeCountry + 1
-        else
-            activeCountry = 1
-        end
-
-        readyObject(activeCountry)
-        setTheFlag=false
+nextFlag = function()
+    if country.id < CFGameSettings:getLength() then
+        cuedCountry = country.id + 1
+    else
+        cuedCountry = 1
     end
+
+    timer.cancel(setFlagTimer)
+    setFlag()
 end
 
 local countryPickerOpts = {
@@ -1036,37 +1052,40 @@ local countryPickerOpts = {
 composer.showOverlay("_tableview", countryPickerOpts)
 
 scene.countryPicker = function(chosenWithCountryPicker)
-    activeCountry = chosenWithCountryPicker
-    newFlag(activeCountry)
+    -- local pickerCountry = chosenWithCountryPicker
+    -- newFlag(pickerCountry)
+    cuedCountry = chosenWithCountryPicker
+    timer.cancel(setFlagTimer)
+    setFlag()
 end
 ------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 function scene:create(e)
-
-    local margins = 6
-    fwBtn = display.newSprite(btnsSheet, btnsSeq)
-    fwBtn:setSequence("fwBtn")
-    fwBtn.type = "fwBtn"
-    fwBtn.name = "fwBtn"
-    fwBtn.xScale = -1
-    fwBtn.anchorX=0
-    fwBtn.anchorY=0
-    fwBtn.x = _W - margins
-    fwBtn.y = _H - fwBtn.height - margins
-
-    xBtn = display.newSprite(btnsSheet, btnsSeq)
-    xBtn:setSequence("xBtn")
-    xBtn.type = "xBtn"
-    xBtn.name = "xBtn"
-    xBtn.anchorX=0
-    xBtn.anchorY=0
-    xBtn.x = 0 + margins
-    xBtn.y = 0 + margins
-    xBtn.gotoScene = "menu"
-    fwBtn:addEventListener("touch", myTouchListener)
-    fwBtn:addEventListener("touch", doFunction)
-    xBtn:addEventListener("touch", myTouchListener)
-    xBtn:addEventListener("touch", doFunction)
+    --
+    -- local margins = 6
+    -- fwBtn = display.newSprite(btnsSheet, btnsSeq)
+    -- fwBtn:setSequence("fwBtn")
+    -- fwBtn.type = "fwBtn"
+    -- fwBtn.name = "fwBtn"
+    -- fwBtn.xScale = -1
+    -- fwBtn.anchorX=0
+    -- fwBtn.anchorY=0
+    -- fwBtn.x = _W - margins
+    -- fwBtn.y = _H - fwBtn.height - margins
+    --
+    -- xBtn = display.newSprite(btnsSheet, btnsSeq)
+    -- xBtn:setSequence("xBtn")
+    -- xBtn.type = "xBtn"
+    -- xBtn.name = "xBtn"
+    -- xBtn.anchorX=0
+    -- xBtn.anchorY=0
+    -- xBtn.x = 0 + margins
+    -- xBtn.y = 0 + margins
+    -- xBtn.gotoScene = "menu"
+    -- fwBtn:addEventListener("touch", myTouchListener)
+    -- fwBtn:addEventListener("touch", doFunction)
+    -- xBtn:addEventListener("touch", myTouchListener)
+    -- xBtn:addEventListener("touch", doFunction)
 end
 
 function scene:show(e)
@@ -1075,22 +1094,17 @@ function scene:show(e)
     if (e.phase == "will") then
         setupVariables()
 
+        sceneGroup:insert(waterGroup)
         sceneGroup:insert(newGroup)
-
---        TEMP COUNTRY PICKER FOR SAM
-       -- countryPicker()
 
         random = math.randomseed( os.time() )
     elseif (e.phase == "did") then
         -- READYOBJ: START
 
         system.activate( "multitouch" )
-        -- Runtime:addEventListener("enterFrame", moveObject)
---        setTimer=timer.performWithDelay(20000, setFlag, 0)
---        timer.performWithDelay(15000, checkMemory,0)
-        -- print("when does this happen")
-        -- activeCountry = math.random(CFGameSettings:getLength())
-        -- setCountryParameters()
+        Runtime:addEventListener("enterFrame", moveObject)
+
+        -- timer.performWithDelay(15000, checkMemory,0)
     end
 end
 
@@ -1104,6 +1118,11 @@ function scene:hide(e)
     xBtn:removeEventListener("touch", doFunction)
     --composer.removeScene("tableView")
     display.remove(background)
+
+    display.remove(paletteBarTop)
+    display.remove(paletteBarBtm)
+    display.remove(testFrame)
+
     display.remove(flag)
     display.remove(xBtn)
     display.remove(fwBtn)

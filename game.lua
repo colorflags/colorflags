@@ -36,7 +36,7 @@ local codeLetterToColorKey = {
 --SAM: var to handle animations
 
 local debugOptions = {}
-debugOptions.gotoDeath = false
+debugOptions.gotoDeath = true
 debugOptions.constantSpeed = true
 debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
@@ -421,7 +421,7 @@ local function setupVariables()
     end
 
     waterGroup = display.newGroup()
-    local water = display.newRect( display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight )
+    water = display.newRect( display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight )
 
     display.setDefault( "textureWrapX", "repeat" )
     display.setDefault( "textureWrapY", "repeat" )
@@ -861,7 +861,7 @@ local function endGame(self)
     display.remove(self)
     choice = choice + 1
     if choice == numDeaths then
-        local   options = {effect = defaultTransition, params = {saveScore = score}}
+        local options = {effect = defaultTransition, params = {saveScore = score}}
         paceRect.isMoving = false
         composer.gotoScene("gameover", options)
     end
@@ -2415,11 +2415,21 @@ end
 function scene:hide(e)
     -- print("HIDE")
     if e.phase == "will" then
+        -- important listeners and timers to be cancelled!
+        transition.cancel( "moveNeedle" )
+        timer.cancel(animateCountryTimer)
+        Runtime:removeEventListener( "enterFrame", water )
+
         display.remove(background)
 
         display.remove(speedTextGroup)
         display.remove(scoreTextGroup)
         display.remove(modeTextGroup)
+
+        display.remove(paletteBarTop)
+        display.remove(paletteBarBtm)
+        display.remove(waterGroup)
+        display.remove(newGroup)
 
         display.remove(flag)
         display.remove(testFrame)
