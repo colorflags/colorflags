@@ -36,7 +36,7 @@ local codeLetterToColorKey = {
 --SAM: var to handle animations
 
 local debugOptions = {}
-debugOptions.gotoDeath = true
+debugOptions.gotoDeath = false
 debugOptions.constantSpeed = true
 debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
@@ -397,25 +397,25 @@ local function setupVariables()
     paletteBarBtm = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_btm")}} )
 
     if platform == "ios" then
-        paletteBarTop.x = _W/2
+        paletteBarTop.x = _W/2 -- fix like for platform == "android"
         paletteBarTop.y = 0
         paletteBarTop.anchorX = .5
         paletteBarTop.anchorY = 0
 
-        paletteBarBtm.x = _W/2
-        paletteBarBtm.y = _H
+        paletteBarBtm.x = _W/2 -- fix like for platform == "android"
+        paletteBarBtm.y = _H -- fix like for platform == "android"
         paletteBarBtm.anchorX = .5
         paletteBarBtm.anchorY = 1
     elseif platform == "android" then
-        paletteBarTop.width = _W
-        paletteBarTop.x = _W/2
+        paletteBarTop.width = display.actualContentWidth
+        paletteBarTop.x = display.contentCenterX
         paletteBarTop.y = 0
         paletteBarTop.anchorX = .5
         paletteBarTop.anchorY = 0
 
-        paletteBarBtm.width = _W
-        paletteBarBtm.x = _W/2
-        paletteBarBtm.y = _H
+        paletteBarBtm.width = display.actualContentWidth
+        paletteBarBtm.x = display.contentCenterX
+        paletteBarBtm.y = display.actualContentHeight
         paletteBarBtm.anchorX = .5
         paletteBarBtm.anchorY = 1
     end
