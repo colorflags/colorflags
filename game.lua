@@ -21,7 +21,7 @@ local offsetPaletteDeathSFX = 20
 local paletteDeathsInCluster = 0
 
 --effects createPalette()
-local adherenceToFlagColorsBool = false
+cornersArray = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
 local inclusiveColorsArray = {}
 local codeLetterToColorKey = {
     w = "white",
@@ -32,6 +32,10 @@ local codeLetterToColorKey = {
     g = "green",
     b = "blue"
 }
+
+local game_W = display.actualContentWidth -- Get the width of the screen
+local game_H = display.actualContentHeight -- Get the height of the screen
+
 --SAM: var to handle death
 --SAM: var to handle animations
 
@@ -41,6 +45,7 @@ debugOptions.constantSpeed = true
 debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
 debugOptions.brazilToCanada = false -- make this into array with a variety of sets - changing between 2 or more countries in sequence
+debugOptions.adherenceToFlagColors = true
 
 local gameMechanics = {}
 gameMechanics.playCountryDuration = 20000
@@ -374,15 +379,18 @@ onOptionsTap = function(event)
     return true
 end
 
--- change to newImageRect()
-local background = display.newRect(0, 0, _W, _H)
+-- local background = display.newRect(display.contentCenterX, display.contentCenterY, display.pixelHeight, game_H)
+local background = display.newRect(0, 0, display.pixelHeight, game_H)
 background:setFillColor(1, 1, 1)
-background.anchorX = 0.5
-background.anchorY = 0.5
+-- background.anchorX = .5
+-- background.anchorY = .5
 background.name = "background"
-background.x = _W / 2 ;background.y = _H / 2
+-- background.x = game_W/2
+-- background.y = game_H/2
 background:toBack()
 
+-- local waterMask
+-- local mapMask
 local water
 local function setupVariables()
     w1 = 1;w2 = 1;w3 = 1
@@ -407,21 +415,26 @@ local function setupVariables()
         paletteBarBtm.anchorX = .5
         paletteBarBtm.anchorY = 1
     elseif platform == "android" then
-        paletteBarTop.width = display.actualContentWidth
-        paletteBarTop.x = display.contentCenterX
+        -- paletteBarTop.width = display.actualContentWidth +
+        print("actualContentWidth from game.lua", display.actualContentWidth)
+        paletteBarTop.width = game_W
+        paletteBarTop.x = game_W/2
         paletteBarTop.y = 0
         paletteBarTop.anchorX = .5
         paletteBarTop.anchorY = 0
 
-        paletteBarBtm.width = display.actualContentWidth
-        paletteBarBtm.x = display.contentCenterX
-        paletteBarBtm.y = display.actualContentHeight
+        paletteBarBtm.width = game_W
+        paletteBarBtm.x = game_W/2
+        paletteBarBtm.y = game_H
         paletteBarBtm.anchorX = .5
         paletteBarBtm.anchorY = 1
     end
 
+    -- paletteBarTop.alpha = 0
+    -- paletteBarBtm.alpha = 0
+
     waterGroup = display.newGroup()
-    water = display.newRect( display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight )
+    water = display.newRect( display.contentCenterX, display.contentCenterY, game_W, game_H ) -- IMPORTANT, must be set to game_W / game_H, which change according to immerstiveSticky mode
 
     display.setDefault( "textureWrapX", "repeat" )
     display.setDefault( "textureWrapY", "repeat" )
@@ -481,15 +494,24 @@ local function setupVariables()
     waterGroup:insert(water)
 
     -- rename?
-	local waterMask = graphics.newMask("images/map_mask.png")
+	local waterMask = graphics.newMask("images/map_mask_2018.png")
 	waterGroup:setMask(waterMask)
-    waterGroup.maskX = _W/2
-    waterGroup.maskY = _H/2
+    waterGroup.maskX = display.contentCenterX
+    waterGroup.maskY = display.contentCenterY
+    -- waterGroup.maskX = game_W/2
+    -- waterGroup.maskY = game_H/2
 
     -- do this math one time in this function, reuse
     if platform == "ios" then
+        waterGroup.maskScaleX = 1.10
         waterGroup.maskScaleY = 1.01
     elseif platform == "android" then
+
+        -- SAM: immersiveSticky, on newer androids
+        -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
+        -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
+        waterGroup.maskScaleX = 1.5
+
         -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
         local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
         -- alignMask will be 1.23
@@ -521,16 +543,25 @@ local function setupVariables()
     newGroup = display.newGroup()
     newGroup:insert(mapGroup)
 
-	local mapMask = graphics.newMask("images/map_mask.png")
+	-- mapMask = graphics.newMask("images/map_mask_2018.png")
 
-    newGroup:setMask(mapMask)
-	newGroup.maskX = _W/2
-	newGroup.maskY = _H/2
+    newGroup:setMask(waterMask)
+    newGroup.maskX = display.contentCenterX
+    newGroup.maskY = display.contentCenterY
+	-- newGroup.maskX = game_W/2
+	-- newGroup.maskY = game_H/2
 
     -- do this math one time in this function, reuse
     if platform == "ios" then
+        newGroup.maskScaleX = 1.10
         newGroup.maskScaleY = 1.01
     elseif platform == "android" then
+
+        -- SAM: immersiveSticky, on newer androids
+        -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
+        -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
+        newGroup.maskScaleX = 1.5
+
         -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
         local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
         -- alignMask will be 1.23
@@ -657,6 +688,39 @@ local function setupVariables()
     lightningIcon3.alpha = .2
     lightningIcon4.alpha = .2
     lightningIcon5.alpha = .2
+end
+
+function adjustWidthsAfterResize( event )
+
+    game_W = display.actualContentWidth
+    game_H = display.actualContentHeight
+
+    local bigRed = display.newRect(display.screenOriginX, 0, game_W, game_H)
+    bigRed.anchorX = 0
+    bigRed.anchorY = 0
+    bigRed:setFillColor( 0.9, 0, 0 )
+    transition.to(bigRed, {time=200, alpha=0, onComplete = function() display.remove(bigRed) end})
+
+    background.xScale = 2 -- scale by 2 of display.pixelHeight - original width of newRect()
+
+    -- IMPORTANT, must be set to game_W / game_H, which change according to immerstiveSticky mode
+    water.x = display.contentCenterX
+    water.y = display.contentCenterY
+    water.width = game_W
+    water.height = game_H
+
+    waterGroup.maskScaleX = 2 -- scale by 2 of game_W
+    newGroup.maskScaleX = 2 -- scale by 2 of game_W
+
+end
+
+if platform == "android" then
+    local function onResize( event )
+        -- SAM: this needs to happen again - IMPORTANT!
+        native.setProperty( "androidSystemUiVisibility", "immersiveSticky" )
+        onResizeTimer = timer.performWithDelay( 1000, function() adjustWidthsAfterResize() end )
+    end
+    Runtime:addEventListener( "resize", onResize )
 end
 
 local function setupScoreboard()
@@ -1205,6 +1269,7 @@ local function paletteGrow(self)
     transition.to(self, {time = timeVar * (.5), xScale = 1, yScale = 1})
 end
 
+-- PALETTES
 local function spawnPalette(params)
 
     -- SAM: spawned pad's color
@@ -1230,20 +1295,20 @@ local function spawnPalette(params)
 
 	-- print("created" .. object.myName)
     if state == 1 then
-        if object.isTopLeft == false then
-            object.x = 0 + 40
-            object.y = gameMechanics.heightModeLow
-        elseif object.isTopLeft == true then
-            object.x = _W - 40
+        if object.corner == "TopRight" then
+            object.x = game_W - 40
             object.y = gameMechanics.heightModeTop
+        elseif object.corner == "BottomLeft" then
+            object.x = 40
+            object.y = gameMechanics.heightModeLow
         end
     elseif state == 2 then
-        if object.isTopLeft == false then
-            object.x = _W - 40
-            object.y = gameMechanics.heightModeLow
-        elseif object.isTopLeft == true then
-            object.x = 0 + 40
+        if object.corner == "TopLeft" then
+            object.x = 40
             object.y = gameMechanics.heightModeTop
+        elseif object.corner == "BottomRight" then
+            object.x = game_W - 40
+            object.y = gameMechanics.heightModeLow
         end
     elseif state == 3 then
         if object.corner == "TopRight" then
@@ -1260,7 +1325,6 @@ local function spawnPalette(params)
             object.y = gameMechanics.heightModeLow
         end
     end
-
     if params.type == "white" then
         object:setFillColor(w1, w2, w3)
         object.L1 = w1   --L1, L2, L3 set colors for lightning beams
@@ -1972,60 +2036,120 @@ finishScale = function()
     -- print("end of finishScale() function")
 end
 
+-- PALETTES: initializes palettes, sets color and corner params. Calls spawnPalette()
 local function createPalette()
-    local spawns
-    if state == 1 or state == 2 then
-        if adherenceToFlagColorsBool == true then
-            local codeLetter
+    -- local spawns
 
-            codeLetter = adherenceToFlagColors(1)
-            spawns = spawnPalette({objTable = spawnTable, type = codeLetterToColorKey[codeLetter], isTopLeft = false})
-            codeLetter = adherenceToFlagColors(1)
-            spawns = spawnPalette({objTable = spawnTable, type = codeLetterToColorKey[codeLetter], isTopLeft = true})
+    if state == 1 then
+        if debugOptions.adherenceToFlagColors == true then
+            local colorKey = {}
+            for i = 1, 2 do
+                local codeLetter
+                codeLetter = adherenceToFlagColors(1)
+                colorKey[i] = codeLetterToColorKey[codeLetter]
+            end
+            -- print("random flag colors to palette.")
+            -- print("colorKey1: " .. colorKey[1])
+            -- print("colorKey2: " .. colorKey[2])
+
+            spawnPalette({objTable = spawnTable, type = colorKey[1], corner = "TopRight"})
+            spawnPalette({objTable = spawnTable, type = colorKey[2], corner = "BottomLeft"})
         else
-            --SAM: eradicate this isTopLeft and isBottomLeft business
             local e = math.random(7)
             if e == 1 then
-                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = false})
+                spawnPalette({objTable = spawnTable, type = "white", corner = "TopRight"})
             elseif e == 2 then
-                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = false})
+                spawnPalette({objTable = spawnTable, type = "black", corner = "TopRight"})
             elseif e == 3 then
-                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = false})
+                spawnPalette({objTable = spawnTable, type = "red", corner = "TopRight"})
             elseif e == 4 then
-                spawns = spawnPalette({objTable = spawnTable, type = "orange",  isTopLeft = false})
+                spawnPalette({objTable = spawnTable, type = "orange",  corner = "TopRight"})
             elseif e == 5 then
-                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = false})
+                spawnPalette({objTable = spawnTable, type = "yellow", corner = "TopRight"})
             elseif e == 6 then
-                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = false})
+                spawnPalette({objTable = spawnTable, type = "green", corner = "TopRight"})
             elseif e == 7 then
-                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = false})
+                spawnPalette({objTable = spawnTable, type = "blue", corner = "TopRight"})
             end
-            --SAM: eradicate this isTopLeft and isBottomLeft business
+
             local f = math.random(7)
             if f == 1 then
-                spawns = spawnPalette({objTable = spawnTable, type = "white", isTopLeft = true})
+                spawnPalette({objTable = spawnTable, type = "white", corner = "BottomLeft"})
             elseif f == 2 then
-                spawns = spawnPalette({objTable = spawnTable, type = "black", isTopLeft = true})
+                spawnPalette({objTable = spawnTable, type = "black", corner = "BottomLeft"})
             elseif f == 3 then
-                spawns = spawnPalette({objTable = spawnTable, type = "red", isTopLeft = true})
+                spawnPalette({objTable = spawnTable, type = "red", corner = "BottomLeft"})
             elseif f == 4 then
-                spawns = spawnPalette({objTable = spawnTable, type = "orange", isTopLeft = true})
+                spawnPalette({objTable = spawnTable, type = "orange", corner = "BottomLeft"})
             elseif f == 5 then
-                spawns = spawnPalette({objTable = spawnTable, type = "yellow", isTopLeft = true})
+                spawnPalette({objTable = spawnTable, type = "yellow", corner = "BottomLeft"})
             elseif f == 6 then
-                spawns = spawnPalette({objTable = spawnTable, type = "green", isTopLeft = true})
+                spawnPalette({objTable = spawnTable, type = "green", corner = "BottomLeft"})
             elseif f == 7 then
-                spawns = spawnPalette({objTable = spawnTable, type = "blue", isTopLeft = true})
+                spawnPalette({objTable = spawnTable, type = "blue", corner = "BottomLeft"})
+            end
+        end
+    elseif state == 2 then
+        if debugOptions.adherenceToFlagColors == true then
+            local colorKey = {}
+            for i = 1, 2 do
+                local codeLetter
+                codeLetter = adherenceToFlagColors(1)
+                colorKey[i] = codeLetterToColorKey[codeLetter]
+            end
+            -- print("random flag colors to palette.")
+            -- print("colorKey1: " .. colorKey[1])
+            -- print("colorKey2: " .. colorKey[2])
+
+            spawnPalette({objTable = spawnTable, type = colorKey[1], corner = "TopLeft"})
+            spawnPalette({objTable = spawnTable, type = colorKey[2], corner = "BottomRight"})
+        else
+            local e = math.random(7)
+            if e == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", corner = "TopLeft"})
+            elseif e == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", corner = "TopLeft"})
+            elseif e == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", corner = "TopLeft"})
+            elseif e == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", corner = "TopLeft"})
+            elseif e == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", corner = "TopLeft"})
+            elseif e == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", corner = "TopLeft"})
+            elseif e == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", corner = "TopLeft"})
+            end
+
+            local f = math.random(7)
+            if f == 1 then
+                spawns = spawnPalette({objTable = spawnTable, type = "white", corner = "BottomRight"})
+            elseif f == 2 then
+                spawns = spawnPalette({objTable = spawnTable, type = "black", corner = "BottomRight"})
+            elseif f == 3 then
+                spawns = spawnPalette({objTable = spawnTable, type = "red", corner = "BottomRight"})
+            elseif f == 4 then
+                spawns = spawnPalette({objTable = spawnTable, type = "orange", corner = "BottomRight"})
+            elseif f == 5 then
+                spawns = spawnPalette({objTable = spawnTable, type = "yellow", corner = "BottomRight"})
+            elseif f == 6 then
+                spawns = spawnPalette({objTable = spawnTable, type = "green", corner = "BottomRight"})
+            elseif f == 7 then
+                spawns = spawnPalette({objTable = spawnTable, type = "blue", corner = "BottomRight"})
             end
         end
     elseif state == 3 then
-        local cornersArray = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
         for i = 1, 4 do
-            if adherenceToFlagColorsBool == true then
+            if debugOptions.adherenceToFlagColors == true then
+                local colorKey
                 local codeLetter
-
                 codeLetter = adherenceToFlagColors(1)
-                spawns = spawnPalette({objTable = spawnTable, type = codeLetterToColorKey[codeLetter], corner = cornersArray[i]})
+                colorKey = codeLetterToColorKey[codeLetter]
+
+                print("random flag colors to palette.")
+                print("colorKey" .. i .. ": " .. colorKey)
+
+                spawnPalette({objTable = spawnTable, type = colorKey, corner = cornersArray[i]})
             else
                 local random = math.random(7)
                 if random == 1 then
@@ -2064,15 +2188,16 @@ moveObject = function(e)
 		--reset PaceRect, call readyObjects() to create a new palette or flag
         readyObject()
     end
---sets direction of existing color palettes
+
+    -- PALETTES: movement and direction of color palettes
     if state == 1 then
         if #spawnTable > 0 then
             for i = 1, #spawnTable do
 				--isGrown means is palette full size
                 if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
-                    if spawnTable[i].isTopLeft == true then
+                    if spawnTable[i].corner == "TopRight" then
                         spawnTable[i].x = spawnTable[i].x - speed
-                    elseif spawnTable[i].isTopLeft == false then
+                    elseif spawnTable[i].corner == "BottomLeft" then
                         spawnTable[i].x = spawnTable[i].x + speed
                     end
                 end
@@ -2082,9 +2207,9 @@ moveObject = function(e)
         if #spawnTable > 0 then
             for i = 1, #spawnTable do
                 if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
-                    if spawnTable[i].isTopLeft == true then
+                    if spawnTable[i].corner == "TopLeft" then
                         spawnTable[i].x = spawnTable[i].x + speed
-                    elseif spawnTable[i].isTopLeft == false then
+                    elseif spawnTable[i].corner == "BottomRight" then
                         spawnTable[i].x = spawnTable[i].x - speed
                     end
                 end
