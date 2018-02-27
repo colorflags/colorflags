@@ -300,7 +300,7 @@ function scene:create( event )
     --btnsTutorial:addEventListener("touch",doFunction)
 
     -- What does this do?
-    timer.performWithDelay(300,initFunction)
+    timer.performWithDelay(300, initFunction)
 
     catchAll:toBack()
     sceneGroup:insert(catchAll)

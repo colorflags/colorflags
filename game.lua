@@ -40,12 +40,12 @@ local game_H = display.actualContentHeight -- Get the height of the screen
 --SAM: var to handle animations
 
 local debugOptions = {}
-debugOptions.gotoDeath = false
+debugOptions.god = true
 debugOptions.constantSpeed = true
 debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
 debugOptions.brazilToCanada = false -- make this into array with a variety of sets - changing between 2 or more countries in sequence
-debugOptions.adherenceToFlagColors = true
+debugOptions.adherenceToFlagColors = false
 
 local gameMechanics = {}
 gameMechanics.playCountryDuration = 20000
@@ -121,6 +121,7 @@ local resetSpawnTimer
 local flag3Timer
 
 ------------------------------------------------------------------------------------------------------
+-- TELL MIKE
 -- SAM: declaring these variables first, assigning functions to them later. That way they can be called in any function regardless of how far down it is in the file.
 -- https://forums.coronalabs.com/topic/65415-addeventlistener-listener-cannot-be-nil-nil/
 
@@ -134,6 +135,7 @@ local setFlag
 local delayPace
 local finishScale
 local onOptionsTap
+local speedUp
 ------------------------------------------------------------------------------------------------------
 
 local newFlagTimer
@@ -167,6 +169,8 @@ local random
 
 local bonusText
 
+-- SAM: store all scoreboard variables inside an array.. scoreboardArray = {}
+
 local speedTextGroup
 local speedText
 local speedTextDesc
@@ -196,6 +200,22 @@ local modeDecreaseBtnFill
 local modeIncreaseBtnFill
 local modeDecreaseBtnSym
 local modeIncreaseBtnSym
+
+local gameDebugGroup
+
+local gameDebugArray = {}
+
+gameDebugArray.gameDebugDeathBtnGroup = nil
+gameDebugArray.gameDebugDeathBtnFill = nil
+gameDebugArray.gameDebugDeathBtnSym = nil
+
+gameDebugArray.gameDebugSpeedBtnGroup = nil
+gameDebugArray.gameDebugSpeedBtnFill = nil
+gameDebugArray.gameDebugSpeedBtnSym = nil
+
+gameDebugArray.gameDebugCycleBtnGroup = nil
+gameDebugArray.gameDebugCycleBtnFill = nil
+gameDebugArray.gameDebugCycleBtnSym = nil
 
 local deathScenario2Array = {}
 
@@ -352,7 +372,24 @@ end
 -- READYOBJ: onOptionsTap
 onOptionsTap = function(event)
     local optionName = event.target.name
-    if optionName == "modeDecrease" or optionName == "modeIncrease" then
+    if optionName == "speedDecrease" or optionName == "speedIncrease" then
+        if flag ~= nil and debugOptions.constantSpeed == false then
+            if optionName == "speedIncrease" then
+                speedUp()
+            end
+
+            -- wrap in a function.. this can all be in the speedUp() function?
+            if fps == 30 then
+                speed = levelsArray[speedTableIndex].speed
+            else
+                speed = levelsArray[speedTableIndex].speed / 2
+            end
+
+            timeVar = levelsArray[speedTableIndex].timeVar
+            speedText.text = speed
+            speedText:toFront()
+        end
+    elseif optionName == "modeDecrease" or optionName == "modeIncrease" then
         if flag ~= nil and debugOptions.cycleModes == false then
             if optionName == "modeDecrease" then
                 if state > 1 then
@@ -374,6 +411,30 @@ onOptionsTap = function(event)
             timer.cancel(setFlagTimer)
             setFlag()
             gameMechanics.overrideFlag = true
+        end
+    elseif optionName == "gameDebugDeath" then
+        if debugOptions.god == false then
+            debugOptions.god = true
+            gameDebugDeathBtnSym.text = "X"
+        else
+            debugOptions.god = false
+            gameDebugDeathBtnSym.text = ""
+        end
+    elseif optionName == "gameDebugSpeed" then
+        if debugOptions.constantSpeed == false then
+            debugOptions.constantSpeed = true
+            gameDebugSpeedBtnSym.text = "X"
+        else
+            debugOptions.constantSpeed = false
+            gameDebugSpeedBtnSym.text = ""
+        end
+    elseif optionName == "gameDebugCycle" then
+        if debugOptions.cycleModes == false then
+            debugOptions.cycleModes = true
+            gameDebugCycleBtnSym.text = "X"
+        else
+            debugOptions.cycleModes = false
+            gameDebugCycleBtnSym.text = ""
         end
     end
     return true
@@ -731,56 +792,39 @@ local function setupScoreboard()
     }
 
     local scoreboardOffsetFromLeft = 5
-    local scoreboardOffsetFromEachOther = 80
+    local scoreboardOffsetFromEachOther = 60
+    local scoreboardOffsetIncDecBtns = 1.2
 
     local scoreTextGroupAnchorX = scoreboardOffsetFromLeft
     local scoreTextGroupAnchorY = _H/2
 
     scoreTextGroup = display.newGroup()
-    scoreTextDesc = display.newEmbossedText("score:", scoreTextGroupAnchorX, scoreTextGroupAnchorY, "PTMono-Bold", 18)
+    scoreTextDesc = display.newEmbossedText("score:", scoreTextGroupAnchorX, scoreTextGroupAnchorY, "PTMono-Bold", 12)
     scoreTextDesc:setFillColor(.2, .9, .4)
     scoreTextDesc:setEmbossColor(scoreboardColor)
     scoreTextDesc.anchorX = 0
     scoreTextDesc.anchorY = 1
     scoreTextGroup:insert(scoreTextDesc)
 
-    scoreText = display.newEmbossedText(score, scoreTextGroupAnchorX + (scoreTextDesc.width/2), scoreTextGroupAnchorY, "PTMono-Bold", 22)
+    scoreText = display.newEmbossedText(score, scoreTextGroupAnchorX + (scoreTextDesc.width/2), scoreTextGroupAnchorY, "PTMono-Bold", 18)
     scoreText:setFillColor(.2, .9, .4)
     scoreText:setEmbossColor(scoreboardColor)
     scoreText.anchorY = 0
     scoreTextGroup:insert(scoreText)
-
-    scoreDecreaseBtnGroup = display.newGroup()
-    scoreDecreaseBtnFill = display.newRoundedRect(scoreDecreaseBtnGroup, scoreTextGroupAnchorX + (scoreTextDesc.width/2) - 6, scoreTextGroupAnchorY - scoreTextDesc.height, 10, 10, 1)
-    scoreDecreaseBtnFill:setFillColor(.4, .4, .4)
-    scoreDecreaseBtnFill.anchorY = 1
-    scoreDecreaseBtnSym = display.newText(scoreDecreaseBtnGroup, "-", scoreDecreaseBtnFill.x, scoreDecreaseBtnFill.y - (scoreDecreaseBtnFill.height/2), "PTMono-Bold", 14)
-    scoreDecreaseBtnSym.anchorX = .5
-    scoreDecreaseBtnSym.anchorY = .5
-    scoreTextGroup:insert(scoreDecreaseBtnGroup)
-
-    scoreIncreaseBtnGroup = display.newGroup()
-    scoreIncreaseBtnFill = display.newRoundedRect(scoreIncreaseBtnGroup, scoreTextGroupAnchorX + (scoreTextDesc.width/2) + 6, scoreTextGroupAnchorY - scoreTextDesc.height, 10, 10, 1)
-    scoreIncreaseBtnFill:setFillColor(.4, .4, .4)
-    scoreIncreaseBtnFill.anchorY = 1
-    scoreDecreaseBtnSym = display.newText(scoreIncreaseBtnGroup, "+", scoreIncreaseBtnFill.x, scoreIncreaseBtnFill.y - (scoreIncreaseBtnFill.height/2), "PTMono-Bold", 14)
-    scoreDecreaseBtnSym.anchorX = .5
-    scoreDecreaseBtnSym.anchorY = .5
-    scoreTextGroup:insert(scoreIncreaseBtnGroup)
 
     local speedTextGroupAnchorX = scoreboardOffsetFromLeft + scoreboardOffsetFromEachOther
     local speedTextGroupAnchorY = _H/2
 
     speedTextGroup = display.newGroup()
 
-    speedTextDesc = display.newEmbossedText("speed:", speedTextGroupAnchorX, speedTextGroupAnchorY, "PTMono-Bold", 18)
+    speedTextDesc = display.newEmbossedText("speed:", speedTextGroupAnchorX, speedTextGroupAnchorY, "PTMono-Bold", 12)
     speedTextDesc:setFillColor(.2, .9, .4)
     speedTextDesc:setEmbossColor(scoreboardColor)
     speedTextDesc.anchorX = 0
     speedTextDesc.anchorY = 1
     speedTextGroup:insert(speedTextDesc)
 
-    speedText = display.newEmbossedText("???", speedTextGroupAnchorX + (speedTextDesc.width/2), speedTextGroupAnchorY, "PTMono-Bold", 22)
+    speedText = display.newEmbossedText("???", speedTextGroupAnchorX + (speedTextDesc.width/2), speedTextGroupAnchorY, "PTMono-Bold", 18)
     speedText:setFillColor(.2, .9, .4)
     speedText:setEmbossColor(scoreboardColor)
     speedText.anchorY = 0
@@ -788,36 +832,38 @@ local function setupScoreboard()
 
     speedDecreaseBtnGroup = display.newGroup()
     speedDecreaseBtnGroup.name = "speedDecrease"
-    speedDecreaseBtnFill = display.newRoundedRect(speedDecreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) - 6, speedTextGroupAnchorY - speedTextDesc.height, 10, 10, 1)
+    speedDecreaseBtnFill = display.newRoundedRect(speedDecreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) - 11, speedTextGroupAnchorY - speedTextDesc.height * scoreboardOffsetIncDecBtns, 16, 16, 1)
     speedDecreaseBtnFill:setFillColor(.4, .4, .4)
     speedDecreaseBtnFill.anchorY = 1
     speedDecreaseBtnSym = display.newText(speedDecreaseBtnGroup, "-", speedDecreaseBtnFill.x, speedDecreaseBtnFill.y - (speedDecreaseBtnFill.height/2), "PTMono-Bold", 14)
     speedDecreaseBtnSym.anchorX = .5
     speedDecreaseBtnSym.anchorY = .5
     speedTextGroup:insert(speedDecreaseBtnGroup)
+    speedDecreaseBtnGroup:addEventListener("tap", onOptionsTap)
 
     speedIncreaseBtnGroup = display.newGroup()
     speedIncreaseBtnGroup.name = "speedIncrease"
-    speedIncreaseBtnFill = display.newRoundedRect(speedIncreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) + 6, speedTextGroupAnchorY - speedTextDesc.height, 10, 10, 1)
+    speedIncreaseBtnFill = display.newRoundedRect(speedIncreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) + 11, speedTextGroupAnchorY - speedTextDesc.height * scoreboardOffsetIncDecBtns, 16, 16, 1)
     speedIncreaseBtnFill:setFillColor(.4, .4, .4)
     speedIncreaseBtnFill.anchorY = 1
-    speedDecreaseBtnSym = display.newText(speedIncreaseBtnGroup, "+", speedIncreaseBtnFill.x, speedIncreaseBtnFill.y - (speedIncreaseBtnFill.height/2), "PTMono-Bold", 14)
-    speedDecreaseBtnSym.anchorX = .5
-    speedDecreaseBtnSym.anchorY = .5
+    speedIncreaseBtnSym = display.newText(speedIncreaseBtnGroup, "+", speedIncreaseBtnFill.x, speedIncreaseBtnFill.y - (speedIncreaseBtnFill.height/2), "PTMono-Bold", 14)
+    speedIncreaseBtnSym.anchorX = .5
+    speedIncreaseBtnSym.anchorY = .5
     speedTextGroup:insert(speedIncreaseBtnGroup)
+    speedIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
 
     local modeTextGroupAnchorX = scoreboardOffsetFromLeft + (scoreboardOffsetFromEachOther*2)
     local modeTextGroupAnchorY = _H/2
 
     modeTextGroup = display.newGroup()
-    modeTextDesc = display.newEmbossedText("mode:", modeTextGroupAnchorX, modeTextGroupAnchorY, "PTMono-Bold", 18)
+    modeTextDesc = display.newEmbossedText("mode:", modeTextGroupAnchorX, modeTextGroupAnchorY, "PTMono-Bold", 12)
     modeTextDesc:setFillColor(.2, .9, .4)
     modeTextDesc:setEmbossColor(scoreboardColor)
     modeTextDesc.anchorX = 0
     modeTextDesc.anchorY = 1
     modeTextGroup:insert(modeTextDesc)
 
-    modeText = display.newEmbossedText("???", modeTextGroupAnchorX + (modeTextDesc.width/2), modeTextGroupAnchorY, "PTMono-Bold", 22)
+    modeText = display.newEmbossedText("???", modeTextGroupAnchorX + (modeTextDesc.width/2), modeTextGroupAnchorY, "PTMono-Bold", 18)
     modeText:setFillColor(.2, .9, .4)
     modeText:setEmbossColor(scoreboardColor)
     modeText.anchorY = 0
@@ -825,28 +871,64 @@ local function setupScoreboard()
 
     modeDecreaseBtnGroup = display.newGroup()
     modeDecreaseBtnGroup.name = "modeDecrease"
-    modeDecreaseBtnFill = display.newRoundedRect(modeDecreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) - 6, modeTextGroupAnchorY - modeTextDesc.height, 10, 10, 1)
+    modeDecreaseBtnFill = display.newRoundedRect(modeDecreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) - 11, modeTextGroupAnchorY - modeTextDesc.height * scoreboardOffsetIncDecBtns, 16, 16, 1)
     modeDecreaseBtnFill:setFillColor(.4, .4, .4)
     modeDecreaseBtnFill.anchorY = 1
     modeDecreaseBtnSym = display.newText(modeDecreaseBtnGroup, "-", modeDecreaseBtnFill.x, modeDecreaseBtnFill.y - (modeDecreaseBtnFill.height/2), "PTMono-Bold", 14)
     modeDecreaseBtnSym.anchorX = .5
     modeDecreaseBtnSym.anchorY = .5
     modeTextGroup:insert(modeDecreaseBtnGroup)
+    modeDecreaseBtnGroup:addEventListener("tap", onOptionsTap)
 
     modeIncreaseBtnGroup = display.newGroup()
     modeIncreaseBtnGroup.name = "modeIncrease"
-    modeIncreaseBtnFill = display.newRoundedRect(modeIncreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) + 6, modeTextGroupAnchorY - modeTextDesc.height, 10, 10, 1)
+    modeIncreaseBtnFill = display.newRoundedRect(modeIncreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) + 11, modeTextGroupAnchorY - modeTextDesc.height * scoreboardOffsetIncDecBtns, 16, 16, 1)
     modeIncreaseBtnFill:setFillColor(.4, .4, .4)
     modeIncreaseBtnFill.anchorY = 1
-    modeDecreaseBtnSym = display.newText(modeIncreaseBtnGroup, "+", modeIncreaseBtnFill.x, modeIncreaseBtnFill.y - (modeIncreaseBtnFill.height/2), "PTMono-Bold", 14)
-    modeDecreaseBtnSym.anchorX = .5
-    modeDecreaseBtnSym.anchorY = .5
+    modeIncreaseBtnSym = display.newText(modeIncreaseBtnGroup, "+", modeIncreaseBtnFill.x, modeIncreaseBtnFill.y - (modeIncreaseBtnFill.height/2), "PTMono-Bold", 14)
+    modeIncreaseBtnSym.anchorX = .5
+    modeIncreaseBtnSym.anchorY = .5
     modeTextGroup:insert(modeIncreaseBtnGroup)
-
-    -- speedDecreaseBtnGroup:addEventListener("tap", onOptionsTap)
-    -- speedIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
-    modeDecreaseBtnGroup:addEventListener("tap", onOptionsTap)
     modeIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
+
+    local gameDebugDeathGroupAnchorY = _H/2 + scoreTextGroup.height * scoreboardOffsetIncDecBtns + 4
+
+    gameDebugDeathBtnGroup = display.newGroup()
+    gameDebugDeathBtnGroup.name = "gameDebugDeath"
+    gameDebugDeathBtnFill = display.newRoundedRect(gameDebugDeathBtnGroup, scoreTextGroupAnchorX + (scoreTextDesc.width/2), gameDebugDeathGroupAnchorY, 20, 20, 1)
+    gameDebugDeathBtnFill:setFillColor(.2, .2, .2)
+    gameDebugDeathBtnFill.anchorY = 1
+    gameDebugDeathBtnSym = display.newText(gameDebugDeathBtnGroup, "", gameDebugDeathBtnFill.x, gameDebugDeathBtnFill.y - (gameDebugDeathBtnFill.height/2), "PTMono-Bold", 20)
+    if debugOptions.god == true then
+        gameDebugDeathBtnSym.text = "X"
+    end
+    gameDebugDeathBtnGroup:addEventListener("tap", onOptionsTap)
+
+    local gameDebugSpeedGroupAnchorY = _H/2 + scoreTextGroup.height * scoreboardOffsetIncDecBtns + 4
+
+    gameDebugSpeedBtnGroup = display.newGroup()
+    gameDebugSpeedBtnGroup.name = "gameDebugSpeed"
+    gameDebugSpeedBtnFill = display.newRoundedRect(gameDebugSpeedBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2), gameDebugSpeedGroupAnchorY, 20, 20, 1)
+    gameDebugSpeedBtnFill:setFillColor(.2, .2, .2)
+    gameDebugSpeedBtnFill.anchorY = 1
+    gameDebugSpeedBtnSym = display.newText(gameDebugSpeedBtnGroup, "", gameDebugSpeedBtnFill.x, gameDebugSpeedBtnFill.y - (gameDebugSpeedBtnFill.height/2), "PTMono-Bold", 20)
+    if debugOptions.constantSpeed == true then
+        gameDebugSpeedBtnSym.text = "X"
+    end
+    gameDebugSpeedBtnGroup:addEventListener("tap", onOptionsTap)
+
+    local gameDebugCycleGroupAnchorY = _H/2 + scoreTextGroup.height * scoreboardOffsetIncDecBtns + 4
+
+    gameDebugCycleBtnGroup = display.newGroup()
+    gameDebugCycleBtnGroup.name = "gameDebugCycle"
+    gameDebugCycleBtnFill = display.newRoundedRect(gameDebugCycleBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2), gameDebugCycleGroupAnchorY, 20, 20, 1)
+    gameDebugCycleBtnFill:setFillColor(.2, .2, .2)
+    gameDebugCycleBtnFill.anchorY = 1
+    gameDebugCycleBtnSym = display.newText(gameDebugCycleBtnGroup, "", gameDebugCycleBtnFill.x, gameDebugCycleBtnFill.y - (gameDebugCycleBtnFill.height/2), "PTMono-Bold", 20)
+    if debugOptions.cycleModes == true then
+        gameDebugCycleBtnSym.text = "X"
+    end
+    gameDebugCycleBtnGroup:addEventListener("tap", onOptionsTap)
 
     --SAM: assign topBar and btmBar variables prior to initrializing deathScenario2Array. That way their height can be referenced. Height = 100, but will vary with adaptive sizing (i.e. 2x and 4x)
     table.insert(deathScenario2Array, display.newEmbossedText("]X", 10, 76, "PTMono-Bold", 14))
@@ -867,7 +949,7 @@ local function setupScoreboard()
 end
 
 -- SAM: combine functions speedUp() and resetSpawnTable()
-local function speedUp()
+speedUp = function()
     if speedTableIndex ~= #levelsArray then
         speedTableIndex = speedTableIndex + 1
         speed = levelsArray[speedTableIndex].speed
@@ -1111,7 +1193,7 @@ local function boundaryCheck(e)
 
 --                        print("isBottomLeft: ", spawnTable[i].isBottomRight)
 
-                        if debugOptions.gotoDeath == true then
+                        if not debugOptions.god then
                             paceRect.isMoving = false
                             spawnTable[i]:toFront()
                             Runtime:removeEventListener("enterFrame", boundaryCheck)
@@ -1159,13 +1241,13 @@ local function boundaryCheck(e)
                             end
                             timer.performWithDelay(2000, boundaryElimination, 1)
                             return --SAM: why?
-                        elseif debugOptions.gotoDeath == false then
+                        elseif debugOptions.god then
                             for i = 1, #spawnTable do
                                 if spawnTable[i] ~= 0 then
                                     if spawnTable[i].x < -40 or spawnTable[i].x > _W + 40 then
                                         if state == 1 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
-                                                if spawnTable[i].isTopLeft then
+                                                if spawnTable[i].corner == "TopRight" then
                                                     -- print("FUCKING CUNT")
                                                     transition.to( deathScenario2Array[1], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[1], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
 
@@ -1180,8 +1262,7 @@ local function boundaryCheck(e)
                                                             local playPaletteDeathR = audio.play( SFXShortL )
                                                         end )
                                                     end
-
-                                                elseif not spawnTable[i].isBottomRight then
+                                                elseif spawnTable[i].corner == "BottomLeft" then
                                                     transition.to( deathScenario2Array[4], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[4], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
 
                                                     if paletteDeathsInCluster == 0 then
@@ -1203,7 +1284,7 @@ local function boundaryCheck(e)
                                             end
                                         elseif state == 2 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
-                                                if spawnTable[i].isTopLeft then
+                                                if spawnTable[i].corner == "TopLeft" then
                                                     transition.to( deathScenario2Array[2], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[2], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
 
                                                     if paletteDeathsInCluster == 0 then
@@ -1217,7 +1298,7 @@ local function boundaryCheck(e)
                                                             local playPaletteDeathR = audio.play( SFXShortL )
                                                         end )
                                                     end
-                                                elseif not spawnTable[i].isBottomRight then
+                                                elseif spawnTable[i].corner == "BottomRight" then
                                                     transition.to( deathScenario2Array[3], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[3], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
 
                                                     if paletteDeathsInCluster == 0 then
@@ -1678,10 +1759,11 @@ end
 -- READYOBJ: setCountryParameters
 setCountryParameters = function(restartCountry)
 
-    if not debugOptions.constantSpeed then
+    if not debugOptions.constantSpeed and gameMechanics.overrideFlag == true then
         speedUp()
     end
 
+    -- wrap in a function.. this can all be in the speedUp() function?
     if fps == 30 then
         speed = levelsArray[speedTableIndex].speed
     else
@@ -2372,7 +2454,7 @@ function objTouch(self, e)
                 bonusText = nil
             end
 
-            if debugOptions.gotoDeath == true then
+            if not debugOptions.god then
                 self:toFront()
                 self.isPaletteActive = false
                 self:removeEventListener("touch", objTouch)

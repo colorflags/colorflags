@@ -214,6 +214,18 @@ local btnsSeq = {
     },
 }
 
+local btnsAgain
+local btnsAgainSheetCoords = require("lua-sheets.btns_again")
+local btnsAgainSheet = graphics.newImageSheet("images/btns_again.png", btnsAgainSheetCoords:getSheet())
+
+local btnsShare
+local btnsShareSheetCoords = require("lua-sheets.btns_share")
+local btnsShareSheet = graphics.newImageSheet("images/btns_share.png", btnsShareSheetCoords:getSheet())
+
+local btnsQuit
+local btnsQuitSheetCoords = require("lua-sheets.btns_quit")
+local btnsQuitSheet = graphics.newImageSheet("images/btns_quit.png", btnsQuitSheetCoords:getSheet())
+
 
 function niceTryPop(event)
     local thisAnimation = event.target
@@ -388,36 +400,42 @@ end
 --   return true
 -- end
 
+-- SAM: needs work
 local function myTouchListener( event )
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
-
     if event.phase == "began" then
-        -- print("touch ON. inside")
+        print("touch ON. inside")
     elseif event.phase == "ended" or event.phase == "cancelled" then
-
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
         if currentObject.name == "again" then
-            currentObject:setSequence("again")
+            -- currentObject:setSequence("playgame")
+            currentObject:setFrame(2)
         elseif currentObject.name == "share" then
-            currentObject:setSequence("share")
+            -- currentObject:setSequence("options")
+            currentObject:setFrame(2)
         elseif currentObject.name == "quit" then
-            currentObject:setSequence("quit")
+            -- currentObject:setSequence("about")
+            currentObject:setFrame(2)
         end
 
         -- redundant ??
         -- currentObject:setFrame(1)
-
+        print(touchInsideBtn, isLoading)
         if touchInsideBtn == true and isLoading == false then
-            -- print("touch OFF. inside")
+
+            print("touch OFF. inside")
             -- composer.removeScene("start")
 
             -- prevents scenes from firing twice!!
             isLoading = true
-
+            print("going to..")
             local goto = currentObject.gotoScene
-            composer.gotoScene( goto, { effect = defaultTransition } )
-
+            if goto == "start" and event.target == btnsPlayGame then
+                composer.showOverlay( goto, { isModal= true})
+            else
+                composer.gotoScene ( goto, { effect = defaultTransition } )
+            end
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
         end
@@ -428,6 +446,7 @@ local function myTouchListener( event )
     end
 end
 
+-- SAM: needs work
 local function doFunction(e)
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
@@ -445,18 +464,26 @@ local function doFunction(e)
                 end
             else
                 if currentObject.name == "again" then
-                    currentObject:setFrame(1)
+                    currentObject:setFrame(4)
                 elseif currentObject.name == "share" then
-                    currentObject:setFrame(1)
+                    currentObject:setFrame(4)
                 elseif currentObject.name == "quit" then
-                    currentObject:setFrame(1)
+                    currentObject:setFrame(4)
                 end
             end
-            -- redundant ??
-            -- currentObject:setFrame(1)
+            currentObject:setFrame(2)
+            -- SAM: wtf. how is this working? do some testing.
+            if(touchInsideBtn == true) then
+                currentObject.xScale = 1
+                currentObject.yScale = 1
+                print("finger down, outside button: ", currentObject.name)
+            end
             touchInsideBtn = false
         else
             if touchInsideBtn == false then
+                print("finger down, inside button: ", currentObject.name)
+                currentObject.xScale = 1.01
+                currentObject.yScale = 1.01
                 if(isBtnAnim) then
                     if currentObject.name == "again" then
                         currentObject:setSequence("again_anim")
@@ -468,11 +495,11 @@ local function doFunction(e)
                     currentObject:play()
                 else
                     if currentObject.name == "again" then
-                        currentObject:setFrame(2)
+                        currentObject:setFrame(4)
                     elseif currentObject.name == "share" then
-                        currentObject:setFrame(2)
+                        currentObject:setFrame(4)
                     elseif currentObject.name == "quit" then
-                        currentObject:setFrame(2)
+                        currentObject:setFrame(4)
                     end
                 end
             end
@@ -667,42 +694,45 @@ local function setScene()
 
     local offsetY = _H/4 - 40
 
-    menuAgain = display.newSprite(btnsSheet, btnsSeq)
 
-    menuAgain.isHitTestMasked = false
-    menuAgain.name = "again"
-    menuAgain:addEventListener( "touch", myTouchListener )
-    menuAgain.x=88
-    menuAgain.y=_H-offsetY
-    menuAgain:setSequence( "again" )
-    menuAgain:setFrame( 1 )
-    menuAgain.gotoScene="game"
-    menuAgain:scale(.8,.8)
+    btnsAgain = display.newSprite( btnsAgainSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+    btnsAgain.isHitTestMasked = false
+    btnsAgain.name = "again"
+    btnsAgain.anchorY = .5
+    btnsAgain.x=88
+    btnsAgain.y=_H-offsetY
+    btnsAgain:setSequence("again")
+    btnsAgain:setFrame(2)
+    btnsAgain.alpha=0
+    btnsAgain.gotoScene="game"
+    -- btnsAgain:scale(.8,.8)
+    transition.to( btnsAgain, {time = 200, alpha=1})
 
-    menuShare= display.newSprite(btnsSheet, btnsSeq)
+    btnsShare = display.newSprite( btnsShareSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+    btnsShare.isHitTestMasked = false
+    btnsShare.name = "share"
+    btnsShare.anchorY = .5
+    btnsShare.x=_W/2+20
+    btnsShare.y=_H-offsetY-1
+    btnsShare:setSequence("game")
+    btnsShare:setFrame(2)
+    btnsShare.alpha=0
+    btnsShare.gotoScene="menu"
+    -- btnsShare:scale(.8,.8)
+    transition.to( btnsShare, {time = 200, alpha=1})
 
-    menuShare.isHitTestMasked = false
-    menuShare.name = "share"
-    menuShare:addEventListener( "touch", myTouchListener )
-    --offset 20 from center
-    menuShare.x=_W/2+20
-    menuShare.y=_H-offsetY-1
-    menuShare:setSequence( "share" )
-    menuShare:setFrame( 1 )
-    -- menuShare.gotoScene=""
-    menuShare:scale(.8,.8)
-
-    menuQuit= display.newSprite(btnsSheet, btnsSeq)
-
-    menuQuit.isHitTestMasked = false
-    menuQuit.name = "quit"
-    menuQuit:addEventListener( "touch", myTouchListener )
-    menuQuit.x=_W-69
-    menuQuit.y=_H-offsetY
-    menuQuit:setSequence( "quit" )
-    menuQuit:setFrame( 1 )
-    menuQuit.gotoScene="menu"
-    menuQuit:scale(.8,.8)
+    btnsQuit = display.newSprite( btnsQuitSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+    btnsQuit.isHitTestMasked = false
+    btnsQuit.name = "quit"
+    btnsQuit.anchorY = .5
+    btnsQuit.x=_W-69
+    btnsQuit.y=_H-offsetY
+    btnsQuit:setSequence("game")
+    btnsQuit:setFrame(2)
+    btnsQuit.alpha=0
+    btnsQuit.gotoScene="menu"
+    -- btnsQuit:scale(.8,.8)
+    transition.to( btnsQuit, {time = 200, alpha=1})
 
     selectRandomFlags()
 
@@ -881,9 +911,12 @@ function scene:show(e)
 
         end
   elseif e.phase== "did" then
-        menuAgain:addEventListener( "touch", doFunction )
-        menuQuit:addEventListener( "touch", doFunction )
-        menuShare:addEventListener( "touch", doFunction )
+        btnsAgain:addEventListener( "touch", myTouchListener )
+        btnsAgain:addEventListener( "touch", doFunction )
+        btnsShare:addEventListener( "touch", myTouchListener )
+        btnsShare:addEventListener( "touch", doFunction )
+        btnsQuit:addEventListener( "touch", myTouchListener )
+        btnsQuit:addEventListener( "touch", doFunction )
   end
 end
 
@@ -926,9 +959,15 @@ function scene:hide(e)
   display.remove(flagPole5)
   display.remove(flagPole6)
   display.remove(menuNiceTry)
-  display.remove(menuAgain)
-  display.remove(menuShare)
-  display.remove(menuQuit)
+  display.remove(btnsAgain)
+  display.remove(btnsShare)
+  display.remove(btnsQuit)
+  btnsAgain:removeEventListener( "touch", myTouchListener )
+  btnsAgain:removeEventListener( "touch", doFunction )
+  btnsShare:removeEventListener( "touch", myTouchListener )
+  btnsShare:removeEventListener( "touch", doFunction )
+  btnsQuit:removeEventListener( "touch", myTouchListener )
+  btnsQuit:removeEventListener( "touch", doFunction )
   composer.removeScene("gameover")
   end
 end
