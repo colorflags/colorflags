@@ -14,6 +14,8 @@ audioReservedChannel2 = nil
 local music
 local bobby
 
+print(CFGameSFX:getItemByID("id"))
+
 -- SAM: SFXShortL to sfxShortL
 local SFXShortL = audio.loadSound( "sfx/shortL.wav" )
 local SFXShortR = audio.loadSound( "sfx/shortR.wav" )
@@ -206,14 +208,17 @@ local gameDebugGroup
 local gameDebugArray = {}
 
 gameDebugArray.gameDebugDeathBtnGroup = nil
+gameDebugArray.gameDebugDeathBtnDesc = nil
 gameDebugArray.gameDebugDeathBtnFill = nil
 gameDebugArray.gameDebugDeathBtnSym = nil
 
 gameDebugArray.gameDebugSpeedBtnGroup = nil
+gameDebugArray.gameDebugSpeedBtnDesc = nil
 gameDebugArray.gameDebugSpeedBtnFill = nil
 gameDebugArray.gameDebugSpeedBtnSym = nil
 
 gameDebugArray.gameDebugCycleBtnGroup = nil
+gameDebugArray.gameDebugCycleBtnDesc = nil
 gameDebugArray.gameDebugCycleBtnFill = nil
 gameDebugArray.gameDebugCycleBtnSym = nil
 
@@ -891,10 +896,29 @@ local function setupScoreboard()
     modeTextGroup:insert(modeIncreaseBtnGroup)
     modeIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
 
+    gameDebugGroup = display.newGroup()
+
     local gameDebugDeathGroupAnchorY = _H/2 + scoreTextGroup.height * scoreboardOffsetIncDecBtns + 4
 
     gameDebugDeathBtnGroup = display.newGroup()
     gameDebugDeathBtnGroup.name = "gameDebugDeath"
+
+    local textParams =
+    {
+        text = "god?",
+        x = scoreTextGroupAnchorX + (scoreTextDesc.width/2),
+        y = gameDebugDeathGroupAnchorY,
+        font = "PTMono-Bold",
+        fontSize = 12,
+        align = "center"
+    }
+    gameDebugDeathBtnDesc = display.newEmbossedText(textParams)
+    gameDebugDeathBtnDesc:setFillColor(.2, .9, .4)
+    gameDebugDeathBtnDesc:setEmbossColor(scoreboardColor)
+    gameDebugDeathBtnDesc.anchorX = .5
+    gameDebugDeathBtnDesc.anchorY = 0
+    gameDebugGroup:insert(gameDebugDeathBtnDesc)
+
     gameDebugDeathBtnFill = display.newRoundedRect(gameDebugDeathBtnGroup, scoreTextGroupAnchorX + (scoreTextDesc.width/2), gameDebugDeathGroupAnchorY, 20, 20, 1)
     gameDebugDeathBtnFill:setFillColor(.2, .2, .2)
     gameDebugDeathBtnFill.anchorY = 1
@@ -903,11 +927,30 @@ local function setupScoreboard()
         gameDebugDeathBtnSym.text = "X"
     end
     gameDebugDeathBtnGroup:addEventListener("tap", onOptionsTap)
+    gameDebugGroup:insert(gameDebugDeathBtnGroup)
 
     local gameDebugSpeedGroupAnchorY = _H/2 + scoreTextGroup.height * scoreboardOffsetIncDecBtns + 4
 
     gameDebugSpeedBtnGroup = display.newGroup()
     gameDebugSpeedBtnGroup.name = "gameDebugSpeed"
+
+    local textParams =
+    {
+        text = "constant\nspeed?",
+        x = speedTextGroupAnchorX + (speedTextDesc.width/2),
+        y = gameDebugSpeedGroupAnchorY,
+        font = "PTMono-Bold",
+        fontSize = 12,
+        align = "center"
+    }
+
+    gameDebugSpeedBtnDesc = display.newEmbossedText(textParams)
+    gameDebugSpeedBtnDesc:setFillColor(.2, .9, .4)
+    gameDebugSpeedBtnDesc:setEmbossColor(scoreboardColor)
+    gameDebugSpeedBtnDesc.anchorX = .5
+    gameDebugSpeedBtnDesc.anchorY = 0
+    gameDebugGroup:insert(gameDebugSpeedBtnDesc)
+
     gameDebugSpeedBtnFill = display.newRoundedRect(gameDebugSpeedBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2), gameDebugSpeedGroupAnchorY, 20, 20, 1)
     gameDebugSpeedBtnFill:setFillColor(.2, .2, .2)
     gameDebugSpeedBtnFill.anchorY = 1
@@ -916,11 +959,31 @@ local function setupScoreboard()
         gameDebugSpeedBtnSym.text = "X"
     end
     gameDebugSpeedBtnGroup:addEventListener("tap", onOptionsTap)
+    gameDebugGroup:insert(gameDebugSpeedBtnGroup)
+
 
     local gameDebugCycleGroupAnchorY = _H/2 + scoreTextGroup.height * scoreboardOffsetIncDecBtns + 4
 
     gameDebugCycleBtnGroup = display.newGroup()
     gameDebugCycleBtnGroup.name = "gameDebugCycle"
+
+    local textParams =
+    {
+        text = "cycle\nmodes?",
+        x = modeTextGroupAnchorX + (modeTextDesc.width/2),
+        y = gameDebugCycleGroupAnchorY,
+        font = "PTMono-Bold",
+        fontSize = 12,
+        align = "center"
+    }
+
+    gameDebugCycleBtnDesc = display.newEmbossedText(textParams)
+    gameDebugCycleBtnDesc:setFillColor(.2, .9, .4)
+    gameDebugCycleBtnDesc:setEmbossColor(scoreboardColor)
+    gameDebugCycleBtnDesc.anchorX = .5
+    gameDebugCycleBtnDesc.anchorY = 0
+    gameDebugGroup:insert(gameDebugCycleBtnDesc)
+
     gameDebugCycleBtnFill = display.newRoundedRect(gameDebugCycleBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2), gameDebugCycleGroupAnchorY, 20, 20, 1)
     gameDebugCycleBtnFill:setFillColor(.2, .2, .2)
     gameDebugCycleBtnFill.anchorY = 1
@@ -929,6 +992,7 @@ local function setupScoreboard()
         gameDebugCycleBtnSym.text = "X"
     end
     gameDebugCycleBtnGroup:addEventListener("tap", onOptionsTap)
+    gameDebugGroup:insert(gameDebugCycleBtnGroup)
 
     --SAM: assign topBar and btmBar variables prior to initrializing deathScenario2Array. That way their height can be referenced. Height = 100, but will vary with adaptive sizing (i.e. 2x and 4x)
     table.insert(deathScenario2Array, display.newEmbossedText("]X", 10, 76, "PTMono-Bold", 14))
@@ -2469,20 +2533,24 @@ function objTouch(self, e)
                     if spawnTable[i] ~= 0 and spawnTable[i] ~= e.target then
 
                         spawnTable[i]:removeEventListener("touch", objTouch)
+                        -- HookSound
                         transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
                     end
                 end
-                numDeaths = 1
+                -- HookSound
                 transition.to(e.target, {time = 700, rotation = 400, x = _W / 2, y = _H / 2, xScale = 8, yScale = 8, onComplete = endGame })
+                numDeaths = 1
                 Runtime:removeEventListener("enterFrame", boundaryCheck)
 
                 Runtime:removeEventListener("enterFrame", moveObject)
                 return
             end
-            if e.target.isGrown == false then   --if canceled
+            if e.target.isGrown == false then --if canceled
                 transition.cancel(self)
+                -- HookSound
                 transition.to(e.target, {time = 500, rotation = 400, xScale = 5, yScale = 5, onComplete = removePalette })
-            else                           --not cancelled
+            else --not cancelled
+                -- HookSound
                 transition.to(e.target, {time = 500, rotation = 400, xScale = 5, yScale = 5, onComplete = removePalette })
             end
             e.target.isPaletteActive = false
@@ -2629,6 +2697,7 @@ function scene:hide(e)
 
         display.remove(background)
 
+        display.remove(gameDebugGroup)
         display.remove(speedTextGroup)
         display.remove(scoreTextGroup)
         display.remove(modeTextGroup)

@@ -2,9 +2,10 @@ local composer=require("composer")
 
 require("cf_game_settings")
 require("cf_game_scale_components")
-
+require("cf_game_sfx")
 CFGameSettings = CFGameSettings()
 CFGameScaleComponents = CFGameScaleComponents()
+CFGameSFX = CFGameSFX()
 
 display.setStatusBar( display.HiddenStatusBar )
 
@@ -153,7 +154,7 @@ function runMain()
 	elseif showSplash==false then
 	        display.remove(splash1)
 	    display.remove(splash2)
-	     composer.gotoScene( "gameover", {effect = defaultTransition})
+	     composer.gotoScene( "game", {effect = defaultTransition})
 	end
 end
 runMain()

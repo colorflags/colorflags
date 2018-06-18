@@ -22,16 +22,7 @@ function CFGameScaleComponents:getItemByID(id)
     end
 end
 
+-- REMOVE
 function CFGameScaleComponents:getItemByName(name)
     return self.countries[name]
 end
-
---[[
-function CFGameSettings:getLength()
-    local count = 0
-    for k, v in pairs(self.countries) do
-        count = count + 1
-    end
-    return count
-end
-]]--

@@ -22,11 +22,11 @@ end
 
 function dog.new( text, type, size, x, y )    -- constructor
 
-    local offset = size / (size / 2) 
+    local offset = size / (size / 2)
     local textForeground = display.newText( text, x, y, type, size )
     local textBackground = display.newText( text, x+offset, y+offset, type, size )
-    textForeground:setFillColor( 189/255, 177/255, 255/255 )                                           
-    textBackground:setFillColor( 47/255, 44/255, 64/255)                                           
+    textForeground:setFillColor( 189/255, 177/255, 255/255 )
+    textBackground:setFillColor( 47/255, 44/255, 64/255)
     local textTable = {
         foreground = textForeground,
         background = textBackground
@@ -39,7 +39,7 @@ function dog:Text(newText)
     self.background.text = newText
 end
 
-function dog:RemoveDisplay() 
+function dog:RemoveDisplay()
     display.remove(self.foreground)
     display.remove(self.background)
 end

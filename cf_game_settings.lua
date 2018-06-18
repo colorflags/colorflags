@@ -620,9 +620,3 @@ function CFGameSettings:getLength()
     end
     return count
 end
-
---[[
-function BulbGameSettings:getItemByName(name)
-    return self.countries[name]
-end
-]]--
