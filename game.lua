@@ -19,6 +19,7 @@ print(CFGameSFX:getItemByID("id"))
 -- SAM: SFXShortL to sfxShortL
 local SFXShortL = audio.loadSound( "sfx/shortL.wav" )
 local SFXShortR = audio.loadSound( "sfx/shortR.wav" )
+local SFXPaletteHit = audio.loadSound( "sfx/puff-attempt-mono.wav" )
 local offsetPaletteDeathSFX = 20
 local paletteDeathsInCluster = 0
 
@@ -47,11 +48,11 @@ debugOptions.constantSpeed = true
 debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
 debugOptions.brazilToCanada = false -- make this into array with a variety of sets - changing between 2 or more countries in sequence
-debugOptions.adherenceToFlagColors = false
+debugOptions.adherenceToFlagColors = true
 
 local gameMechanics = {}
 gameMechanics.playCountryDuration = 20000
-gameMechanics.transitionToCountryDuration = 50
+gameMechanics.transitionToCountryDuration = 2000
 gameMechanics.firstPaletteDelay = 10
 gameMechanics.countriesSpawned = 0
 gameMechanics.overrideFlag = false
@@ -161,6 +162,20 @@ local mapGroup
 local waterGroup
 local newGroup
 local zoomMultiplier = .3
+
+local zoomLevel = {}
+zoomLevel.pseudoTargetX = 0
+zoomLevel.pseudoTargetY = 0
+zoomLevel.x1 = 0
+zoomLevel.y1 = 0
+
+local distanceFromCamera = {}
+distanceFromCamera.pseudoTargetX = 0
+distanceFromCamera.pseudoTargetY = 0
+distanceFromCamera.x = 0
+distanceFromCamera.y = 0
+distanceFromCamera.enemySpeed = 30
+distanceFromCamera.amplitude = .01
 
 local flagFrameOptions
 -- rename to flagFrame
@@ -754,6 +769,26 @@ local function setupVariables()
     lightningIcon3.alpha = .2
     lightningIcon4.alpha = .2
     lightningIcon5.alpha = .2
+
+    zoomLevel.target = display.newCircle(_W/2, _H/2, 20)
+    zoomLevel.target:setFillColor(0.5)
+    zoomLevel.target.anchorX = .5
+    zoomLevel.target.anchorY = .5
+    zoomLevel.x0 = 0
+    zoomLevel.y0 = zoomLevel.target.y
+    zoomLevel.enemySpeed = 15
+    zoomLevel.amplitude = 2
+
+    local zoomEvent = function( event )
+        zoomLevel.x0 = zoomLevel.x0 + 1
+        local y = zoomLevel.y0 + math.sin(zoomLevel.x0 / zoomLevel.enemySpeed) * zoomLevel.amplitude
+        zoomLevel.target.x = zoomLevel.x0
+        -- OR
+        zoomLevel.target.x = 0
+        zoomLevel.target.y = y
+    end
+    Runtime:addEventListener( "enterFrame", zoomEvent )
+
 end
 
 function adjustWidthsAfterResize( event )
@@ -1229,21 +1264,6 @@ local function boundaryCheck(e)
     if #spawnTable > 0 and breakLoop == false then
         for i = 1, #spawnTable do
             if spawnTable[i] ~= 0 and spawnTable[i] ~= nil then
---                if state == 1 then
---                    if spawnTable[i].x < -40 then
---                        print("top left death")
---                        print("a")
---                        transition.to( deathScenario2Array[1], { time=5, alpha=1, onComplete=function() transition.to( deathScenario2Array[1], { time=5, alpha=0})end})
---                    elseif spawnTable[i].x > _W + 40 then
---                        print("bottom right death")
---                    end
---                elseif state == 2 then
---                    if spawnTable[i].x > _W + 40 then
---                        print("top right death")
---                    elseif spawnTable[i].x < -40 then
---                        print("bottom left death")
---                    end
---                end
                 if spawnTable[i].x < -40 or spawnTable[i].x > _W + 40 then
                     if lookupCode(code, spawnTable[i]) == 1 then    --Out of bound and Palette Matches flag. GameOver
 
@@ -1254,32 +1274,66 @@ local function boundaryCheck(e)
                             bonusText:removeSelf()
                             bonusText = nil
                         end
-
---                        print("isBottomLeft: ", spawnTable[i].isBottomRight)
-
                         if not debugOptions.god then
                             paceRect.isMoving = false
                             spawnTable[i]:toFront()
                             Runtime:removeEventListener("enterFrame", boundaryCheck)
                             Runtime:removeEventListener("enterFrame", moveObject)
                             for i = 1, #spawnTable do
-								--Check for other palettes that could be out of bounds
+								--Check for palettes that are out of bounds
                                 if spawnTable[i] ~= 0 then
                                     spawnTable[i].isPaletteActive = false
                                     spawnTable[i]:removeEventListener("touch", objTouch)
 									--Check for gameover palettes
                                     if spawnTable[i].x < - 40 or spawnTable[i].x > _W + 40 then
-                                        if lookupCode(code, spawnTable[i]) == 1 then
-                                            spawnTable[i]:removeEventListener("touch", objTouch)
-                                            spawnTable[i].dead = true
-                                            numDeaths = numDeaths + 1
-                                        else
-                                            spawnTable[i].dead = false
+                                        if state == 1 then
+                                            if lookupCode(code, spawnTable[i]) == 1 then
+
+                                                if spawnTable[i].corner == "TopRight" then
+                                                    transition.to( deathScenario2Array[1], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[1], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
+
+                                                    if paletteDeathsInCluster == 0 then
+                                                        local playPaletteDeathL = audio.play( SFXShortL, { onComplete=function(event)
+                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
+                                                            -- print(paletteDeathsInCluster)
+                                                        end })
+                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
+                                                    elseif paletteDeathsInCluster > 0 then
+                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
+                                                            local playPaletteDeathR = audio.play( SFXShortL )
+                                                        end )
+                                                    end
+                                                elseif spawnTable[i].corner == "BottomLeft" then
+                                                    transition.to( deathScenario2Array[4], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[4], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
+
+                                                    if paletteDeathsInCluster == 0 then
+                                                        local playPaletteDeathR = audio.play( SFXShortR, { onComplete=function(event)
+                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
+                                                            -- print(paletteDeathsInCluster)
+                                                        end })
+                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
+                                                    elseif paletteDeathsInCluster > 0 then
+                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
+                                                            local playPaletteDeathR = audio.play( SFXShortR )
+                                                        end )
+                                                    end
+                                                end
+                                                spawnTable[i]:removeEventListener("touch", objTouch)
+                                                spawnTable[i].dead = true
+                                                numDeaths = numDeaths + 1
+                                            else
+                                                spawnTable[i].dead = false
+                                            end
                                         end
                                     end
+
+                                    print("effects for palettes within bounds")
                                     if state == 3 and spawnTable[i].dead ~= true  then
                                         transition.to(spawnTable[i], {time = 300, alpha = 0})
                                     end
+
+
+                                    print("reverse motion for death effect")
                                     if spawnTable[i].isTopLeft == true or spawnTable[i].isBottomLeft == true then
                                         temp = spawnTable[i].x
                                         if state == 1 or state == 3 then
@@ -1295,14 +1349,16 @@ local function boundaryCheck(e)
                                             transition.to(spawnTable[i], {time = 2000, x = temp + 90})
                                         end
                                     end
-                                end
-                                if state ~= 3 and spawnTable[i] ~= 0 then
-                                    if spawnTable[i].isGrown == false then
-                                        spawnTable[i]:removeSelf()
-                                        spawnTable[i] = 0
+                                    if state ~= 3 and spawnTable[i] ~= 0 then
+                                        if spawnTable[i].isGrown == false then
+                                            spawnTable[i]:removeSelf()
+                                            spawnTable[i] = 0
+                                        end
                                     end
                                 end
                             end
+
+                            print("calling boundaryElimination")
                             timer.performWithDelay(2000, boundaryElimination, 1)
                             return --SAM: why?
                         elseif debugOptions.god then
@@ -1862,12 +1918,70 @@ setCountryParameters = function(restartCountry)
         sideTimer = timer.performWithDelay(gameMechanics.transitionToCountryDuration, finishScale, 1)
         -- SAM: IMPORTANT, rename paceTimer to something more serious
         paceTimer = timer.performWithDelay(10, delayPace, 1)
-        mapTimer = transition.to( mapGroup, { time=gameMechanics.transitionToCountryDuration, x=xCoord, y=yCoord, xScale=1*zoomMultiplier, yScale=1*zoomMultiplier})
+
+        local sineEvent = function( event )
+            -- math to use sinusoid curve
+            distanceFromCamera.x = distanceFromCamera.x + 1
+            local y = distanceFromCamera.y  + math.sin(distanceFromCamera.x / distanceFromCamera.enemySpeed) * distanceFromCamera.amplitude
+            distanceFromCamera.pseudoTargetX = distanceFromCamera.x
+            -- OR
+            distanceFromCamera.pseudoTargetX = 0
+            distanceFromCamera.pseudoTargetY = y
+            print(y)
+        end
+        -- Runtime:addEventListener( "enterFrame", sineEvent )
+
+        local cameraEvent = function( event )
+
+            local previousXCoord = xCoord
+            local previousYCoord = yCoord
+
+            zoomMultiplier = .3
+            xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
+            yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
+
+            local transXCoord = previousXCoord - (previousXCoord-xCoord)/2
+            local transYCoord = previousYCoord - (previousYCoord-yCoord)/2
+
+            local xCoord2=(_W/2)-((country.coords.x/2)*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
+            local yCoord2=(_H/2)-((country.coords.y/2)*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
+
+            local transXCoord2 = previousXCoord - (previousXCoord-xCoord)
+            local transYCoord2 = previousYCoord - (previousYCoord-yCoord)
+
+            -- for reference
+            -- mapGroup.x=xCoord
+            -- mapGroup.y=yCoord
+            -- mapGroup.xScale=1*zoomMultiplier
+            -- mapGroup.yScale=1*zoomMultiplier
+
+            mapTimer = transition.to( mapGroup, { transition=easing.inCirc,
+                time=gameMechanics.transitionToCountryDuration/2,
+                x=transXCoord,
+                y=transYCoord,
+                xScale=1*zoomMultiplier,
+                yScale=1*zoomMultiplier,
+                onComplete=function(event)
+                    zoomMultiplier = .3
+                    mapTimer = transition.to(mapGroup, { transition=easing.inCirc,
+                        time=gameMechanics.transitionToCountryDuration/2,
+                        x=xCoord,
+                        y=yCoord,
+                        xScale=1*zoomMultiplier,
+                        yScale=1*zoomMultiplier
+                    })
+
+                end})
+        end
+        cameraEvent()
+
+        -- old style. Currently working on function to handle transitions to zoom in and out!
+        -- mapTimer = transition.to( mapGroup, { time=gameMechanics.transitionToCountryDuration, x=xCoord, y=yCoord, xScale=1*zoomMultiplier, yScale=1*zoomMultiplier})
     else
         paceTimer = timer.performWithDelay(10, delayPace, 1)
     end
 
-    -- delete
+    -- SAM: delete
     --[[
     if infoMode == true then
         infoPic = display.newImage(info, 165, 77)
@@ -2027,15 +2141,15 @@ newCountry = function()
     -- sends newCircle() to back, behind country
     -- fxGroup:toBack()
 
+    -- SAM: DELETE? i think i already have this all figured out. now in a new location
     -- (2031/2) - 958 - (?/2)
     -- (851/2) - 225 - (?/2)
     -- xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
     -- yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
     -- (2031/2) - (958*1.5) - ((?*1.5)/2)
     -- (851/2) - (225*1.5) - ((?*1.5)/2)
-    xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
-    yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
-
+    -- xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
+    -- yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
     -- print("xCoord:", xCoord, "yCoord:", yCoord)
 
     if(countriesCompleted == 0) then
@@ -2112,10 +2226,12 @@ newCountry = function()
         audio.stop(bobby)
     end
 
+
     music = audio.loadStream("anthems/" .. country.name .. ".mp3")
-    bobby = audio.play(music, {loops=-1, onComplete=function(event)
+    bobby = audio.play(music, {channel = 1, loops=-1, onComplete=function(event)
         print("finished streaming ANTHEM on channel ", event.channel)
     end})
+    audio.setVolume( .2, { channel = 1 } )
 end
 
 local function killBars()
@@ -2508,9 +2624,15 @@ end
 
 function objTouch(self, e)
     if e.phase == "began" and e.target.isPaletteActive == true then
--- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isTopLeft)
+    -- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isTopLeft)
+
+        local playPaletteDeathR = audio.play( SFXPaletteHit, { onComplete=function(event)
+            print(event.channel)
+        end })
 
         if lookupCode(code, e.target) == 0 then   --You are Dead --color does not match
+            -- HOOKSOUND
+            -- local pHit = audio.play( SFXPaletteHit )
 
             -- SAM: bonusText activity
             if bonusText ~= nil then
@@ -2531,13 +2653,10 @@ function objTouch(self, e)
 						-- spawnTable[i]:removeEventListener("enterFrame", moveObject)
                     end
                     if spawnTable[i] ~= 0 and spawnTable[i] ~= e.target then
-
                         spawnTable[i]:removeEventListener("touch", objTouch)
-                        -- HookSound
                         transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
                     end
                 end
-                -- HookSound
                 transition.to(e.target, {time = 700, rotation = 400, x = _W / 2, y = _H / 2, xScale = 8, yScale = 8, onComplete = endGame })
                 numDeaths = 1
                 Runtime:removeEventListener("enterFrame", boundaryCheck)
@@ -2547,15 +2666,15 @@ function objTouch(self, e)
             end
             if e.target.isGrown == false then --if canceled
                 transition.cancel(self)
-                -- HookSound
                 transition.to(e.target, {time = 500, rotation = 400, xScale = 5, yScale = 5, onComplete = removePalette })
             else --not cancelled
-                -- HookSound
                 transition.to(e.target, {time = 500, rotation = 400, xScale = 5, yScale = 5, onComplete = removePalette })
             end
             e.target.isPaletteActive = false
 			--You are Alive
         else
+            -- HOOKSOUND
+            -- local pHit = audio.play( SFXPaletteHit )
             e.target.isPaletteActive = false
             if e.target.isGrown == false then
                 e.target:removeSelf()
