@@ -1,4 +1,4 @@
- -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
+-- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html
 local CFText = require("cf_text")
 local composer = require("composer")
@@ -14,12 +14,10 @@ audioReservedChannel2 = nil
 local music
 local bobby
 
-print(CFGameSFX:getItemByID("id"))
-
 -- SAM: SFXShortL to sfxShortL
 local SFXShortL = audio.loadSound( "sfx/shortL.wav" )
 local SFXShortR = audio.loadSound( "sfx/shortR.wav" )
-local SFXPaletteHit = audio.loadSound( "sfx/puff-attempt-mono.wav" )
+local SFXPaletteHit = audio.loadSound( "sfx/puff-attempt.wav" )
 local offsetPaletteDeathSFX = 20
 local paletteDeathsInCluster = 0
 
@@ -48,7 +46,7 @@ debugOptions.constantSpeed = true
 debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
 debugOptions.brazilToCanada = false -- make this into array with a variety of sets - changing between 2 or more countries in sequence
-debugOptions.adherenceToFlagColors = true
+debugOptions.adherenceToFlagColors = false
 
 local gameMechanics = {}
 gameMechanics.playCountryDuration = 20000
@@ -58,7 +56,7 @@ gameMechanics.countriesSpawned = 0
 gameMechanics.overrideFlag = false
 gameMechanics.heightModeTop = 35
 gameMechanics.heightModeLow = _H - 35
-
+gameMechanics.mode = 1
 -- FPS
 if fps == 30 then
     gameMechanics.paletteSpawnDelay = 85
@@ -71,10 +69,6 @@ end
 -- infoMode=true
 
 local lightningCount = 1
--- rename state to mode
-local state = 1
-local stateFour = 0
-local stateFourGrow = 0
 
 local score = 0
 local numDeaths = 0
@@ -92,7 +86,7 @@ local code
 
 -- MIKE: get rid of all the info related stuff for now. Bring back in CF 2.0
 local info
-local infoMode = false
+local infoMode = true
 local infoTimer
 local spawnTable = {}   --Create a table to hold our spawns
 local lineTable = {} --Table for deleting lighning lines
@@ -161,13 +155,13 @@ local map
 local mapGroup
 local waterGroup
 local newGroup
-local zoomMultiplier = .3
+local zoomMultiplier = .1
 
-local zoomLevel = {}
-zoomLevel.pseudoTargetX = 0
-zoomLevel.pseudoTargetY = 0
-zoomLevel.x1 = 0
-zoomLevel.y1 = 0
+local jitterCameraPosition = {}
+jitterCameraPosition.pseudoTargetX = 0
+jitterCameraPosition.pseudoTargetY = 0
+jitterCameraPosition.x1 = 0
+jitterCameraPosition.y1 = 0
 
 local distanceFromCamera = {}
 distanceFromCamera.pseudoTargetX = 0
@@ -308,7 +302,6 @@ local nationalFlagsSeq = {
     {name = "unitedstates", sheet = nationalFlags3Sheet, frames = {7}}
 }
 
-
 -- REMOVE
 local topBtmBarSpriteCoords = require("lua-sheets.TopBtmBar")
 local topBtmBarSheet = graphics.newImageSheet("images/TopBtmBar.png", topBtmBarSpriteCoords:getSheet())
@@ -412,21 +405,21 @@ onOptionsTap = function(event)
     elseif optionName == "modeDecrease" or optionName == "modeIncrease" then
         if flag ~= nil and debugOptions.cycleModes == false then
             if optionName == "modeDecrease" then
-                if state > 1 then
-                    state = state - 1
+                if gameMechanics.mode > 1 then
+                    gameMechanics.mode = gameMechanics.mode - 1
                 else
-                    state = 3
+                    gameMechanics.mode = 3
                 end
             elseif optionName == "modeIncrease" then
-                if state < 3 then
-                    state = state + 1
+                if gameMechanics.mode < 3 then
+                    gameMechanics.mode = gameMechanics.mode + 1
                 else
-                    state = 1
+                    gameMechanics.mode = 1
                 end
             end
-            -- print("state set in onOptionsTap(): " .. state)
-            -- SAM: rename state to mode
-            modeText.text = state
+            -- print("gameMechanics.mode set in onOptionsTap(): " .. gameMechanics.mode)
+            -- SAM: rename gameMechanics.mode to mode
+            modeText.text = gameMechanics.mode
 
             timer.cancel(setFlagTimer)
             setFlag()
@@ -770,25 +763,27 @@ local function setupVariables()
     lightningIcon4.alpha = .2
     lightningIcon5.alpha = .2
 
-    zoomLevel.target = display.newCircle(_W/2, _H/2, 20)
-    zoomLevel.target:setFillColor(0.5)
-    zoomLevel.target.anchorX = .5
-    zoomLevel.target.anchorY = .5
-    zoomLevel.x0 = 0
-    zoomLevel.y0 = zoomLevel.target.y
-    zoomLevel.enemySpeed = 15
-    zoomLevel.amplitude = 2
+    --[[
+    -- jitterCameraPosition to add/enhance position derived from distanceFromCamera
+    jitterCameraPosition.target = display.newCircle(_W/2, _H/2, 20)
+    jitterCameraPosition.target:setFillColor(0)
+    jitterCameraPosition.target.anchorX = .5
+    jitterCameraPosition.target.anchorY = .5
+    jitterCameraPosition.x0 = 0
+    jitterCameraPosition.y0 = jitterCameraPosition.target.y
+    jitterCameraPosition.enemySpeed = 15
+    jitterCameraPosition.amplitude = 2
 
-    local zoomEvent = function( event )
-        zoomLevel.x0 = zoomLevel.x0 + 1
-        local y = zoomLevel.y0 + math.sin(zoomLevel.x0 / zoomLevel.enemySpeed) * zoomLevel.amplitude
-        zoomLevel.target.x = zoomLevel.x0
+    local jitterEvent = function( event )
+        jitterCameraPosition.x0 = jitterCameraPosition.x0 + 1
+        local y = jitterCameraPosition.y0 + math.sin(jitterCameraPosition.x0 / jitterCameraPosition.enemySpeed) * jitterCameraPosition.amplitude
+        jitterCameraPosition.target.x = jitterCameraPosition.x0
         -- OR
-        zoomLevel.target.x = 0
-        zoomLevel.target.y = y
+        jitterCameraPosition.target.x = 0
+        jitterCameraPosition.target.y = y
     end
-    Runtime:addEventListener( "enterFrame", zoomEvent )
-
+    Runtime:addEventListener( "enterFrame", jitterEvent )
+    ]]--
 end
 
 function adjustWidthsAfterResize( event )
@@ -1070,7 +1065,7 @@ resetSpawnTable = function()
     count = 1
     -- same as countriesCompleted counted?
     firstObject = true
-    currentColor = nil    --reset bonus score states for new flag
+    currentColor = nil    --reset bonus score gameMechanics.modes for new flag
     previousColor = nil
 
     -- SAM: bonusText activity
@@ -1080,16 +1075,16 @@ resetSpawnTable = function()
     end
 
     if debugOptions.cycleModes == true then
-    	--decide what state is next
-        if state == 1 then
-            state = 2
+    	--decide what gameMechanics.mode is next
+        if gameMechanics.mode == 1 then
+            gameMechanics.mode = 2
             --speedTableIndex = speedTableIndex + 1
-        elseif state == 2 then
-            state = 3
+        elseif gameMechanics.mode == 2 then
+            gameMechanics.mode = 3
             --speedTableIndex = speedTableIndex / 2 - 1
             --speedTableIndex = math.round(speedTableIndex)
-        elseif state == 3 then
-            state = 1
+        elseif gameMechanics.mode == 3 then
+            gameMechanics.mode = 1
             --speedTableIndex = (speedTableIndex) * 2
         end
     end
@@ -1222,7 +1217,7 @@ local function boundaryElimination(e)
 			--Pallets player lost with.  Fling them at the screen
         elseif spawnTable[i] ~= 0 and spawnTable[i].dead == true  then
 
-            if state == 3 then
+            if gameMechanics.mode == 3 then
 
                 transition.to(spawnTable[i], {time = 900, rotation = 400, x = _W / 2, y = _H / 2, xScale = 6, yScale = 6, onComplete = endGame })
             else
@@ -1286,7 +1281,7 @@ local function boundaryCheck(e)
                                     spawnTable[i]:removeEventListener("touch", objTouch)
 									--Check for gameover palettes
                                     if spawnTable[i].x < - 40 or spawnTable[i].x > _W + 40 then
-                                        if state == 1 then
+                                        if gameMechanics.mode == 1 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
 
                                                 if spawnTable[i].corner == "TopRight" then
@@ -1328,7 +1323,7 @@ local function boundaryCheck(e)
                                     end
 
                                     print("effects for palettes within bounds")
-                                    if state == 3 and spawnTable[i].dead ~= true  then
+                                    if gameMechanics.mode == 3 and spawnTable[i].dead ~= true  then
                                         transition.to(spawnTable[i], {time = 300, alpha = 0})
                                     end
 
@@ -1336,20 +1331,20 @@ local function boundaryCheck(e)
                                     print("reverse motion for death effect")
                                     if spawnTable[i].isTopLeft == true or spawnTable[i].isBottomLeft == true then
                                         temp = spawnTable[i].x
-                                        if state == 1 or state == 3 then
+                                        if gameMechanics.mode == 1 or gameMechanics.mode == 3 then
                                             transition.to(spawnTable[i], {time = 2000, x = temp + 90})
-                                        elseif state == 2 then
+                                        elseif gameMechanics.mode == 2 then
                                             transition.to(spawnTable[i], {time = 2000, x = temp - 90})
                                         end
                                     else
                                         temp = spawnTable[i].x
-                                        if state == 1 or state == 3 then
+                                        if gameMechanics.mode == 1 or gameMechanics.mode == 3 then
                                             transition.to(spawnTable[i], {time = 2000, x = temp - 90})
-                                        elseif state == 2 then
+                                        elseif gameMechanics.mode == 2 then
                                             transition.to(spawnTable[i], {time = 2000, x = temp + 90})
                                         end
                                     end
-                                    if state ~= 3 and spawnTable[i] ~= 0 then
+                                    if gameMechanics.mode ~= 3 and spawnTable[i] ~= 0 then
                                         if spawnTable[i].isGrown == false then
                                             spawnTable[i]:removeSelf()
                                             spawnTable[i] = 0
@@ -1365,7 +1360,7 @@ local function boundaryCheck(e)
                             for i = 1, #spawnTable do
                                 if spawnTable[i] ~= 0 then
                                     if spawnTable[i].x < -40 or spawnTable[i].x > _W + 40 then
-                                        if state == 1 then
+                                        if gameMechanics.mode == 1 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
                                                 if spawnTable[i].corner == "TopRight" then
                                                     -- print("FUCKING CUNT")
@@ -1402,7 +1397,7 @@ local function boundaryCheck(e)
                                                 spawnTable[i]:removeSelf()
                                                 spawnTable[i] = 0
                                             end
-                                        elseif state == 2 then
+                                        elseif gameMechanics.mode == 2 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
                                                 if spawnTable[i].corner == "TopLeft" then
                                                     transition.to( deathScenario2Array[2], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[2], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
@@ -1438,7 +1433,7 @@ local function boundaryCheck(e)
                                                 spawnTable[i]:removeSelf()
                                                 spawnTable[i] = 0
                                             end
-                                        elseif state == 3 then
+                                        elseif gameMechanics.mode == 3 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
                                                 if spawnTable[i].corner == "TopLeft" then
                                                     transition.to( deathScenario2Array[1], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[1], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
@@ -1495,7 +1490,7 @@ local function spawnPalette(params)
     object.type = params.type
 
 	-- print("created" .. object.myName)
-    if state == 1 then
+    if gameMechanics.mode == 1 then
         if object.corner == "TopRight" then
             object.x = game_W - 40
             object.y = gameMechanics.heightModeTop
@@ -1503,7 +1498,7 @@ local function spawnPalette(params)
             object.x = 40
             object.y = gameMechanics.heightModeLow
         end
-    elseif state == 2 then
+    elseif gameMechanics.mode == 2 then
         if object.corner == "TopLeft" then
             object.x = 40
             object.y = gameMechanics.heightModeTop
@@ -1511,7 +1506,7 @@ local function spawnPalette(params)
             object.x = game_W - 40
             object.y = gameMechanics.heightModeLow
         end
-    elseif state == 3 then
+    elseif gameMechanics.mode == 3 then
         if object.corner == "TopRight" then
             object.x = _W / 2 + 40
             object.y = gameMechanics.heightModeTop
@@ -1569,7 +1564,7 @@ local function spawnPalette(params)
     object:scale(0, 0)
 
 	--new pallets are being scaled to full size as they appear
-    if state == 1 or state == 2 then
+    if gameMechanics.mode == 1 or gameMechanics.mode == 2 then
         if object.index == 1 or object.index == 2 then
             transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
         else
@@ -1578,7 +1573,7 @@ local function spawnPalette(params)
                 spawnTable[object.index - 2]:toFront()
             end
         end
-    elseif state == 3 then
+    elseif gameMechanics.mode == 3 then
         if object.index == 1 or object.index == 2 or object.index == 3 or object.index == 4 then
             transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
         else
@@ -1909,9 +1904,9 @@ setCountryParameters = function(restartCountry)
     end
 
 
-    -- SAM: rename state to mode
-    -- print("state set in setCountryParameters(): ", state)
-    modeText.text = state
+    -- SAM: rename gameMechanics.mode to mode
+    -- print("gameMechanics.mode set in setCountryParameters(): ", gameMechanics.mode)
+    modeText.text = gameMechanics.mode
 
     if restartCountry == nil then
         newCountry()
@@ -1919,6 +1914,7 @@ setCountryParameters = function(restartCountry)
         -- SAM: IMPORTANT, rename paceTimer to something more serious
         paceTimer = timer.performWithDelay(10, delayPace, 1)
 
+        -- SAM: Experimentation, in process
         local sineEvent = function( event )
             -- math to use sinusoid curve
             distanceFromCamera.x = distanceFromCamera.x + 1
@@ -1936,13 +1932,14 @@ setCountryParameters = function(restartCountry)
             local previousXCoord = xCoord
             local previousYCoord = yCoord
 
-            zoomMultiplier = .3
+            zoomMultiplier = .1
             xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
             yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
 
             local transXCoord = previousXCoord - (previousXCoord-xCoord)/2
             local transYCoord = previousYCoord - (previousYCoord-yCoord)/2
 
+            -- SAM: try these
             local xCoord2=(_W/2)-((country.coords.x/2)*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
             local yCoord2=(_H/2)-((country.coords.y/2)*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
 
@@ -1962,7 +1959,7 @@ setCountryParameters = function(restartCountry)
                 xScale=1*zoomMultiplier,
                 yScale=1*zoomMultiplier,
                 onComplete=function(event)
-                    zoomMultiplier = .3
+                    zoomMultiplier = .1
                     mapTimer = transition.to(mapGroup, { transition=easing.inCirc,
                         time=gameMechanics.transitionToCountryDuration/2,
                         x=xCoord,
@@ -1980,25 +1977,6 @@ setCountryParameters = function(restartCountry)
     else
         paceTimer = timer.performWithDelay(10, delayPace, 1)
     end
-
-    -- SAM: delete
-    --[[
-    if infoMode == true then
-        infoPic = display.newImage(info, 165, 77)
-        infoPic.x = _W / 6
-        infoPic.y = _H / 2
-        infoPic.alpha = 0
-        timer.performWithDelay(2000, infoAppear, 1)
-    end
-
-    countryText = display.newText(country, _W / 2, _H / 2, native.systemFont, 50)
-    countryText.anchorX = 0.5
-    countryText.anchorY = 0.5
-    countryText:setFillColor(0, 0, 0)
-    countryText:toFront()
-    timer.performWithDelay(2000, countryTextScale, 1)
-    ]]--
-
 end
 
 -- READYOBJ: newCountry
@@ -2226,12 +2204,11 @@ newCountry = function()
         audio.stop(bobby)
     end
 
-
-    music = audio.loadStream("anthems/" .. country.name .. ".mp3")
+    music = audio.loadStream("anthems/" .. country.name .. ".wav")
     bobby = audio.play(music, {channel = 1, loops=-1, onComplete=function(event)
         print("finished streaming ANTHEM on channel ", event.channel)
     end})
-    audio.setVolume( .2, { channel = 1 } )
+    audio.setVolume( .9, { channel = 1 } )
 end
 
 local function killBars()
@@ -2302,7 +2279,7 @@ end
 local function createPalette()
     -- local spawns
 
-    if state == 1 then
+    if gameMechanics.mode == 1 then
         if debugOptions.adherenceToFlagColors == true then
             local colorKey = {}
             for i = 1, 2 do
@@ -2351,7 +2328,7 @@ local function createPalette()
                 spawnPalette({objTable = spawnTable, type = "blue", corner = "BottomLeft"})
             end
         end
-    elseif state == 2 then
+    elseif gameMechanics.mode == 2 then
         if debugOptions.adherenceToFlagColors == true then
             local colorKey = {}
             for i = 1, 2 do
@@ -2400,7 +2377,7 @@ local function createPalette()
                 spawns = spawnPalette({objTable = spawnTable, type = "blue", corner = "BottomRight"})
             end
         end
-    elseif state == 3 then
+    elseif gameMechanics.mode == 3 then
         for i = 1, 4 do
             if debugOptions.adherenceToFlagColors == true then
                 local colorKey
@@ -2452,7 +2429,7 @@ moveObject = function(e)
     end
 
     -- PALETTES: movement and direction of color palettes
-    if state == 1 then
+    if gameMechanics.mode == 1 then
         if #spawnTable > 0 then
             for i = 1, #spawnTable do
 				--isGrown means is palette full size
@@ -2465,7 +2442,7 @@ moveObject = function(e)
                 end
             end
         end
-    elseif state == 2 then
+    elseif gameMechanics.mode == 2 then
         if #spawnTable > 0 then
             for i = 1, #spawnTable do
                 if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
@@ -2477,7 +2454,7 @@ moveObject = function(e)
                 end
             end
         end
-    elseif state == 3 then
+    elseif gameMechanics.mode == 3 then
         if #spawnTable > 0 then
             for i = 1, #spawnTable do
                 if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
@@ -2575,7 +2552,7 @@ readyObject = function(firstCountry)
             if firstObject == true then
                 firstObject = false
             elseif firstObject == false then
-                if state == 1 or state == 2 then
+                if gameMechanics.mode == 1 or gameMechanics.mode == 2 then
                     if spawnTable[count] ~= 0 then
 						--isGrown means colorPalletes are full size scale=1
                         spawnTable[count].isGrown = true
@@ -2584,7 +2561,7 @@ readyObject = function(firstCountry)
                         spawnTable[count + 1].isGrown = true
                     end
                     count = count + 2
-                elseif state == 3 then --SAM: this should be state == 3
+                elseif gameMechanics.mode == 3 then --SAM: this should be gameMechanics.mode == 3
                     if spawnTable[count] ~= 0 then
                         spawnTable[count].isGrown = true
                     end

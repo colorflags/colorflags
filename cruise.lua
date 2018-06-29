@@ -972,7 +972,7 @@ newCountry = function()
         audio.stop(bobby)
     end
 
-    music = audio.loadStream("anthems/" .. country.name .. ".mp3")
+    music = audio.loadStream("anthems/" .. country.name .. ".wav")
     bobby = audio.play(music, {loops=-1, onComplete=function(event)
         print("finished streaming ANTHEM on channel ", event.channel)
     end})
