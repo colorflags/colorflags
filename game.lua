@@ -46,7 +46,7 @@ debugOptions.constantSpeed = true
 debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
 debugOptions.brazilToCanada = false -- make this into array with a variety of sets - changing between 2 or more countries in sequence
-debugOptions.adherenceToFlagColors = false
+debugOptions.adherenceToFlagColors = true
 
 local gameMechanics = {}
 gameMechanics.playCountryDuration = 20000
@@ -326,12 +326,39 @@ local bonusImplodeSeq = {
     {name = "7x", sheet = bonusImplodeSheet1, frames = {19, 20, 21, 22, 23, 24}, time = 800, loopCount = 1},
     {name = "8x", sheet = bonusImplodeSheet1, frames = {25, 26, 27, 28, 29, 30}, time = 800, loopCount = 1},
     {name = "9x", sheet = bonusImplodeSheet2, frames = {13, 14, 15, 16, 17, 18}, time = 800, loopCount = 1},
-
 }
 
-local bonusShatterBool = false
-local bonusImplode = display.newSprite(bonusImplodeSheet1, bonusImplodeSeq)
+-- SAM: how about no multipack! There are only going to be 4 or 5 more image files anyway. This will make configuring the animation sequence easier
+
+-- SAM: char1, char2, charPlus
+
+local bonusScatter = {}
+bonusScatter.spriteCoords1 = require("lua-sheets.bonus-scatter1")
+bonusScatter.sheet1 = graphics.newImageSheet("images/bonus-scatter1.png", bonusScatter.spriteCoords1:getSheet())
+
+bonusScatter.sequence = {
+    {
+        name = "1",
+        sheet = bonusScatter.sheet1,
+        frames = {5, 5, 5, 5, 6, 7, 8, 9, 10, 11, 2, 3, 4},
+        -- ???
+        -- transition = easing.inCubic,
+        time = 800,
+        loopCount = 1},
+}
+
+-- SAM: put in new bonusShatter array
+local bonusShatterBool = true
+local bonusImplode = display.newSprite(bonusScatter.sheet1, bonusScatter.sequence)
+bonusImplode:scale(.5, .5)
 bonusImplode.alpha = 0 --start with 0
+
+local function spriteListener( event )
+    -- print( "Sprite event: ", event.target.sequence, event.target.frame, event.phase )
+end
+
+-- Add sprite listener (assumes "mySprite" is a valid sprite object)
+bonusImplode:addEventListener( "sprite", spriteListener )
 
 local lightningIconsCoords = require("lua-sheets.new-lightning-icons")
 local lightningIconsSheet = graphics.newImageSheet("images/new-lightning-icons.png", lightningIconsCoords:getSheet())
@@ -1729,27 +1756,12 @@ function lightningStrike(self)
         end})
 
         -- SAM: disable bonusImplode for now...
-        --[[
         if motion ~= nil then
             timer.cancel(motion)
             motion = nil
         end
-        if spread == 2 then
-            bonusImplode:setSequence("2x")
-        elseif spread == 3 then
-            bonusImplode:setSequence("3x")
-        elseif spread == 4 then
-            bonusImplode:setSequence("4x")
-        elseif spread == 5 then
-            bonusImplode:setSequence("5x")
-        elseif spread == 6 then
-            bonusImplode:setSequence("6x")
-        elseif spread == 7 then
-            bonusImplode:setSequence("7x")
-        elseif spread == 8 then
-            bonusImplode:setSequence("8x")
-        elseif spread == 9 then
-            bonusImplode:setSequence("9x")
+        if spread then
+            bonusImplode:setSequence("1")
         end
         bonusImplode.alpha = 1
         bonusImplode:toFront()
@@ -1757,7 +1769,6 @@ function lightningStrike(self)
         bonusImplode.x = _W * (4 / 5)
         bonusImplode.y = _H / 2
         motion = timer.performWithDelay(800, cancelTimerBonusImplode, 1)
-        ]]--
     else
         spread = 1
         currentColor = nil

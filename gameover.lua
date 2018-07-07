@@ -42,6 +42,9 @@ local menuNiceTry
 local menuAgain
 local menuShare
 local menuQuit
+
+local randomFlagSequenceArray = {}
+
 local randomFlag1
 local randomFlag2
 local randomFlag3
@@ -68,13 +71,12 @@ local isLoading = false
 local touchInsideBtn = false
 local isBtnAnim = false
 
-local flagHeights = {24, 75, 109}
 -- for randomFlags1-8
 -- local flagX = {20, 98, 69, 500, 525, 100, 480, 534}
 
 -- SAM: make into a nicer function. break up this array into 2 arrays each containing 3 random flags Big, Med, Big. improve the randomFlag naming scheme
-local flagXPoleSpacing = math.random(42,119)
-local flagXPoleSpacingMiddleOffset = function()
+local flagPoleSpacingSpacing = math.random(42,119)
+local flagPoleSpacingSpacingMiddleOffset = function()
     local offset = math.random(20)
     if math.random() > .5 then
         offset = -offset
@@ -84,8 +86,8 @@ end
 
 local flagX = {
     (_W/4),
-    (_W/4) + (flagXPoleSpacing/2) + flagXPoleSpacingMiddleOffset(),
-    (_W/4) + flagXPoleSpacing,
+    (_W/4) + (flagPoleSpacingSpacing/2) + flagPoleSpacingSpacingMiddleOffset(),
+    (_W/4) + flagPoleSpacingSpacing,
     (_W/4)*3,
     (_W/4)*3 + 50,
     (_W/4)*3 + 100,
@@ -94,8 +96,8 @@ local flagX = {
 
  local function makeFlagXArray(start)
     local offsetArray = {}
-    local flagXPoleSpacing = math.random(82,110)
-    local flagXPoleSpacingMiddleOffset = function()
+    local flagPoleSpacingSpacing = math.random(82,110)
+    local flagPoleSpacingSpacingMiddleOffset = function()
         local offset = math.random(20)
         if math.random() > .5 then
             offset = -offset
@@ -104,9 +106,9 @@ local flagX = {
     end
 
     offsetArray = {
-        start - (flagXPoleSpacing/2),
-        start + flagXPoleSpacingMiddleOffset(),
-        start + (flagXPoleSpacing/2)
+        start - (flagPoleSpacingSpacing/2),
+        start + flagPoleSpacingSpacingMiddleOffset(),
+        start + (flagPoleSpacingSpacing/2)
     }
 
     return offsetArray
@@ -117,8 +119,8 @@ local flagSet2HorizontalPositions = makeFlagXArray((_W-(_W/4) + 44))
 
 -- local flagSet1X = function()
 --     local offsetArray = {}
---     local flagXPoleSpacing = math.random(42,119)
---     local flagXPoleSpacingMiddleOffset = function()
+--     local flagPoleSpacingSpacing = math.random(42,119)
+--     local flagPoleSpacingSpacingMiddleOffset = function()
 --         local offset = math.random(20)
 --         if math.random() > .5 then
 --             offset = -offset
@@ -128,8 +130,8 @@ local flagSet2HorizontalPositions = makeFlagXArray((_W-(_W/4) + 44))
 --
 --     offsetArray = {
 --         (_W/4),
---         (_W/4) + (flagXPoleSpacing/2) + flagXPoleSpacingMiddleOffset(),
---         (_W/4) + flagXPoleSpacing
+--         (_W/4) + (flagPoleSpacingSpacing/2) + flagPoleSpacingSpacingMiddleOffset(),
+--         (_W/4) + flagPoleSpacingSpacing
 --     }
 --
 --     return offsetArray
@@ -272,7 +274,60 @@ local flagWave34Sheet = graphics.newImageSheet( "images/flagwave34.png", flagWav
 
 function selectRandomFlags()
 
-    local worldFlags = {1, 7, 13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79, 85, 91, 97, 103, 109, 115, 121, 127, 133, 139, 145, 151, 157, 163, 169, 175, 181, 187, 193, 199, 205, 211, 217, 223, 229, 235, 241, 247, 253, 259, 265, 271, 277, 283, 289, 313, 319, 325}
+    local worldFlags = {
+        1,
+        7,
+        13,
+        19,
+        25,
+        31,
+        37,
+        43,
+        49,
+        55,
+        61,
+        67,
+        73,
+        79,
+        85,
+        91,
+        97,
+        103,
+        109,
+        115,
+        121,
+        127,
+        133,
+        139,
+        145,
+        151,
+        157,
+        163,
+        169,
+        175,
+        181,
+        187,
+        193,
+        199,
+        205,
+        211,
+        217,
+        223,
+        229,
+        235,
+        241,
+        247,
+        253,
+        259,
+        265,
+        271,
+        277,
+        283,
+        289,
+        313,
+        319,
+        325
+    }
 
     local function shuffle(t)
         local iterations = #t
@@ -285,92 +340,101 @@ function selectRandomFlags()
     end
     shuffle(worldFlags)
 
-    for i=1, 8 do
+    for i=1, 6 do
         local randomFlagSeq={
             {name="randomflagseq1",frames={worldFlags[i],(worldFlags[i]+1),(worldFlags[i]+2),(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4),(worldFlags[i]+3), (worldFlags[i]+2), (worldFlags[i]+1)},time=860},
-
-            {name="andorra-test",frames={1,2,3,4,5,6},time=860},
-
             {name="randomflagseq2",frames={worldFlags[i]+3,(worldFlags[i]+2),(worldFlags[i]+1),(worldFlags[i]+2),(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4)},time=1021},
             {name="randomflagseq3",frames={worldFlags[i]+4,(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4),(worldFlags[i]+3),(worldFlags[i]+2),(worldFlags[i]+1)},time=820 },
             {name="randomflagseq4",frames={worldFlags[i]+5,(worldFlags[i]+4),(worldFlags[i]+3),(worldFlags[i]+2),(worldFlags[i]+1),(worldFlags[i]),(worldFlags[i]+1),(worldFlags[i]+2)},time=902},
             {name="randomflagseq5",frames={worldFlags[i]+2,(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4),(worldFlags[i]+3),(worldFlags[i]+2),(worldFlags[i]+1)},time=896}
         }
-
-
-    -- ["Flag_of_Ireland1"] = 127,
-    -- ["Flag_of_Ireland2"] = 128,
-    -- ["Flag_of_Ireland3"] = 129,
-    -- ["Flag_of_Ireland4"] = 130,
-    -- ["Flag_of_Ireland5"] = 131,
-    -- ["Flag_of_Ireland6"] = 132,
-
-        if i==1 then
-            -- Big Flag
-            randomFlag1=display.newSprite(flagWave40Sheet,randomFlagSeq)
-            randomFlag1.x=flagSet1HorizontalPositions[1]+21 -- SAM: +21 refers to flagwave sprite width
-            randomFlag1.y= (_H - killScreen.height) - flagHeights[3]
-            randomFlag1:setSequence("randomflagseq1")
-            randomFlag1:setFrame( math.random(1,5) )
-
-            randomFlag1:play()
+        randomFlagSequenceArray[i] = {
+            {
+                name="randomflagseq1",
+                frames={
+                    worldFlags[i],
+                    worldFlags[i]+1,
+                    worldFlags[i]+2,
+                    worldFlags[i]+3,
+                    worldFlags[i]+4,
+                    worldFlags[i]+5,
+                    worldFlags[i]+4,
+                    worldFlags[i]+3,
+                    worldFlags[i]+2,
+                    worldFlags[i]+1
+                },
+                time=860
+            }
+        }
+        --[[
+        local flagFrames = ""
+        for k,v in pairs(randomFlagSequenceArray[i][1].frames) do
+            flagFrames = flagFrames .. v .. ", "
         end
-        if i==2 then
-            -- Med Flag
-            randomFlag2=display.newSprite(flagWave34Sheet,randomFlagSeq)
-            randomFlag2.x=flagSet1HorizontalPositions[2]+18
-            randomFlag2.y= (_H - killScreen.height) - flagHeights[2]
-            randomFlag2:setSequence("randomflagseq1")
-            randomFlag2:setFrame( math.random(1,2) )
-            randomFlag2:toBack()
-            randomFlag2.alpha=0.65
-
-            randomFlag2:play()
-        end
-        if i==3 then
-            -- Big Flag
-            randomFlag3=display.newSprite(flagWave40Sheet,randomFlagSeq)
-            randomFlag3.x=flagSet1HorizontalPositions[3]+21
-            randomFlag3.y= (_H - killScreen.height) - flagHeights[3]
-            randomFlag3:setSequence("randomflagseq1")
-            randomFlag3:setFrame( math.random(1,2) )
-
-            randomFlag3:play()
-        end
-        if i==4 then
-            -- Big Flag
-            randomFlag4=display.newSprite(flagWave40Sheet,randomFlagSeq)
-            randomFlag4.x=flagSet2HorizontalPositions[1]+21
-            randomFlag4.y= (_H - killScreen.height) - flagHeights[3]
-            randomFlag4:setSequence("randomflagseq1")
-            randomFlag4:setFrame( math.random(1,5) )
-
-            randomFlag4:play()
-        end
-        if i==5 then
-            -- Med Flag
-            randomFlag5=display.newSprite(flagWave34Sheet,randomFlagSeq)
-            randomFlag5.x=flagSet2HorizontalPositions[2]+18
-            randomFlag5.y= (_H - killScreen.height) - flagHeights[2]
-            randomFlag5:setSequence("randomflagseq1")
-            randomFlag5:setFrame( math.random(1,2) )
-            randomFlag5:toBack()
-            randomFlag5.alpha=0.65
-            randomFlag5:setFrame( 2 )
-
-            randomFlag5:play()
-        end
-        if i==6 then
-            -- Big Flag
-            randomFlag6=display.newSprite(flagWave40Sheet,randomFlagSeq)
-            randomFlag6.x=flagSet2HorizontalPositions[3]+21
-            randomFlag6.y= (_H - killScreen.height) - flagHeights[3]
-            randomFlag6:setSequence("randomflagseq1")
-            randomFlag6:setFrame( math.random(1,2) )
-
-            randomFlag6:play()
-        end
+        print(flagFrames .. "\n")
+        ]]--
     end
+end
+
+function setUpRandomFlags()
+    -- Big Flag
+    randomFlag1 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[1])
+    randomFlag1.x = flagSet1HorizontalPositions[1]+21 -- SAM: +21 refers to flagwave sprite width
+    randomFlag1.y = (_H - killScreen.height) - 70
+    randomFlag1:setSequence("randomflagseq1")
+    -- randomFlag1:setFrame( math.random(1,5) )
+
+    randomFlag1:play()
+
+    -- Med Flag
+    randomFlag2 = display.newSprite(flagWave34Sheet, randomFlagSequenceArray[2])
+    randomFlag2.x = flagSet1HorizontalPositions[2] + 18
+    randomFlag2.y = (_H - killScreen.height) - 58
+    randomFlag2:setSequence("randomflagseq1")
+    -- randomFlag2:setFrame( math.random(1,2) )
+    randomFlag2:toBack()
+    randomFlag2.alpha = 0.65
+
+    randomFlag2:play()
+
+    -- Big Flag
+    randomFlag3 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[3])
+    randomFlag3.x = flagSet1HorizontalPositions[3] + 21
+    randomFlag3.y = (_H - killScreen.height) - 70
+    randomFlag3:setSequence("randomflagseq1")
+    -- randomFlag3:setFrame( math.random(1,2) )
+
+    randomFlag3:play()
+
+    -- Big Flag
+    randomFlag4 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[4])
+    randomFlag4.x = flagSet2HorizontalPositions[1] + 21
+    randomFlag4.y = (_H - killScreen.height) - 70
+    randomFlag4:setSequence("randomflagseq1")
+    -- randomFlag4:setFrame( math.random(1,5) )
+
+    randomFlag4:play()
+
+    -- Med Flag
+    randomFlag5 = display.newSprite(flagWave34Sheet, randomFlagSequenceArray[5])
+    randomFlag5.x = flagSet2HorizontalPositions[2] + 18
+    randomFlag5.y = (_H - killScreen.height) - 58
+    randomFlag5:setSequence("randomflagseq1")
+    -- randomFlag5:setFrame( math.random(1,2) )
+    randomFlag5:toBack()
+    randomFlag5.alpha = 0.65
+    -- randomFlag5:setFrame( 2 )
+
+    randomFlag5:play()
+
+    -- Big Flag
+    randomFlag6 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[6])
+    randomFlag6.x = flagSet2HorizontalPositions[3] + 21
+    randomFlag6.y = (_H - killScreen.height) - 70
+    randomFlag6:setSequence("randomflagseq1")
+    -- randomFlag6:setFrame( math.random(1,2) )
+
+    randomFlag6:play()
 end
 
 -- SAM: only using Big and Med flagwave sprites. remove Small Flag sprites all together?
@@ -646,14 +710,14 @@ local function setScene()
     menuNiceTry:play()
     menuNiceTry:addEventListener("sprite", niceTryPop)
 
-    flagPole1 = display.newImage( "images/flagpole-142.png", 18,142)
+    flagPole1 = display.newImage( "images/flagpole-102.png", 18,142)
     flagPole1.anchorX=0.5
     flagPole1.anchorY=1
     flagPole1.name="flagPole1" -- SAM: is flagPole1.name ever used?
     flagPole1.x=flagSet1HorizontalPositions[1]
     flagPole1.y= _H - killScreen.height
 
-    flagPole2 = display.newImage( "images/flagpole-110.png", 18,110)
+    flagPole2 = display.newImage( "images/flagpole-90.png", 18,110)
     flagPole2.anchorX=0.5
     flagPole2.anchorY=1
     flagPole2.name="flagPole2"
@@ -661,21 +725,21 @@ local function setScene()
     flagPole2.y= _H - killScreen.height
     flagPole2.alpha=0.30
 
-    flagPole3 = display.newImage( "images/flagpole-142.png", 18,142)
+    flagPole3 = display.newImage( "images/flagpole-102.png", 18,142)
     flagPole3.anchorX=0.5
     flagPole3.anchorY=1
     flagPole3.name="flagPole3"
     flagPole3.x=flagSet1HorizontalPositions[3]
     flagPole3.y= _H - killScreen.height
 
-    flagPole4 = display.newImage( "images/flagpole-142.png", 18,142)
+    flagPole4 = display.newImage( "images/flagpole-102.png", 18,142)
     flagPole4.anchorX=0.5
     flagPole4.anchorY=1
     flagPole4.name="flagPole4"
     flagPole4.x=flagSet2HorizontalPositions[1]
     flagPole4.y= _H - killScreen.height
 
-    flagPole5 = display.newImage( "images/flagpole-110.png", 18,110)
+    flagPole5 = display.newImage( "images/flagpole-90.png", 18,110)
     flagPole5.anchorX=0.5
     flagPole5.anchorY=1
     flagPole5.name="flagPole5"
@@ -683,7 +747,7 @@ local function setScene()
     flagPole5.y= _H - killScreen.height
     flagPole5.alpha=0.30
 
-    flagPole6 = display.newImage( "images/flagpole-142.png", 18,142)
+    flagPole6 = display.newImage( "images/flagpole-102.png", 18,142)
     flagPole6.anchorX=0.5
     flagPole6.anchorY=1
     flagPole6.name="flagPole6"
@@ -735,7 +799,7 @@ local function setScene()
     transition.to( btnsQuit, {time = 200, alpha=1})
 
     selectRandomFlags()
-
+    setUpRandomFlags()
     killScreen:toBack()
     bg:toBack()
 

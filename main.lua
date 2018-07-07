@@ -154,7 +154,7 @@ function runMain()
 	elseif showSplash==false then
 	        display.remove(splash1)
 	    display.remove(splash2)
-	     composer.gotoScene( "game", {effect = defaultTransition})
+	     composer.gotoScene( "gameover", {effect = defaultTransition})
 	end
 end
 runMain()
