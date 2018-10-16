@@ -19,7 +19,6 @@ local SFXShortL = audio.loadSound( "sfx/shortL.wav" )
 local SFXShortR = audio.loadSound( "sfx/shortR.wav" )
 local SFXPaletteHit = audio.loadSound( "sfx/puff-attempt.wav" )
 local offsetPaletteDeathSFX = 20
-local paletteDeathsInCluster = 0
 
 --effects createPalette()
 cornersArray = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
@@ -41,15 +40,15 @@ local game_H = display.actualContentHeight -- Get the height of the screen
 --SAM: var to handle animations
 
 local debugOptions = {}
-debugOptions.god = true
+debugOptions.god = false
 debugOptions.constantSpeed = true
 debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
 debugOptions.brazilToCanada = false -- make this into array with a variety of sets - changing between 2 or more countries in sequence
-debugOptions.adherenceToFlagColors = true
+debugOptions.adherenceToFlagColors = false
 
 local gameMechanics = {}
-gameMechanics.playCountryDuration = 20000
+gameMechanics.playCountryDuration = 4000
 gameMechanics.transitionToCountryDuration = 2000
 gameMechanics.firstPaletteDelay = 10
 gameMechanics.countriesSpawned = 0
@@ -631,7 +630,7 @@ local function setupVariables()
 
     mapGroup = display.newGroup()
     map = display.newImageRect("images/worldmap_2017_300.png", 8191, 4084)
-    map.alpha = 1
+    -- map.alpha = 0
     map.anchorX = 0
     map.anchorY = 0
     map.name = "map"
@@ -669,6 +668,8 @@ local function setupVariables()
         -- print(alignMask)
         newGroup.maskScaleY = alignMask
     end
+
+    newGroup.alpha = 0
 
     -- mapGroup:setMask(mapMask)
 	-- mapGroup.maskScaleY = 1.01
@@ -1050,23 +1051,6 @@ local function setupScoreboard()
     end
     gameDebugCycleBtnGroup:addEventListener("tap", onOptionsTap)
     gameDebugGroup:insert(gameDebugCycleBtnGroup)
-
-    --SAM: assign topBar and btmBar variables prior to initrializing deathScenario2Array. That way their height can be referenced. Height = 100, but will vary with adaptive sizing (i.e. 2x and 4x)
-    table.insert(deathScenario2Array, display.newEmbossedText("]X", 10, 76, "PTMono-Bold", 14))
-    table.insert(deathScenario2Array, display.newEmbossedText("X[", _W - 10, 76, "PTMono-Bold", 14))
-    table.insert(deathScenario2Array, display.newEmbossedText("]X", 10, _H - 76, "PTMono-Bold", 14))
-    table.insert(deathScenario2Array, display.newEmbossedText("X[", _W - 10, _H - 76, "PTMono-Bold", 14))
-
-    local deathScenario2Color = {
-        highlight = {r = 0, g = 0, b = 0},
-        shadow = {r = 158/255, g = 13/255, b = 0}
-    }
-
-    for i = 1, #deathScenario2Array do
-        deathScenario2Array[i]:setFillColor(246/255, 81/255, 0)
-        deathScenario2Array[i]:setEmbossColor(deathScenario2Color)
-        deathScenario2Array[i].alpha = 0
-    end
 end
 
 -- SAM: combine functions speedUp() and resetSpawnTable()
@@ -1310,36 +1294,6 @@ local function boundaryCheck(e)
                                     if spawnTable[i].x < - 40 or spawnTable[i].x > _W + 40 then
                                         if gameMechanics.mode == 1 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
-
-                                                if spawnTable[i].corner == "TopRight" then
-                                                    transition.to( deathScenario2Array[1], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[1], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-
-                                                    if paletteDeathsInCluster == 0 then
-                                                        local playPaletteDeathL = audio.play( SFXShortL, { onComplete=function(event)
-                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            -- print(paletteDeathsInCluster)
-                                                        end })
-                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
-                                                    elseif paletteDeathsInCluster > 0 then
-                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
-                                                            local playPaletteDeathR = audio.play( SFXShortL )
-                                                        end )
-                                                    end
-                                                elseif spawnTable[i].corner == "BottomLeft" then
-                                                    transition.to( deathScenario2Array[4], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[4], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-
-                                                    if paletteDeathsInCluster == 0 then
-                                                        local playPaletteDeathR = audio.play( SFXShortR, { onComplete=function(event)
-                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            -- print(paletteDeathsInCluster)
-                                                        end })
-                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
-                                                    elseif paletteDeathsInCluster > 0 then
-                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
-                                                            local playPaletteDeathR = audio.play( SFXShortR )
-                                                        end )
-                                                    end
-                                                end
                                                 spawnTable[i]:removeEventListener("touch", objTouch)
                                                 spawnTable[i].dead = true
                                                 numDeaths = numDeaths + 1
@@ -1354,9 +1308,9 @@ local function boundaryCheck(e)
                                         transition.to(spawnTable[i], {time = 300, alpha = 0})
                                     end
 
-
                                     print("reverse motion for death effect")
                                     if spawnTable[i].isTopLeft == true or spawnTable[i].isBottomLeft == true then
+                                        -- SAM: temp = ???
                                         temp = spawnTable[i].x
                                         if gameMechanics.mode == 1 or gameMechanics.mode == 3 then
                                             transition.to(spawnTable[i], {time = 2000, x = temp + 90})
@@ -1364,6 +1318,7 @@ local function boundaryCheck(e)
                                             transition.to(spawnTable[i], {time = 2000, x = temp - 90})
                                         end
                                     else
+                                        -- SAM: temp = ???
                                         temp = spawnTable[i].x
                                         if gameMechanics.mode == 1 or gameMechanics.mode == 3 then
                                             transition.to(spawnTable[i], {time = 2000, x = temp - 90})
@@ -1389,89 +1344,18 @@ local function boundaryCheck(e)
                                     if spawnTable[i].x < -40 or spawnTable[i].x > _W + 40 then
                                         if gameMechanics.mode == 1 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
-                                                if spawnTable[i].corner == "TopRight" then
-                                                    -- print("FUCKING CUNT")
-                                                    transition.to( deathScenario2Array[1], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[1], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-
-                                                    if paletteDeathsInCluster == 0 then
-                                                        local playPaletteDeathL = audio.play( SFXShortL, { onComplete=function(event)
-                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            -- print(paletteDeathsInCluster)
-                                                        end })
-                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
-                                                    elseif paletteDeathsInCluster > 0 then
-                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
-                                                            local playPaletteDeathR = audio.play( SFXShortL )
-                                                        end )
-                                                    end
-                                                elseif spawnTable[i].corner == "BottomLeft" then
-                                                    transition.to( deathScenario2Array[4], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[4], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-
-                                                    if paletteDeathsInCluster == 0 then
-                                                        local playPaletteDeathR = audio.play( SFXShortR, { onComplete=function(event)
-                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            -- print(paletteDeathsInCluster)
-                                                        end })
-                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
-                                                    elseif paletteDeathsInCluster > 0 then
-                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
-                                                            local playPaletteDeathR = audio.play( SFXShortR )
-                                                        end )
-                                                    end
-                                                end
-
                                                 spawnTable[i]:removeEventListener("touch", objTouch)
                                                 spawnTable[i]:removeSelf()
                                                 spawnTable[i] = 0
                                             end
                                         elseif gameMechanics.mode == 2 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
-                                                if spawnTable[i].corner == "TopLeft" then
-                                                    transition.to( deathScenario2Array[2], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[2], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-
-                                                    if paletteDeathsInCluster == 0 then
-                                                        local playPaletteDeathL = audio.play( SFXShortL, { onComplete=function(event)
-                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            -- print(paletteDeathsInCluster)
-                                                        end })
-                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
-                                                    elseif paletteDeathsInCluster > 0 then
-                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
-                                                            local playPaletteDeathR = audio.play( SFXShortL )
-                                                        end )
-                                                    end
-                                                elseif spawnTable[i].corner == "BottomRight" then
-                                                    transition.to( deathScenario2Array[3], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[3], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-
-                                                    if paletteDeathsInCluster == 0 then
-                                                        local playPaletteDeathR = audio.play( SFXShortR, { onComplete=function(event)
-                                                            paletteDeathsInCluster = paletteDeathsInCluster - 1
-                                                            -- print(paletteDeathsInCluster)
-                                                        end })
-                                                        paletteDeathsInCluster = paletteDeathsInCluster + 1
-                                                    elseif paletteDeathsInCluster > 0 then
-                                                        timer.performWithDelay( offsetPaletteDeathSFX, function()
-                                                            local playPaletteDeathR = audio.play( SFXShortR )
-                                                        end )
-                                                    end
-                                                end
-
                                                 spawnTable[i]:removeEventListener("touch", objTouch)
                                                 spawnTable[i]:removeSelf()
                                                 spawnTable[i] = 0
                                             end
                                         elseif gameMechanics.mode == 3 then
                                             if lookupCode(code, spawnTable[i]) == 1 then
-                                                if spawnTable[i].corner == "TopLeft" then
-                                                    transition.to( deathScenario2Array[1], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[1], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-                                                elseif spawnTable[i].corner == "TopRight" then
-                                                    transition.to( deathScenario2Array[2], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[2], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-                                                elseif spawnTable[i].corner == "BottomLeft" then
-                                                    transition.to( deathScenario2Array[3], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[3], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-                                                elseif spawnTable[i].corner == "BottomRight" then
-                                                    transition.to( deathScenario2Array[4], { time=200, alpha=1, transition=easing.outCirc, onComplete=function() transition.to( deathScenario2Array[4], { delay=50, time=200, alpha=0, transition=easing.inCirc})end})
-                                                end
-
                                                 spawnTable[i]:removeEventListener("touch", objTouch)
                                                 spawnTable[i]:removeSelf()
                                                 spawnTable[i] = 0
@@ -1882,6 +1766,7 @@ animateCountry = function()
     })
 end
 
+previousCountry = nil
 -- READYOBJ: setCountryParameters
 setCountryParameters = function(restartCountry)
 
@@ -1920,6 +1805,9 @@ setCountryParameters = function(restartCountry)
     modeText.text = gameMechanics.mode
 
     if restartCountry == nil then
+        if countriesCompleted > 0 then
+            previousCountry = country
+        end
         newCountry()
         sideTimer = timer.performWithDelay(gameMechanics.transitionToCountryDuration, finishScale, 1)
         -- SAM: IMPORTANT, rename paceTimer to something more serious
@@ -1939,23 +1827,18 @@ setCountryParameters = function(restartCountry)
         -- Runtime:addEventListener( "enterFrame", sineEvent )
 
         local cameraEvent = function( event )
+            print(previousCountry.name, previousCountry.coords.x)
+            print(country.name, country.coords.x)
 
-            local previousXCoord = xCoord
-            local previousYCoord = yCoord
+            previousXCoord = xCoord
+            previousYCoord = yCoord
 
-            zoomMultiplier = .1
+            zoomMultiplier = .3
             xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
             yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
 
-            local transXCoord = previousXCoord - (previousXCoord-xCoord)/2
-            local transYCoord = previousYCoord - (previousYCoord-yCoord)/2
-
-            -- SAM: try these
-            local xCoord2=(_W/2)-((country.coords.x/2)*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
-            local yCoord2=(_H/2)-((country.coords.y/2)*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
-
-            local transXCoord2 = previousXCoord - (previousXCoord-xCoord)
-            local transYCoord2 = previousYCoord - (previousYCoord-yCoord)
+            local transXCoord = previousXCoord - (previousXCoord-xCoord/2)
+            local transYCoord = previousYCoord - (previousYCoord-yCoord/2)
 
             -- for reference
             -- mapGroup.x=xCoord
@@ -1970,7 +1853,9 @@ setCountryParameters = function(restartCountry)
                 xScale=1*zoomMultiplier,
                 yScale=1*zoomMultiplier,
                 onComplete=function(event)
-                    zoomMultiplier = .1
+                    zoomMultiplier = .3
+                    xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
+                    yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
                     mapTimer = transition.to(mapGroup, { transition=easing.inCirc,
                         time=gameMechanics.transitionToCountryDuration/2,
                         x=xCoord,
@@ -1981,7 +1866,18 @@ setCountryParameters = function(restartCountry)
 
                 end})
         end
-        cameraEvent()
+        if(countriesCompleted == 0) then
+            zoomMultiplier = .3
+            xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
+            yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
+            mapGroup.x = xCoord
+            mapGroup.y = yCoord
+            mapGroup.xScale = 1 * zoomMultiplier
+            mapGroup.yScale = 1 * zoomMultiplier
+            transition.to( newGroup, {delay=40, time=200, alpha=1} )
+        else
+            cameraEvent()
+        end
 
         -- old style. Currently working on function to handle transitions to zoom in and out!
         -- mapTimer = transition.to( mapGroup, { time=gameMechanics.transitionToCountryDuration, x=xCoord, y=yCoord, xScale=1*zoomMultiplier, yScale=1*zoomMultiplier})
@@ -2219,7 +2115,7 @@ newCountry = function()
     bobby = audio.play(music, {channel = 1, loops=-1, onComplete=function(event)
         print("finished streaming ANTHEM on channel ", event.channel)
     end})
-    audio.setVolume( .9, { channel = 1 } )
+    audio.setVolume( .5, { channel = 1 } )
 end
 
 local function killBars()
