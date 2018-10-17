@@ -1767,6 +1767,7 @@ animateCountry = function()
 end
 
 previousCountry = nil
+previousCountryOutline = nil
 -- READYOBJ: setCountryParameters
 setCountryParameters = function(restartCountry)
 
@@ -1807,6 +1808,7 @@ setCountryParameters = function(restartCountry)
     if restartCountry == nil then
         if countriesCompleted > 0 then
             previousCountry = country
+            previousCountryOutline = countryOutline
         end
         newCountry()
         sideTimer = timer.performWithDelay(gameMechanics.transitionToCountryDuration, finishScale, 1)
@@ -1827,35 +1829,36 @@ setCountryParameters = function(restartCountry)
         -- Runtime:addEventListener( "enterFrame", sineEvent )
 
         local cameraEvent = function( event )
-            print(previousCountry.name, previousCountry.coords.x)
-            print(country.name, country.coords.x)
-
-            previousXCoord = xCoord
-            previousYCoord = yCoord
-
             zoomMultiplier = .3
             xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
             yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
 
-            local transXCoord = previousXCoord - (previousXCoord-xCoord/2)
-            local transYCoord = previousYCoord - (previousYCoord-yCoord/2)
+            previousXCoord=(_W/2)-(previousCountry.coords.x*zoomMultiplier)-((previousCountryOutline.width*zoomMultiplier)/2)
+            previousYCoord=(_H/2)-(previousCountry.coords.y*zoomMultiplier)-((previousCountryOutline.height*zoomMultiplier)/2)
+
+            distanceX = xCoord - previousXCoord
+            distanceY = yCoord - previousYCoord
+
+            print(distanceX)
+            print(distanceY)
+
+            -- mapGroup.x = mapGroup.x + distanceX/2
+            -- mapGroup.y = mapGroup.y + distanceY/2
 
             -- for reference
             -- mapGroup.x=xCoord
             -- mapGroup.y=yCoord
             -- mapGroup.xScale=1*zoomMultiplier
             -- mapGroup.yScale=1*zoomMultiplier
-
+            zoomMultiplier = .24
             mapTimer = transition.to( mapGroup, { transition=easing.inCirc,
                 time=gameMechanics.transitionToCountryDuration/2,
-                x=transXCoord,
-                y=transYCoord,
+                x=mapGroup.x + distanceX/2,
+                y=mapGroup.y + distanceY/2,
                 xScale=1*zoomMultiplier,
                 yScale=1*zoomMultiplier,
                 onComplete=function(event)
                     zoomMultiplier = .3
-                    xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
-                    yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
                     mapTimer = transition.to(mapGroup, { transition=easing.inCirc,
                         time=gameMechanics.transitionToCountryDuration/2,
                         x=xCoord,
@@ -1863,8 +1866,8 @@ setCountryParameters = function(restartCountry)
                         xScale=1*zoomMultiplier,
                         yScale=1*zoomMultiplier
                     })
-
-                end})
+                end
+            })
         end
         if(countriesCompleted == 0) then
             zoomMultiplier = .3
