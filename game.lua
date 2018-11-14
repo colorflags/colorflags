@@ -2,6 +2,7 @@
 -- http://docs.coronalabs.com/api/library/display/newSprite.html
 local CFText = require("cf_text")
 local composer = require("composer")
+local cameraEvent = require("cameraevent")
 local scene = composer.newScene()
 
 -- stop audioReservedChannel1. set it to nil?
@@ -44,11 +45,10 @@ debugOptions.god = false
 debugOptions.constantSpeed = true
 debugOptions.cycleModes = false
 debugOptions.topBottomBars = false
-debugOptions.brazilToCanada = false -- make this into array with a variety of sets - changing between 2 or more countries in sequence
 debugOptions.adherenceToFlagColors = false
 
 local gameMechanics = {}
-gameMechanics.playCountryDuration = 4000
+gameMechanics.playCountryDuration = 20000
 gameMechanics.transitionToCountryDuration = 2000
 gameMechanics.firstPaletteDelay = 10
 gameMechanics.countriesSpawned = 0
@@ -154,7 +154,7 @@ local map
 local mapGroup
 local waterGroup
 local newGroup
-local zoomMultiplier = .1
+local zoomMultiplier = .3
 
 local jitterCameraPosition = {}
 jitterCameraPosition.pseudoTargetX = 0
@@ -629,14 +629,17 @@ local function setupVariables()
     testHeight = mapDimensions.dimensions['@1x'].height
 
     mapGroup = display.newGroup()
+    fapGroup = display.newGroup()
     map = display.newImageRect("images/worldmap_2017_300.png", 8191, 4084)
-    -- map.alpha = 0
     map.anchorX = 0
     map.anchorY = 0
     map.name = "map"
     map.x = 0
     map.y = 0
-	mapGroup:insert(map)
+	fapGroup:insert(map)
+    mapGroup:insert(fapGroup)
+    mapGroup.x = _W/2
+    mapGroup.y = _H/2
     mapGroup.xScale = 1 * zoomMultiplier
     mapGroup.yScale = 1 * zoomMultiplier
 
@@ -954,40 +957,11 @@ local function setupScoreboard()
     modeTextGroup:insert(modeIncreaseBtnGroup)
     modeIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
 
+    -- ##### ##### ##### ##### ##### #####
+
     gameDebugGroup = display.newGroup()
 
-    local gameDebugDeathGroupAnchorY = _H/2 + scoreTextGroup.height * scoreboardOffsetIncDecBtns + 4
-
-    gameDebugDeathBtnGroup = display.newGroup()
-    gameDebugDeathBtnGroup.name = "gameDebugDeath"
-
-    local textParams =
-    {
-        text = "god?",
-        x = scoreTextGroupAnchorX + (scoreTextDesc.width/2),
-        y = gameDebugDeathGroupAnchorY,
-        font = "PTMono-Bold",
-        fontSize = 12,
-        align = "center"
-    }
-    gameDebugDeathBtnDesc = display.newEmbossedText(textParams)
-    gameDebugDeathBtnDesc:setFillColor(.2, .9, .4)
-    gameDebugDeathBtnDesc:setEmbossColor(scoreboardColor)
-    gameDebugDeathBtnDesc.anchorX = .5
-    gameDebugDeathBtnDesc.anchorY = 0
-    gameDebugGroup:insert(gameDebugDeathBtnDesc)
-
-    gameDebugDeathBtnFill = display.newRoundedRect(gameDebugDeathBtnGroup, scoreTextGroupAnchorX + (scoreTextDesc.width/2), gameDebugDeathGroupAnchorY, 20, 20, 1)
-    gameDebugDeathBtnFill:setFillColor(.2, .2, .2)
-    gameDebugDeathBtnFill.anchorY = 1
-    gameDebugDeathBtnSym = display.newText(gameDebugDeathBtnGroup, "", gameDebugDeathBtnFill.x, gameDebugDeathBtnFill.y - (gameDebugDeathBtnFill.height/2), "PTMono-Bold", 20)
-    if debugOptions.god == true then
-        gameDebugDeathBtnSym.text = "X"
-    end
-    gameDebugDeathBtnGroup:addEventListener("tap", onOptionsTap)
-    gameDebugGroup:insert(gameDebugDeathBtnGroup)
-
-    local gameDebugSpeedGroupAnchorY = _H/2 + scoreTextGroup.height * scoreboardOffsetIncDecBtns + 4
+    local gameDebugGroupAnchorY = _H/2 + scoreTextGroup.height + 20
 
     gameDebugSpeedBtnGroup = display.newGroup()
     gameDebugSpeedBtnGroup.name = "gameDebugSpeed"
@@ -995,8 +969,8 @@ local function setupScoreboard()
     local textParams =
     {
         text = "constant\nspeed?",
-        x = speedTextGroupAnchorX + (speedTextDesc.width/2),
-        y = gameDebugSpeedGroupAnchorY,
+        x = _W/2,
+        y = gameDebugGroupAnchorY,
         font = "PTMono-Bold",
         fontSize = 12,
         align = "center"
@@ -1009,7 +983,7 @@ local function setupScoreboard()
     gameDebugSpeedBtnDesc.anchorY = 0
     gameDebugGroup:insert(gameDebugSpeedBtnDesc)
 
-    gameDebugSpeedBtnFill = display.newRoundedRect(gameDebugSpeedBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2), gameDebugSpeedGroupAnchorY, 20, 20, 1)
+    gameDebugSpeedBtnFill = display.newRoundedRect(gameDebugSpeedBtnGroup, _W/2, gameDebugGroupAnchorY, 20, 20, 1)
     gameDebugSpeedBtnFill:setFillColor(.2, .2, .2)
     gameDebugSpeedBtnFill.anchorY = 1
     gameDebugSpeedBtnSym = display.newText(gameDebugSpeedBtnGroup, "", gameDebugSpeedBtnFill.x, gameDebugSpeedBtnFill.y - (gameDebugSpeedBtnFill.height/2), "PTMono-Bold", 20)
@@ -1019,8 +993,38 @@ local function setupScoreboard()
     gameDebugSpeedBtnGroup:addEventListener("tap", onOptionsTap)
     gameDebugGroup:insert(gameDebugSpeedBtnGroup)
 
+    local gameDebugDeathAnchorX = _W/2 - scoreboardOffsetFromEachOther
 
-    local gameDebugCycleGroupAnchorY = _H/2 + scoreTextGroup.height * scoreboardOffsetIncDecBtns + 4
+    gameDebugDeathBtnGroup = display.newGroup()
+    gameDebugDeathBtnGroup.name = "gameDebugDeath"
+
+    local textParams =
+    {
+        text = "god?",
+        x = gameDebugDeathAnchorX,
+        y = gameDebugGroupAnchorY,
+        font = "PTMono-Bold",
+        fontSize = 12,
+        align = "center"
+    }
+    gameDebugDeathBtnDesc = display.newEmbossedText(textParams)
+    gameDebugDeathBtnDesc:setFillColor(.2, .9, .4)
+    gameDebugDeathBtnDesc:setEmbossColor(scoreboardColor)
+    gameDebugDeathBtnDesc.anchorX = .5
+    gameDebugDeathBtnDesc.anchorY = 0
+    gameDebugGroup:insert(gameDebugDeathBtnDesc)
+
+    gameDebugDeathBtnFill = display.newRoundedRect(gameDebugDeathBtnGroup, gameDebugDeathAnchorX, gameDebugGroupAnchorY, 20, 20, 1)
+    gameDebugDeathBtnFill:setFillColor(.2, .2, .2)
+    gameDebugDeathBtnFill.anchorY = 1
+    gameDebugDeathBtnSym = display.newText(gameDebugDeathBtnGroup, "", gameDebugDeathBtnFill.x, gameDebugDeathBtnFill.y - (gameDebugDeathBtnFill.height/2), "PTMono-Bold", 20)
+    if debugOptions.god == true then
+        gameDebugDeathBtnSym.text = "X"
+    end
+    gameDebugDeathBtnGroup:addEventListener("tap", onOptionsTap)
+    gameDebugGroup:insert(gameDebugDeathBtnGroup)
+
+    local gameDebugCycleAnchorX = _W/2 + scoreboardOffsetFromEachOther
 
     gameDebugCycleBtnGroup = display.newGroup()
     gameDebugCycleBtnGroup.name = "gameDebugCycle"
@@ -1028,8 +1032,8 @@ local function setupScoreboard()
     local textParams =
     {
         text = "cycle\nmodes?",
-        x = modeTextGroupAnchorX + (modeTextDesc.width/2),
-        y = gameDebugCycleGroupAnchorY,
+        x = gameDebugCycleAnchorX,
+        y = gameDebugGroupAnchorY,
         font = "PTMono-Bold",
         fontSize = 12,
         align = "center"
@@ -1042,7 +1046,7 @@ local function setupScoreboard()
     gameDebugCycleBtnDesc.anchorY = 0
     gameDebugGroup:insert(gameDebugCycleBtnDesc)
 
-    gameDebugCycleBtnFill = display.newRoundedRect(gameDebugCycleBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2), gameDebugCycleGroupAnchorY, 20, 20, 1)
+    gameDebugCycleBtnFill = display.newRoundedRect(gameDebugCycleBtnGroup, gameDebugCycleAnchorX, gameDebugGroupAnchorY, 20, 20, 1)
     gameDebugCycleBtnFill:setFillColor(.2, .2, .2)
     gameDebugCycleBtnFill.anchorY = 1
     gameDebugCycleBtnSym = display.newText(gameDebugCycleBtnGroup, "", gameDebugCycleBtnFill.x, gameDebugCycleBtnFill.y - (gameDebugCycleBtnFill.height/2), "PTMono-Bold", 20)
@@ -1051,6 +1055,7 @@ local function setupScoreboard()
     end
     gameDebugCycleBtnGroup:addEventListener("tap", onOptionsTap)
     gameDebugGroup:insert(gameDebugCycleBtnGroup)
+
 end
 
 -- SAM: combine functions speedUp() and resetSpawnTable()
@@ -1828,58 +1833,24 @@ setCountryParameters = function(restartCountry)
         end
         -- Runtime:addEventListener( "enterFrame", sineEvent )
 
-        local cameraEvent = function( event )
-            zoomMultiplier = .3
-            xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
-            yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
-
-            previousXCoord=(_W/2)-(previousCountry.coords.x*zoomMultiplier)-((previousCountryOutline.width*zoomMultiplier)/2)
-            previousYCoord=(_H/2)-(previousCountry.coords.y*zoomMultiplier)-((previousCountryOutline.height*zoomMultiplier)/2)
-
-            distanceX = xCoord - previousXCoord
-            distanceY = yCoord - previousYCoord
-
-            print(distanceX)
-            print(distanceY)
-
-            -- mapGroup.x = mapGroup.x + distanceX/2
-            -- mapGroup.y = mapGroup.y + distanceY/2
-
-            -- for reference
-            -- mapGroup.x=xCoord
-            -- mapGroup.y=yCoord
-            -- mapGroup.xScale=1*zoomMultiplier
-            -- mapGroup.yScale=1*zoomMultiplier
-            zoomMultiplier = .24
-            mapTimer = transition.to( mapGroup, { transition=easing.inCirc,
-                time=gameMechanics.transitionToCountryDuration/2,
-                x=mapGroup.x + distanceX/2,
-                y=mapGroup.y + distanceY/2,
-                xScale=1*zoomMultiplier,
-                yScale=1*zoomMultiplier,
-                onComplete=function(event)
-                    zoomMultiplier = .3
-                    mapTimer = transition.to(mapGroup, { transition=easing.inCirc,
-                        time=gameMechanics.transitionToCountryDuration/2,
-                        x=xCoord,
-                        y=yCoord,
-                        xScale=1*zoomMultiplier,
-                        yScale=1*zoomMultiplier
-                    })
-                end
-            })
-        end
         if(countriesCompleted == 0) then
-            zoomMultiplier = .3
-            xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
-            yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
-            mapGroup.x = xCoord
-            mapGroup.y = yCoord
-            mapGroup.xScale = 1 * zoomMultiplier
-            mapGroup.yScale = 1 * zoomMultiplier
+            print(country.name)
+            xCoord=(0)-(country.coords.x + (countryOutline.width/2))
+            yCoord=(0)-(country.coords.y + (countryOutline.height/2))
+
+            mapGroup[1].x = xCoord
+            mapGroup[1].y = yCoord
+
             transition.to( newGroup, {delay=40, time=200, alpha=1} )
         else
-            cameraEvent()
+            cameraEvent.focus(
+                gameMechanics.transitionToCountryDuration,
+                country,
+                countryOutline,
+                previousCountry,
+                previousCountryOutline,
+                mapGroup
+            )
         end
 
         -- old style. Currently working on function to handle transitions to zoom in and out!
@@ -1891,23 +1862,6 @@ end
 
 -- READYOBJ: newCountry
 newCountry = function()
-    -- largerCountries to debugOptions
-    -- local largerCountries = {2, 3, 6, 7, 9, 39, 55}
-    -- local e = largerCountries[math.random(table.getn(largerCountries))]
-
-    -- make this into array with a variety of sets - changing between 2 or more countries in sequence
-    if debugOptions.brazilToCanada == true then
-        if country == nil then
-            e = 6
-        else
-            if country.name == "brazil" then
-                e = 7
-            else
-                e = 6
-            end
-        end
-        country = CFGameSettings:getItemByID(e)
-    end
 
     -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
     local randomCountry = math.random(CFGameSettings:getLength())
@@ -1926,18 +1880,18 @@ newCountry = function()
         end
 
         -- print(mapGroup.numChildren)
-        if(mapGroup) then
-            for j=mapGroup.numChildren, 1, -1 do
-                if(mapGroup[j].id == "fxGroup") then
-                    for k=mapGroup[j].numChildren, 1, -1 do
-                        local child = mapGroup[j][k]
+        if(fapGroup) then
+            for j=fapGroup.numChildren, 1, -1 do
+                if(fapGroup[j].id == "fxGroup") then
+                    for k=fapGroup[j].numChildren, 1, -1 do
+                        local child = fapGroup[j][k]
                         print("fxGroup item")
                         print(child.fill)
                         child:removeSelf()
                         child = nil
                     end
-                    print("remove group: ", mapGroup[j].id )
-                    mapGroup[j]:removeSelf()
+                    print("remove group: ", fapGroup[j].id )
+                    fapGroup[j]:removeSelf()
                 end
             end
         end
@@ -2011,8 +1965,6 @@ newCountry = function()
     fxBG.fill.effect.angle = 20
     fxBG.rotation = 0
 
-    fxGroup.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
-    fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
     fxGroup:insert(fxBG)
 
     newTex = graphics.newTexture( { type="canvas", width=fxSize, height=fxSize } )
@@ -2024,7 +1976,10 @@ newCountry = function()
     fxGroup:setMask(mask)
     canvasObj.alpha = 0
 
-    mapGroup:insert(fxGroup)
+    fxGroup.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
+    fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
+
+    fapGroup:insert(fxGroup)
 
     -- sends newCircle() to back, behind country
     -- fxGroup:toBack()
