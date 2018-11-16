@@ -2,12 +2,20 @@
 -- portrait, portraitUpsideDown, landscapeLeft, landscapeRight
 
 settings = {
-	
+
+    plugins =
+    {
+        ["plugin.utf8"] =
+        {
+            publisherId = "com.coronalabs"
+        },
+    },
+		
 	orientation = {
 		default = "landscapeRight",
 		supported = { "landscapeRight", }
 	},
-	
+
 	iphone = {
 		plist = {
 			UIStatusBarHidden = false,
@@ -17,7 +25,7 @@ settings = {
             UIAppFonts =
             {
                 "FFF_Tusj.tff",
-  
+
             },
 
 
@@ -39,7 +47,7 @@ settings = {
             --]]
 		}
 	},
-	
+
 	--[[
 	-- Android permissions
 

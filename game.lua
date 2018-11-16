@@ -63,10 +63,6 @@ else
     gameMechanics.paletteSpawnDelay = 42.5
 end
 
--- delete
--- lightningY=90
--- infoMode=true
-
 local lightningCount = 1
 
 local score = 0
@@ -80,13 +76,8 @@ local timeVar
 -- checks if game just started
 local countriesCompleted = 0
 
-local infoPic
 local code
 
--- MIKE: get rid of all the info related stuff for now. Bring back in CF 2.0
-local info
-local infoMode = true
-local infoTimer
 local spawnTable = {}   --Create a table to hold our spawns
 local lineTable = {} --Table for deleting lighning lines
 local lineTableCount = 0
@@ -170,9 +161,10 @@ distanceFromCamera.y = 0
 distanceFromCamera.enemySpeed = 30
 distanceFromCamera.amplitude = .01
 
+local flagFrame
 local flagFrameOptions
--- rename to flagFrame
-local testFrame
+
+local bmpText
 
 local flag
 local random
@@ -331,41 +323,17 @@ local bonusImplodeSeq = {
 
 -- SAM: char1, char2, charPlus
 
-local bonusScatter = {}
-bonusScatter.spriteCoords1 = require("lua-sheets.bonus-scatter1")
-bonusScatter.sheet1 = graphics.newImageSheet("images/bonus-scatter1.png", bonusScatter.spriteCoords1:getSheet())
-
-bonusScatter.sequence = {
-    {
-        name = "1",
-        sheet = bonusScatter.sheet1,
-        frames = {5, 5, 5, 5, 6, 7, 8, 9, 10, 11, 2, 3, 4},
-        -- ???
-        -- transition = easing.inCubic,
-        time = 800,
-        loopCount = 1},
-}
-
--- SAM: put in new bonusShatter array
-local bonusShatterBool = true
-local bonusImplode = display.newSprite(bonusScatter.sheet1, bonusScatter.sequence)
-bonusImplode:scale(.5, .5)
-bonusImplode.alpha = 0 --start with 0
-
 local function spriteListener( event )
     -- print( "Sprite event: ", event.target.sequence, event.target.frame, event.phase )
 end
-
--- Add sprite listener (assumes "mySprite" is a valid sprite object)
-bonusImplode:addEventListener( "sprite", spriteListener )
 
 local lightningIconsCoords = require("lua-sheets.new-lightning-icons")
 local lightningIconsSheet = graphics.newImageSheet("images/new-lightning-icons.png", lightningIconsCoords:getSheet())
 -- local lightningIcons = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
 
-local countryOutlineSheetCoords = require("lua-sheets.country_outline_mask")
-local countryOutlineSheet = graphics.newImageSheet("images/country_outline_mask.png", countryOutlineSheetCoords:getSheet())
-local countryOutline
+local countryFillSheetCoords = require("lua-sheets.country_fill_mask")
+local countryFillSheet = graphics.newImageSheet("images/country_fill_mask.png", countryFillSheetCoords:getSheet())
+local countryFill
 
 local paletteBarSheetCoords = require("lua-sheets.palette_bar")
 local paletteBarSheet = graphics.newImageSheet("images/palette_bar.png", paletteBarSheetCoords:getSheet())
@@ -748,19 +716,19 @@ local function setupVariables()
         flagOffset = .5
     }
 
-    -- rename testFrame to flagFrame
-    testFrame = display.newRect(
+    -- rename flagFrame to flagFrame
+    flagFrame = display.newRect(
         flagFrameOptions.x,
         flagFrameOptions.y,
         flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding,
         flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding
     )
 
-    testFrame.anchorX = flagFrameOptions.anchorX
-    testFrame.anchorY = flagFrameOptions.anchorY
-    testFrame:setFillColor(0, 0, 0)
+    flagFrame.anchorX = flagFrameOptions.anchorX
+    flagFrame.anchorY = flagFrameOptions.anchorY
+    flagFrame:setFillColor(0, 0, 0)
 
-    -- flagFrameAnchorX and flagFrameAnchorY are derived from flagFrameOptions (used by testFrame) to place GUI objects pertaining and bound to flag area
+    -- flagFrameAnchorX and flagFrameAnchorY are derived from flagFrameOptions (used by flagFrame) to place GUI objects pertaining and bound to flag area
     -- flagFrameAnchorX and flagFrameAnchorY set to the top-left corner of this flag area (flag, flagFrame, and lightningIcons)
     local flagFrameAnchorX = flagFrameOptions.x - ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) - 12) -- 12 to offset an extra amount from left-side of the flagFrame
 
@@ -1702,19 +1670,6 @@ local function nextMove()
     pointAnimation:toBack()
 end
 
-local function infoAppear()
-    transition.to(infoPic, {time = 500, alpha = 1})
-end
-
-local function deleteCountryText()
-    display.remove(CountryText)
-end
-
-local function countryTextScale()
-    countryTimer = transition.to(countryText, {time = 500, alpha = 0})
-    timer.performWithDelay(500, deleteCountryText, 1)
-end
-
 local function adherenceToFlagColors(e)
     local result
 
@@ -1753,26 +1708,25 @@ local function adherenceToFlagColors(e)
     end
 end
 
-local animateCountryTimer
-local animateCountry
-local function triggerAnimateCountry()
-    animateCountryTimer = timer.performWithDelay( 1000, animateCountry, 1 )
-    -- timer.cancel(animateCountryTimer)
+local countryFillBounceTimer
+local countryFillBounce
+local function triggercountryFillBounce()
+    countryFillBounceTimer = timer.performWithDelay( 1000, countryFillBounce, 1 )
 end
-animateCountry = function()
+countryFillBounce = function()
     transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
         function()
             transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop})
         end
     })
     transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad, onComplete=function()
-            triggerAnimateCountry()
+            triggercountryFillBounce()
         end
     })
 end
 
 previousCountry = nil
-previousCountryOutline = nil
+previouscountryFill = nil
 -- READYOBJ: setCountryParameters
 setCountryParameters = function(restartCountry)
 
@@ -1813,7 +1767,7 @@ setCountryParameters = function(restartCountry)
     if restartCountry == nil then
         if countriesCompleted > 0 then
             previousCountry = country
-            previousCountryOutline = countryOutline
+            previouscountryFill = countryFill
         end
         newCountry()
         sideTimer = timer.performWithDelay(gameMechanics.transitionToCountryDuration, finishScale, 1)
@@ -1835,8 +1789,8 @@ setCountryParameters = function(restartCountry)
 
         if(countriesCompleted == 0) then
             print(country.name)
-            xCoord=(0)-(country.coords.x + (countryOutline.width/2))
-            yCoord=(0)-(country.coords.y + (countryOutline.height/2))
+            xCoord=(0)-(country.coords.x + (countryFill.width/2))
+            yCoord=(0)-(country.coords.y + (countryFill.height/2))
 
             mapGroup[1].x = xCoord
             mapGroup[1].y = yCoord
@@ -1846,9 +1800,9 @@ setCountryParameters = function(restartCountry)
             cameraEvent.focus(
                 gameMechanics.transitionToCountryDuration,
                 country,
-                countryOutline,
+                countryFill,
                 previousCountry,
-                previousCountryOutline,
+                previouscountryFill,
                 mapGroup
             )
         end
@@ -1867,16 +1821,52 @@ newCountry = function()
     local randomCountry = math.random(CFGameSettings:getLength())
     country = CFGameSettings:getItemByID(randomCountry)
 
-    -- print("current country: ", country.name)
+    display.setDefault("background", 0.4,0.4,0.4)
+
+    local subGroup = display.newGroup()
+    local options
+    options = {
+      text = country.printedName,
+      x = flagFrame.x - (flagFrame.width / 2) ,
+      y = flagFrame.y + 24,
+      width = flagFrame.width,
+      font = "fonts/kefa.fnt",
+      fontSize = 18,
+      align = "left",
+    }
+
+    if bmpText ~= nil then
+        display.remove(bmpText)
+        bmpText = nil
+    end
+
+    -- Uses pretty much the same options as display.newText
+    bmpText = ponyfont.newText(options)
+    bmpText.anchorY = 0
+    bmpText.anchorX = 0.5
+    subGroup:insert(bmpText.raw) -- use the .raw to get to the displaygroup for inserting
+
+
+    -- You can set the properties without calling any update() function
+    -- uncomment the lines below to see how the text reacts
+    --bmpText.text = "This is updated text in the same displayObject..."
+    --bmpText.fontSize = 60
+    bmpText.align = "center"
+
+
+    -- Demo looping through each letter
+    for i = 1, bmpText.numChildren do
+      transition.from ( bmpText[i], { delay = 100 + (i*25), time = 250, xScale = 2, yScale = 2, alpha = 0, transition = easing.outBounce })
+    end
 
     inclusiveColorsArray = adherenceToFlagColors(0)
 
     --SAM: should i put this outside the countries() function? Or is no need for it to be in a function?
     function destroyStuff()
 
-        if(countryOutline ~= nil) then
-            countryOutline:removeSelf()
-            countryOutline = nil
+        if(countryFill ~= nil) then
+            countryFill:removeSelf()
+            countryFill = nil
         end
 
         -- print(mapGroup.numChildren)
@@ -1898,38 +1888,38 @@ newCountry = function()
     end
     destroyStuff()
 
-    countryOutline = display.newSprite( countryOutlineSheet, {frames={countryOutlineSheetCoords:getFrameIndex(country.name)}} )
+    countryFill = display.newSprite( countryFillSheet, {frames={countryFillSheetCoords:getFrameIndex(country.name)}} )
 
-    -- print("country width:", countryOutline.width, "country height:", countryOutline.height)
+    -- print("country width:", countryFill.width, "country height:", countryFill.height)
 
     -- SAM: zoom to country
     --[[
-    if countryOutline.width < _W/2 and countryOutline.height < _H/2 then
+    if countryFill.width < _W/2 and countryFill.height < _H/2 then
     end
     ]]--
 
-    -- SAM: countryOutline scaling
-    countryOutlineWidthMultiplier = display.pixelHeight/display.contentWidth
-    countryOutlineHeightMultiplier = display.pixelWidth/display.contentHeight
-    -- print("pixelHeight / contentWidth: ", countryOutlineWidthMultiplier)
-    -- print("pixelWidth / contentHeight: ", countryOutlineHeightMultiplier)
-    countryOutline:scale(1/countryOutlineWidthMultiplier, 1/countryOutlineHeightMultiplier)
+    -- SAM: countryFill scaling
+    countryFillWidthMultiplier = display.pixelHeight/display.contentWidth
+    countryFillHeightMultiplier = display.pixelWidth/display.contentHeight
+    -- print("pixelHeight / contentWidth: ", countryFillWidthMultiplier)
+    -- print("pixelWidth / contentHeight: ", countryFillHeightMultiplier)
+    countryFill:scale(1/countryFillWidthMultiplier, 1/countryFillHeightMultiplier)
 
     -- SAM: originally a local variable
     fxGroup = display.newGroup()
     fxGroup.id = "fxGroup"
 
-    -- print("countryOutline.width:" .. countryOutline.width, "countryOutline.height" .. countryOutline.height)
+    -- print("countryFill.width:" .. countryFill.width, "countryFill.height" .. countryFill.height)
 
     local fxSize
-    if(countryOutline.width > countryOutline.height) then
+    if(countryFill.width > countryFill.height) then
         -- delete?
-        -- fxSize = math.ceil(countryOutline.width * countryOutline.xScale) + 120
-        fxSize = math.ceil(countryOutline.width) + 120
+        -- fxSize = math.ceil(countryFill.width * countryFill.xScale) + 120
+        fxSize = math.ceil(countryFill.width) + 120
     else
         -- delete?
-        -- fxSize = math.ceil(countryOutline.height * countryOutline.yScale) + 120
-        fxSize = math.ceil(countryOutline.width) + 120
+        -- fxSize = math.ceil(countryFill.height * countryFill.yScale) + 120
+        fxSize = math.ceil(countryFill.width) + 120
     end
 
     -- print("circumference of fxBG:", fxSize)
@@ -1968,7 +1958,7 @@ newCountry = function()
     fxGroup:insert(fxBG)
 
     newTex = graphics.newTexture( { type="canvas", width=fxSize, height=fxSize } )
-    newTex:draw(countryOutline)
+    newTex:draw(countryFill)
     newTex:invalidate()
 
     -- SAM: masks fxBG (newCircle) with country outline
@@ -1976,30 +1966,15 @@ newCountry = function()
     fxGroup:setMask(mask)
     canvasObj.alpha = 0
 
-    fxGroup.x=(map.x)-(map.x-country.coords.x-(countryOutline.width/2))
-    fxGroup.y=(map.y)-(map.y-country.coords.y-(countryOutline.height/2))
+    fxGroup.x=(map.x)-(map.x-country.coords.x-(countryFill.width/2))
+    fxGroup.y=(map.y)-(map.y-country.coords.y-(countryFill.height/2))
 
     fapGroup:insert(fxGroup)
 
-    -- sends newCircle() to back, behind country
-    -- fxGroup:toBack()
-
-    -- SAM: DELETE? i think i already have this all figured out. now in a new location
-    -- (2031/2) - 958 - (?/2)
-    -- (851/2) - 225 - (?/2)
-    -- xCoord=(_W/2)-country.coords.x-(countryOutline.width/2)
-    -- yCoord=(_H/2)-country.coords.y-(countryOutline.height/2)
-    -- (2031/2) - (958*1.5) - ((?*1.5)/2)
-    -- (851/2) - (225*1.5) - ((?*1.5)/2)
-    -- xCoord=(_W/2)-(country.coords.x*zoomMultiplier)-((countryOutline.width*zoomMultiplier)/2)
-    -- yCoord=(_H/2)-(country.coords.y*zoomMultiplier)-((countryOutline.height*zoomMultiplier)/2)
-    -- print("xCoord:", xCoord, "yCoord:", yCoord)
 
     if(countriesCompleted == 0) then
-        animateCountry()
+        countryFillBounce()
     end
-
-    info="images/infoBrazil.png"
 
     flag=display.newSprite(nationalFlags1Sheet,nationalFlagsSeq, 100, 10)
     flag:setSequence(country.name)
@@ -2399,9 +2374,6 @@ readyObject = function(firstCountry)
                 --[[
                 killBarsTimer = timer.performWithDelay(500, killBars)
                 resetSpawnTimer = timer.performWithDelay(540, resetSpawnTable)
-                if infoMode == true then
-                    infoTimer = transition.to(infoPic, {time = 500, alpha = 0})
-                end
                 -- SAM: flag timers - calls newFlag()
                 newFlagTimer = timer.performWithDelay(600, setCountryParameters)
                 ]]--
@@ -2444,24 +2416,6 @@ readyObject = function(firstCountry)
             end
         end
     end
-end
-
-local bonusTimer
-local eventTimer
-local t = {}
-function t:timer(event)
-    local count = event.count
-    if count ~= 9 then
-        bonusShatter.x = bonusShatter.x - 50
-    else
-        bonusShatter.alpha = 0
-        timer.cancel(event.source)
-    end
-end
-
-local function cancelTimerBonusImplode()
-    bonusImplode.alpha = 0
-    bonusImplode:pause()
 end
 
 function objTouch(self, e)
@@ -2558,32 +2512,6 @@ function objTouch(self, e)
                     motion = nil
                 end
 
-                if bonusShatterBool == true then
-                    if spread == 2 then
-                        bonusImplode:setSequence("2x")
-                    elseif spread == 3 then
-                        bonusImplode:setSequence("3x")
-                    elseif spread == 4 then
-                        bonusImplode:setSequence("4x")
-                    elseif spread == 5 then
-                        bonusImplode:setSequence("5x")
-                    elseif spread == 6 then
-                        bonusImplode:setSequence("6x")
-                    elseif spread == 7 then
-                        bonusImplode:setSequence("7x")
-                    elseif spread == 8 then
-                        bonusImplode:setSequence("8x")
-                    elseif spread == 9 then
-                        bonusImplode:setSequence("9x")
-                    end
-                    bonusImplode.alpha = 1
-                    bonusImplode:toFront()
-                    bonusImplode:play()
-                    bonusImplode.x = _W * (4 / 5)
-                    bonusImplode.y = _H / 2
-                    motion = timer.performWithDelay(800, cancelTimerBonusImplode, 1)
-                end
-
             else
                 spread = 0
                 currentColor = nil
@@ -2653,7 +2581,7 @@ function scene:hide(e)
     if e.phase == "will" then
         -- important listeners and timers to be cancelled!
         transition.cancel( "moveNeedle" )
-        timer.cancel(animateCountryTimer)
+        timer.cancel(countryFillBounceTimer)
         Runtime:removeEventListener( "enterFrame", water )
 
         display.remove(background)
@@ -2669,7 +2597,8 @@ function scene:hide(e)
         display.remove(newGroup)
 
         display.remove(flag)
-        display.remove(testFrame)
+        display.remove(flagFrame)
+        display.remove(bmpText)
 
 		-- what about mask applied to fxGroup
         display.remove(fxGroup)
@@ -2677,7 +2606,6 @@ function scene:hide(e)
         display.remove(mapGroup)
         display.remove(topBar)
         display.remove(lowBar)
-        display.remove(infoPic)
         display.remove(lightningIcon1)
         display.remove(lightningIcon2)
         display.remove(lightningIcon3)

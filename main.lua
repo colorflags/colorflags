@@ -1,5 +1,8 @@
 local composer=require("composer")
 
+utf8 = require( "plugin.utf8" )
+ponyfont = require("ponyfont")
+
 require("cf_game_settings")
 require("cf_game_scale_components")
 require("cf_game_sfx")

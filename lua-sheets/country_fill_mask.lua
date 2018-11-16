@@ -13,7 +13,7 @@ local SheetInfo = {}
 SheetInfo.sheet =
 {
     frames = {
-    
+
         {
             -- andorra
             x=3864,
@@ -455,7 +455,7 @@ SheetInfo.sheet =
 
         },
     },
-    
+
     sheetContentWidth = 8091,
     sheetContentHeight = 2040
 }
