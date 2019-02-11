@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:592d32f8e345460eb1b77495f067d9e9:5e9f49927ccadee96f1290c4c386c456:a1db3c08425829f8d2ae39e343992c72$
+-- $TexturePacker:SmartUpdate:79e01694f7ad704dd6562d013c950752:5e9f49927ccadee96f1290c4c386c456:a1db3c08425829f8d2ae39e343992c72$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -16,40 +16,40 @@ SheetInfo.sheet =
     
         {
             -- Cruise1
-            x=686,
+            x=4,
             y=4,
-            width=220,
-            height=52,
+            width=232,
+            height=68,
 
         },
         {
             -- Cruise2
-            x=4,
+            x=240,
             y=4,
-            width=224,
-            height=56,
+            width=232,
+            height=68,
 
         },
         {
             -- Cruise3
-            x=460,
+            x=476,
             y=4,
-            width=222,
-            height=56,
+            width=232,
+            height=68,
 
         },
         {
             -- Cruise4
-            x=232,
+            x=712,
             y=4,
-            width=224,
-            height=56,
+            width=232,
+            height=68,
 
         },
     },
     
-    sheetContentWidth = 910,
-    sheetContentHeight = 64
+    sheetContentWidth = 948,
+    sheetContentHeight = 76
 }
 
 SheetInfo.frameIndex =

@@ -135,16 +135,12 @@ local function myTouchListener( event )
     if event.phase == "began" then
         print("touch ON. inside")
     elseif event.phase == "ended" or event.phase == "cancelled" then
-        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
         if currentObject.name == "playgame" then
-            -- currentObject:setSequence("playgame")
-            currentObject:setFrame(2)
+            currentObject:setFrame(1)
         elseif currentObject.name == "options" then
-            -- currentObject:setSequence("options")
-            currentObject:setFrame(2)
+            currentObject:setFrame(1)
         elseif currentObject.name == "about" then
-            -- currentObject:setSequence("about")
-            currentObject:setFrame(2)
+            currentObject:setFrame(1)
         end
 
         -- redundant ??
@@ -192,14 +188,14 @@ local function doFunction(e)
                 end
             else
                 if currentObject.name == "playgame" then
-                    currentObject:setFrame(4)
+                    currentObject:setFrame(1)
                 elseif currentObject.name == "options" then
-                    currentObject:setFrame(4)
+                    currentObject:setFrame(1)
                 elseif currentObject.name == "about" then
-                    currentObject:setFrame(4)
+                    currentObject:setFrame(1)
                 end
             end
-            currentObject:setFrame(2)
+            -- currentObject:setFrame(2)
             -- SAM: wtf. how is this working? do some testing.
             if(touchInsideBtn == true) then
                 currentObject.xScale = 1
@@ -210,8 +206,12 @@ local function doFunction(e)
         else
             if touchInsideBtn == false then
                 print("finger down, inside button: ", currentObject.name)
-                currentObject.xScale = 1.01
-                currentObject.yScale = 1.01
+
+                currentObject.xScale = 1
+                currentObject.yScale = 1
+                -- currentObject.xScale = 1.01
+                -- currentObject.yScale = 1.01
+
                 if(isBtnAnim) then
                     if currentObject.name == "pg" then
                         currentObject:setSequence("playgame_anim")
@@ -223,11 +223,11 @@ local function doFunction(e)
                     currentObject:play()
                 else
                     if currentObject.name == "playgame" then
-                        currentObject:setFrame(4)
+                        currentObject:setFrame(2)
                     elseif currentObject.name == "options" then
-                        currentObject:setFrame(4)
+                        currentObject:setFrame(2)
                     elseif currentObject.name == "about" then
-                        currentObject:setFrame(4)
+                        currentObject:setFrame(2)
                     end
                 end
             end
@@ -331,7 +331,8 @@ function scene:create( event )
     btnsPlayGame.anchorY = .5
     btnsPlayGame.x = _W/2
     btnsPlayGame.y = offsetStartBtns
-    btnsPlayGame:setFrame(2)
+    btnsPlayGame:setSequence( "playgame" )
+    btnsPlayGame:setFrame(1)
     --  btnsPlayGame.alpha=0.98
     btnsPlayGame.gotoScene="start"
     --  btnsPlayGame:scale(.8,.8)
@@ -345,7 +346,7 @@ function scene:create( event )
     btnsOptions.x = _W/2
     btnsOptions.y = offsetStartBtns+btnSpacing
     -- btnsOptions:setSequence("options")
-    btnsOptions:setFrame(2)
+    btnsOptions:setFrame(1)
     --  btnsOptions.alpha=.98
     btnsOptions.gotoScene = "options"
     --  btnsOptions:scale(.8,.8)
@@ -357,7 +358,7 @@ function scene:create( event )
     btnsAbout.x = _W/2
     btnsAbout.y = offsetStartBtns+(btnSpacing*2)
     -- btnsAbout:setSequence("about")
-    btnsAbout:setFrame(2)
+    btnsAbout:setFrame(1)
     --  btnsAbout.alpha=0.98
     btnsAbout.gotoScene = "about"
     --  btnsAbout:scale(.8,.8)

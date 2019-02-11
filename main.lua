@@ -3,6 +3,7 @@ local composer=require("composer")
 utf8 = require( "plugin.utf8" )
 ponyfont = require("ponyfont")
 
+require("ssk2.loadSSK")
 require("cf_game_settings")
 require("cf_game_scale_components")
 require("cf_game_sfx")
@@ -11,6 +12,9 @@ CFGameScaleComponents = CFGameScaleComponents()
 CFGameSFX = CFGameSFX()
 
 display.setStatusBar( display.HiddenStatusBar )
+
+_G.ssk.init({})
+ssk.persist.setDefault( "score.json", "highScore", 0 )
 
 _G.platform = system.getInfo( "platform" )
 if platform == "android" then

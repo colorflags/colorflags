@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:5c448248848c47c1c01957dcf2d448c6:99690a268d6701cc0b8453c827bd0e9a:a6b0c628d49414425d775f70fac857e0$
+-- $TexturePacker:SmartUpdate:91f4dd597443a0f6154e8d0dec97fda5:99690a268d6701cc0b8453c827bd0e9a:a6b0c628d49414425d775f70fac857e0$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -17,39 +17,39 @@ SheetInfo.sheet =
         {
             -- About1
             x=2,
-            y=33,
-            width=102,
-            height=27,
+            y=2,
+            width=108,
+            height=34,
 
         },
         {
             -- About2
-            x=107,
-            y=32,
-            width=103,
-            height=28,
+            x=112,
+            y=2,
+            width=108,
+            height=34,
 
         },
         {
             -- About3
-            x=2,
+            x=222,
             y=2,
-            width=103,
-            height=29,
+            width=108,
+            height=34,
 
         },
         {
             -- About4
-            x=107,
+            x=332,
             y=2,
-            width=105,
-            height=28,
+            width=108,
+            height=34,
 
         },
     },
     
-    sheetContentWidth = 214,
-    sheetContentHeight = 62
+    sheetContentWidth = 442,
+    sheetContentHeight = 38
 }
 
 SheetInfo.frameIndex =

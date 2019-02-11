@@ -1,6 +1,9 @@
 local composer=require("composer")
 local scene = composer.newScene()
 
+local pGet = ssk.persist.get
+local pSet = ssk.persist.set
+
 audio.stop()
 
 music=nil
@@ -163,8 +166,8 @@ local btnsSeq = {
     {
         name = "again",
         frames = {
-            btnsSheetCoords:getFrameIndex("Again4"),
-            btnsSheetCoords:getFrameIndex("Again1")
+            btnsSheetCoords:getFrameIndex("Again3"),
+            btnsSheetCoords:getFrameIndex("Again5")
         },
         time = 500
     },
@@ -181,8 +184,8 @@ local btnsSeq = {
     {
         name = "share",
         frames = {
-            btnsSheetCoords:getFrameIndex("Share4"),
-            btnsSheetCoords:getFrameIndex("Share1")
+            btnsSheetCoords:getFrameIndex("Share3"),
+            btnsSheetCoords:getFrameIndex("Share5")
         },
         time = 500
     },
@@ -199,8 +202,8 @@ local btnsSeq = {
     {
         name = "quit",
         frames = {
-            btnsSheetCoords:getFrameIndex("Quit4"),
-            btnsSheetCoords:getFrameIndex("Quit1")
+            btnsSheetCoords:getFrameIndex("Quit3"),
+            btnsSheetCoords:getFrameIndex("Quit5")
         },
         time = 500
     },
@@ -471,20 +474,7 @@ local function myTouchListener( event )
     if event.phase == "began" then
         print("touch ON. inside")
     elseif event.phase == "ended" or event.phase == "cancelled" then
-        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "again" then
-            -- currentObject:setSequence("playgame")
-            currentObject:setFrame(2)
-        elseif currentObject.name == "share" then
-            -- currentObject:setSequence("options")
-            currentObject:setFrame(2)
-        elseif currentObject.name == "quit" then
-            -- currentObject:setSequence("about")
-            currentObject:setFrame(2)
-        end
 
-        -- redundant ??
-        -- currentObject:setFrame(1)
         print(touchInsideBtn, isLoading)
         if touchInsideBtn == true and isLoading == false then
 
@@ -528,14 +518,14 @@ local function doFunction(e)
                 end
             else
                 if currentObject.name == "again" then
-                    currentObject:setFrame(4)
+                    currentObject:setFrame(1)
                 elseif currentObject.name == "share" then
-                    currentObject:setFrame(4)
+                    currentObject:setFrame(1)
                 elseif currentObject.name == "quit" then
-                    currentObject:setFrame(4)
+                    currentObject:setFrame(1)
                 end
             end
-            currentObject:setFrame(2)
+            -- currentObject:setFrame(2)
             -- SAM: wtf. how is this working? do some testing.
             if(touchInsideBtn == true) then
                 currentObject.xScale = 1
@@ -546,8 +536,12 @@ local function doFunction(e)
         else
             if touchInsideBtn == false then
                 print("finger down, inside button: ", currentObject.name)
-                currentObject.xScale = 1.01
-                currentObject.yScale = 1.01
+
+                currentObject.xScale = 1
+                currentObject.yScale = 1
+                -- currentObject.xScale = 1.01
+                -- currentObject.yScale = 1.01
+
                 if(isBtnAnim) then
                     if currentObject.name == "again" then
                         currentObject:setSequence("again_anim")
@@ -559,11 +553,11 @@ local function doFunction(e)
                     currentObject:play()
                 else
                     if currentObject.name == "again" then
-                        currentObject:setFrame(4)
+                        currentObject:setFrame(2)
                     elseif currentObject.name == "share" then
-                        currentObject:setFrame(4)
+                        currentObject:setFrame(2)
                     elseif currentObject.name == "quit" then
-                        currentObject:setFrame(4)
+                        currentObject:setFrame(2)
                     end
                 end
             end
@@ -641,6 +635,9 @@ local function cloudFade(self)
 end
 
 local function setScene()
+
+    print("High score: ", pGet( "score.json", "highScore" ) )
+
     bg = display.newRect(_W/2, _H/2, _W, _H)
     bg:setFillColor(0,.6,1)
 
@@ -766,7 +763,7 @@ local function setScene()
     btnsAgain.x=88
     btnsAgain.y=_H-offsetY
     btnsAgain:setSequence("again")
-    btnsAgain:setFrame(2)
+    btnsAgain:setFrame(1)
     btnsAgain.alpha=0
     btnsAgain.gotoScene="game"
     -- btnsAgain:scale(.8,.8)
@@ -779,7 +776,7 @@ local function setScene()
     btnsShare.x=_W/2+20
     btnsShare.y=_H-offsetY-1
     btnsShare:setSequence("game")
-    btnsShare:setFrame(2)
+    btnsShare:setFrame(1)
     btnsShare.alpha=0
     btnsShare.gotoScene="menu"
     -- btnsShare:scale(.8,.8)
@@ -792,7 +789,7 @@ local function setScene()
     btnsQuit.x=_W-69
     btnsQuit.y=_H-offsetY
     btnsQuit:setSequence("game")
-    btnsQuit:setFrame(2)
+    btnsQuit:setFrame(1)
     btnsQuit.alpha=0
     btnsQuit.gotoScene="menu"
     -- btnsQuit:scale(.8,.8)
@@ -957,7 +954,7 @@ function scene:show(e)
         }
 
         --align to center of "share" btn
-        scoreText = display.newEmbossedText( gameScore, _W/2+20, _H/2,"PTMono-Bold", 38 )
+        scoreText = display.newEmbossedText( pGet( "score.json", "highScore" ), _W/2+20, _H/2,"PTMono-Bold", 38 )
         scoreText:setFillColor( 1, .9, .4)
         scoreText:setEmbossColor( color )
 

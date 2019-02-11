@@ -110,18 +110,6 @@ local function myTouchListener( event )
         print("touch ON. inside")
     elseif event.phase == "ended" or event.phase == "cancelled" then
 
-        -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "pg" then
-            currentObject:setSequence("Start")
-        elseif currentObject.name == "opt" then
-            currentObject:setSequence("Cruise")
-        elseif currentObject.name == "abt" then
-            currentObject:setSequence("Tutorial")
-        end
-
-        -- redundant ??
-        -- currentObject:setFrame(1)
-
         if touchInsideBtn == true and isLoading == false then
             print("touch OFF. inside")
             -- composer.removeScene("start")

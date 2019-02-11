@@ -5,6 +5,9 @@ local composer = require("composer")
 local cameraEvent = require("cameraevent")
 local scene = composer.newScene()
 
+local pGet = ssk.persist.get
+local pSet = ssk.persist.set
+
 -- stop audioReservedChannel1. set it to nil?
 audio.stop( 1 )
 audioReservedChannel1 = nil
@@ -1085,6 +1088,7 @@ local function endGame(self)
     display.remove(self)
     choice = choice + 1
     if choice == numDeaths then
+        pSet( "score.json", "highScore" , score )
         local options = {effect = defaultTransition, params = {saveScore = score}}
         paceRect.isMoving = false
         composer.gotoScene("gameover", options)
