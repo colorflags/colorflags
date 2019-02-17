@@ -45,8 +45,8 @@ local game_H = display.actualContentHeight -- Get the height of the screen
 
 local debugOptions = {}
 debugOptions.god = false
-debugOptions.constantSpeed = true
-debugOptions.cycleModes = false
+debugOptions.gameSpeed = true
+debugOptions.cycleModes = true
 debugOptions.topBottomBars = false
 debugOptions.adherenceToFlagColors = false
 
@@ -224,6 +224,9 @@ gameDebugArray.gameDebugCycleBtnGroup = nil
 gameDebugArray.gameDebugCycleBtnDesc = nil
 gameDebugArray.gameDebugCycleBtnFill = nil
 gameDebugArray.gameDebugCycleBtnSym = nil
+gameDebugArray.gameDebugPanelInner = nil
+gameDebugArray.gameDebugPanelOuter = nil
+gameDebugArray.gameDebugPanelToggle = nil
 
 local deathScenario2Array = {}
 
@@ -383,7 +386,7 @@ end
 onOptionsTap = function(event)
     local optionName = event.target.name
     if optionName == "speedDecrease" or optionName == "speedIncrease" then
-        if flag ~= nil and debugOptions.constantSpeed == false then
+        if flag ~= nil and debugOptions.gameSpeed == false then
             if optionName == "speedIncrease" then
                 speedUp()
             end
@@ -431,11 +434,11 @@ onOptionsTap = function(event)
             gameDebugDeathBtnSym.text = ""
         end
     elseif optionName == "gameDebugSpeed" then
-        if debugOptions.constantSpeed == false then
-            debugOptions.constantSpeed = true
+        if debugOptions.gameSpeed == false then
+            debugOptions.gameSpeed = true
             gameDebugSpeedBtnSym.text = "X"
         else
-            debugOptions.constantSpeed = false
+            debugOptions.gameSpeed = false
             gameDebugSpeedBtnSym.text = ""
         end
     elseif optionName == "gameDebugCycle" then
@@ -828,7 +831,7 @@ local function setupScoreboard()
         shadow = {r = 0, g = 0, b = 0}
     }
 
-    local scoreboardOffsetFromLeft = 5
+    local scoreboardOffsetFromLeft = 14
     local scoreboardOffsetFromEachOther = 60
     local scoreboardOffsetIncDecBtns = 1.2
 
@@ -928,18 +931,23 @@ local function setupScoreboard()
     modeTextGroup:insert(modeIncreaseBtnGroup)
     modeIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
 
+    gameDebugPanelToggle = display.newEmbossedText("debug >", modeTextGroupAnchorX + (modeTextDesc.width/2), _H/2 + modeTextGroup.height, "PTMono-Bold", 12)
+    gameDebugPanelToggle:setFillColor(.2, .9, .4)
+    gameDebugPanelToggle:setEmbossColor(scoreboardColor)
+    gameDebugPanelToggle.anchorY = 0
+
     -- ##### ##### ##### ##### ##### #####
 
     gameDebugGroup = display.newGroup()
 
-    local gameDebugGroupAnchorY = _H/2 + scoreTextGroup.height + 20
-
+    local gameDebugGroupAnchorY = gameDebugPanelToggle.y + 10
+    local gameDebugGroupOffset = 10
     gameDebugSpeedBtnGroup = display.newGroup()
     gameDebugSpeedBtnGroup.name = "gameDebugSpeed"
 
     local textParams =
     {
-        text = "constant\nspeed?",
+        text = "speed?",
         x = _W/2,
         y = gameDebugGroupAnchorY,
         font = "PTMono-Bold",
@@ -958,7 +966,7 @@ local function setupScoreboard()
     gameDebugSpeedBtnFill:setFillColor(.2, .2, .2)
     gameDebugSpeedBtnFill.anchorY = 1
     gameDebugSpeedBtnSym = display.newText(gameDebugSpeedBtnGroup, "", gameDebugSpeedBtnFill.x, gameDebugSpeedBtnFill.y - (gameDebugSpeedBtnFill.height/2), "PTMono-Bold", 20)
-    if debugOptions.constantSpeed == true then
+    if debugOptions.gameSpeed == true then
         gameDebugSpeedBtnSym.text = "X"
     end
     gameDebugSpeedBtnGroup:addEventListener("tap", onOptionsTap)
@@ -1002,7 +1010,7 @@ local function setupScoreboard()
 
     local textParams =
     {
-        text = "cycle\nmodes?",
+        text = "modes?",
         x = gameDebugCycleAnchorX,
         y = gameDebugGroupAnchorY,
         font = "PTMono-Bold",
@@ -1027,6 +1035,14 @@ local function setupScoreboard()
     gameDebugCycleBtnGroup:addEventListener("tap", onOptionsTap)
     gameDebugGroup:insert(gameDebugCycleBtnGroup)
 
+    gameDebugPanelInner = display.newRoundedRect(_W/2, gameDebugGroupAnchorY - 4, gameDebugGroup.width+24, gameDebugGroup.height, 2)
+    gameDebugPanelInner:setFillColor(.7, .2, .4)
+    gameDebugGroup:insert(gameDebugPanelInner)
+    gameDebugPanelOuter = display.newRoundedRect(_W/2, gameDebugGroupAnchorY - 4, gameDebugGroup.width+4, gameDebugGroup.height + 4, 2)
+    gameDebugPanelOuter:setFillColor(.8, .6, .1)
+    gameDebugGroup:insert(gameDebugPanelOuter)
+    gameDebugPanelInner:toBack()
+    gameDebugPanelOuter:toBack()
 end
 
 -- SAM: combine functions speedUp() and resetSpawnTable()
@@ -1088,10 +1104,11 @@ local function endGame(self)
     display.remove(self)
     choice = choice + 1
     if choice == numDeaths then
-        pSet( "score.json", "highScore" , score )
-        local options = {effect = defaultTransition, params = {saveScore = score}}
+        if score > pGet("score.json", "highScore") then
+            pSet( "score.json", "highScore" , score )
+        end
         paceRect.isMoving = false
-        composer.gotoScene("gameover", options)
+        composer.gotoScene("gameover")
     end
 end
 
@@ -1734,7 +1751,7 @@ previouscountryFill = nil
 -- READYOBJ: setCountryParameters
 setCountryParameters = function(restartCountry)
 
-    if not debugOptions.constantSpeed and gameMechanics.overrideFlag == true then
+    if not debugOptions.gameSpeed and gameMechanics.overrideFlag == true then
         speedUp()
     end
 
@@ -1857,7 +1874,6 @@ newCountry = function()
     --bmpText.fontSize = 60
     bmpText.align = "center"
 
-
     -- Demo looping through each letter
     for i = 1, bmpText.numChildren do
       transition.from ( bmpText[i], { delay = 100 + (i*25), time = 250, xScale = 2, yScale = 2, alpha = 0, transition = easing.outBounce })
@@ -1946,6 +1962,7 @@ newCountry = function()
     end
 
     local tileMultiplier = .9
+    -- SAM: understand this a bit more. Should these values be returned to their defaults as soon as implementing this fxgroup.png texture?
     display.setDefault("textureWrapX", "repeat")
     display.setDefault("textureWrapY", "mirroredRepeat")
     -- SAM: rename png, add scaling variants
@@ -2594,6 +2611,7 @@ function scene:hide(e)
         display.remove(speedTextGroup)
         display.remove(scoreTextGroup)
         display.remove(modeTextGroup)
+        display.remove(gameDebugPanelToggle)
 
         display.remove(paletteBarTop)
         display.remove(paletteBarBtm)

@@ -1,3 +1,6 @@
+display.setDefault("textureWrapX", "clampToEdge")
+display.setDefault("textureWrapY", "clampToEdge")
+
 local composer=require("composer")
 local scene = composer.newScene()
 
@@ -871,55 +874,6 @@ local function noHighScore()
   setScene()
 end
 
-local function scoreSave(tempScore)
-   local path = system.pathForFile( "CFscorefile.txt", system.DocumentsDirectory )
-   local file = io.open(path, "w")
-   if ( file ) then
-      local contents = tostring(tempScore )
-      file:write( tempScore )
-      io.close( file )
-      return true
-   else
-      print( "Error: could not read ", "CFscorefile.txt", "." )
-      return false
-   end
-end
-
-local function scoreLoad()
-   local path = system.pathForFile( "CFscorefile.txt", system.DocumentsDirectory )
-   local contents = ""
-   local file = io.open( path, "r" )
-   if ( file ) then
-      -- Read all contents of file into a string
-      local contents = file:read( "*a" )
-      local score = tonumber(contents);
-      io.close( file )
-      return score
-   else
-      print( "Error: could not read scores from ", "CFscorefile.txt", "." )
-   end
-   return nil
-end
-
-local function scoreCheck()
-
-    local loadedHighScore=scoreLoad()
-    if loadedHighScore == nil then
-      scoreSave(gameScore)
-      highScore=gameScore
-      newHighScore()
-    elseif loadedHighScore ~= nil then
-      if loadedHighScore >= gameScore then
-         highScore=loadedHighScore
-         noHighScore()
-      elseif loadedHighScore < gameScore then
-         scoreSave(gameScore)
-         highScore=gameScore
-         newHighScore()
-      end
-    end
-end
-
 -- transition.to( self, { time=4000, y=200, transition=easing.continuousLoop } )
 
 local function shakeText()
@@ -940,13 +894,6 @@ end
 function scene:show(e)
   if e.phase == "will" then
 
-        if overrideScore==true then
-          gameScore=5
-         highScore=6
-        elseif setScore == false then
-          gameScore=e.params.saveScore
-        end
-
         local color =
         {
             highlight = { r=1, g=1, b=1 },
@@ -961,16 +908,10 @@ function scene:show(e)
         shakeText()
         self.view:insert(scoreText)
 
-        if overrideScore== true then
-          if highScore>gameScore then
-         newHighScore()
-          elseif highScore<=gameScore then
-          noHighScore()
-        end
-        elseif overrideScore==false then
-           scoreCheck()
+        newHighScore()
+        -- issues
+        -- noHighScore()
 
-        end
   elseif e.phase== "did" then
         btnsAgain:addEventListener( "touch", myTouchListener )
         btnsAgain:addEventListener( "touch", doFunction )

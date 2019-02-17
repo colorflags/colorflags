@@ -160,10 +160,11 @@ CFGameSettings = class(function(c)
         id = 14,
         name = "egypt",
         printedName = "Egypt",
-        code = "rw",
+        code = "rwb",
         colors = {
             r = CFColor(206,17,38),
-            w = CFColor(255,255,255)
+            w = CFColor(255,255,255),
+            b = CFColor(0,0,0)
         },
         coords = { x = 4431, y = 1192 }
     }
