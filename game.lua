@@ -49,6 +49,7 @@ debugOptions.gameSpeed = true
 debugOptions.cycleModes = true
 debugOptions.topBottomBars = false
 debugOptions.adherenceToFlagColors = false
+debugOptions.debugPanel = true
 
 local gameMechanics = {}
 gameMechanics.playCountryDuration = 20000
@@ -72,8 +73,8 @@ local score = 0
 local numDeaths = 0
 
 local levelsArray
-local speedTableIndex = 3
-local speed
+local levelsIndex = 3
+local speed  -- gameSpeed?
 local timeVar
 
 -- checks if game just started
@@ -389,18 +390,20 @@ onOptionsTap = function(event)
         if flag ~= nil and debugOptions.gameSpeed == false then
             if optionName == "speedIncrease" then
                 speedUp()
+            elseif optionName == "speedDecrease" then
+                speedDown()
             end
 
             -- wrap in a function.. this can all be in the speedUp() function?
-            if fps == 30 then
-                speed = levelsArray[speedTableIndex].speed
-            else
-                speed = levelsArray[speedTableIndex].speed / 2
-            end
-
-            timeVar = levelsArray[speedTableIndex].timeVar
-            speedText.text = speed
-            speedText:toFront()
+            -- if fps == 30 then
+            --     speed = levelsArray[levelsIndex].speed
+            -- else
+            --     speed = levelsArray[levelsIndex].speed / 2
+            -- end
+            --
+            -- timeVar = levelsArray[levelsIndex].timeVar
+            -- speedText.text = levelsIndex
+            -- speedText:toFront()
         end
     elseif optionName == "modeDecrease" or optionName == "modeIncrease" then
         if flag ~= nil and debugOptions.cycleModes == false then
@@ -448,6 +451,20 @@ onOptionsTap = function(event)
         else
             debugOptions.cycleModes = false
             gameDebugCycleBtnSym.text = ""
+        end
+    elseif optionName == "gameDebugPanel" then
+        if debugOptions.debugPanel == false then
+            debugOptions.debugPanel = true
+            gameDebugGroup.alpha = 1
+            gameDebugPanelInner.alpha = 1
+            gameDebugPanelOuter.alpha = 1
+            print("open panel")
+        else
+            debugOptions.debugPanel = false
+            gameDebugGroup.alpha = 0
+            gameDebugPanelInner.alpha = 0
+            gameDebugPanelOuter.alpha = 0
+            print("close panel")
         end
     end
     return true
@@ -932,9 +949,11 @@ local function setupScoreboard()
     modeIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
 
     gameDebugPanelToggle = display.newEmbossedText("debug >", modeTextGroupAnchorX + (modeTextDesc.width/2), _H/2 + modeTextGroup.height, "PTMono-Bold", 12)
+    gameDebugPanelToggle.name = "gameDebugPanel"
     gameDebugPanelToggle:setFillColor(.2, .9, .4)
     gameDebugPanelToggle:setEmbossColor(scoreboardColor)
     gameDebugPanelToggle.anchorY = 0
+    gameDebugPanelToggle:addEventListener("tap", onOptionsTap)
 
     -- ##### ##### ##### ##### ##### #####
 
@@ -1043,20 +1062,55 @@ local function setupScoreboard()
     gameDebugGroup:insert(gameDebugPanelOuter)
     gameDebugPanelInner:toBack()
     gameDebugPanelOuter:toBack()
+
+    if debugOptions.debugPanel == true then
+        gameDebugGroup.alpha = 1
+        -- gameDebugPanelInner.alpha = 1
+        -- gameDebugPanelOuter.alpha = 1
+        print("start game with debug panel")
+    else
+        gameDebugGroup.alpha = 0
+        -- gameDebugPanelInner.alpha = 0
+        -- gameDebugPanelOuter.alpha = 0
+        print("start game with no debug panel")
+    end
 end
 
 -- SAM: combine functions speedUp() and resetSpawnTable()
 speedUp = function()
-    if speedTableIndex ~= #levelsArray then
-        speedTableIndex = speedTableIndex + 1
-        speed = levelsArray[speedTableIndex].speed
-        timeVar = levelsArray[speedTableIndex].timeVar
-        speedText.text = speed
+    if levelsIndex ~= #levelsArray then
+        levelsIndex = levelsIndex + 1
+        if fps == 30 then
+            speed = levelsArray[levelsIndex].speed
+        else
+            speed = levelsArray[levelsIndex].speed / 2
+        end
+        -- speed = levelsArray[levelsIndex].speed
+        timeVar = levelsArray[levelsIndex].timeVar
+        speedText.text = levelsIndex
         speedText:toFront()
     elseif finalChallenge == false then
         finalChallenge = true
     end
 end
+
+speedDown = function()
+    if levelsIndex ~= #levelsArray then
+        levelsIndex = levelsIndex - 1
+        if fps == 30 then
+            speed = levelsArray[levelsIndex].speed
+        else
+            speed = levelsArray[levelsIndex].speed / 2
+        end
+        -- speed = levelsArray[levelsIndex].speed
+        timeVar = levelsArray[levelsIndex].timeVar
+        speedText.text = levelsIndex
+        speedText:toFront()
+    elseif finalChallenge == false then
+        finalChallenge = true
+    end
+end
+
 
 -- READYOBJ: resetSpawnTable
 resetSpawnTable = function()
@@ -1081,22 +1135,22 @@ resetSpawnTable = function()
     	--decide what gameMechanics.mode is next
         if gameMechanics.mode == 1 then
             gameMechanics.mode = 2
-            --speedTableIndex = speedTableIndex + 1
+            --levelsIndex = levelsIndex + 1
         elseif gameMechanics.mode == 2 then
             gameMechanics.mode = 3
-            --speedTableIndex = speedTableIndex / 2 - 1
-            --speedTableIndex = math.round(speedTableIndex)
+            --levelsIndex = levelsIndex / 2 - 1
+            --levelsIndex = math.round(levelsIndex)
         elseif gameMechanics.mode == 3 then
             gameMechanics.mode = 1
-            --speedTableIndex = (speedTableIndex) * 2
+            --levelsIndex = (levelsIndex) * 2
         end
     end
 
     --ERROR: crashes, let the game run
-    -- speed = levels[speedTableIndex].speed
-    -- timeVar = levels[speedTableIndex].timeVar
+    -- speed = levels[levelsIndex].speed
+    -- timeVar = levels[levelsIndex].timeVar
 
-    speedText.text = speed
+    speedText.text = levelsIndex
     speedText:toFront()
 end
 
@@ -1681,7 +1735,7 @@ end
 delayPace = function()
     paceRect.isMoving = true
     if speedText ~= 0 and speedText ~= nil then
-        speedText.text = speed
+        speedText.text = levelsIndex
         speedText:toFront()
     end
 end
@@ -1751,19 +1805,19 @@ previouscountryFill = nil
 -- READYOBJ: setCountryParameters
 setCountryParameters = function(restartCountry)
 
-    if not debugOptions.gameSpeed and gameMechanics.overrideFlag == true then
+    if debugOptions.gameSpeed == true and gameMechanics.overrideFlag == false and countriesCompleted > 0 then
         speedUp()
     end
 
     -- wrap in a function.. this can all be in the speedUp() function?
     if fps == 30 then
-        speed = levelsArray[speedTableIndex].speed
+        speed = levelsArray[levelsIndex].speed
     else
-        speed = levelsArray[speedTableIndex].speed / 2
+        speed = levelsArray[levelsIndex].speed / 2
     end
 
-    timeVar = levelsArray[speedTableIndex].timeVar
-    speedText.text = speed
+    timeVar = levelsArray[levelsIndex].timeVar
+    speedText.text = levelsIndex
     speedText:toFront()
 
     music = nil
