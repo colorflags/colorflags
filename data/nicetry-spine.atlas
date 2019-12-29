@@ -1,0 +1,200 @@
+
+nicetry-spine.png
+size: 2048,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+01
+  rotate: false
+  xy: 816, 798
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+02
+  rotate: false
+  xy: 2, 599
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+03
+  rotate: false
+  xy: 832, 599
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+04
+  rotate: false
+  xy: 2, 400
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+05
+  rotate: false
+  xy: 832, 400
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+06
+  rotate: false
+  xy: 2, 201
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+07
+  rotate: false
+  xy: 832, 201
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+08
+  rotate: true
+  xy: 1662, 167
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+09
+  rotate: false
+  xy: 2, 2
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+10
+  rotate: false
+  xy: 832, 2
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+inner-text
+  rotate: false
+  xy: 2, 814
+  size: 812, 181
+  orig: 812, 181
+  offset: 0, 0
+  index: -1
+
+nicetry-spine2.png
+size: 2048,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+11
+  rotate: false
+  xy: 2, 798
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+12
+  rotate: false
+  xy: 2, 599
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+13
+  rotate: false
+  xy: 832, 798
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+14
+  rotate: false
+  xy: 2, 400
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+15
+  rotate: false
+  xy: 832, 599
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+16
+  rotate: false
+  xy: 2, 201
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+17
+  rotate: false
+  xy: 832, 400
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+18
+  rotate: false
+  xy: 2, 2
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+19
+  rotate: false
+  xy: 832, 201
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+20
+  rotate: false
+  xy: 832, 2
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+21
+  rotate: true
+  xy: 1662, 167
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+
+nicetry-spine3.png
+size: 2048,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+22
+  rotate: false
+  xy: 2, 201
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+23
+  rotate: false
+  xy: 2, 2
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+24
+  rotate: false
+  xy: 832, 201
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1
+25
+  rotate: false
+  xy: 832, 2
+  size: 828, 197
+  orig: 828, 197
+  offset: 0, 0
+  index: -1

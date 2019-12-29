@@ -40,21 +40,23 @@ local codeLetterToColorKey = {
 local game_W = display.actualContentWidth -- Get the width of the screen
 local game_H = display.actualContentHeight -- Get the height of the screen
 
---SAM: var to handle death
---SAM: var to handle animations
-
 local debugOptions = {}
 debugOptions.god = false
-debugOptions.gameSpeed = true
-debugOptions.cycleModes = true
-debugOptions.topBottomBars = false
+debugOptions.gameSpeed = false
+debugOptions.cycleModes = false
 debugOptions.adherenceToFlagColors = false
 debugOptions.debugPanel = true
+debugOptions.scoreKeeper = true
+
+if debugOptions.scoreKeeper == true then
+    pSet( "score.json", "highScore" , 0 )
+end
 
 local gameMechanics = {}
-gameMechanics.playCountryDuration = 20000
+gameMechanics.playCountryDuration = 30000 --30000
 gameMechanics.transitionToCountryDuration = 2000
 gameMechanics.firstPaletteDelay = 10
+gameMechanics.growSpeedIndependance = false
 gameMechanics.countriesSpawned = 0
 gameMechanics.overrideFlag = false
 gameMechanics.heightModeTop = 35
@@ -72,10 +74,33 @@ local lightningCount = 1
 local score = 0
 local numDeaths = 0
 
-local levelsArray
-local levelsIndex = 3
-local speed  -- gameSpeed?
+-- bad names here?
+local levelsIndex = 1
+-- SAM: better name for variables speed and timeVar
+
+local speed -- use gameSpeed? we already have speed as obj in levelsArray
 local timeVar
+local timeVarMultiplier = 0.5
+
+local levelsArray
+    levelsArray = {
+        {speed=0.50, timeVar=5900},
+        {speed=0.55, timeVar=5400},
+        {speed=0.60, timeVar=4950},
+        {speed=0.65, timeVar=4450},
+        {speed=0.70, timeVar=4400},
+        {speed=0.75, timeVar=4200},
+
+        {speed=0.80, timeVar=4000},
+        {speed=0.85, timeVar=3800},
+        {speed=0.90, timeVar=3600},
+        {speed=0.95, timeVar=3400},
+        {speed=1.00, timeVar=3200},
+        {speed=1.05, timeVar=3000},
+        {speed=1.10, timeVar=2800},
+        {speed=1.15, timeVar=2600},
+        {speed=1.20, timeVar=2400}
+    }
 
 -- checks if game just started
 local countriesCompleted = 0
@@ -87,13 +112,12 @@ local lineTable = {} --Table for deleting lighning lines
 local lineTableCount = 0
 local currentColor = "first"
 local previousColor = "first"
-local motion
 local choice = 0
 local timerSpeed
 local flag2Timer
 local finalChallenge = false
 local count = 1
-local firstObject = true
+local firstPalette = true
 local setTheFlag = false
 local xCoord = 0
 local yCoord = 0
@@ -299,36 +323,6 @@ local nationalFlagsSeq = {
     {name = "unitedkingdom", sheet = nationalFlags3Sheet, frames = {6}},
     {name = "unitedstates", sheet = nationalFlags3Sheet, frames = {7}}
 }
-
--- REMOVE
-local topBtmBarSpriteCoords = require("lua-sheets.TopBtmBar")
-local topBtmBarSheet = graphics.newImageSheet("images/TopBtmBar.png", topBtmBarSpriteCoords:getSheet())
-
-local topBtmBarSeq = {
-    {name = "top", frames = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, time = 1000, loopCount = 0},
-    {name = "btm", frames = {6, 7, 8, 9, 10, 1, 2, 3, 4, 5}, time = 1000, loopcount = 0},
-}
-
-local bonusImplodeSpriteCoords1 = require("lua-sheets.bonus-implode1")
-local bonusImplodeSheet1 = graphics.newImageSheet("images/bonus-implode1.png", bonusImplodeSpriteCoords1:getSheet())
-
-local bonusImplodeSpriteCoords2 = require("lua-sheets.bonus-implode2")
-local bonusImplodeSheet2 = graphics.newImageSheet("images/bonus-implode2.png", bonusImplodeSpriteCoords2:getSheet())
-
-local bonusImplodeSeq = {
-    {name = "2x", sheet = bonusImplodeSheet1, frames = {1, 2, 3, 4, 5, 6}, time = 800, loopCount = 1},
-    {name = "3x", sheet = bonusImplodeSheet2, frames = {1, 2, 3, 4, 5, 6}, time = 800, loopCount = 1},
-    {name = "4x", sheet = bonusImplodeSheet1, frames = {7, 8, 9, 10, 11, 12}, time = 800, loopCount = 1},
-    {name = "5x", sheet = bonusImplodeSheet2, frames = {7, 8, 9, 10, 11, 12}, time = 800, loopCount = 1},
-    {name = "6x", sheet = bonusImplodeSheet1, frames = {13, 14, 15, 16, 17, 18}, time = 800, loopCount = 1},
-    {name = "7x", sheet = bonusImplodeSheet1, frames = {19, 20, 21, 22, 23, 24}, time = 800, loopCount = 1},
-    {name = "8x", sheet = bonusImplodeSheet1, frames = {25, 26, 27, 28, 29, 30}, time = 800, loopCount = 1},
-    {name = "9x", sheet = bonusImplodeSheet2, frames = {13, 14, 15, 16, 17, 18}, time = 800, loopCount = 1},
-}
-
--- SAM: how about no multipack! There are only going to be 4 or 5 more image files anyway. This will make configuring the animation sequence easier
-
--- SAM: char1, char2, charPlus
 
 local function spriteListener( event )
     -- print( "Sprite event: ", event.target.sequence, event.target.frame, event.phase )
@@ -670,49 +664,7 @@ local function setupVariables()
 	-- mapGroup.maskX = _W/2
 	-- mapGroup.maskY = _H/2
 
-    -- SAM: better name for variables speed and timeVar
-    levelsArray = {
-        {speed = 1, timeVar = 2550},
-        {speed = 2, timeVar = 1700},
-        {speed = 3, timeVar = 1250},
-        {speed = 4, timeVar = 1000},
-        {speed = 5, timeVar = 910},
-        {speed = 6, timeVar = 750},
-        {speed = 7, timeVar = 700},
-        {speed = 8, timeVar = 600},
-        {speed = 9, timeVar = 550},
-        {speed = 10, timeVar = 450},
-        {speed = 11, timeVar = 420},
-        {speed = 12, timeVar = 400},
-        {speed = 13, timeVar = 380},
-        {speed = 14, timeVar = 365},
-        {speed = 15, timeVar = 345},
-        {speed = 16, timeVar = 335},
-        {speed = 17, timeVar = 305},
-        {speed = 18, timeVar = 280},
-        {speed = 19, timeVar = 260},
-        {speed = 20, timeVar = 240},
-        {speed = 21, timeVar = 220},
-        {speed = 22, timeVar = 200},
-        {speed = 23, timeVar = 190},
-        {speed = 24, timeVar = 185},
-        {speed = 25, timeVar = 175},
-        {speed = 26, timeVar = 170},
-        {speed = 27, timeVar = 170},
-        {speed = 28, timeVar = 165},
-        {speed = 29, timeVar = 165},
-        {speed = 30, timeVar = 160},
-        {speed = 31, timeVar = 155},
-        {speed = 32, timeVar = 155},
-        {speed = 33, timeVar = 150},
-        {speed = 34, timeVar = 145},
-        {speed = 35, timeVar = 145},
-        {speed = 36, timeVar = 140},
-        {speed = 37, timeVar = 135},
-        {speed = 38, timeVar = 125},
-        {speed = 39, timeVar = 120},
-        {speed = 40, timeVar = 110}
-    }
+
 
     -- flag.anchorX = 0.5 ; flag.anchorY = 0.5
     --
@@ -1087,7 +1039,7 @@ speedUp = function()
         end
         -- speed = levelsArray[levelsIndex].speed
         timeVar = levelsArray[levelsIndex].timeVar
-        speedText.text = levelsIndex
+        speedText.text = levelsArray[levelsIndex].speed
         speedText:toFront()
     elseif finalChallenge == false then
         finalChallenge = true
@@ -1104,7 +1056,7 @@ speedDown = function()
         end
         -- speed = levelsArray[levelsIndex].speed
         timeVar = levelsArray[levelsIndex].timeVar
-        speedText.text = levelsIndex
+        speedText.text = levelsArray[levelsIndex].speed
         speedText:toFront()
     elseif finalChallenge == false then
         finalChallenge = true
@@ -1121,7 +1073,7 @@ resetSpawnTable = function()
     spawnTable = {}
     count = 1
     -- same as countriesCompleted counted?
-    firstObject = true
+    firstPalette = true
     currentColor = nil    --reset bonus score gameMechanics.modes for new flag
     previousColor = nil
 
@@ -1150,7 +1102,7 @@ resetSpawnTable = function()
     -- speed = levels[levelsIndex].speed
     -- timeVar = levels[levelsIndex].timeVar
 
-    speedText.text = levelsIndex
+    speedText.text = levelsArray[levelsIndex].speed
     speedText:toFront()
 end
 
@@ -1265,7 +1217,7 @@ local function removeText(text)
     text:removeSelf()
 end
 
--- REVIEW: rename?
+-- Boundary Handler
 local function boundaryElimination(e)
     for i = 1, #spawnTable do
 		--junk paletts go away
@@ -1310,11 +1262,11 @@ local function boundaryElimination(e)
     end
 end
 
--- REVIEW: rename?
+-- Boundary Handler
 local function boundaryCheck(e)
     local temp
     local breakLoop = false
-	--breakLoop ensures this outerloop will break after it finds the bad pallet
+	--breakLoop ensures this outerloop will break after it finds the bad pallete
     if #spawnTable > 0 and breakLoop == false then
         for i = 1, #spawnTable do
             if spawnTable[i] ~= 0 and spawnTable[i] ~= nil then
@@ -1340,14 +1292,12 @@ local function boundaryCheck(e)
                                     spawnTable[i]:removeEventListener("touch", objTouch)
 									--Check for gameover palettes
                                     if spawnTable[i].x < - 40 or spawnTable[i].x > _W + 40 then
-                                        if gameMechanics.mode == 1 then
-                                            if lookupCode(code, spawnTable[i]) == 1 then
-                                                spawnTable[i]:removeEventListener("touch", objTouch)
-                                                spawnTable[i].dead = true
-                                                numDeaths = numDeaths + 1
-                                            else
-                                                spawnTable[i].dead = false
-                                            end
+                                        if lookupCode(code, spawnTable[i]) == 1 then
+                                            spawnTable[i]:removeEventListener("touch", objTouch)
+                                            spawnTable[i].dead = true
+                                            numDeaths = numDeaths + 1
+                                        else
+                                            spawnTable[i].dead = false
                                         end
                                     end
 
@@ -1357,6 +1307,7 @@ local function boundaryCheck(e)
                                     end
 
                                     print("reverse motion for death effect")
+                                    -- replace with Corner implementation
                                     if spawnTable[i].isTopLeft == true or spawnTable[i].isBottomLeft == true then
                                         -- SAM: temp = ???
                                         temp = spawnTable[i].x
@@ -1390,24 +1341,10 @@ local function boundaryCheck(e)
                             for i = 1, #spawnTable do
                                 if spawnTable[i] ~= 0 then
                                     if spawnTable[i].x < -40 or spawnTable[i].x > _W + 40 then
-                                        if gameMechanics.mode == 1 then
-                                            if lookupCode(code, spawnTable[i]) == 1 then
-                                                spawnTable[i]:removeEventListener("touch", objTouch)
-                                                spawnTable[i]:removeSelf()
-                                                spawnTable[i] = 0
-                                            end
-                                        elseif gameMechanics.mode == 2 then
-                                            if lookupCode(code, spawnTable[i]) == 1 then
-                                                spawnTable[i]:removeEventListener("touch", objTouch)
-                                                spawnTable[i]:removeSelf()
-                                                spawnTable[i] = 0
-                                            end
-                                        elseif gameMechanics.mode == 3 then
-                                            if lookupCode(code, spawnTable[i]) == 1 then
-                                                spawnTable[i]:removeEventListener("touch", objTouch)
-                                                spawnTable[i]:removeSelf()
-                                                spawnTable[i] = 0
-                                            end
+                                        if lookupCode(code, spawnTable[i]) == 1 then
+                                            spawnTable[i]:removeEventListener("touch", objTouch)
+                                            spawnTable[i]:removeSelf()
+                                            spawnTable[i] = 0
                                         end
                                     end
                                 end
@@ -1421,7 +1358,13 @@ local function boundaryCheck(e)
 end
 
 local function paletteGrow(self)
-    transition.to(self, {time = timeVar * (.5), xScale = 1, yScale = 1})
+    if gameMechanics.growSpeedIndependance == true then
+        transition.to(self, {time = 200, xScale = 1, yScale = 1})
+    else
+        -- SAM: originally timeVar * timeVarMultiplier
+        transition.to(self, {time = timeVar * timeVarMultiplier, xScale = 1, yScale = 1})
+        -- transition.to(self, {time = timeVar, xScale = 1, yScale = 1})
+    end
 end
 
 -- PALETTES
@@ -1431,10 +1374,6 @@ local function spawnPalette(params)
     -- print(params.type)
 
     local object = display.newRoundedRect(0, 0, 80, 60, 3)
-
-    -- temp, look into shadow
-    -- object.strokeWidth = 2
-    -- object:setStrokeColor( .1, .1, .1 )
 
     object.isPaletteActive = true
     object.isGrown = false
@@ -1525,18 +1464,18 @@ local function spawnPalette(params)
 	--new pallets are being scaled to full size as they appear
     if gameMechanics.mode == 1 or gameMechanics.mode == 2 then
         if object.index == 1 or object.index == 2 then
-            transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
+            transition.to(object, {time = timeVar * timeVarMultiplier, xScale = .01, yScale = .01, onComplete = paletteGrow})
         else
-            transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
+            transition.to(object, {time = timeVar * timeVarMultiplier, xScale = .01, yScale = .01, onComplete = paletteGrow})
             if spawnTable[object.index - 2] ~= 0 then
                 spawnTable[object.index - 2]:toFront()
             end
         end
     elseif gameMechanics.mode == 3 then
         if object.index == 1 or object.index == 2 or object.index == 3 or object.index == 4 then
-            transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
+            transition.to(object, {time = timeVar * timeVarMultiplier, xScale = .01, yScale = .01, onComplete = paletteGrow})
         else
-            transition.to(object, {time = timeVar * (.5), xScale = .01, yScale = .01, onComplete = paletteGrow})
+            transition.to(object, {time = timeVar * timeVarMultiplier, xScale = .01, yScale = .01, onComplete = paletteGrow})
             if spawnTable[object.index - 4] ~= 0 then
                 spawnTable[object.index - 4]:toFront()
             end
@@ -1617,24 +1556,12 @@ local function lightningButton(flagTouchEvent)
     lightningIcons()
 end
 
-local function lightningEnable()
-    --SAM: we can just keep this running rather than removing it and adding it again whenever lightningCount changes from 0
-    -- add animation (flag shakes) when you have no lightning to use
-    if lightningCount > 0 then
-        flag:addEventListener("tap", lightningButton)
-        lightningIcons()
-    else
-        flag:removeEventListener("tap", lightningButton)
-    end
-end
-
-
 local function trackLightningScore()
     print("spread from trackLightningScore:", spread)
     -- SAM: my lightning tracker. keeping things simple
     if spread == 0 then
         lightningScore = 0
-    elseif spread >= 2 and lightningCount <= 4 then
+    elseif spread >= 1 and lightningCount <= 4 then
         -- SAM: do we no longer need lightningScore?
         lightningScore = lightningScore + 1
         lightningCount = lightningCount + 1
@@ -1686,21 +1613,6 @@ function lightningStrike(self)
             bonusTextTemp:removeSelf()
             bonusTextTemp = nil
         end})
-
-        -- SAM: disable bonusImplode for now...
-        if motion ~= nil then
-            timer.cancel(motion)
-            motion = nil
-        end
-        if spread then
-            bonusImplode:setSequence("1")
-        end
-        bonusImplode.alpha = 1
-        bonusImplode:toFront()
-        bonusImplode:play()
-        bonusImplode.x = _W * (4 / 5)
-        bonusImplode.y = _H / 2
-        motion = timer.performWithDelay(800, cancelTimerBonusImplode, 1)
     else
         spread = 1
         currentColor = nil
@@ -1713,8 +1625,6 @@ function lightningStrike(self)
         end
     end
     previousColor = self.type
-
-
 
     scoreText.text = score + spread
     score = score + spread
@@ -1735,7 +1645,7 @@ end
 delayPace = function()
     paceRect.isMoving = true
     if speedText ~= 0 and speedText ~= nil then
-        speedText.text = levelsIndex
+        speedText.text = levelsArray[levelsIndex].speed
         speedText:toFront()
     end
 end
@@ -1804,7 +1714,7 @@ previousCountry = nil
 previouscountryFill = nil
 -- READYOBJ: setCountryParameters
 setCountryParameters = function(restartCountry)
-
+    -- don't increase speed every new country, change modes or randomize modes.
     if debugOptions.gameSpeed == true and gameMechanics.overrideFlag == false and countriesCompleted > 0 then
         speedUp()
     end
@@ -1817,7 +1727,7 @@ setCountryParameters = function(restartCountry)
     end
 
     timeVar = levelsArray[levelsIndex].timeVar
-    speedText.text = levelsIndex
+    speedText.text = levelsArray[levelsIndex].speed
     speedText:toFront()
 
     music = nil
@@ -1844,8 +1754,13 @@ setCountryParameters = function(restartCountry)
             previousCountry = country
             previouscountryFill = countryFill
         end
+
         newCountry()
-        sideTimer = timer.performWithDelay(gameMechanics.transitionToCountryDuration, finishScale, 1)
+
+        -- SAM: calling of finishScale
+        -- sideTimer = timer.performWithDelay(gameMechanics.transitionToCountryDuration, finishScale, 1)
+        sideTimer = timer.performWithDelay(1, finishScale, 1)
+
         -- SAM: IMPORTANT, rename paceTimer to something more serious
         paceTimer = timer.performWithDelay(10, delayPace, 1)
 
@@ -2069,6 +1984,9 @@ newCountry = function()
     lightningIcon4:toFront()
     lightningIcon5:toFront()
 
+    flag:addEventListener("tap", lightningButton)
+    lightningIcons()
+
     code = country.code
 
     if(country.colors.r) then
@@ -2119,11 +2037,16 @@ newCountry = function()
         audio.stop(bobby)
     end
 
+    -- print(timeVar * timeVarMultiplier)
     music = audio.loadStream("anthems/" .. country.name .. ".wav")
-    bobby = audio.play(music, {channel = 1, loops=-1, onComplete=function(event)
-        print("finished streaming ANTHEM on channel ", event.channel)
-    end})
-    audio.setVolume( .5, { channel = 1 } )
+    local function listener(event)
+        bobby = audio.play(music, {channel = 1, loops=-1, onComplete=function(event)
+            print("finished streaming ANTHEM on channel ", event.channel)
+        end})
+        audio.setVolume( .5, { channel = 1 } )
+    end
+    timer.performWithDelay ((timeVar * timeVarMultiplier), listener)
+
 end
 
 local function killBars()
@@ -2137,7 +2060,7 @@ local function countryTrace()
 end
 
 local function removeFlag()
-    flag:removeEventListener("touch", lightningButton)
+    flag:removeEventListener("tap", lightningButton)
     flag:removeSelf()
     flag = nil
 end
@@ -2147,40 +2070,10 @@ end
 -- no longer using topBar and lowBar
 
 finishScale = function()
-    topBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
-	topBar:setFillColor(0, 0, 0)
-	topBar.yScale = -1
-	topBar.anchorX = 0.5
-    topBar.anchorY = 1
-    topBar.x = _W / 2
-	topBar.y = -30
-    topBar.alpha = 0
-    topBar:toFront()
-    topBar:setSequence("top")
-    topBar:play()
-
-	lowBar = display.newSprite(topBtmBarSheet, topBtmBarSeq)
-    lowBar:setFillColor(0, 0, 0)
-	lowBar.anchorX = 0.5
-    lowBar.anchorY = 1
-	lowBar.x = _W / 2
-	lowBar.y = _H + 30
-    lowBar.alpha = 0
-    lowBar:toFront()
-    lowBar:setSequence("btm")
-    lowBar:play()
-
-    if debugOptions.topBottomBars == true then
-        transition.to(topBar, {time = 1300, alpha = .6, y = -35})
-        transition.to(lowBar, {time = 1300, alpha = .6, y = _H + 35})
-    end
 
 	transition.to(flag, {time = 1000, alpha = 1})
 
-    -- WTF
-    if flag ~= nil then
-        lightningEnable()
-    end
+    -- SAM: delete?
     -- flagLightningReady = timer.performWithDelay(1000, lightningEnable, 1)
 
     -- SAM: delete this? used for offsetting when speedUp() occurs - can happen in during midst of a country
@@ -2335,9 +2228,9 @@ moveObject = function(e)
     end
     if paceRect.isMoving == true then
         if fps == 30 then
-            paceRect.x = paceRect.x + speed
+            paceRect.x = paceRect.x + levelsArray[levelsIndex].speed
         else
-            paceRect.x = paceRect.x + (speed / 2)
+            paceRect.x = paceRect.x + (levelsArray[levelsIndex].speed / 2)
         end
 		--reset PaceRect, call readyObjects() to create a new palette or flag
         readyObject()
@@ -2388,16 +2281,16 @@ end
 -- READYOBJ: readyObject
 readyObject = function(firstCountry)
     if firstCountry then
-        print("first")
         gameMechanics.countriesSpawned = gameMechanics.countriesSpawned + 1
-        print("countriesSpawned: " .. gameMechanics.countriesSpawned)
+        print("first country AKA countriesSpawned: " .. gameMechanics.countriesSpawned)
         setCountryParameters()
         setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
         return
     end
-    -- print("past first country")
-    if paceRect.x > gameMechanics.paletteSpawnDelay or gameMechanics.overrideFlag == true then
-        -- print("new spacing determined when " .. paceRect.x .. " > " .. 85)
+
+    -- SAM: added 3rd OR (firstPalette == true) condition
+    -- print("new spacing determined when " .. paceRect.x .. " > " .. 85)
+    if paceRect.x > gameMechanics.paletteSpawnDelay * 2 or gameMechanics.overrideFlag == true or firstPalette == true then
         paceRect.x = 0
         if setTheFlag == true then
             if gameMechanics.overrideFlag == true then
@@ -2454,16 +2347,13 @@ readyObject = function(firstCountry)
                 ]]--
             end
         else
-            --CREATE A NEW COLOR SQUARE
-            -- print("createPalette()")
+            -- print(timeVar * timeVarMultiplier)
+            -- timer.performWithDelay((timeVar * timeVarMultiplier) * 2, createPalette, 1)
             createPalette()
 
-            -- sooner???
-            -- firstObject = false
-
-            if firstObject == true then
-                firstObject = false
-            elseif firstObject == false then
+            if firstPalette == true then
+                firstPalette = false
+            elseif firstPalette == false then
                 if gameMechanics.mode == 1 or gameMechanics.mode == 2 then
                     if spawnTable[count] ~= 0 then
 						--isGrown means colorPalletes are full size scale=1
@@ -2582,11 +2472,6 @@ function objTouch(self, e)
                     bonusTextTemp = nil
                 end})
 
-                if motion ~= nil then
-                    timer.cancel(motion)
-                    motion = nil
-                end
-
             else
                 spread = 0
                 currentColor = nil
@@ -2625,14 +2510,16 @@ function scene:show(e)
         setupVariables()
         setupScoreboard()
         random = math.randomseed(os.time())
-        paceRect = display.newRect(0, 0, 80, 60)
-        paceRect:setFillColor(1, 0, 0)
-        paceRect.anchorX = 0 ; paceRect.anchorY = 0.5
-        paceRect.x = 0 ; paceRect.y = _H / 2
+        paceRect = display.newRoundedRect(0, 0, 80, 6, 3)
+        paceRect:setFillColor(1, 1, 1)
+        paceRect.anchorX = 0
+        paceRect.anchorY = 1
+        paceRect.x = 0
+        paceRect.y = _H - (gameMechanics.heightModeTop*2)
         paceRect.isTopLeft = false
         paceRect.isMoving = false
-        paceRect.alpha = 0
-        self.view:insert(paceRect)
+        paceRect.alpha = 0.4
+        -- self.view:insert(paceRect)
 
     elseif (e.phase == "did") then
         Runtime:addEventListener("enterFrame", boundaryCheck)
@@ -2675,7 +2562,7 @@ function scene:hide(e)
         display.remove(flag)
         display.remove(flagFrame)
         display.remove(bmpText)
-
+        display.remove(paceRect)
 		-- what about mask applied to fxGroup
         display.remove(fxGroup)
         display.remove(piece)

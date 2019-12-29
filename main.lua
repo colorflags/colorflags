@@ -71,11 +71,13 @@ function runMain()
 	local backgroundColor={255,255,255}
 
 	_G.musicMenu = audio.loadStream( "magee_music/magee_main.mp3" ) -- rename magee_main.mp3 to magee_menu.mp3
-	_G.musicGameOver = audio.loadStream( "magee_music/magee_gameover_2.mp3" )
+	_G.musicGameOver = audio.loadStream( "magee_music/magee_gameover.mp3" )
 
 	audio.reserveChannels( 2 )
 	_G.audioReservedChannel1 = nil
 	_G.audioReservedChannel2 = nil
+	_G.audioReservedChannels = {nil, nil}
+	_G.lastUsedChannel = nil
 
 	-- SAM: what is this?
 	audioCanPlay=true
@@ -161,9 +163,7 @@ function runMain()
 	elseif showSplash==false then
 	        display.remove(splash1)
 	    display.remove(splash2)
-	     composer.gotoScene( "game", {effect = defaultTransition})
+	     composer.gotoScene( "menu", {effect = defaultTransition})
 	end
 end
 runMain()
-  -- composer.removeScene("main",false)
---composer.gotoScene("menu")

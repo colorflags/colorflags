@@ -1,0 +1,225 @@
+
+colorflags-spine.png
+size: 2048,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+01
+  rotate: false
+  xy: 2, 590
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+02
+  rotate: false
+  xy: 2, 394
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+03
+  rotate: false
+  xy: 2, 198
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+04
+  rotate: false
+  xy: 2, 2
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+inner-text
+  rotate: false
+  xy: 2, 786
+  size: 1091, 178
+  orig: 1091, 178
+  offset: 0, 0
+  index: -1
+
+colorflags-spine2.png
+size: 2048,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+05
+  rotate: false
+  xy: 2, 786
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+06
+  rotate: false
+  xy: 2, 590
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+07
+  rotate: false
+  xy: 2, 394
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+08
+  rotate: false
+  xy: 2, 198
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+09
+  rotate: false
+  xy: 2, 2
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+
+colorflags-spine3.png
+size: 2048,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+10
+  rotate: false
+  xy: 2, 786
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+11
+  rotate: false
+  xy: 2, 590
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+12
+  rotate: false
+  xy: 2, 394
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+13
+  rotate: false
+  xy: 2, 198
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+14
+  rotate: false
+  xy: 2, 2
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+
+colorflags-spine4.png
+size: 2048,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+15
+  rotate: false
+  xy: 2, 786
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+16
+  rotate: false
+  xy: 2, 590
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+17
+  rotate: false
+  xy: 2, 394
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+18
+  rotate: false
+  xy: 2, 198
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+19
+  rotate: false
+  xy: 2, 2
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+
+colorflags-spine5.png
+size: 2048,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+20
+  rotate: false
+  xy: 2, 786
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+21
+  rotate: false
+  xy: 2, 590
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+22
+  rotate: false
+  xy: 2, 394
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+23
+  rotate: false
+  xy: 2, 198
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+24
+  rotate: false
+  xy: 2, 2
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+
+colorflags-spine6.png
+size: 2048,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+25
+  rotate: false
+  xy: 2, 198
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
+back
+  rotate: false
+  xy: 2, 2
+  size: 1107, 194
+  orig: 1107, 194
+  offset: 0, 0
+  index: -1
