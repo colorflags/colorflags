@@ -8,12 +8,6 @@ local scene = composer.newScene()
 local pGet = ssk.persist.get
 local pSet = ssk.persist.set
 
--- stop audioReservedChannel1. set it to nil?
-audio.stop( 1 )
-audioReservedChannel1 = nil
-audio.stop( 2 )
-audioReservedChannel2 = nil
-
 -- audio stuff
 local music
 local bobby
@@ -53,7 +47,7 @@ if debugOptions.scoreKeeper == true then
 end
 
 local gameMechanics = {}
-gameMechanics.playCountryDuration = 30000 --30000
+gameMechanics.playCountryDuration = 30000 -- default 30000
 gameMechanics.transitionToCountryDuration = 2000
 gameMechanics.firstPaletteDelay = 10
 gameMechanics.growSpeedIndependance = false
@@ -2032,20 +2026,44 @@ newCountry = function()
         -- print(k1, k2, k3)
     end
 
-	-- if check.. when first flag appear. there will be no music. !!!
-    if countriesCompleted ~= 0 then
-        audio.stop(bobby)
+    music = audio.loadStream("anthems/" .. country.name .. ".wav")
+
+    local function offsetIncomingAnthem(outgoingAnthem, incomingAnthem)
+        local function listener(event)
+            audio.stop(outgoingAnthem)
+            lastReservedChannel = incomingAnthem
+            audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1, onComplete=function(event)
+                print("finished streaming anthem on channel " .. event.channel)
+            end})
+        end
+        timer.performWithDelay ((timeVar * timeVarMultiplier), listener)
     end
 
-    -- print(timeVar * timeVarMultiplier)
-    music = audio.loadStream("anthems/" .. country.name .. ".wav")
-    local function listener(event)
-        bobby = audio.play(music, {channel = 1, loops=-1, onComplete=function(event)
-            print("finished streaming ANTHEM on channel ", event.channel)
-        end})
-        audio.setVolume( .5, { channel = 1 } )
+    if countriesCompleted ~= 0 then
+        if lastReservedChannel ~= nil then
+        	if lastReservedChannel == 1 then
+                offsetIncomingAnthem(1, 2)
+        	elseif lastReservedChannel == 2 then
+                offsetIncomingAnthem(2, 1)
+        	end
+        end
+    else
+        if lastReservedChannel ~= nil then
+        	if lastReservedChannel == 1 then
+                audio.stop(lastReservedChannel)
+                lastReservedChannel = 2
+                audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
+        	elseif lastReservedChannel == 2 then
+                audio.stop(lastReservedChannel)
+                lastReservedChannel = 1
+                audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
+        	end
+        else
+            lastReservedChannel = 1
+            audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
+        end
     end
-    timer.performWithDelay ((timeVar * timeVarMultiplier), listener)
+
 
 end
 

@@ -82,61 +82,73 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 end
 
 local function playAnim(event)
-    local currentTime = event.time / 1000
+    local currentTime = event.time / 3000
     local delta = currentTime - _lastTime
     _lastTime = currentTime
 
-    local skeleton = M.skeleton;
-    local state = M.state;
+    local skeleton = M.skeleton
+    local state = M.state
     state:update(delta)
     state:apply(skeleton)
 
-    skeleton:updateWorldTransform();
+    skeleton:updateWorldTransform()
 
-end;
+end
 
 local function startAnim()
-    Runtime:addEventListener("enterFrame", playAnim);
+    Runtime:addEventListener("enterFrame", playAnim)
     M.state:setAnimationByName(1, "nt_forward", false)
-end;
+end
 
 local function stopAnim()
-    Runtime:removeEventListener("enterFrame", playAnim);
-end;
+    Runtime:removeEventListener("enterFrame", playAnim)
+end
 
 function M.load()
     -- local lastTime = 0
     result = loadSkeleton("nicetry-spine.atlas", "nicetry-spine.json", _W/5, _H/5 , 0.25, "animation")
-    -- local skeleton = result.skeleton;
-    -- local state = result.state;
-    -- local spineData = Skeleton.load("res/game/dice/skeleton", centerX + 120, centerY - 200, 0.5, "shake");
-    M.skeleton = result.skeleton;
-    M.state = result.state;
+    -- local skeleton = result.skeleton
+    -- local state = result.state
+    -- local spineData = Skeleton.load("res/game/dice/skeleton", centerX + 120, centerY - 200, 0.5, "shake")
+    M.skeleton = result.skeleton
+    M.state = result.state
     M.animation = 0
     -- End roll event
-    M.state.onEvent = onRollComplete;
-    -- M.skeleton.group.rotation = 175;
-    -- M.skeleton.group.alpha = 0;
+    M.state.onEvent = onRollComplete
+    -- M.skeleton.group.rotation = 175
+    -- M.skeleton.group.alpha = 0
 
-end;
+end
 
 M.load()
 startAnim()
 
-audio.stop()
-
 music=nil
 bobby=nil
 
-if(audioReservedChannel2 == nil) then
-    audioReservedChannel2 = audio.play(musicGameOver, {channel=2,loops=-1})
+if lastReservedChannel ~= nil then
+	if lastReservedChannel == 1 then
+		audio.stop(lastReservedChannel)
+		lastReservedChannel = 2
+		audioReservedChannels[lastReservedChannel] = audio.play( musicGameOver, {channel=lastReservedChannel,loops=-1} )
+	elseif lastReservedChannel == 2 then
+		audio.stop(lastReservedChannel)
+		lastReservedChannel = 1
+		audioReservedChannels[lastReservedChannel] = audio.play( musicGameOver, {channel=lastReservedChannel,loops=-1} )
+	end
+else
+	lastReservedChannel = 1
+	audioReservedChannels[lastReservedChannel] = audio.play( musicGameOver, {channel=lastReservedChannel,loops=-1} )
 end
+
+local myFunctionKill
+local scoreTextGroup
+local scoreText
+local scoreTextDesc
 
 local highScore
 local gameScore
-local shakeTextRight = true
-local shakeTextTimer
-local shakeText
+
 local cloudsBG1
 local cloudsBG2
 local cloudsFG1
@@ -172,11 +184,6 @@ local randomFlag5
 local randomFlag6
 local randomFlag7
 local randomFlag8
-
-local scoreGroup
-local scoreText
-local highScoreGroup
-local highScoreText
 
 local FG1Transition1
 local FG1Transition2
@@ -673,8 +680,8 @@ end
 end
 
 local function cloudFade(self)
-    cloudFadeTransition2 = transition.to( self, {time=3920, alpha=.28,onComplete=function()
-        cloudFadeTransition1 = transition.to( self, {time=2360, alpha=.57,onComplete=cloudFade})
+    cloudFadeTransition2 = transition.to( self, {time=3920, alpha=.35,onComplete=function()
+        cloudFadeTransition1 = transition.to( self, {time=4460, alpha=.20,onComplete=cloudFade})
     end
 })
 end
@@ -682,7 +689,98 @@ end
 local function setScene()
     bg = display.newRect(_W/2, _H/2, _W, _H)
     bg:setFillColor(0,0,0)
-    bg:toBack()
+
+    local embossColor = {
+        highlight = {r = 1, g = 1, b = 1},
+        shadow = {r = 0, g = 0, b = 0}
+    }
+    -- print(M.skeleton.group.x)
+    local scoreboardOffsetFromLeft = _W/2+20
+    local scoreboardOffsetFromEachOther = 60
+    local scoreboardOffsetIncDecBtns = 1.2
+
+    local scoreTextGroupAnchorX = scoreboardOffsetFromLeft
+    local scoreTextGroupAnchorY = 18
+
+    -- SAM: rotate scoreText
+    --[[
+    scoreTextGroup = display.newGroup()
+    scoreTextDesc = display.newEmbossedText("your score:", scoreTextGroupAnchorX, scoreTextGroupAnchorY, "PTMono-Bold", 14)
+    scoreTextDesc:setFillColor( 1, .9, .4)
+    scoreTextDesc:setEmbossColor(embossColor)
+    scoreTextDesc.anchorX = 0.5
+    scoreTextDesc.anchorY = 0
+    scoreTextGroup:insert(scoreTextDesc)
+
+    scoreText = display.newEmbossedText(pGet( "score.json", "highScore" ), scoreTextGroupAnchorX, scoreTextGroupAnchorY + scoreTextDesc.height, "PTMono-Bold", 28)
+    scoreText:setFillColor( 1, .9, .4)
+    scoreText:setEmbossColor(embossColor)
+    scoreText.anchorX = 0.5
+    scoreText.anchorY = 0
+    scoreTextGroup:insert(scoreText)
+
+    local function shiftAnchor()
+       local ax = 0.5
+       local ay = 0.5
+
+       local sx, sy = scoreText:localToContent( scoreText.width*ax, scoreText.height*ay )
+
+       scoreText.anchorX = ax
+       scoreText.anchorY = ay
+
+       scoreText.x = sx - (scoreText.width/2)
+       scoreText.y = sy - (scoreText.height/2)
+
+       transition.to( scoreText, { time = 2000, rotation = 10, onComplete = function()
+           transition.to( scoreText, { time=2000, rotation=0, onComplete = function()
+               transition.to( scoreText, { time=2000, rotation=-10, onComplete = function()
+                   transition.to( scoreText, { time=2000, rotation=0, onComplete = shiftAnchor })
+               end })
+           end })
+       end })
+    end
+    shiftAnchor()
+    ]]--
+
+    -- SAM: rotate scoreTextGroup
+    scoreTextGroup = display.newGroup()
+    scoreTextDesc = display.newEmbossedText("your score:", 0, 0, "PTMono-Bold", 14)
+    scoreTextDesc:setFillColor( 1, .9, .4)
+    scoreTextDesc:setEmbossColor(embossColor)
+    scoreTextDesc.anchorX = 0.5
+    scoreTextDesc.anchorY = 0
+    scoreTextGroup:insert(scoreTextDesc)
+
+    scoreText = display.newEmbossedText(pGet( "score.json", "highScore" ), 0, 0 + scoreTextDesc.height, "PTMono-Bold", 28)
+    scoreText:setFillColor( 1, .9, .4)
+    scoreText:setEmbossColor(embossColor)
+    scoreText.anchorX = 0.5
+    scoreText.anchorY = 0
+    scoreTextGroup:insert(scoreText)
+    scoreTextGroup.x = scoreTextGroupAnchorX
+    scoreTextGroup.y = 18
+
+    local function shiftAnchorGroup()
+       local ax = 0.5
+       local ay = 0.5
+
+       local sx, sy = scoreTextGroup:localToContent( scoreTextGroup.width*ax, scoreTextGroup.height*ay )
+
+       scoreTextGroup.anchorX = ax
+       scoreTextGroup.anchorY = ay
+
+       scoreTextGroup.x = sx - (scoreTextGroup.width/2)
+       scoreTextGroup.y = sy - (scoreTextGroup.height/2)
+       -- transition.cancel(self)
+       transition.to( scoreTextGroup, { time = 2000, rotation = 2, onComplete = function()
+           transition.to( scoreTextGroup, { time=2000, rotation=0, onComplete = function()
+               transition.to( scoreTextGroup, { time=2000, rotation=-2, onComplete = function()
+                   transition.to( scoreTextGroup, { time=2000, rotation=0, onComplete=shiftAnchorGroup, tag="rotateScoreText" })
+               end })
+           end })
+       end })
+    end
+    shiftAnchorGroup()
 
     -- SAM: rename all this
     killScreen = display.newImageRect( "images/bricks_trans_cracks.png", _W, 94)
@@ -794,31 +892,40 @@ local function setScene()
 
     cloudsBG1 = display.newImage( "images/clouds_bg_2.png", 568, 320 )
     cloudsBG1.name="cloudsBG1"
-    cloudsBG1.alpha=.57
-    cloudsBG1.x=_W/2 ;cloudsBG1.y=_H/2
+    cloudsBG1.alpha=.1
+    cloudsBG1.x=_W/2
+    cloudsBG1.y=_H/2
     cloudsBG1.speed = 1
+    cloudsBG1:toBack()
 
     cloudsBG2 = display.newImage( "images/clouds_bg_2.png", 568, 320 )
     cloudsBG2.name="cloudsBG2"
-    cloudsBG2.alpha=.57
+    cloudsBG2.alpha=.1
     -- cloudsBG2 = display.newRect( 0,0,568,320 )
     -- cloudsBG2:setFillColor(1.0, 1.0, 0.0)
     -- cloudsBG2.alpha = .5
-    cloudsBG2.x=_W/2+568 ;cloudsBG2.y=_H/2
+    cloudsBG2.x=_W/2+568
+    cloudsBG2.y=_H/2
     cloudsBG2.speed = 1
+    cloudsBG2:toBack()
 
     offsetCloudFG = 20
 
     cloudsFG1 = display.newImage( "images/clouds_fg4_large.png", 568, 350 )
     cloudsFG1.name="cloudsFG1"
     -- cloudsFG1:setFillColor( 1, 1, 0 )
-    cloudsFG1.x=_W/2-(offsetCloudFG) ;cloudsFG1.y=_H/2
+    cloudsFG1.x=_W/2-(offsetCloudFG)
+    cloudsFG1.y=_H/2
     cloudsFG1.speed = 2
+    cloudsFG1.alpha=0
     cloudsFG2 = display.newImage( "images/clouds_fg4_large.png", 568, 350 )
     cloudsFG2.name="cloudsFG2"
     -- cloudsFG2:setFillColor( 1, 1, 0 )
-    cloudsFG2.x=_W/2+(_W-offsetCloudFG) ;cloudsFG2.y=_H/2
+    cloudsFG2.x=_W/2+(_W-offsetCloudFG)
+    cloudsFG2.y=_H/2
     cloudsFG2.speed = 2
+    cloudsFG2.alpha=0
+
 
     -- ISSUES WITH THESE RECYCLING (JUMPING TO BEHIND ONE ANOTHER) IMAGES FOR:
     --   1. SIMULATOR, NON IPHONE 5
@@ -839,16 +946,8 @@ local function setScene()
 
     cloudFade(cloudsBG1)
     cloudFade(cloudsBG2)
-end
 
-local function shakeText()
-    if shakeTextRight == true then
-        transition.to( scoreText, { time=5000, rotation=-10 , onComplete=shakeText } )
-        shakeTextRight=false
-    elseif shakeTextRight == false then
-        transition.to( scoreText, { time=5000, rotation=10 , onComplete=shakeText } )
-        shakeTextRight=true
-    end
+    bg:toBack()
 end
 
 function scene:create(e)
@@ -856,24 +955,16 @@ end
 
 function scene:show(e)
     if e.phase == "will" then
+        -- SAM: Notice transition
         local color =
         {
             highlight = { r=1, g=1, b=1 },
             shadow = { r=0, g=0, b=0 }
         }
 
-        --align to center of "share" btn
-
-        scoreText = display.newEmbossedText( pGet( "score.json", "highScore" ), _W/2+20, _H/2,"PTMono-Bold", 38 )
-        scoreText:setFillColor( 1, .9, .4)
-        scoreText:setEmbossColor( color )
-
         -- highScoreText = display.newText("BEST " .. highScore, _W/2, _H/2+_H*(1/4)+2, native.systemFont, 16)
         -- highScoreText:setFillColor( 1, 1, 1 )
         -- highScoreText:toFront()
-
-        shakeText()
-        self.view:insert(scoreText)
 
         setScene()
         -- issues
@@ -913,14 +1004,16 @@ function scene:hide(e)
         display.remove(randomFlag6)
         display.remove(title)
         display.remove(highScoreText)
-        display.remove(cloudsFG1)
-        display.remove(cloudsFG2)
 
         display.remove(bg)
+        transition.cancel(scoreTextGroup)
+        display.remove(scoreTextGroup)
 
         display.remove(killScreen)
         display.remove(cloudsBG1)
-        display.remove(cloudsBF2)
+        display.remove(cloudsBG2)
+        display.remove(cloudsFG1)
+        display.remove(cloudsFG2)
         display.remove(flagPole1)
         display.remove(flagPole2)
         display.remove(flagPole3)

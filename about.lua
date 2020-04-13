@@ -240,7 +240,7 @@ function scene:show( event )
         backBtn:addEventListener("touch", doFunction)
         twitterBtn:addEventListener("tap",urlTwitter)
         bmpText.mageeGames:addEventListener("tap",urlMagee)
-        bmpText.colorFlagesGame:addEventListener("tap",urlColor)
+        bmpText.colorFlagsGame:addEventListener("tap",urlColor)
         facebookBtn:addEventListener("tap",urlFacebook)
         mgBtn:addEventListener("tap",urlMG)
     end

@@ -78,9 +78,9 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 end
 
 local function animationPop2()
-    transition.to( M.skeleton.group, { time=1250, alpha=.7, onComplete=
+    transition.to( M.skeleton.group, { time=1250, alpha=1, onComplete=
         function()
-            transition.to( M.skeleton.group, { time=1850, alpha=1})
+            transition.to( M.skeleton.group, { time=1850, alpha=.9})
         end
     })
 end
@@ -137,25 +137,27 @@ end;
 M.load()
 startAnim()
 
-audio.stop()
-
--- audio.stop( 2 )
-audioReservedChannel2 = nil
-
 music=nil
 bobby=nil
 
-if lastUsedChannel == nil then
-	audioReservedChannels[1] = audio.play( musicMenu, {channel=1,loops=-1} )
+if lastReservedChannel ~= nil then
+	if lastUsedMusic ~= "musicMenu" then
+		if lastReservedChannel == 1 then
+			audio.stop(lastReservedChannel)
+			lastReservedChannel = 2
+			audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
+		elseif lastReservedChannel == 2 then
+			audio.stop(lastReservedChannel)
+			lastReservedChannel = 1
+			audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
+		end
+		lastUsedMusic = "musicMenu"
+	end
+else
+	lastReservedChannel = 1
+	audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
+	lastUsedMusic = "musicMenu"
 end
-
--- if(audioReservedChannel1 == nil) then
--- 	audioReservedChannel1 = audio.play(musicMenu, {channel=1,loops=-1})
--- end
-
--- audio.stop( )
--- music = audio.loadStream( "magee_music/magee_main.mp3" )
--- bobby = audio.play(music,{loops=-1})
 
 -- set by options.lua
 soundOn=false
@@ -291,6 +293,7 @@ local function myTouchListener( event )
 			if goto == "start" and event.target == btnsPlayGame then
 				composer.showOverlay( goto, { isModal= true})
 			else
+				-- composer.showOverlay( goto, { isModal= true})
 				composer.gotoScene ( goto, { effect = defaultTransition } )
 			end
 		elseif touchInsideBtn == false then

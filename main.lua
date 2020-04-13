@@ -74,10 +74,12 @@ function runMain()
 	_G.musicGameOver = audio.loadStream( "magee_music/magee_gameover.mp3" )
 
 	audio.reserveChannels( 2 )
-	_G.audioReservedChannel1 = nil
-	_G.audioReservedChannel2 = nil
+	audio.setVolume( .5, { channel = 1 } )
+	audio.setVolume( .5, { channel = 2 } )
+
 	_G.audioReservedChannels = {nil, nil}
-	_G.lastUsedChannel = nil
+	_G.lastReservedChannel = nil
+	_G.lastUsedMusic = nil
 
 	-- SAM: what is this?
 	audioCanPlay=true
