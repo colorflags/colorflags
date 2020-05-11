@@ -47,6 +47,12 @@ if debugOptions.scoreKeeper == true then
     pSet( "score.json", "highScore" , 0 )
 end
 
+-- understand this, could it be of use in this situation?
+-- ssk.persist.setDefault( "iap.json", "disabled_ads", false , { save = false } )
+if pGet("score.json", "debugPanelStoredValues") == nil then
+    pSet( "score.json", "debugPanelStoredValues" , { false, false, false } )
+end
+
 local gameMechanics = {}
 gameMechanics.playCountryDuration = 30000 -- default 30000
 gameMechanics.transitionToCountryDuration = 2000
