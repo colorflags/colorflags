@@ -36,10 +36,11 @@ local game_H = display.actualContentHeight -- Get the height of the screen
 
 local debugOptions = {}
 debugOptions.god = false
-debugOptions.gameSpeed = false
-debugOptions.cycleModes = false
+debugOptions.godSpeed = false
+debugOptions.godCycle = false
 debugOptions.adherenceToFlagColors = false
 debugOptions.debugPanel = true
+debugOptions.debugPanelStoredValues = {}
 debugOptions.scoreKeeper = true
 
 if debugOptions.scoreKeeper == true then
@@ -56,6 +57,7 @@ gameMechanics.overrideFlag = false
 gameMechanics.heightModeTop = 35
 gameMechanics.heightModeLow = _H - 35
 gameMechanics.mode = 1
+
 -- FPS
 if fps == 30 then
     gameMechanics.paletteSpawnDelay = 85
@@ -72,29 +74,29 @@ local numDeaths = 0
 local levelsIndex = 1
 -- SAM: better name for variables speed and timeVar
 
-local speed -- use gameSpeed? we already have speed as obj in levelsArray
+local speed -- use godSpeed? we already have speed as obj in levelsArray
 local timeVar
 local timeVarMultiplier = 0.5
 
 local levelsArray
-    levelsArray = {
-        {speed=0.50, timeVar=5900},
-        {speed=0.55, timeVar=5400},
-        {speed=0.60, timeVar=4950},
-        {speed=0.65, timeVar=4450},
-        {speed=0.70, timeVar=4400},
-        {speed=0.75, timeVar=4200},
+levelsArray = {
+    {speed=0.50, timeVar=5900},
+    {speed=0.55, timeVar=5400},
+    {speed=0.60, timeVar=4950},
+    {speed=0.65, timeVar=4450},
+    {speed=0.70, timeVar=4400},
+    {speed=0.75, timeVar=4200},
 
-        {speed=0.80, timeVar=4000},
-        {speed=0.85, timeVar=3800},
-        {speed=0.90, timeVar=3600},
-        {speed=0.95, timeVar=3400},
-        {speed=1.00, timeVar=3200},
-        {speed=1.05, timeVar=3000},
-        {speed=1.10, timeVar=2800},
-        {speed=1.15, timeVar=2600},
-        {speed=1.20, timeVar=2400}
-    }
+    {speed=0.80, timeVar=4000},
+    {speed=0.85, timeVar=3800},
+    {speed=0.90, timeVar=3600},
+    {speed=0.95, timeVar=3400},
+    {speed=1.00, timeVar=3200},
+    {speed=1.05, timeVar=3000},
+    {speed=1.10, timeVar=2800},
+    {speed=1.15, timeVar=2600},
+    {speed=1.20, timeVar=2400}
+}
 
 -- checks if game just started
 local countriesCompleted = 0
@@ -189,7 +191,6 @@ local flagFrameOptions
 local bmpText
 
 local flag
-local random
 
 local bonusText
 
@@ -228,11 +229,14 @@ local modeIncreaseBtnSym
 local gameDebugGroup
 
 local gameDebugArray = {}
+gameDebugArray.gameDebugPanelToggle = nil
+gameDebugArray.gameDebugPanelInner = nil
+gameDebugArray.gameDebugPanelOuter = nil
 
-gameDebugArray.gameDebugDeathBtnGroup = nil
-gameDebugArray.gameDebugDeathBtnDesc = nil
-gameDebugArray.gameDebugDeathBtnFill = nil
-gameDebugArray.gameDebugDeathBtnSym = nil
+gameDebugArray.gameDebugGodBtnGroup = nil
+gameDebugArray.gameDebugGodBtnDesc = nil
+gameDebugArray.gameDebugGodBtnFill = nil
+gameDebugArray.gameDebugGodBtnSym = nil
 
 gameDebugArray.gameDebugSpeedBtnGroup = nil
 gameDebugArray.gameDebugSpeedBtnDesc = nil
@@ -243,9 +247,6 @@ gameDebugArray.gameDebugCycleBtnGroup = nil
 gameDebugArray.gameDebugCycleBtnDesc = nil
 gameDebugArray.gameDebugCycleBtnFill = nil
 gameDebugArray.gameDebugCycleBtnSym = nil
-gameDebugArray.gameDebugPanelInner = nil
-gameDebugArray.gameDebugPanelOuter = nil
-gameDebugArray.gameDebugPanelToggle = nil
 
 local deathScenario2Array = {}
 
@@ -309,7 +310,7 @@ local nationalFlagsSeq = {
     {name = "srilanka", sheet = nationalFlags2Sheet, frames = {24}},
     {name = "sweden", sheet = nationalFlags3Sheet, frames = {1}},
     {name = "switzerland", sheet = nationalFlags3Sheet, frames = {2}},
-	-- SAM: Taiwan flag out of order in sprite/atlas because originally named Republic of China
+    -- SAM: Taiwan flag out of order in sprite/atlas because originally named Republic of China
     {name = "taiwan", sheet = nationalFlags2Sheet, frames = {15}},
     {name = "thailand", sheet = nationalFlags3Sheet, frames = {3}},
     {name = "turkey", sheet = nationalFlags3Sheet, frames = {4}},
@@ -342,10 +343,10 @@ local fxAnim
 local newTex = graphics.newTexture({type = "canvas", width = display.contentWidth, height = display.contentHeight})
 
 local canvasObj = display.newImageRect(
-    newTex.filename,  -- "filename" property required
-    newTex.baseDir,   -- "baseDir" property required
-    display.contentWidth,
-    display.contentHeight
+newTex.filename,  -- "filename" property required
+newTex.baseDir,   -- "baseDir" property required
+display.contentWidth,
+display.contentHeight
 )
 canvasObj.x = display.contentCenterX
 canvasObj.y = display.contentCenterY
@@ -364,18 +365,18 @@ local function myImplodeListener(event)
 end
 
 local function round(val, n)
-   if (n) then
-      return math.floor( (val * 10^n) + 0.5) / (10^n)
-   else
-      return math.floor(val+0.5)
-   end
+    if (n) then
+        return math.floor( (val * 10^n) + 0.5) / (10^n)
+    else
+        return math.floor(val+0.5)
+    end
 end
 
 -- READYOBJ: onOptionsTap
 onOptionsTap = function(event)
     local optionName = event.target.name
     if optionName == "speedDecrease" or optionName == "speedIncrease" then
-        if flag ~= nil and debugOptions.gameSpeed == false then
+        if flag ~= nil and debugOptions.godSpeed == false then
             if optionName == "speedIncrease" then
                 speedUp()
             elseif optionName == "speedDecrease" then
@@ -394,7 +395,7 @@ onOptionsTap = function(event)
             -- speedText:toFront()
         end
     elseif optionName == "modeDecrease" or optionName == "modeIncrease" then
-        if flag ~= nil and debugOptions.cycleModes == false then
+        if flag ~= nil and debugOptions.godCycle == false then
             if optionName == "modeDecrease" then
                 if gameMechanics.mode > 1 then
                     gameMechanics.mode = gameMechanics.mode - 1
@@ -416,343 +417,83 @@ onOptionsTap = function(event)
             setFlag()
             gameMechanics.overrideFlag = true
         end
-    elseif optionName == "gameDebugDeath" then
+    elseif optionName == "gameDebugGod" then
         if debugOptions.god == false then
             debugOptions.god = true
-            gameDebugDeathBtnSym.text = "X"
+            gameDebugGodBtnSym.text = "X"
         else
             debugOptions.god = false
-            gameDebugDeathBtnSym.text = ""
+            gameDebugGodBtnSym.text = ""
         end
+        pSet( "score.json", "debugPanelStoredValues" , { debugOptions.god, debugOptions.godSpeed, debugOptions.godCycle } )
     elseif optionName == "gameDebugSpeed" then
-        if debugOptions.gameSpeed == false then
-            debugOptions.gameSpeed = true
+        if debugOptions.godSpeed == false then
+            debugOptions.godSpeed = true
             gameDebugSpeedBtnSym.text = "X"
         else
-            debugOptions.gameSpeed = false
+            debugOptions.godSpeed = false
             gameDebugSpeedBtnSym.text = ""
         end
+        print("godspeed", debugOptions.godSpeed)
+        pSet( "score.json", "debugPanelStoredValues" , { debugOptions.god, debugOptions.godSpeed, debugOptions.godCycle } )
     elseif optionName == "gameDebugCycle" then
-        if debugOptions.cycleModes == false then
-            debugOptions.cycleModes = true
+        if debugOptions.godCycle == false then
+            debugOptions.godCycle = true
             gameDebugCycleBtnSym.text = "X"
         else
-            debugOptions.cycleModes = false
+            debugOptions.godCycle = false
             gameDebugCycleBtnSym.text = ""
         end
+        pSet( "score.json", "debugPanelStoredValues" , { debugOptions.god, debugOptions.godSpeed, debugOptions.godCycle } )
     elseif optionName == "gameDebugPanel" then
         if debugOptions.debugPanel == false then
             debugOptions.debugPanel = true
+
+            -- read saved debugPanel values
+            local debugPanelValues = pGet( "score.json", "debugPanelStoredValues" )
+            if debugPanelValues[1] == true then
+                debugOptions.god = true
+                gameDebugGodBtnSym.text = "X"
+            end
+
+            if debugPanelValues[2] == true then
+                debugOptions.godSpeed = true
+                gameDebugSpeedBtnSym.text = "X"
+            end
+
+            if debugPanelValues[3] == true then
+                debugOptions.godCycle = true
+                gameDebugCycleBtnSym.text = "X"
+            end
+
             gameDebugGroup.alpha = 1
             gameDebugPanelInner.alpha = 1
             gameDebugPanelOuter.alpha = 1
+            paceRect.alpha = 0.6
+
             print("open panel")
         else
             debugOptions.debugPanel = false
+
+            -- disable god, godSpeed, godCycle
+            debugOptions.god = false
+            debugOptions.godSpeed = false
+            debugOptions.godCycle = false
+
             gameDebugGroup.alpha = 0
             gameDebugPanelInner.alpha = 0
             gameDebugPanelOuter.alpha = 0
+            paceRect.alpha = 0
             print("close panel")
         end
     end
     return true
 end
 
--- local background = display.newRect(display.contentCenterX, display.contentCenterY, display.pixelHeight, game_H)
-local background = display.newRect(0, 0, display.pixelHeight, game_H)
-background:setFillColor(1, 1, 1)
--- background.anchorX = .5
--- background.anchorY = .5
-background.name = "background"
--- background.x = game_W/2
--- background.y = game_H/2
-background:toBack()
-
+-- DELETE
 -- local waterMask
 -- local mapMask
 local water
-local function setupVariables()
-    w1 = 1;w2 = 1;w3 = 1
-    k1 = 0;k2 = 0;k3 = 0
-    r1 = 1;r2 = 0;r3 = 0
-    o1 = 1;o2 = .502;o3 = 0
-    y1 = 1;y2 = 1;y3 = 0
-    g1 = 0;g2 = .4;g3 = 0
-    b1 = 0;b2 = 0;b3 = 1
-
-    paletteBarTop = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_top")}} )
-    paletteBarBtm = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_btm")}} )
-
-    if platform == "ios" then
-        paletteBarTop.x = _W/2 -- fix like for platform == "android"
-        paletteBarTop.y = 0
-        paletteBarTop.anchorX = .5
-        paletteBarTop.anchorY = 0
-
-        paletteBarBtm.x = _W/2 -- fix like for platform == "android"
-        paletteBarBtm.y = _H -- fix like for platform == "android"
-        paletteBarBtm.anchorX = .5
-        paletteBarBtm.anchorY = 1
-    elseif platform == "android" then
-        -- paletteBarTop.width = display.actualContentWidth +
-        print("actualContentWidth from game.lua", display.actualContentWidth)
-        paletteBarTop.width = game_W
-        paletteBarTop.x = game_W/2
-        paletteBarTop.y = 0
-        paletteBarTop.anchorX = .5
-        paletteBarTop.anchorY = 0
-
-        paletteBarBtm.width = game_W
-        paletteBarBtm.x = game_W/2
-        paletteBarBtm.y = game_H
-        paletteBarBtm.anchorX = .5
-        paletteBarBtm.anchorY = 1
-    end
-
-    -- paletteBarTop.alpha = 0
-    -- paletteBarBtm.alpha = 0
-
-    waterGroup = display.newGroup()
-    water = display.newRect( display.contentCenterX, display.contentCenterY, game_W, game_H ) -- IMPORTANT, must be set to game_W / game_H, which change according to immerstiveSticky mode
-
-    display.setDefault( "textureWrapX", "repeat" )
-    display.setDefault( "textureWrapY", "repeat" )
-    water.alpha = 1
-
-    water.fill = { type = "image", filename = "images/water.png"}
-    water.fill.scaleX = 32/display.actualContentWidth
-    water.fill.scaleY = 32/display.actualContentHeight
-
-    display.setDefault( "textureWrapX", "clampToEdge" )
-    display.setDefault( "textureWrapY", "clampToEdge" )
-
-    water.texOffsetX = 0
-    water.texOffsetY = 0
-    water.lastT = system.getTimer()
-    water.rateX = 1
-    water.rateY = -1
-
-    function water.enterFrame( self )
-    	local curT 	= system.getTimer()
-    	local dt 	= curT - self.lastT
-    	self.lastT 	= curT
-
-    	local dOffsetX = dt * self.rateX / 20000
-    	local dOffsetY = dt * self.rateY / 50000
-
-    	self.texOffsetX = self.texOffsetX + dOffsetX
-    	self.texOffsetY = self.texOffsetY + dOffsetY
-
-    	--
-    	-- Keep values in bounds [-1, 1]
-    	--
-    	if( dOffsetX >= 0 ) then
-    		while(self.texOffsetX > 1) do
-    			self.texOffsetX = self.texOffsetX - 2
-    		end
-    	else
-    		while(self.texOffsetX < -1) do
-    			self.texOffsetX = self.texOffsetX + 2
-    		end
-    	end
-    	if( dOffsetY >= 0 ) then
-    		while(self.texOffsetY > 1) do
-    			self.texOffsetY = self.texOffsetY - 2
-    		end
-    	else
-    		while(self.texOffsetY < -1) do
-    			self.texOffsetY = self.texOffsetY + 2
-    		end
-    	end
-
-    	self.fill.x = self.texOffsetX
-    	self.fill.y = self.texOffsetY
-    end
-
-    Runtime:addEventListener( "enterFrame", water )
-    waterGroup:insert(water)
-
-    -- rename?
-	local waterMask = graphics.newMask("images/map_mask_2018.png")
-	waterGroup:setMask(waterMask)
-    waterGroup.maskX = display.contentCenterX
-    waterGroup.maskY = display.contentCenterY
-    -- waterGroup.maskX = game_W/2
-    -- waterGroup.maskY = game_H/2
-
-    -- do this math one time in this function, reuse
-    if platform == "ios" then
-        waterGroup.maskScaleX = 1.10
-        waterGroup.maskScaleY = 1.01
-    elseif platform == "android" then
-
-        -- SAM: immersiveSticky, on newer androids
-        -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
-        -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
-        waterGroup.maskScaleX = 1.5
-
-        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
-        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
-        -- alignMask will be 1.23
-        -- print(alignMask)
-        waterGroup.maskScaleY = alignMask
-    end
-
-    -- ['@1x'] = {2031, 851},
-    -- ['@2x'] = {4062, 1702},
-    -- ['@4x'] = {8124, 3404}
-
-    mapDimensions = CFGameScaleComponents:getItemByID(1)
-
-    testWidth = mapDimensions.dimensions['@1x'].width
-    testHeight = mapDimensions.dimensions['@1x'].height
-
-    mapGroup = display.newGroup()
-    fapGroup = display.newGroup()
-    map = display.newImageRect("images/worldmap_2017_300.png", 8191, 4084)
-    map.anchorX = 0
-    map.anchorY = 0
-    map.name = "map"
-    map.x = 0
-    map.y = 0
-	fapGroup:insert(map)
-    mapGroup:insert(fapGroup)
-    mapGroup.x = _W/2
-    mapGroup.y = _H/2
-    mapGroup.xScale = 1 * zoomMultiplier
-    mapGroup.yScale = 1 * zoomMultiplier
-
-    newGroup = display.newGroup()
-    newGroup:insert(mapGroup)
-
-	-- mapMask = graphics.newMask("images/map_mask_2018.png")
-
-    newGroup:setMask(waterMask)
-    newGroup.maskX = display.contentCenterX
-    newGroup.maskY = display.contentCenterY
-	-- newGroup.maskX = game_W/2
-	-- newGroup.maskY = game_H/2
-
-    -- do this math one time in this function, reuse
-    if platform == "ios" then
-        newGroup.maskScaleX = 1.10
-        newGroup.maskScaleY = 1.01
-    elseif platform == "android" then
-
-        -- SAM: immersiveSticky, on newer androids
-        -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
-        -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
-        newGroup.maskScaleX = 1.5
-
-        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
-        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
-        -- alignMask will be 1.23
-        -- print(alignMask)
-        newGroup.maskScaleY = alignMask
-    end
-
-    newGroup.alpha = 0
-
-    -- mapGroup:setMask(mapMask)
-	-- mapGroup.maskScaleY = 1.01
-	-- mapGroup.maskX = _W/2
-	-- mapGroup.maskY = _H/2
-
-
-
-    -- flag.anchorX = 0.5 ; flag.anchorY = 0.5
-    --
-    -- flag.width = 500
-    -- flag.height = 333
-    -- flag.xScale = .2
-    -- flag.yScale = .2 * .7
-    -- flag.anchorX = 1
-    -- flag.anchorY = 0.5
-    --
-    -- flag.x = _W
-    -- flag.y = _H/2
-
-    flagFrameOptions = {
-        x = _W,
-        y = _H/2,
-        width = 500,
-        height = 333,
-        xScale = .2,
-        yScale = .2 * .7,
-        anchorX = 1,
-        anchorY = .5,
-        flagPadding = 1,
-        flagOffset = .5
-    }
-
-    -- rename flagFrame to flagFrame
-    flagFrame = display.newRect(
-        flagFrameOptions.x,
-        flagFrameOptions.y,
-        flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding,
-        flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding
-    )
-
-    flagFrame.anchorX = flagFrameOptions.anchorX
-    flagFrame.anchorY = flagFrameOptions.anchorY
-    flagFrame:setFillColor(0, 0, 0)
-
-    -- flagFrameAnchorX and flagFrameAnchorY are derived from flagFrameOptions (used by flagFrame) to place GUI objects pertaining and bound to flag area
-    -- flagFrameAnchorX and flagFrameAnchorY set to the top-left corner of this flag area (flag, flagFrame, and lightningIcons)
-    local flagFrameAnchorX = flagFrameOptions.x - ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) - 12) -- 12 to offset an extra amount from left-side of the flagFrame
-
-    local flagFrameAnchorY = (flagFrameOptions.y - ((flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding) / 2) - 6)
-    local lightningIconPaddingLeft = ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) / 5) -- 5 in this case, represents the # of lightningIcons
-    -- local lightningIconPaddingBottom
-
-    lightningIcon1 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-    lightningIcon1.x = flagFrameAnchorX
-    lightningIcon1.y = flagFrameAnchorY
-
-    lightningIcon2 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-    lightningIcon2.x = flagFrameAnchorX + (lightningIconPaddingLeft)
-    lightningIcon2.y = flagFrameAnchorY
-
-    lightningIcon3 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-    lightningIcon3.x = flagFrameAnchorX + (lightningIconPaddingLeft * 2)
-    lightningIcon3.y = flagFrameAnchorY
-
-    lightningIcon4 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-    lightningIcon4.x = flagFrameAnchorX + (lightningIconPaddingLeft * 3)
-    lightningIcon4.y = flagFrameAnchorY
-
-    lightningIcon5 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-    lightningIcon5.x = flagFrameAnchorX + (lightningIconPaddingLeft * 4)
-    lightningIcon5.y = flagFrameAnchorY
-
-    lightningIcon1.alpha = .2
-    lightningIcon2.alpha = .2
-    lightningIcon3.alpha = .2
-    lightningIcon4.alpha = .2
-    lightningIcon5.alpha = .2
-
-    --[[
-    -- jitterCameraPosition to add/enhance position derived from distanceFromCamera
-    jitterCameraPosition.target = display.newCircle(_W/2, _H/2, 20)
-    jitterCameraPosition.target:setFillColor(0)
-    jitterCameraPosition.target.anchorX = .5
-    jitterCameraPosition.target.anchorY = .5
-    jitterCameraPosition.x0 = 0
-    jitterCameraPosition.y0 = jitterCameraPosition.target.y
-    jitterCameraPosition.enemySpeed = 15
-    jitterCameraPosition.amplitude = 2
-
-    local jitterEvent = function( event )
-        jitterCameraPosition.x0 = jitterCameraPosition.x0 + 1
-        local y = jitterCameraPosition.y0 + math.sin(jitterCameraPosition.x0 / jitterCameraPosition.enemySpeed) * jitterCameraPosition.amplitude
-        jitterCameraPosition.target.x = jitterCameraPosition.x0
-        -- OR
-        jitterCameraPosition.target.x = 0
-        jitterCameraPosition.target.y = y
-    end
-    Runtime:addEventListener( "enterFrame", jitterEvent )
-    ]]--
-end
 
 function adjustWidthsAfterResize( event )
 
@@ -764,8 +505,6 @@ function adjustWidthsAfterResize( event )
     bigRed.anchorY = 0
     bigRed:setFillColor( 0.9, 0, 0 )
     transition.to(bigRed, {time=200, alpha=0, onComplete = function() display.remove(bigRed) end})
-
-    background.xScale = 2 -- scale by 2 of display.pixelHeight - original width of newRect()
 
     -- IMPORTANT, must be set to game_W / game_H, which change according to immerstiveSticky mode
     water.x = display.contentCenterX
@@ -931,49 +670,49 @@ local function setupScoreboard()
     gameDebugSpeedBtnFill:setFillColor(.2, .2, .2)
     gameDebugSpeedBtnFill.anchorY = 1
     gameDebugSpeedBtnSym = display.newText(gameDebugSpeedBtnGroup, "", gameDebugSpeedBtnFill.x, gameDebugSpeedBtnFill.y - (gameDebugSpeedBtnFill.height/2), "PTMono-Bold", 20)
-    if debugOptions.gameSpeed == true then
+    if debugOptions.godSpeed == true then
         gameDebugSpeedBtnSym.text = "X"
     end
     gameDebugSpeedBtnGroup:addEventListener("tap", onOptionsTap)
     gameDebugGroup:insert(gameDebugSpeedBtnGroup)
 
-    local gameDebugDeathAnchorX = _W/2 - scoreboardOffsetFromEachOther
+    local gameDebugGodAnchorX = _W/2 - scoreboardOffsetFromEachOther
 
-    gameDebugDeathBtnGroup = display.newGroup()
-    gameDebugDeathBtnGroup.name = "gameDebugDeath"
+    gameDebugGodBtnGroup = display.newGroup()
+    gameDebugGodBtnGroup.name = "gameDebugGod"
 
-    local textParams =
+    textParams =
     {
         text = "god?",
-        x = gameDebugDeathAnchorX,
+        x = gameDebugGodAnchorX,
         y = gameDebugGroupAnchorY,
         font = "PTMono-Bold",
         fontSize = 12,
         align = "center"
     }
-    gameDebugDeathBtnDesc = display.newEmbossedText(textParams)
-    gameDebugDeathBtnDesc:setFillColor(.2, .9, .4)
-    gameDebugDeathBtnDesc:setEmbossColor(scoreboardColor)
-    gameDebugDeathBtnDesc.anchorX = .5
-    gameDebugDeathBtnDesc.anchorY = 0
-    gameDebugGroup:insert(gameDebugDeathBtnDesc)
+    gameDebugGodBtnDesc = display.newEmbossedText(textParams)
+    gameDebugGodBtnDesc:setFillColor(.2, .9, .4)
+    gameDebugGodBtnDesc:setEmbossColor(scoreboardColor)
+    gameDebugGodBtnDesc.anchorX = .5
+    gameDebugGodBtnDesc.anchorY = 0
+    gameDebugGroup:insert(gameDebugGodBtnDesc)
 
-    gameDebugDeathBtnFill = display.newRoundedRect(gameDebugDeathBtnGroup, gameDebugDeathAnchorX, gameDebugGroupAnchorY, 20, 20, 1)
-    gameDebugDeathBtnFill:setFillColor(.2, .2, .2)
-    gameDebugDeathBtnFill.anchorY = 1
-    gameDebugDeathBtnSym = display.newText(gameDebugDeathBtnGroup, "", gameDebugDeathBtnFill.x, gameDebugDeathBtnFill.y - (gameDebugDeathBtnFill.height/2), "PTMono-Bold", 20)
+    gameDebugGodBtnFill = display.newRoundedRect(gameDebugGodBtnGroup, gameDebugGodAnchorX, gameDebugGroupAnchorY, 20, 20, 1)
+    gameDebugGodBtnFill:setFillColor(.2, .2, .2)
+    gameDebugGodBtnFill.anchorY = 1
+    gameDebugGodBtnSym = display.newText(gameDebugGodBtnGroup, "", gameDebugGodBtnFill.x, gameDebugGodBtnFill.y - (gameDebugGodBtnFill.height/2), "PTMono-Bold", 20)
     if debugOptions.god == true then
-        gameDebugDeathBtnSym.text = "X"
+        gameDebugGodBtnSym.text = "X"
     end
-    gameDebugDeathBtnGroup:addEventListener("tap", onOptionsTap)
-    gameDebugGroup:insert(gameDebugDeathBtnGroup)
+    gameDebugGodBtnGroup:addEventListener("tap", onOptionsTap)
+    gameDebugGroup:insert(gameDebugGodBtnGroup)
 
     local gameDebugCycleAnchorX = _W/2 + scoreboardOffsetFromEachOther
 
     gameDebugCycleBtnGroup = display.newGroup()
     gameDebugCycleBtnGroup.name = "gameDebugCycle"
 
-    local textParams =
+    textParams =
     {
         text = "modes?",
         x = gameDebugCycleAnchorX,
@@ -994,7 +733,7 @@ local function setupScoreboard()
     gameDebugCycleBtnFill:setFillColor(.2, .2, .2)
     gameDebugCycleBtnFill.anchorY = 1
     gameDebugCycleBtnSym = display.newText(gameDebugCycleBtnGroup, "", gameDebugCycleBtnFill.x, gameDebugCycleBtnFill.y - (gameDebugCycleBtnFill.height/2), "PTMono-Bold", 20)
-    if debugOptions.cycleModes == true then
+    if debugOptions.godCycle == true then
         gameDebugCycleBtnSym.text = "X"
     end
     gameDebugCycleBtnGroup:addEventListener("tap", onOptionsTap)
@@ -1010,14 +749,33 @@ local function setupScoreboard()
     gameDebugPanelOuter:toBack()
 
     if debugOptions.debugPanel == true then
+        -- read saved debugPanel values
+        local debugPanelValues = pGet( "score.json", "debugPanelStoredValues" )
+        if debugPanelValues[1] == true then
+            debugOptions.god = true
+            gameDebugGodBtnSym.text = "X"
+        end
+
+        if debugPanelValues[2] == true then
+            debugOptions.godSpeed = true
+            gameDebugSpeedBtnSym.text = "X"
+        end
+
+        if debugPanelValues[3] == true then
+            debugOptions.godCycle = true
+            gameDebugCycleBtnSym.text = "X"
+        end
+
         gameDebugGroup.alpha = 1
-        -- gameDebugPanelInner.alpha = 1
-        -- gameDebugPanelOuter.alpha = 1
+        gameDebugPanelInner.alpha = 1
+        gameDebugPanelOuter.alpha = 1
+        paceRect.alpha = 0.6
         print("start game with debug panel")
     else
         gameDebugGroup.alpha = 0
-        -- gameDebugPanelInner.alpha = 0
-        -- gameDebugPanelOuter.alpha = 0
+        gameDebugPanelInner.alpha = 0
+        gameDebugPanelOuter.alpha = 0
+        paceRect.alpha = 0
         print("start game with no debug panel")
     end
 end
@@ -1077,8 +835,8 @@ resetSpawnTable = function()
         bonusText = nil
     end
 
-    if debugOptions.cycleModes == true then
-    	--decide what gameMechanics.mode is next
+    if debugOptions.godCycle == true then
+        --decide what gameMechanics.mode is next
         if gameMechanics.mode == 1 then
             gameMechanics.mode = 2
             --levelsIndex = levelsIndex + 1
@@ -1214,12 +972,12 @@ end
 -- Boundary Handler
 local function boundaryElimination(e)
     for i = 1, #spawnTable do
-		--junk paletts go away
+        --junk paletts go away
         if spawnTable[i] ~= 0 and spawnTable[i].dead ~= true then
             spawnTable[i].PaletteActive = false
             spawnTable[i]:removeEventListener("touch", objTouch)
             transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
-			--Pallets player lost with.  Fling them at the screen
+            --Pallets player lost with.  Fling them at the screen
         elseif spawnTable[i] ~= 0 and spawnTable[i].dead == true  then
 
             if gameMechanics.mode == 3 then
@@ -1260,7 +1018,7 @@ end
 local function boundaryCheck(e)
     local temp
     local breakLoop = false
-	--breakLoop ensures this outerloop will break after it finds the bad pallete
+    --breakLoop ensures this outerloop will break after it finds the bad pallete
     if #spawnTable > 0 and breakLoop == false then
         for i = 1, #spawnTable do
             if spawnTable[i] ~= 0 and spawnTable[i] ~= nil then
@@ -1280,11 +1038,11 @@ local function boundaryCheck(e)
                             Runtime:removeEventListener("enterFrame", boundaryCheck)
                             Runtime:removeEventListener("enterFrame", moveObject)
                             for i = 1, #spawnTable do
-								--Check for palettes that are out of bounds
+                                --Check for palettes that are out of bounds
                                 if spawnTable[i] ~= 0 then
                                     spawnTable[i].isPaletteActive = false
                                     spawnTable[i]:removeEventListener("touch", objTouch)
-									--Check for gameover palettes
+                                    --Check for gameover palettes
                                     if spawnTable[i].x < - 40 or spawnTable[i].x > _W + 40 then
                                         if lookupCode(code, spawnTable[i]) == 1 then
                                             spawnTable[i]:removeEventListener("touch", objTouch)
@@ -1381,7 +1139,7 @@ local function spawnPalette(params)
     object.corner = params.corner
     object.type = params.type
 
-	-- print("created" .. object.myName)
+    -- print("created" .. object.myName)
     if gameMechanics.mode == 1 then
         if object.corner == "TopRight" then
             object.x = game_W - 40
@@ -1451,11 +1209,11 @@ local function spawnPalette(params)
     end
     object.touch = objTouch
     object:addEventListener("touch", object)
-	--object:addEventListener("enterFrame", moveObject)
+    --object:addEventListener("enterFrame", moveObject)
     object.objTable[object.index] = object --Insert the object into the table at the specified index
     object:scale(0, 0)
 
-	--new pallets are being scaled to full size as they appear
+    --new pallets are being scaled to full size as they appear
     if gameMechanics.mode == 1 or gameMechanics.mode == 2 then
         if object.index == 1 or object.index == 2 then
             transition.to(object, {time = timeVar * timeVarMultiplier, xScale = .01, yScale = .01, onComplete = paletteGrow})
@@ -1564,16 +1322,16 @@ local function trackLightningScore()
     lightningIcons()
     --[[ SAM: Mike's trackLightningScore methods
     if lightningScore >= 10 then
-        lightningScore = score - (10 * lightningMultiplier)
-        lightningCount = lightningCount + 1
-        lightningMultiplier = lightningMultiplier + 1
-        lightningIcons()
-    end
-    ]]--
+    lightningScore = score - (10 * lightningMultiplier)
+    lightningCount = lightningCount + 1
+    lightningMultiplier = lightningMultiplier + 1
+    lightningIcons()
+end
+]]--
 end
 
 function lightningStrike(self)
-	--You are Alive
+    --You are Alive
     if self.isGrown == false then
         self:removeSelf()
         spawnTable[self.index] = 0
@@ -1585,7 +1343,7 @@ function lightningStrike(self)
         end
     end
     currentColor = self.type
-	--bonus score
+    --bonus score
     if currentColor == previousColor then
         spread = spread + 1
 
@@ -1694,14 +1452,14 @@ local function triggercountryFillBounce()
 end
 countryFillBounce = function()
     transition.to( fxBG.fill.effect, { time=10, angle=0, onComplete=
-        function()
-            transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop})
-        end
-    })
-    transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad, onComplete=function()
-            triggercountryFillBounce()
-        end
-    })
+    function()
+        transition.to( fxBG.fill.effect, { time=1390, angle=20, transition=easing.continuousLoop})
+    end
+})
+transition.to( fxBG, { tag="moveNeedle", delay=50, time=1350, rotation=fxBG.rotation+90, transition = easing.inOutQuad, onComplete=function()
+    triggercountryFillBounce()
+end
+})
 end
 
 previousCountry = nil
@@ -1709,7 +1467,7 @@ previouscountryFill = nil
 -- READYOBJ: setCountryParameters
 setCountryParameters = function(restartCountry)
     -- don't increase speed every new country, change modes or randomize modes.
-    if debugOptions.gameSpeed == true and gameMechanics.overrideFlag == false and countriesCompleted > 0 then
+    if debugOptions.godSpeed == true and gameMechanics.overrideFlag == false and countriesCompleted > 0 then
         speedUp()
     end
 
@@ -1782,20 +1540,20 @@ setCountryParameters = function(restartCountry)
             transition.to( newGroup, {delay=40, time=200, alpha=1} )
         else
             cameraEvent.focus(
-                gameMechanics.transitionToCountryDuration,
-                country,
-                countryFill,
-                previousCountry,
-                previouscountryFill,
-                mapGroup
-            )
-        end
-
-        -- old style. Currently working on function to handle transitions to zoom in and out!
-        -- mapTimer = transition.to( mapGroup, { time=gameMechanics.transitionToCountryDuration, x=xCoord, y=yCoord, xScale=1*zoomMultiplier, yScale=1*zoomMultiplier})
-    else
-        paceTimer = timer.performWithDelay(10, delayPace, 1)
+            gameMechanics.transitionToCountryDuration,
+            country,
+            countryFill,
+            previousCountry,
+            previouscountryFill,
+            mapGroup
+        )
     end
+
+    -- old style. Currently working on function to handle transitions to zoom in and out!
+    -- mapTimer = transition.to( mapGroup, { time=gameMechanics.transitionToCountryDuration, x=xCoord, y=yCoord, xScale=1*zoomMultiplier, yScale=1*zoomMultiplier})
+else
+    paceTimer = timer.performWithDelay(10, delayPace, 1)
+end
 end
 
 -- READYOBJ: newCountry
@@ -1805,18 +1563,16 @@ newCountry = function()
     local randomCountry = math.random(CFGameSettings:getLength())
     country = CFGameSettings:getItemByID(randomCountry)
 
-    display.setDefault("background", 0.4,0.4,0.4)
-
     local subGroup = display.newGroup()
     local options
     options = {
-      text = country.printedName,
-      x = flagFrame.x - (flagFrame.width / 2) ,
-      y = flagFrame.y + 24,
-      width = flagFrame.width,
-      font = "fonts/kefa.fnt",
-      fontSize = 18,
-      align = "left",
+        text = country.printedName,
+        x = flagFrame.x - (flagFrame.width / 2) ,
+        y = flagFrame.y + 24,
+        width = flagFrame.width,
+        font = "fonts/kefa.fnt",
+        fontSize = 18,
+        align = "left",
     }
 
     if bmpText ~= nil then
@@ -1839,7 +1595,7 @@ newCountry = function()
 
     -- Demo looping through each letter
     for i = 1, bmpText.numChildren do
-      transition.from ( bmpText[i], { delay = 100 + (i*25), time = 250, xScale = 2, yScale = 2, alpha = 0, transition = easing.outBounce })
+        transition.from ( bmpText[i], { delay = 100 + (i*25), time = 250, xScale = 2, yScale = 2, alpha = 0, transition = easing.outBounce })
     end
 
     inclusiveColorsArray = adherenceToFlagColors(0)
@@ -1878,55 +1634,55 @@ newCountry = function()
     -- SAM: zoom to country
     --[[
     if countryFill.width < _W/2 and countryFill.height < _H/2 then
-    end
-    ]]--
+end
+]]--
 
-    -- SAM: countryFill scaling
-    countryFillWidthMultiplier = display.pixelHeight/display.contentWidth
-    countryFillHeightMultiplier = display.pixelWidth/display.contentHeight
-    -- print("pixelHeight / contentWidth: ", countryFillWidthMultiplier)
-    -- print("pixelWidth / contentHeight: ", countryFillHeightMultiplier)
-    countryFill:scale(1/countryFillWidthMultiplier, 1/countryFillHeightMultiplier)
+-- SAM: countryFill scaling
+countryFillWidthMultiplier = display.pixelHeight/display.contentWidth
+countryFillHeightMultiplier = display.pixelWidth/display.contentHeight
+-- print("pixelHeight / contentWidth: ", countryFillWidthMultiplier)
+-- print("pixelWidth / contentHeight: ", countryFillHeightMultiplier)
+countryFill:scale(1/countryFillWidthMultiplier, 1/countryFillHeightMultiplier)
 
-    -- SAM: originally a local variable
-    fxGroup = display.newGroup()
-    fxGroup.id = "fxGroup"
+-- SAM: originally a local variable
+fxGroup = display.newGroup()
+fxGroup.id = "fxGroup"
 
-    -- print("countryFill.width:" .. countryFill.width, "countryFill.height" .. countryFill.height)
+-- print("countryFill.width:" .. countryFill.width, "countryFill.height" .. countryFill.height)
 
-    local fxSize
-    if(countryFill.width > countryFill.height) then
-        -- delete?
-        -- fxSize = math.ceil(countryFill.width * countryFill.xScale) + 120
-        fxSize = math.ceil(countryFill.width) + 120
-    else
-        -- delete?
-        -- fxSize = math.ceil(countryFill.height * countryFill.yScale) + 120
-        fxSize = math.ceil(countryFill.width) + 120
-    end
+local fxSize
+if(countryFill.width > countryFill.height) then
+    -- delete?
+    -- fxSize = math.ceil(countryFill.width * countryFill.xScale) + 120
+    fxSize = math.ceil(countryFill.width) + 120
+else
+    -- delete?
+    -- fxSize = math.ceil(countryFill.height * countryFill.yScale) + 120
+    fxSize = math.ceil(countryFill.width) + 120
+end
 
-    -- print("circumference of fxBG:", fxSize)
+-- print("circumference of fxBG:", fxSize)
 
-	-- SAM: make into local variable? I don't know if there's a visual difference for when fxBG is local vs global. Leave as is until thoroughly tested
-	fxBG = display.newCircle(0, 0, fxSize)
-    fxBG.anchorX = .5
-    fxBG.anchorY = .5
+-- SAM: make into local variable? I don't know if there's a visual difference for when fxBG is local vs global. Leave as is until thoroughly tested
+fxBG = display.newCircle(0, 0, fxSize)
+fxBG.anchorX = .5
+fxBG.anchorY = .5
 
-    -- SAM: what does this scaleFactorX and scaleFactorY do?
-    local scaleFactorX = 1
-	local scaleFactorY = 1
+-- SAM: what does this scaleFactorX and scaleFactorY do?
+local scaleFactorX = 1
+local scaleFactorY = 1
 
-    -- print("fxBG width:", fxBG.width, "fxBG height:", fxBG.height)
+-- print("fxBG width:", fxBG.width, "fxBG height:", fxBG.height)
 
-    if (fxBG.width > fxBG.height) then
-        scaleFactorY = fxBG.width / fxBG.height
-    else
-        scaleFactorX = fxBG.height / fxBG.width
-    end
+if (fxBG.width > fxBG.height) then
+    scaleFactorY = fxBG.width / fxBG.height
+else
+    scaleFactorX = fxBG.height / fxBG.width
+end
 
-    local tileMultiplier = .9
-    -- SAM: understand this a bit more. Should these values be returned to their defaults as soon as implementing this fxgroup.png texture?
-    display.setDefault("textureWrapX", "repeat")
+local tileMultiplier = .9
+-- SAM: understand this a bit more. Should these values be returned to their defaults as soon as implementing this fxgroup.png texture?
+display.setDefault("textureWrapX", "repeat")
     display.setDefault("textureWrapY", "mirroredRepeat")
     -- SAM: rename png, add scaling variants
     fxBG.fill = {type = "image", filename = "images/fxgroup.png"}
@@ -2030,36 +1786,45 @@ newCountry = function()
 
     local function offsetIncomingAnthem(outgoingAnthem, incomingAnthem)
         local function listener(event)
-            audio.stop(outgoingAnthem)
+            -- audio.fadeOut( { channel=outgoingAnthem, time=500 } )
+            -- audio.stop(outgoingAnthem)
+
             lastReservedChannel = incomingAnthem
-            audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1, onComplete=function(event)
-                print("finished streaming anthem on channel " .. event.channel)
-            end})
+            audio.stop(lastReservedChannel)
+            -- audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1, onComplete=function(event)
+            --     print("finished streaming anthem on channel " .. event.channel)
+            -- end})
         end
-        timer.performWithDelay ((timeVar * timeVarMultiplier), listener)
+    	audio.setVolume( .5, { channel = 1 } )
+    	audio.setVolume( .5, { channel = 2 } )
+        audio.fadeOut( { channel=outgoingAnthem, time=500 } )
+        timer.performWithDelay ((timeVar * timeVarMultiplier)/2, listener)
     end
 
     if countriesCompleted ~= 0 then
         if lastReservedChannel ~= nil then
-        	if lastReservedChannel == 1 then
+            if lastReservedChannel == 1 then
                 offsetIncomingAnthem(1, 2)
-        	elseif lastReservedChannel == 2 then
+            elseif lastReservedChannel == 2 then
                 offsetIncomingAnthem(2, 1)
-        	end
+            end
         end
     else
         if lastReservedChannel ~= nil then
-        	if lastReservedChannel == 1 then
+            if lastReservedChannel == 1 then
                 audio.stop(lastReservedChannel)
                 lastReservedChannel = 2
+                audio.stop(lastReservedChannel)
                 audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
-        	elseif lastReservedChannel == 2 then
+            elseif lastReservedChannel == 2 then
                 audio.stop(lastReservedChannel)
                 lastReservedChannel = 1
+                audio.stop(lastReservedChannel)
                 audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
-        	end
+            end
         else
             lastReservedChannel = 1
+            audio.stop(lastReservedChannel)
             audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
         end
     end
@@ -2089,7 +1854,7 @@ end
 
 finishScale = function()
 
-	transition.to(flag, {time = 1000, alpha = 1})
+    transition.to(flag, {time = 1000, alpha = 1})
 
     -- SAM: delete?
     -- flagLightningReady = timer.performWithDelay(1000, lightningEnable, 1)
@@ -2097,7 +1862,7 @@ finishScale = function()
     -- SAM: delete this? used for offsetting when speedUp() occurs - can happen in during midst of a country
     -- timerSpeed = timer.performWithDelay(9500, speedUp, 1)
 
-	countriesCompleted = countriesCompleted + 1
+    countriesCompleted = countriesCompleted + 1
     -- print("end of finishScale() function")
 end
 
@@ -2250,7 +2015,7 @@ moveObject = function(e)
         else
             paceRect.x = paceRect.x + (levelsArray[levelsIndex].speed / 2)
         end
-		--reset PaceRect, call readyObjects() to create a new palette or flag
+        --reset PaceRect, call readyObjects() to create a new palette or flag
         readyObject()
     end
 
@@ -2258,7 +2023,7 @@ moveObject = function(e)
     if gameMechanics.mode == 1 then
         if #spawnTable > 0 then
             for i = 1, #spawnTable do
-				--isGrown means is palette full size
+                --isGrown means is palette full size
                 if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
                     if spawnTable[i].corner == "TopRight" then
                         spawnTable[i].x = spawnTable[i].x - speed
@@ -2374,7 +2139,7 @@ readyObject = function(firstCountry)
             elseif firstPalette == false then
                 if gameMechanics.mode == 1 or gameMechanics.mode == 2 then
                     if spawnTable[count] ~= 0 then
-						--isGrown means colorPalletes are full size scale=1
+                        --isGrown means colorPalletes are full size scale=1
                         spawnTable[count].isGrown = true
                     end
                     if spawnTable[count + 1] ~= 0 then
@@ -2403,7 +2168,7 @@ end
 
 function objTouch(self, e)
     if e.phase == "began" and e.target.isPaletteActive == true then
-    -- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isTopLeft)
+        -- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isTopLeft)
 
         local playPaletteDeathR = audio.play( SFXPaletteHit, { onComplete=function(event)
             print(event.channel)
@@ -2424,12 +2189,12 @@ function objTouch(self, e)
                 self.isPaletteActive = false
                 self:removeEventListener("touch", objTouch)
 
-				-- Death Palette Animation
+                -- Death Palette Animation
                 for i = 1, #spawnTable do
                     if spawnTable[i] ~= 0 then
                         spawnTable[i].isGrown = false
                         spawnTable[i].isPaletteActive = false
-						-- spawnTable[i]:removeEventListener("enterFrame", moveObject)
+                        -- spawnTable[i]:removeEventListener("enterFrame", moveObject)
                     end
                     if spawnTable[i] ~= 0 and spawnTable[i] ~= e.target then
                         spawnTable[i]:removeEventListener("touch", objTouch)
@@ -2450,7 +2215,7 @@ function objTouch(self, e)
                 transition.to(e.target, {time = 500, rotation = 400, xScale = 5, yScale = 5, onComplete = removePalette })
             end
             e.target.isPaletteActive = false
-			--You are Alive
+            --You are Alive
         else
             -- HOOKSOUND
             -- local pHit = audio.play( SFXPaletteHit )
@@ -2466,7 +2231,7 @@ function objTouch(self, e)
                 end
             end
             currentColor = e.target.type
-			--BONUS SCORE
+            --BONUS SCORE
             if currentColor == previousColor then
                 print("match!")
                 -- spread = spread + 1
@@ -2514,30 +2279,308 @@ function objTouch(self, e)
     end
     return true
 end
+
 ------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------
+
 function scene:create(e)
+
     --SAM: determine objects to be managed by scene:create()
-    -- print("CREATE")
+    w1 = 1;w2 = 1;w3 = 1
+    k1 = 0;k2 = 0;k3 = 0
+    r1 = 1;r2 = 0;r3 = 0
+    o1 = 1;o2 = .502;o3 = 0
+    y1 = 1;y2 = 1;y3 = 0
+    g1 = 0;g2 = .4;g3 = 0
+    b1 = 0;b2 = 0;b3 = 1
+
+    paletteBarTop = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_top")}} )
+    paletteBarBtm = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_btm")}} )
+    self.view:insert(paletteBarTop)
+    self.view:insert(paletteBarBtm)
+
+    if platform == "ios" then
+        paletteBarTop.x = _W/2 -- fix like for platform == "android"
+        paletteBarTop.y = 0
+        paletteBarTop.anchorX = .5
+        paletteBarTop.anchorY = 0
+
+        paletteBarBtm.x = _W/2 -- fix like for platform == "android"
+        paletteBarBtm.y = _H -- fix like for platform == "android"
+        paletteBarBtm.anchorX = .5
+        paletteBarBtm.anchorY = 1
+    elseif platform == "android" then
+        -- paletteBarTop.width = display.actualContentWidth +
+        print("actualContentWidth from game.lua", display.actualContentWidth)
+        paletteBarTop.width = game_W
+        paletteBarTop.x = game_W/2
+        paletteBarTop.y = 0
+        paletteBarTop.anchorX = .5
+        paletteBarTop.anchorY = 0
+
+        paletteBarBtm.width = game_W
+        paletteBarBtm.x = game_W/2
+        paletteBarBtm.y = game_H
+        paletteBarBtm.anchorX = .5
+        paletteBarBtm.anchorY = 1
+    end
+
+    waterGroup = display.newGroup()
+    water = display.newRect( display.contentCenterX, display.contentCenterY, game_W, game_H ) -- IMPORTANT, must be set to game_W / game_H, which change according to immerstiveSticky mode
+
+    display.setDefault( "textureWrapX", "repeat" )
+        display.setDefault( "textureWrapY", "repeat" )
+            water.alpha = 1
+
+            water.fill = { type = "image", filename = "images/water.png"}
+            water.fill.scaleX = 32/display.actualContentWidth
+            water.fill.scaleY = 32/display.actualContentHeight
+
+            display.setDefault( "textureWrapX", "clampToEdge" )
+            display.setDefault( "textureWrapY", "clampToEdge" )
+
+            water.texOffsetX = 0
+            water.texOffsetY = 0
+            water.lastT = system.getTimer()
+            water.rateX = 1
+            water.rateY = -1
+
+            function water.enterFrame( self )
+                local curT 	= system.getTimer()
+                local dt 	= curT - self.lastT
+                self.lastT 	= curT
+
+                local dOffsetX = dt * self.rateX / 20000
+                local dOffsetY = dt * self.rateY / 50000
+
+                self.texOffsetX = self.texOffsetX + dOffsetX
+                self.texOffsetY = self.texOffsetY + dOffsetY
+
+                --
+                -- Keep values in bounds [-1, 1]
+                --
+                if( dOffsetX >= 0 ) then
+                    while(self.texOffsetX > 1) do
+                        self.texOffsetX = self.texOffsetX - 2
+                    end
+                else
+                    while(self.texOffsetX < -1) do
+                        self.texOffsetX = self.texOffsetX + 2
+                    end
+                end
+                if( dOffsetY >= 0 ) then
+                    while(self.texOffsetY > 1) do
+                        self.texOffsetY = self.texOffsetY - 2
+                    end
+                else
+                    while(self.texOffsetY < -1) do
+                        self.texOffsetY = self.texOffsetY + 2
+                    end
+                end
+
+                self.fill.x = self.texOffsetX
+                self.fill.y = self.texOffsetY
+            end
+
+            Runtime:addEventListener( "enterFrame", water )
+            waterGroup:insert(water)
+            self.view:insert(waterGroup)
+
+            -- rename?
+            local waterMask = graphics.newMask("images/map_mask_2018.png")
+            waterGroup:setMask(waterMask)
+            waterGroup.maskX = display.contentCenterX
+            waterGroup.maskY = display.contentCenterY
+            -- waterGroup.maskX = game_W/2
+            -- waterGroup.maskY = game_H/2
+
+            -- do this math one time in this function, reuse
+            if platform == "ios" then
+                waterGroup.maskScaleX = 1.10
+                waterGroup.maskScaleY = 1.01
+            elseif platform == "android" then
+
+                -- SAM: immersiveSticky, on newer androids
+                -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
+                -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
+                waterGroup.maskScaleX = 1.5
+
+                -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+                local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+                -- alignMask will be 1.23
+                -- print(alignMask)
+                waterGroup.maskScaleY = alignMask
+            end
+
+            -- ['@1x'] = {2031, 851},
+            -- ['@2x'] = {4062, 1702},
+            -- ['@4x'] = {8124, 3404}
+
+            mapDimensions = CFGameScaleComponents:getItemByID(1)
+
+            testWidth = mapDimensions.dimensions['@1x'].width
+            testHeight = mapDimensions.dimensions['@1x'].height
+
+            mapGroup = display.newGroup()
+            fapGroup = display.newGroup()
+            map = display.newImageRect("images/worldmap_2017_300.png", 8191, 4084)
+            map.anchorX = 0
+            map.anchorY = 0
+            map.name = "map"
+            map.x = 0
+            map.y = 0
+            fapGroup:insert(map)
+            mapGroup:insert(fapGroup)
+            mapGroup.x = _W/2
+            mapGroup.y = _H/2
+            mapGroup.xScale = 1 * zoomMultiplier
+            mapGroup.yScale = 1 * zoomMultiplier
+
+            newGroup = display.newGroup()
+            newGroup:insert(mapGroup)
+            self.view:insert(newGroup)
+            -- mapMask = graphics.newMask("images/map_mask_2018.png")
+
+            newGroup:setMask(waterMask)
+            newGroup.maskX = display.contentCenterX
+            newGroup.maskY = display.contentCenterY
+            -- newGroup.maskX = game_W/2
+            -- newGroup.maskY = game_H/2
+
+            -- do this math one time in this function, reuse
+            if platform == "ios" then
+                newGroup.maskScaleX = 1.10
+                newGroup.maskScaleY = 1.01
+            elseif platform == "android" then
+
+                -- SAM: immersiveSticky, on newer androids
+                -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
+                -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
+                newGroup.maskScaleX = 1.5
+
+                -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+                local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+                -- alignMask will be 1.23
+                -- print(alignMask)
+                newGroup.maskScaleY = alignMask
+            end
+
+            newGroup.alpha = 0
+
+            -- mapGroup:setMask(mapMask)
+            -- mapGroup.maskScaleY = 1.01
+            -- mapGroup.maskX = _W/2
+            -- mapGroup.maskY = _H/2
+
+
+
+            -- flag.anchorX = 0.5 ; flag.anchorY = 0.5
+            --
+            -- flag.width = 500
+            -- flag.height = 333
+            -- flag.xScale = .2
+            -- flag.yScale = .2 * .7
+            -- flag.anchorX = 1
+            -- flag.anchorY = 0.5
+            --
+            -- flag.x = _W
+            -- flag.y = _H/2
+
+            flagFrameOptions = {
+                x = _W,
+                y = _H/2,
+                width = 500,
+                height = 333,
+                xScale = .2,
+                yScale = .2 * .7,
+                anchorX = 1,
+                anchorY = .5,
+                flagPadding = 1,
+                flagOffset = .5
+            }
+
+            -- rename flagFrame to flagFrame
+            flagFrame = display.newRect(
+            flagFrameOptions.x,
+            flagFrameOptions.y,
+            flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding,
+            flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding
+        )
+
+        flagFrame.anchorX = flagFrameOptions.anchorX
+        flagFrame.anchorY = flagFrameOptions.anchorY
+        flagFrame:setFillColor(0, 0, 0)
+
+        -- flagFrameAnchorX and flagFrameAnchorY are derived from flagFrameOptions (used by flagFrame) to place GUI objects pertaining and bound to flag area
+        -- flagFrameAnchorX and flagFrameAnchorY set to the top-left corner of this flag area (flag, flagFrame, and lightningIcons)
+        local flagFrameAnchorX = flagFrameOptions.x - ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) - 12) -- 12 to offset an extra amount from left-side of the flagFrame
+
+        local flagFrameAnchorY = (flagFrameOptions.y - ((flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding) / 2) - 6)
+        local lightningIconPaddingLeft = ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) / 5) -- 5 in this case, represents the # of lightningIcons
+        -- local lightningIconPaddingBottom
+
+        lightningIcon1 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+        lightningIcon1.x = flagFrameAnchorX
+        lightningIcon1.y = flagFrameAnchorY
+
+        lightningIcon2 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+        lightningIcon2.x = flagFrameAnchorX + (lightningIconPaddingLeft)
+        lightningIcon2.y = flagFrameAnchorY
+
+        lightningIcon3 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+        lightningIcon3.x = flagFrameAnchorX + (lightningIconPaddingLeft * 2)
+        lightningIcon3.y = flagFrameAnchorY
+
+        lightningIcon4 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+        lightningIcon4.x = flagFrameAnchorX + (lightningIconPaddingLeft * 3)
+        lightningIcon4.y = flagFrameAnchorY
+
+        lightningIcon5 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+        lightningIcon5.x = flagFrameAnchorX + (lightningIconPaddingLeft * 4)
+        lightningIcon5.y = flagFrameAnchorY
+
+        lightningIcon1.alpha = .2
+        lightningIcon2.alpha = .2
+        lightningIcon3.alpha = .2
+        lightningIcon4.alpha = .2
+        lightningIcon5.alpha = .2
+
+        --[[
+        -- jitterCameraPosition to add/enhance position derived from distanceFromCamera
+        jitterCameraPosition.target = display.newCircle(_W/2, _H/2, 20)
+        jitterCameraPosition.target:setFillColor(0)
+        jitterCameraPosition.target.anchorX = .5
+        jitterCameraPosition.target.anchorY = .5
+        jitterCameraPosition.x0 = 0
+        jitterCameraPosition.y0 = jitterCameraPosition.target.y
+        jitterCameraPosition.enemySpeed = 15
+        jitterCameraPosition.amplitude = 2
+
+        local jitterEvent = function( event )
+        jitterCameraPosition.x0 = jitterCameraPosition.x0 + 1
+        local y = jitterCameraPosition.y0 + math.sin(jitterCameraPosition.x0 / jitterCameraPosition.enemySpeed) * jitterCameraPosition.amplitude
+        jitterCameraPosition.target.x = jitterCameraPosition.x0
+        -- OR
+        jitterCameraPosition.target.x = 0
+        jitterCameraPosition.target.y = y
+    end
+    Runtime:addEventListener( "enterFrame", jitterEvent )
+    ]]--
+
+    paceRect = display.newRoundedRect(0, 0, 80, 6, 3)
+    paceRect:setFillColor(1, 1, 1)
+    paceRect.anchorX = 0
+    paceRect.anchorY = 1
+    paceRect.x = 0
+    paceRect.y = _H - (gameMechanics.heightModeTop*2)
+    paceRect.isTopLeft = false
+    paceRect.isMoving = false
+    paceRect.alpha = 0.6
+    setupScoreboard()
 end
 
 function scene:show(e)
     if (e.phase == "will") then
         -- print("SHOWWILL")
-
-        setupVariables()
-        setupScoreboard()
-        random = math.randomseed(os.time())
-        paceRect = display.newRoundedRect(0, 0, 80, 6, 3)
-        paceRect:setFillColor(1, 1, 1)
-        paceRect.anchorX = 0
-        paceRect.anchorY = 1
-        paceRect.x = 0
-        paceRect.y = _H - (gameMechanics.heightModeTop*2)
-        paceRect.isTopLeft = false
-        paceRect.isMoving = false
-        paceRect.alpha = 0.4
-        -- self.view:insert(paceRect)
 
     elseif (e.phase == "did") then
         Runtime:addEventListener("enterFrame", boundaryCheck)
@@ -2552,7 +2595,7 @@ function scene:show(e)
         -- SAM: flag timers - length of country/flag duration
         -- originally set to 20000
         -- timer.cancel(setFlagTimer)
-		--  timer.performWithDelay(15000, checkMemory,0)
+        --  timer.performWithDelay(15000, checkMemory,0)
     end
 end
 
@@ -2581,7 +2624,7 @@ function scene:hide(e)
         display.remove(flagFrame)
         display.remove(bmpText)
         display.remove(paceRect)
-		-- what about mask applied to fxGroup
+        -- what about mask applied to fxGroup
         display.remove(fxGroup)
         display.remove(piece)
         display.remove(mapGroup)

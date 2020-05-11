@@ -5,8 +5,6 @@ local currentObject
 local touchInsideBtn = false
 local isBtnAnim = false
 
-local backBtn
-
 local phaseGroup = display.newGroup()
 
 local options = {}
@@ -25,30 +23,9 @@ local arialFont = "Arial Rounded MT Bold"
 
 local musicOff
 
-local btnsSheetCoords = require("lua-sheets.buttons")
-
-local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
-
-local btnsSeq = {
-    {
-        name = "backBtn",
-        frames = {
-            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn5")
-        },
-        time = 500
-    },
-    {
-        name = "backBtn_anim",
-        frames = {
-            btnsSheetCoords:getFrameIndex("backArrowBtn2"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn4"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn5")
-        },
-        time = 500
-    }
-}
+local btnsLeftArrow
+local btnsLeftArrowSheetCoords = require("lua-sheets.btns_left_arrow")
+local btnsLeftArrowSheet = graphics.newImageSheet("images/btns_left_arrow.png", btnsLeftArrowSheetCoords:getSheet())
 
 -- New
 local function myTouchListener(event)
@@ -60,8 +37,8 @@ local function myTouchListener(event)
     elseif event.phase == "ended" or event.phase == "cancelled" then
 
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "backBtn" then
-            currentObject:setSequence("backBtn")
+        if currentObject.name == "btnsLeftArrow" then
+            currentObject:setSequence("btnsLeftArrow")
         end
 
         if touchInsideBtn == true then
@@ -69,7 +46,7 @@ local function myTouchListener(event)
             print("touch OFF. inside")
             -- composer.removeScene("start")
 
-            if(currentObject.name == "backBtn") then
+            if(currentObject.name == "btnsLeftArrow") then
                 composer.gotoScene("menu", { effect = defaultTransition })
             end
 
@@ -90,12 +67,13 @@ local function doFunction(e)
             e.y < currentObject.contentBounds.yMin or
             e.y > currentObject.contentBounds.yMax then
 
+            -- DELETE isBtnAnim handling
             if(isBtnAnim) then
-                if currentObject.name == "backBtn" then
-                    currentObject:setSequence("backBtn")
+                if currentObject.name == "btnsLeftArrow" then
+                    currentObject:setSequence("btnsLeftArrow")
                 end
             else
-                if currentObject.name == "backBtn" then
+                if currentObject.name == "btnsLeftArrow" then
                     currentObject:setFrame(1)
                 end
             end
@@ -105,12 +83,12 @@ local function doFunction(e)
         else
             if touchInsideBtn == false then
                 if(isBtnAnim) then
-                    if currentObject.name == "backBtn" then
-                        currentObject:setSequence("backBtn_anim")
+                    if currentObject.name == "btnsLeftArrow" then
+                        currentObject:setSequence("btnsLeftArrow_anim")
                     end
                     currentObject:play()
                 else
-                    if currentObject.name == "backBtn" then
+                    if currentObject.name == "btnsLeftArrow" then
                         currentObject:setFrame(2)
                     end
                 end
@@ -154,7 +132,7 @@ end
 -- SAM: Rename
 local function buttonHit(e)
     local group = e.target
-    -- SAM: backBtn check NOT NEEDED
+    -- SAM: btnsLeftArrow check NOT NEEDED
     if group == optionsMusicGroup then
         if options.music == true then
             optionsMusicStatus.text = "OFF"
@@ -180,17 +158,16 @@ function scene:create( event )
 	titleLogo.y = _H/2
     self.view:insert(titleLogo)
 
-	backBtn = display.newSprite(btnsSheet, btnsSeq)
-    backBtn:setSequence("backBtn")
-    backBtn.name = "backBtn"
-    backBtn.anchorX = 0
-    backBtn.anchorY = 1
-    backBtn.x = 0 + margins
-    backBtn.y = _H - backBtn.y - margins
-	backBtn.gotoScene = "menu"
-    backBtn:setFillColor(224/225,96/225,224/225)
+	btnsLeftArrow = display.newSprite( btnsLeftArrowSheet, {frames={1,2}} )
+    btnsLeftArrow.name = "btnsLeftArrow"
+    btnsLeftArrow.anchorX = 0
+    btnsLeftArrow.anchorY = 1
+    btnsLeftArrow.x = 0 + margins
+    btnsLeftArrow.y = _H - btnsLeftArrow.y - margins
+	btnsLeftArrow.gotoScene = "menu"
+    -- btnsLeftArrow:setFillColor(0.98, 0.42, 0.98)
 
-    self.view:insert(backBtn)
+    self.view:insert(btnsLeftArrow)
 end
 
 
@@ -226,8 +203,8 @@ function scene:show( event )
         optionsMusicGroup:addEventListener("tap", buttonHit)
 
     elseif event.phase=="did" then
-        backBtn:addEventListener("touch", myTouchListener)
-        backBtn:addEventListener("touch", doFunction)
+        btnsLeftArrow:addEventListener("touch", myTouchListener)
+        btnsLeftArrow:addEventListener("touch", doFunction)
     end
 end
 
@@ -235,8 +212,8 @@ function scene:hide( event )
     if event.phase == "will" then
         display.remove(optionsMusicGroup)
         optionsMusicGroup:removeEventListener("tap", buttonHit)
-        backBtn:removeEventListener("touch", myTouchListener)
-        backBtn:removeEventListener("touch", doFunction)
+        btnsLeftArrow:removeEventListener("touch", myTouchListener)
+        btnsLeftArrow:removeEventListener("touch", doFunction)
         composer.removeScene("options",false)
     elseif event.phase == "did" then
       --  composer.gotoScene("menu", {effect=defaultTransition} )

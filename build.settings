@@ -13,23 +13,13 @@ settings = {
 		
 	orientation = {
 		default = "landscapeRight",
-		supported = { "landscapeRight", }
+		supported = { "landscapeRight", "landscapeLeft" }
 	},
 
 	iphone = {
 		plist = {
 			UIStatusBarHidden = false,
 			UIPrerenderedIcon = true, -- set to false for "shine" overlay
-
-
-            UIAppFonts =
-            {
-                "FFF_Tusj.tff",
-
-            },
-
-
-
 			UIApplicationExitsOnSuspend = true, -- uncomment to quit app on suspend
 
             --[[

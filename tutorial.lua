@@ -11,83 +11,49 @@ local phase = 1
 
 -- RENAME VARS
 
-local bkBtn
-local fwBtn
-local xBtn
+local btnsX
+local btnsXSheetCoords = require("lua-sheets.btns_x")
+local btnsXSheet = graphics.newImageSheet("images/btns_x.png", btnsXSheetCoords:getSheet())
+
+local btnsLeftArrow
+local btnsLeftArrowSheetCoords = require("lua-sheets.btns_left_arrow")
+local btnsLeftArrowSheet = graphics.newImageSheet("images/btns_left_arrow.png", btnsLeftArrowSheetCoords:getSheet())
+
+local btnsRightArrow
+local btnsRightArrowSheetCoords = require("lua-sheets.btns_right_arrow")
+local btnsRightArrowSheet = graphics.newImageSheet("images/btns_right_arrow.png", btnsRightArrowSheetCoords:getSheet())
 
 local currentObject
 local touchInsideBtn = false
 local isBtnAnim = false
-
-local btnsSheetCoords = require("lua-sheets.buttons")
-local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
-
-local btnsSeq = {
-    {
-        name = "xBtn",
-        frames = {
-            btnsSheetCoords:getFrameIndex("xBtn3"),
-            btnsSheetCoords:getFrameIndex("xBtn5")
-        },
-        time = 500 
-    },
-    {
-        name = "xBtn_anim",
-        frames = {
-            btnsSheetCoords:getFrameIndex("xBtn2"),
-            btnsSheetCoords:getFrameIndex("xBtn3"),
-            btnsSheetCoords:getFrameIndex("xBtn4"),
-            btnsSheetCoords:getFrameIndex("xBtn5")
-        },
-        time = 500 
-    },
-    {
-        name = "fwBtn",
-        frames = {
-            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn5")
-        },
-        time = 500 
-    },
-    {
-        name = "fwBtn_anim",
-        frames = {
-            btnsSheetCoords:getFrameIndex("backArrowBtn2"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn4"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn5")
-        },
-        time = 500 
-    }
-}
 
 -- New
 -- SAM: add a variable so that setSequence() can be set more easily. Unnecessary if statements
 local function myTouchListener(event)
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
-    print(currentObject.name) 
+    print(currentObject.name)
     if event.phase == "began" then
-        print("touch ON. inside")          
+        print("touch ON. inside")
     elseif event.phase == "ended" or event.phase == "cancelled" then
-        
+
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "bkBtn" then
-            currentObject:setSequence("fwBtn") -- these are the same
-        elseif currentObject.name == "fwBtn" then
-            currentObject:setSequence("fwBtn") -- these are the same
-        elseif currentObject.name == "xBtn" then
-            currentObject:setSequence("xBtn")
+        if currentObject.name == "btnsLeftArrow" then
+            currentObject:setSequence("btnsLeftArrow") -- these are the same
+        elseif currentObject.name == "btnsRightArrow" then
+            currentObject:setSequence("btnsRightArrow") -- these are the same
+        elseif currentObject.name == "btnsX" then
+            currentObject:setSequence("btnsX")
         end
 
-        if touchInsideBtn == true then 
+        if touchInsideBtn == true then
 
             print("touch OFF. inside")
             -- composer.removeScene("start")
-            
-            if(currentObject.name == "xBtn") then
+
+            if(currentObject.name == "btnsX") then
                 composer.gotoScene ( "menu", { effect = defaultTransition } )
-            elseif(currentObject.name == "bkBtn" or currentObject.name == "fwBtn") then
+            elseif(currentObject.name == "btnsLeftArrow" or currentObject.name == "btnsRightArrow") then
                 navigateTutorial(currentObject.name)
             end
 
@@ -95,34 +61,34 @@ local function myTouchListener(event)
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
         end
-        
+
         currentObject = nil
         display.getCurrentStage():setFocus(nil)
         touchInsideBtn = false
     end
 end
- 
+
 local function doFunction(e)
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
             e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or 
-            e.y > currentObject.contentBounds.yMax then 
-            
+            e.y < currentObject.contentBounds.yMin or
+            e.y > currentObject.contentBounds.yMax then
+
             if(isBtnAnim) then
-                if currentObject.name == "bkBtn" then
-                    currentObject:setSequence("fwBtn") -- these are the same
-                elseif currentObject.name == "fwBtn" then
-                    currentObject:setSequence("fwBtn") -- these are the same
-                elseif currentObject.name == "xBtn" then
-                    currentObject:setSequence("xBtn")
+                if currentObject.name == "btnsLeftArrow" then
+                    currentObject:setSequence("btnsLeftArrow") -- these are the same
+                elseif currentObject.name == "btnsRightArrow" then
+                    currentObject:setSequence("btnsRightArrow") -- these are the same
+                elseif currentObject.name == "btnsX" then
+                    currentObject:setSequence("btnsX")
                 end
-            else 
-                if currentObject.name == "bkBtn" then
+            else
+                if currentObject.name == "btnsLeftArrow" then
                     currentObject:setFrame(1)
-                elseif currentObject.name == "fwBtn" then
+                elseif currentObject.name == "btnsRightArrow" then
                     currentObject:setFrame(1)
-                elseif currentObject.name == "xBtn" then
+                elseif currentObject.name == "btnsX" then
                     currentObject:setFrame(1)
                 end
             end
@@ -132,20 +98,20 @@ local function doFunction(e)
         else
             if touchInsideBtn == false then
                 if(isBtnAnim) then
-                    if currentObject.name == "bkBtn" then
-                        currentObject:setSequence("fwBtn_anim") -- these are the same
-                    elseif currentObject.name == "fwBtn" then
-                        currentObject:setSequence("fwBtn_anim") -- these are the same
-                    elseif currentObject.name == "xBtn" then
-                        currentObject:setSequence("xBtn_anim")
+                    if currentObject.name == "btnsLeftArrow" then
+                        currentObject:setSequence("btnsLeftArrow_anim") -- these are the same
+                    elseif currentObject.name == "btnsRightArrow" then
+                        currentObject:setSequence("btnsRightArrow_anim") -- these are the same
+                    elseif currentObject.name == "btnsX" then
+                        currentObject:setSequence("btnsX_anim")
                     end
                     currentObject:play()
                 else
-                    if currentObject.name == "bkBtn" then
+                    if currentObject.name == "btnsLeftArrow" then
                         currentObject:setFrame(2)
-                    elseif currentObject.name == "fwBtn" then
+                    elseif currentObject.name == "btnsRightArrow" then
                         currentObject:setFrame(2)
-                    elseif currentObject.name == "xBtn" then
+                    elseif currentObject.name == "btnsX" then
                         currentObject:setFrame(2)
                     end
                 end
@@ -155,8 +121,8 @@ local function doFunction(e)
     end
 end
 
-navigateTutorial = function(e)         
-    if e=="bkBtn" then          
+navigateTutorial = function(e)
+    if e=="btnsLeftArrow" then
         if phase == 2 then
             t1:toFront()
             phase = phase - 1
@@ -167,8 +133,8 @@ navigateTutorial = function(e)
             t3:toFront()
             phase = phase - 1
         end
-    elseif e=="fwBtn" then           
-        if phase == 1 then 
+    elseif e=="btnsRightArrow" then
+        if phase == 1 then
             t2:toFront()
             phase = phase + 1
         elseif phase == 2 then
@@ -180,12 +146,12 @@ navigateTutorial = function(e)
         end
     end
     if phase ~= 4 then
-        fwBtn:toFront() 
+        btnsRightArrow:toFront()
     end
-    if phase ~= 1 then      
-        bkBtn:toFront()
+    if phase ~= 1 then
+        btnsLeftArrow:toFront()
     end
-    xBtn:toFront()   
+    btnsX:toFront()
 end
 
 function scene:create( event )
@@ -195,120 +161,85 @@ function scene:create( event )
     t4.anchorX=0.5
     t4.anchorY=0.5
     t4.x = _W/2
-    t4.y = _H/2  
+    t4.y = _H/2
     t3 = display.newImageRect( "images/T3.png", 580, 320 )
     t3.alpha = 1
     t3.anchorX=0.5
     t3.anchorY=0.5
     t3.x = _W/2
-    t3.y = _H/2  
+    t3.y = _H/2
     t2 = display.newImageRect( "images/T2.png", 580, 320 )
     t2.alpha = 1
     t2.anchorX=0.5
     t2.anchorY=0.5
     t2.x = _W/2
-    t2.y = _H/2  
+    t2.y = _H/2
     t1 = display.newImageRect( "images/T1.png", 580, 320 )
     t1.alpha = 1
     t1.anchorX=0.5
     t1.anchorY=0.5
     t1.x = _W/2
-    t1.y = _H/2  
+    t1.y = _H/2
 
     local margins = 6
 
-    bkBtn = display.newSprite(btnsSheet, btnsSeq)
-    bkBtn:setSequence("fwBtn")
-    bkBtn.type = "bkBtn"
-    bkBtn.name = "bkBtn"
-    bkBtn.anchorX=0
-    bkBtn.anchorY=0
-    bkBtn.x = margins
-    bkBtn.y = _H - bkBtn.height - margins 
-    
-    fwBtn = display.newSprite(btnsSheet, btnsSeq)
-    fwBtn:setSequence("fwBtn")
-    fwBtn.type = "fwBtn"
-    fwBtn.name = "fwBtn"
-    fwBtn.xScale = -1
-    fwBtn.anchorX=0
-    fwBtn.anchorY=0
-    fwBtn.x = _W - margins
-    fwBtn.y = _H - fwBtn.height - margins 
-    
-    xBtn = display.newSprite(btnsSheet, btnsSeq)
-    xBtn:setSequence("xBtn")
-    xBtn.type = "xBtn"
-    xBtn.name = "xBtn"
-    xBtn.anchorX=0
-    xBtn.anchorY=0
-    xBtn.x = 0 + margins
-    xBtn.y = 0 + margins
-    xBtn.gotoScene = "menu"
+    btnsLeftArrow = display.newSprite( btnsLeftArrowSheet, {frames={1,2}} )
+    btnsLeftArrow.name = "btnsLeftArrow"
+    btnsLeftArrow.anchorX=0
+    btnsLeftArrow.anchorY=0
+    btnsLeftArrow.x = margins
+    btnsLeftArrow.y = _H - btnsLeftArrow.height - margins
 
-    --[[
-    samBack = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_--Btn")}} )
-    samBack.type = "bkBtn"
-    samBack.anchorX=0
-    samBack.anchorY=0
-    samBack.x = margins
-    samBack.y = _H - samBack.height - margins
-    samBack:toBack() 
+    btnsRightArrow = display.newSprite( btnsRightArrowSheet, {frames={1,2}} )
+    btnsRightArrow.name = "btnsRightArrow"
+    btnsRightArrow.anchorX=1
+    btnsRightArrow.anchorY=0
+    btnsRightArrow.x = _W - margins
+    btnsRightArrow.y = _H - btnsRightArrow.height - margins
 
-    
-    samFwd = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_--Btn")}} )
-    samFwd.type = "fwBtn"
-    samFwd.xScale = -1
-    samFwd.anchorX=0
-    samFwd.anchorY=0
-    samFwd.x = _W - margins
-    samFwd.y = _H - samFwd.height - margins 
-    
-    samX = display.newSprite( buttonSheet, {frames={buttonSheetInfo:getFrameIndex("TextButtons_xBtn")}} )
-    samX.type = "xBtn"
-    samX.anchorX=0
-    samX.anchorY=0
-    samX.x = 0 + margins
-    samX.y = 0 + margins
-    samX.gotoScene = "menu"
-    ]]--
+    btnsX = display.newSprite( btnsXSheet, {frames={1,2}} )
+    btnsX.name = "btnsX"
+    btnsX.anchorX=0
+    btnsX.anchorY=0
+    btnsX.x = 0 + margins
+    btnsX.y = 0 + margins
+    btnsX.gotoScene = "menu"
+
     self.view:insert(t4)
-    self.view:insert(t3) 
-    self.view:insert(t2)    
+    self.view:insert(t3)
+    self.view:insert(t2)
     self.view:insert(t1)
-    self.view:insert(xBtn)
-    self.view:insert(bkBtn)
-    self.view:insert(fwBtn)
+    self.view:insert(btnsX)
+    self.view:insert(btnsLeftArrow)
+    self.view:insert(btnsRightArrow)
 end
 
 
 function scene:show( event )
-  
+
     local group = self.view
     if event.phase == "will" then
-        bkBtn:toBack()
+        btnsLeftArrow:toBack()
     elseif event.phase=="did" then
-        bkBtn:addEventListener("touch", myTouchListener)
-        bkBtn:addEventListener("touch", doFunction)
-        fwBtn:addEventListener("touch", myTouchListener)
-        fwBtn:addEventListener("touch", doFunction)
-        xBtn:addEventListener("touch", myTouchListener)
-        xBtn:addEventListener("touch", doFunction)
+        btnsLeftArrow:addEventListener("touch", myTouchListener)
+        btnsLeftArrow:addEventListener("touch", doFunction)
+        btnsRightArrow:addEventListener("touch", myTouchListener)
+        btnsRightArrow:addEventListener("touch", doFunction)
+        btnsX:addEventListener("touch", myTouchListener)
+        btnsX:addEventListener("touch", doFunction)
     end
 end
 
 function scene:hide( event )
     if event.phase == "will" then
-        bkBtn:removeEventListener("touch", myTouchListener)
-        bkBtn:removeEventListener("touch", doFunction)
-        fwBtn:removeEventListener("touch", myTouchListener)
-        fwBtn:removeEventListener("touch", doFunction)
-        xBtn:removeEventListener("touch", myTouchListener)
-        xBtn:removeEventListener("touch", doFunction)
-          --samBack:removeEventListener("tap", buttonHit)
-          --samFwd:removeEventListener("tap",buttonHit)
-          --samX:removeEventListener("tap",buttonHit)  
-          composer.removeScene("tutorial",false)   
+        btnsLeftArrow:removeEventListener("touch", myTouchListener)
+        btnsLeftArrow:removeEventListener("touch", doFunction)
+        btnsRightArrow:removeEventListener("touch", myTouchListener)
+        btnsRightArrow:removeEventListener("touch", doFunction)
+        btnsX:removeEventListener("touch", myTouchListener)
+        btnsX:removeEventListener("touch", doFunction)
+
+        composer.removeScene("tutorial",false)
     elseif event.phase == "did" then
     end
 end

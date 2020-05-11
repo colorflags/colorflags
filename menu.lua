@@ -1,5 +1,3 @@
---menu.lua
-require("mobdebug").start()
 local composer=require("composer")
 local scene = composer.newScene()
 
@@ -120,7 +118,7 @@ end;
 
 function M.load()
 	-- local lastTime = 0
-	result = loadSkeleton("colorflags-spine.atlas", "colorflags-spine.json", _W/2, _H/2 , 0.5, "animation")
+	result = loadSkeleton("colorflags-spine.atlas", "colorflags-spine.json", _W/2, _H/3 , 0.5, "animation")
 	-- local skeleton = result.skeleton;
 	-- local state = result.state;
     -- local spineData = Skeleton.load("res/game/dice/skeleton", centerX + 120, centerY - 200, 0.5, "shake");
@@ -141,20 +139,24 @@ music=nil
 bobby=nil
 
 if lastReservedChannel ~= nil then
+	audio.rewind( musicMenu )
 	if lastUsedMusic ~= "musicMenu" then
 		if lastReservedChannel == 1 then
 			audio.stop(lastReservedChannel)
 			lastReservedChannel = 2
+			audio.stop(lastReservedChannel)
 			audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
 		elseif lastReservedChannel == 2 then
 			audio.stop(lastReservedChannel)
 			lastReservedChannel = 1
+			audio.stop(lastReservedChannel)
 			audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
 		end
 		lastUsedMusic = "musicMenu"
 	end
 else
 	lastReservedChannel = 1
+	audio.stop(lastReservedChannel)
 	audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
 	lastUsedMusic = "musicMenu"
 end
@@ -165,6 +167,8 @@ soundOn=false
 local whiteBackground
 local titleLogo
 local colorFlagsAnimBack
+
+local btnsGroup
 
 local currentObject
 local isLoading = false
@@ -180,67 +184,6 @@ local isBtnAnim = false
 -- btnsPlayGame.y=_H - _H/4
 -- btnsPlayGame:setFrame( 1 )
 
--- GLOBALIZE
-local btnsSheetCoords = require("lua-sheets.buttons")
-local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
-
-local btnsSeq = {
-	{
-		name = "playgame",
-		frames = {
-			btnsSheetCoords:getFrameIndex("PlayGame3"),
-			btnsSheetCoords:getFrameIndex("PlayGame5")
-		},
-		time = 500
-	},
-	{
-		name = "playgame_anim",
-		frames = {
-			btnsSheetCoords:getFrameIndex("PlayGame1"),
-			btnsSheetCoords:getFrameIndex("PlayGame2"),
-			btnsSheetCoords:getFrameIndex("PlayGame3"),
-			btnsSheetCoords:getFrameIndex("PlayGame4")
-		},
-		time = 500
-	},
-	{
-		name = "options",
-		frames = {
-			btnsSheetCoords:getFrameIndex("Options3"),
-			btnsSheetCoords:getFrameIndex("Options5")
-		},
-		time = 500
-	},
-	{
-		name = "options_anim",
-		frames = {
-			btnsSheetCoords:getFrameIndex("Options2"),
-			btnsSheetCoords:getFrameIndex("Options3"),
-			btnsSheetCoords:getFrameIndex("Options4"),
-			btnsSheetCoords:getFrameIndex("Options5")
-		},
-		time = 500
-	},
-	{
-		name = "about",
-		frames = {
-			btnsSheetCoords:getFrameIndex("About3"),
-			btnsSheetCoords:getFrameIndex("About5")
-		},
-		time = 500
-	},
-	{
-		name = "about_anim",
-		frames = {
-			btnsSheetCoords:getFrameIndex("About2"),
-			btnsSheetCoords:getFrameIndex("About3"),
-			btnsSheetCoords:getFrameIndex("About4"),
-			btnsSheetCoords:getFrameIndex("About5")
-		},
-		time = 500
-	},
-}
-
 local menuSpriteCoords = require("lua-sheets.playgame-menu")
 local menuStartSheet = graphics.newImageSheet( "images/playgame-menu.png", menuSpriteCoords:getSheet() )
 
@@ -255,13 +198,25 @@ local btnsPlayGame
 local btnsPlayGameSheetCoords = require("lua-sheets.btns_playgame")
 local btnsPlayGameSheet = graphics.newImageSheet("images/btns_playgame.png", btnsPlayGameSheetCoords:getSheet())
 
+local btnsPlayGameGiga
+local btnsPlayGameGigaSheetCoords = require("lua-sheets.btns_playgame_giga")
+local btnsPlayGameGigaSheet = graphics.newImageSheet("images/btns_playgame_giga.png", btnsPlayGameGigaSheetCoords:getSheet())
+
 local btnsOptions
 local btnsOptionsSheetCoords = require("lua-sheets.btns_options")
 local btnsOptionsSheet = graphics.newImageSheet("images/btns_options.png", btnsOptionsSheetCoords:getSheet())
 
+local btnsOptionsGiga
+local btnsOptionsGigaSheetCoords = require("lua-sheets.btns_options_giga")
+local btnsOptionsGigaSheet = graphics.newImageSheet("images/btns_options_giga.png", btnsOptionsGigaSheetCoords:getSheet())
+
 local btnsAbout
 local btnsAboutSheetCoords = require("lua-sheets.btns_about")
 local btnsAboutSheet = graphics.newImageSheet("images/btns_about.png", btnsAboutSheetCoords:getSheet())
+
+local btnsAboutGiga
+local btnsAboutGigaSheetCoords = require("lua-sheets.btns_about_giga")
+local btnsAboutGigaSheet = graphics.newImageSheet("images/btns_about_giga.png", btnsAboutGigaSheetCoords:getSheet())
 
 -- SAM: needs work
 local function myTouchListener( event )
@@ -289,12 +244,11 @@ local function myTouchListener( event )
 			-- prevents scenes from firing twice!!
 			isLoading = true
 			print("going to..")
-			local goto = currentObject.gotoScene
-			if goto == "start" and event.target == btnsPlayGame then
-				composer.showOverlay( goto, { isModal= true})
+			local gotoo = currentObject.gotoScene
+			if gotoo == "start" and event.target == btnsPlayGame then
+				composer.showOverlay( gotoo, { isModal = true, params = { menuBtnsGroup = btnsGroup } })
 			else
-				-- composer.showOverlay( goto, { isModal= true})
-				composer.gotoScene ( goto, { effect = defaultTransition } )
+				composer.gotoScene ( gotoo, { effect = defaultTransition } )
 			end
 		elseif touchInsideBtn == false then
 			-- print("touch OFF outside")
@@ -440,13 +394,10 @@ function scene:create( event )
 	whiteBackground:setFillColor(1, 1, 1)
 
 	titleLogo = display.newImageRect( "images/menu_background.png", _W, _H )
-	-- titleLogo = display.newImageRect( "images/start-menuWTF.png", _W, _H )
 	titleLogo.anchorX=0.5
 	titleLogo.anchorY=0.5
 	titleLogo.x = _W/2
 	titleLogo.y = _H/2
-	titleLogo.alpha=0.98
-
 
 	local sequenceData =
 	{
@@ -480,12 +431,12 @@ function scene:create( event )
 	colorFlagsAnimBack = display.newSprite( sheet, sequenceData )
 	colorFlagsAnimBack:scale(0.5, 0.5)
 	colorFlagsAnimBack.x = _W/2
-	colorFlagsAnimBack.y = _H/2 - 50
+	colorFlagsAnimBack.y = _H/3 - 50
 	colorFlagsAnimBack.blendMode = "multiply"
 	colorFlagsAnimBack:setFillColor(1, 1, 1, .5)
 
 	-- rename
-	local offsetStartBtns = _H/1.5
+	local offsetStartBtns = _H/2
 	-- local offsetStartBtns = _H/3 + ((_H/2)/2)
 
 	local tempSeq = {
@@ -500,51 +451,54 @@ function scene:create( event )
 			time = 500
 		},
 	}
+    btnsGroup = display.newGroup()
 
-	btnsPlayGame = display.newSprite( btnsPlayGameSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+	btnsPlayGame = display.newSprite( btnsPlayGameGigaSheet, {frames={1,2}} ) -- use btnsSeq
 	btnsPlayGame.name = "playgame"
 	btnsPlayGame:addEventListener( "touch", myTouchListener )
 	btnsPlayGame.anchorY = .5
 	btnsPlayGame.x = _W/2
-	btnsPlayGame.y = offsetStartBtns
+--	btnsPlayGame.y = offsetStartBtns
 	btnsPlayGame:setSequence( "playgame" )
 	btnsPlayGame:setFrame(1)
 	--  btnsPlayGame.alpha=0.98
 	btnsPlayGame.gotoScene="start"
 	--  btnsPlayGame:scale(.8,.8)
+    btnsGroup:insert(btnsPlayGame)
 
 	local btnSpacing = btnsPlayGame.height + 4
 
-	btnsOptions = display.newSprite( btnsOptionsSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+	btnsOptions = display.newSprite( btnsOptionsGigaSheet, {frames={1,2}} ) -- use btnsSeq
 	btnsOptions.name = "options"
 	btnsOptions:addEventListener( "touch", myTouchListener )
 	btnsOptions.anchorY = .5
 	btnsOptions.x = _W/2
-	btnsOptions.y = offsetStartBtns+btnSpacing
+	btnsOptions.y = btnSpacing
 	-- btnsOptions:setSequence("options")
 	btnsOptions:setFrame(1)
 	--  btnsOptions.alpha=.98
 	btnsOptions.gotoScene = "options"
 	--  btnsOptions:scale(.8,.8)
+    btnsGroup:insert(btnsOptions)
 
-	btnsAbout = display.newSprite( btnsAboutSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+	btnsAbout = display.newSprite( btnsAboutGigaSheet, {frames={1,2}} ) -- use btnsSeq
 	btnsAbout.name = "about"
 	btnsAbout:addEventListener( "touch", myTouchListener )
 	btnsAbout.anchorY = .5
 	btnsAbout.x = _W/2
-	btnsAbout.y = offsetStartBtns+(btnSpacing*2)
+	btnsAbout.y = btnSpacing*2
 	-- btnsAbout:setSequence("about")
 	btnsAbout:setFrame(1)
 	--  btnsAbout.alpha=0.98
 	btnsAbout.gotoScene = "about"
 	--  btnsAbout:scale(.8,.8)
+    btnsGroup:insert(btnsAbout)
+    btnsGroup.y = _H - btnsGroup.height + 10
 
 	sceneGroup:insert(whiteBackground)
 	sceneGroup:insert(titleLogo) -- SAM: BACKGROUND NOT TITLE !!! CHANGE NAME
 	sceneGroup:insert(colorFlagsAnimBack)
-	sceneGroup:insert(btnsPlayGame)
-	sceneGroup:insert(btnsOptions)
-	sceneGroup:insert(btnsAbout)
+    sceneGroup:insert(btnsGroup)
 	sceneGroup:insert(M.skeleton.group)
 
 	btnsPlayGame:addEventListener("touch",doFunction)
@@ -564,7 +518,6 @@ end
 function scene:show( event )
 	local sceneGroup=self.view
 	local phase = event.phase
-
 	touchInsideBtn = false
 	print("focus")
 	if event.phase == "will" then

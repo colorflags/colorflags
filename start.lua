@@ -15,13 +15,25 @@ local btnsStart
 local btnsStartSheetCoords = require("lua-sheets.btns_start")
 local btnsStartSheet = graphics.newImageSheet("images/btns_start.png", btnsStartSheetCoords:getSheet())
 
+local btnsStartGiga
+local btnsStartGigaSheetCoords = require("lua-sheets.btns_start_giga")
+local btnsStartGigaSheet = graphics.newImageSheet("images/btns_start_giga.png", btnsStartGigaSheetCoords:getSheet())
+
 local btnsCruise
 local btnsCruiseSheetCoords = require("lua-sheets.btns_cruise")
 local btnsCruiseSheet = graphics.newImageSheet("images/btns_cruise.png", btnsCruiseSheetCoords:getSheet())
 
+local btnsCruiseGiga
+local btnsCruiseGigaSheetCoords = require("lua-sheets.btns_cruise_giga")
+local btnsCruiseGigaSheet = graphics.newImageSheet("images/btns_cruise_giga.png", btnsCruiseGigaSheetCoords:getSheet())
+
 local btnsTutorial
 local btnsTutorialSheetCoords = require("lua-sheets.btns_tutorial")
 local btnsTutorialSheet = graphics.newImageSheet("images/btns_tutorial.png", btnsTutorialSheetCoords:getSheet())
+
+local btnsTutorialGiga
+local btnsTutorialGigaSheetCoords = require("lua-sheets.btns_tutorial_giga")
+local btnsTutorialGigaSheet = graphics.newImageSheet("images/btns_tutorial_giga.png", btnsTutorialGigaSheetCoords:getSheet())
 
 local currentObject
 local isLoading = false
@@ -117,11 +129,11 @@ local function myTouchListener( event )
             -- prevents scenes from firing twice!!
             isLoading = true
 
-            local goto = currentObject.gotoScene
-            if goto == "start" and event.target == btnsStart then
-                composer.showOverlay( goto, { isModal= true})
+            local gotoo = currentObject.gotoScene
+            if gotoo == "start" and event.target == btnsStart then
+                composer.showOverlay( gotoo, { isModal= true})
             else
-                composer.gotoScene ( goto, { effect = defaultTransition } )
+                composer.gotoScene ( gotoo, { effect = defaultTransition } )
             end
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
@@ -224,63 +236,67 @@ function scene:create( event )
      catchAll.anchorX=0
      catchAll.anchorY=0
 
+     local menuBtnsGroup = event.params.menuBtnsGroup
     -- rename
-    local offsetStartBtns = _H/1.5 + 9
+    local offsetStartBtns = _H/2
 
     background=display.newRoundedRect(50, 50, _W/2, 0, 20)
     background:setFillColor(120/255,115/255,115/255)
     --background:setStrokeColor( 25/255, 1 ,20/255 )
     --background.strokeWidth = 5
-    background.anchorY = 0
     background.x=_W/2
-    background.y=offsetStartBtns
     background.alpha=0
     transition.to( background, {time = 200, alpha=1})
 
+    local btnsGroup = display.newGroup()
 
-
-    btnsStart = display.newSprite( btnsStartSheet, {frames={1,2,3,4}} ) -- use btnsSeq
+    btnsStart = display.newSprite( btnsStartGigaSheet, {frames={1,2}} ) -- use btnsSeq
     btnsStart.name = "start"
     btnsStart.anchorY = .5
     btnsStart.x=_W/2
-    btnsStart.y=offsetStartBtns
+    -- btnsStart.y=offsetStartBtns
     btnsStart:setSequence( "start" )
     btnsStart:setFrame( 1 )
     btnsStart.alpha=0
     btnsStart.gotoScene="game"
-    btnsStart:scale(.8,.8)
+    -- btnsStart:scale(.8,.8)
     transition.to( btnsStart, {time = 200, alpha=1})
+    btnsGroup:insert(btnsStart)
 
     local btnSpacing = btnsStart.height + 4
 
-    btnsCruise = display.newSprite(btnsCruiseSheet, {frames={1,2,3,4}} )
+    btnsCruise = display.newSprite(btnsCruiseGigaSheet, {frames={1,2}} )
     btnsCruise.name = "cruise"
     --btnsCruise:addEventListener("touch", myTouchListener)
     btnsCruise.anchorY = .5
     btnsCruise.x = _W/2
-    btnsCruise.y = offsetStartBtns+btnSpacing
+    btnsCruise.y = btnSpacing
     btnsCruise:setSequence( "cruise" )
     btnsCruise:setFrame( 1 )
     btnsCruise.alpha=0
     btnsCruise.gotoScene="cruise"
-    btnsCruise:scale(.8,.8)
+    -- btnsCruise:scale(.8,.8)
     transition.to( btnsCruise, {time = 200, alpha=1})
+    btnsGroup:insert(btnsCruise)
 
-    btnsTutorial = display.newSprite(btnsTutorialSheet, {frames={1,2,3,4}} )
+    btnsTutorial = display.newSprite(btnsTutorialGigaSheet, {frames={1,2}} )
     btnsTutorial.name = "tutorial"
     --btnsTutorial:addEventListener("touch", myTouchListener)
     btnsTutorial.anchorY = .5
     btnsTutorial.x = _W/2
-    btnsTutorial.y = offsetStartBtns+(btnSpacing*2)
+    btnsTutorial.y = btnSpacing * 2
     btnsTutorial:setSequence( "tutorial" )
     btnsTutorial:setFrame( 1 )
     btnsTutorial.alpha=0
     btnsTutorial.gotoScene="tutorial"
-    btnsTutorial:scale(.8,.8)
+    -- btnsTutorial:scale(.8,.8)
     transition.to( btnsTutorial, {time = 200, alpha=1})
+    btnsGroup:insert(btnsTutorial)
+    btnsGroup.y = _H - btnsGroup.height
 
-    background.height = btnsTutorial.y - btnsStart.y + (btnsStart.height)
-    background.y = background.y - btnsStart.height/2
+    background.height = btnsGroup.height
+    background.y = btnsGroup.y + btnsCruise.y
+
 
     --Duplicates of objs' addEventListener
     --menuStart:addEventListener("touch",doFunction)
@@ -293,15 +309,16 @@ function scene:create( event )
     catchAll:toBack()
     sceneGroup:insert(catchAll)
     sceneGroup:insert(background)
-    sceneGroup:insert(btnsStart)
-    sceneGroup:insert(btnsTutorial)
-    sceneGroup:insert(btnsCruise)
+    -- sceneGroup:insert(btnsStart)
+    -- sceneGroup:insert(btnsTutorial)
+    -- sceneGroup:insert(btnsCruise)
 
     phaseGroup:insert(catchAll)
     phaseGroup:insert(background)
-    phaseGroup:insert(btnsStart)
-    phaseGroup:insert(btnsTutorial)
-    phaseGroup:insert(btnsCruise)
+    -- phaseGroup:insert(btnsStart)
+    -- phaseGroup:insert(btnsTutorial)
+    -- phaseGroup:insert(btnsCruise)
+    phaseGroup:insert(btnsGroup)
     phaseGroup:toFront()
 end
 

@@ -4,7 +4,6 @@ local scene = composer.newScene()
 
 local bmpText = {}
 
-local backBtn
 local twitterBtn
 local mageeBtn
 local colorBtn
@@ -20,30 +19,9 @@ local fontTable = {}
 local tempFont
 local m
 
-local btnsSheetCoords = require("lua-sheets.buttons")
-
-local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
-
-local btnsSeq = {
-    {
-        name = "backBtn",
-        frames = {
-            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn5")
-        },
-        time = 500
-    },
-    {
-        name = "backBtn_anim",
-        frames = {
-            btnsSheetCoords:getFrameIndex("backArrowBtn2"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn3"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn4"),
-            btnsSheetCoords:getFrameIndex("backArrowBtn5")
-        },
-        time = 500
-    }
-}
+local btnsLeftArrow
+local btnsLeftArrowSheetCoords = require("lua-sheets.btns_left_arrow")
+local btnsLeftArrowSheet = graphics.newImageSheet("images/btns_left_arrow.png", btnsLeftArrowSheetCoords:getSheet())
 
 local function myTouchListener(event)
     currentObject = event.target
@@ -54,8 +32,8 @@ local function myTouchListener(event)
     elseif event.phase == "ended" or event.phase == "cancelled" then
 
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
-        if currentObject.name == "backBtn" then
-            currentObject:setSequence("backBtn")
+        if currentObject.name == "btnsLeftArrow" then
+            currentObject:setSequence("btnsLeftArrow")
         end
 
         if touchInsideBtn == true and canQuit == true then
@@ -63,7 +41,7 @@ local function myTouchListener(event)
             print("touch OFF. inside")
             -- composer.removeScene("start")
 
-            if(currentObject.name == "backBtn") then
+            if(currentObject.name == "btnsLeftArrow") then
                 composer.gotoScene("menu", { effect = defaultTransition })
             end
 
@@ -85,11 +63,11 @@ local function doFunction(e)
             e.y > currentObject.contentBounds.yMax then
 
             if(isBtnAnim) then
-                if currentObject.name == "backBtn" then
-                    currentObject:setSequence("backBtn")
+                if currentObject.name == "btnsLeftArrow" then
+                    currentObject:setSequence("btnsLeftArrow")
                 end
             else
-                if currentObject.name == "backBtn" then
+                if currentObject.name == "btnsLeftArrow" then
                     currentObject:setFrame(1)
                 end
             end
@@ -99,12 +77,12 @@ local function doFunction(e)
         else
             if touchInsideBtn == false then
                 if(isBtnAnim) then
-                    if currentObject.name == "backBtn" then
-                        currentObject:setSequence("backBtn_anim")
+                    if currentObject.name == "btnsLeftArrow" then
+                        currentObject:setSequence("btnsLeftArrow_anim")
                     end
                     currentObject:play()
                 else
-                    if currentObject.name == "backBtn" then
+                    if currentObject.name == "btnsLeftArrow" then
                         currentObject:setFrame(2)
                     end
                 end
@@ -215,20 +193,19 @@ function scene:create( event )
     facebookBtn.anchorX=0.5
     facebookBtn.anchorY=0.5
 
-	backBtn = display.newSprite(btnsSheet, btnsSeq)
-    backBtn:setSequence("backBtn")
-    backBtn.name = "backBtn"
-    backBtn.anchorX = 0
-    backBtn.anchorY = 1
-    backBtn.x = 0 + margins
-    backBtn.y = _H - backBtn.y - margins
-	backBtn.gotoScene = "menu"
-    backBtn:setFillColor(224/225,96/225,224/225)
+	btnsLeftArrow = display.newSprite( btnsLeftArrowSheet, {frames={1,2}} )
+    btnsLeftArrow.name = "btnsLeftArrow"
+    btnsLeftArrow.anchorX = 0
+    btnsLeftArrow.anchorY = 1
+    btnsLeftArrow.x = 0 + margins
+    btnsLeftArrow.y = _H - btnsLeftArrow.y - margins
+	btnsLeftArrow.gotoScene = "menu"
+    -- btnsLeftArrow:setFillColor(0.98, 0.42, 0.98)
 
     self.view:insert(mgBtn)
     self.view:insert(twitterBtn)
     self.view:insert(facebookBtn)
-    self.view:insert(backBtn)
+    self.view:insert(btnsLeftArrow)
 end
 
 function scene:show( event )
@@ -236,8 +213,8 @@ function scene:show( event )
     if event.phase == "will" then
     elseif event.phase == "did" then
 
-        backBtn:addEventListener("touch", myTouchListener)
-        backBtn:addEventListener("touch", doFunction)
+        btnsLeftArrow:addEventListener("touch", myTouchListener)
+        btnsLeftArrow:addEventListener("touch", doFunction)
         twitterBtn:addEventListener("tap",urlTwitter)
         bmpText.mageeGames:addEventListener("tap",urlMagee)
         bmpText.colorFlagsGame:addEventListener("tap",urlColor)
@@ -255,8 +232,8 @@ function scene:hide( event )
         display.remove(bmpText.mageeGames)
         display.remove(bmpText.colorFlagsGame)
 
-        backBtn:removeEventListener("touch", myTouchListener)
-        backBtn:removeEventListener("touch", doFunction)
+        btnsLeftArrow:removeEventListener("touch", myTouchListener)
+        btnsLeftArrow:removeEventListener("touch", doFunction)
         twitterBtn:removeEventListener("tap",urlTwitter)
         bmpText.mageeGames:removeEventListener("tap",urlMagee)
         bmpText.colorFlagsGame:removeEventListener("tap",urlColor)

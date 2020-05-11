@@ -1,3 +1,5 @@
+require("mobdebug").start()
+
 local composer=require("composer")
 
 utf8 = require( "plugin.utf8" )
@@ -15,6 +17,8 @@ display.setStatusBar( display.HiddenStatusBar )
 
 _G.ssk.init({})
 ssk.persist.setDefault( "score.json", "highScore", 0 )
+ssk.persist.setDefault( "scone.json", "bought_extra_content", false )
+
 
 _G.platform = system.getInfo( "platform" )
 if platform == "android" then
@@ -165,7 +169,7 @@ function runMain()
 	elseif showSplash==false then
 	        display.remove(splash1)
 	    display.remove(splash2)
-	     composer.gotoScene( "menu", {effect = defaultTransition})
+	     composer.gotoScene( "game", {effect = defaultTransition})
 	end
 end
 runMain()
