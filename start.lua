@@ -38,80 +38,6 @@ local btnsTutorialGigaSheet = graphics.newImageSheet("images/btns_tutorial_giga.
 local currentObject
 local isLoading = false
 local touchInsideBtn = false
-local isBtnAnim = false
-
--- GLOBALIZE
-local btnsSheetCoords = require("lua-sheets.buttons")
-local btnsSheet = graphics.newImageSheet("images/buttons.png", btnsSheetCoords:getSheet())
-
-local btnsSeq = {
-    {
-        name = "start",
-        frames = {
-            btnsSheetCoords:getFrameIndex("Start3"),
-            btnsSheetCoords:getFrameIndex("Start5")
-        },
-        time = 500
-    },
-    {
-        name = "start_anim",
-        frames = {
-            btnsSheetCoords:getFrameIndex("Start2"),
-            btnsSheetCoords:getFrameIndex("Start3"),
-            btnsSheetCoords:getFrameIndex("Start4"),
-            btnsSheetCoords:getFrameIndex("Start5")
-        },
-        time = 500
-    },
-    {
-        name = "cruise",
-        frames = {
-            btnsSheetCoords:getFrameIndex("Cruise3"),
-            btnsSheetCoords:getFrameIndex("Cruise5")
-        },
-        time = 500
-    },
-    {
-        name = "cruise_anim",
-        frames = {
-            btnsSheetCoords:getFrameIndex("Cruise2"),
-            btnsSheetCoords:getFrameIndex("Cruise3"),
-            btnsSheetCoords:getFrameIndex("Cruise4"),
-            btnsSheetCoords:getFrameIndex("Cruise5")
-        },
-        time = 500
-    },
-    {
-        name = "tutorial",
-        frames = {
-            btnsSheetCoords:getFrameIndex("Tutorial3"),
-            btnsSheetCoords:getFrameIndex("Tutorial5")
-        },
-        time = 500
-    },
-    {
-        name = "tutorial_anim",
-        frames = {
-            btnsSheetCoords:getFrameIndex("Tutorial2"),
-            btnsSheetCoords:getFrameIndex("Tutorial3"),
-            btnsSheetCoords:getFrameIndex("Tutorial4"),
-            btnsSheetCoords:getFrameIndex("Tutorial5")
-        },
-        time = 500
-    },
-}
-
-local menuSeq = {
-    { name = "start", frames = {6}, time = 500 },
-    { name = "start_anim", frames = {7, 8, 9, 10}, time = 500 },
-    { name = "cruise", frames = {1}, time = 500 },
-    { name = "cruise_anim", frames = {2, 3, 4, 5}, time = 500 },
-    { name = "tutorial", frames = {11}, time = 500 },
-    { name = "tutorial_anim", frames = {12, 13, 14, 15}, time = 500 }
-}
-
--- local menuSpriteCoords = require("lua-sheets.Start-menu")
--- local menuStartSheet = graphics.newImageSheet( "images/Start-menu.png", menuSpriteCoords:getSheet() )
 
 -- New
 local function myTouchListener( event )
@@ -148,49 +74,27 @@ end
 local function doFunction(e)
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
-            e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or
-            e.y > currentObject.contentBounds.yMax then
-
-            if(isBtnAnim) then
-                if currentObject.name == "start" then
-                    currentObject:setSequence("start")
-                elseif currentObject.name == "cruise" then
-                    currentObject:setSequence("cruise")
-                elseif currentObject.name == "tutorial" then
-                    currentObject:setSequence("tutorial")
-                end
-            else
-                if currentObject.name == "start" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "cruise" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "tutorial" then
-                    currentObject:setFrame(1)
-                end
+        e.x > currentObject.contentBounds.xMax or
+        e.y < currentObject.contentBounds.yMin or
+        e.y > currentObject.contentBounds.yMax then
+            if currentObject.name == "start" then
+                currentObject:setFrame(1)
+            elseif currentObject.name == "cruise" then
+                currentObject:setFrame(1)
+            elseif currentObject.name == "tutorial" then
+                currentObject:setFrame(1)
             end
-            -- redundant ??
+        -- redundant ??
             -- currentObject:setFrame(1)
             touchInsideBtn = false
         else
             if touchInsideBtn == false then
-                if(isBtnAnim) then
-                    if currentObject.name == "start" then
-                        currentObject:setSequence("start_anim")
-                    elseif currentObject.name == "cruise" then
-                        currentObject:setSequence("cruise_anim")
-                    elseif currentObject.name == "tutorial" then
-                        currentObject:setSequence("tutorial_anim")
-                    end
-                    currentObject:play()
-                else
-                    if currentObject.name == "start" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "cruise" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "tutorial" then
-                        currentObject:setFrame(2)
-                    end
+                if currentObject.name == "start" then
+                    currentObject:setFrame(2)
+                elseif currentObject.name == "cruise" then
+                    currentObject:setFrame(2)
+                elseif currentObject.name == "tutorial" then
+                    currentObject:setFrame(2)
                 end
             end
             touchInsideBtn = true

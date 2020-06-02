@@ -8,6 +8,9 @@ local scene = composer.newScene()
 local pGet = ssk.persist.get
 local pSet = ssk.persist.set
 
+local game_W = display.actualContentWidth -- Get the width of the screen
+local game_H = display.actualContentHeight -- Get the height of the screen
+
 -- audio stuff
 local music
 local bobby
@@ -30,9 +33,6 @@ local codeLetterToColorKey = {
     g = "green",
     b = "blue"
 }
-
-local game_W = display.actualContentWidth -- Get the width of the screen
-local game_H = display.actualContentHeight -- Get the height of the screen
 
 local debugOptions = {}
 debugOptions.god = false
@@ -382,7 +382,7 @@ end
 onOptionsTap = function(event)
     local optionName = event.target.name
     if optionName == "speedDecrease" or optionName == "speedIncrease" then
-        if flag ~= nil and debugOptions.godSpeed == false then
+        if flag ~= nil and debugOptions.godSpeed == true then
             if optionName == "speedIncrease" then
                 speedUp()
             elseif optionName == "speedDecrease" then
@@ -401,7 +401,7 @@ onOptionsTap = function(event)
             -- speedText:toFront()
         end
     elseif optionName == "modeDecrease" or optionName == "modeIncrease" then
-        if flag ~= nil and debugOptions.godCycle == false then
+        if flag ~= nil and debugOptions.godCycle == true then
             if optionName == "modeDecrease" then
                 if gameMechanics.mode > 1 then
                     gameMechanics.mode = gameMechanics.mode - 1
@@ -841,7 +841,7 @@ resetSpawnTable = function()
         bonusText = nil
     end
 
-    if debugOptions.godCycle == true then
+    if debugOptions.godCycle == false then
         --decide what gameMechanics.mode is next
         if gameMechanics.mode == 1 then
             gameMechanics.mode = 2
@@ -1473,7 +1473,7 @@ previouscountryFill = nil
 -- READYOBJ: setCountryParameters
 setCountryParameters = function(restartCountry)
     -- don't increase speed every new country, change modes or randomize modes.
-    if debugOptions.godSpeed == true and gameMechanics.overrideFlag == false and countriesCompleted > 0 then
+    if debugOptions.godSpeed == false and gameMechanics.overrideFlag == false and countriesCompleted > 0 then
         speedUp()
     end
 
@@ -1792,27 +1792,32 @@ display.setDefault("textureWrapX", "repeat")
 
     local function offsetIncomingAnthem(outgoingAnthem, incomingAnthem)
         local function listener(event)
-            -- audio.fadeOut( { channel=outgoingAnthem, time=500 } )
-            -- audio.stop(outgoingAnthem)
-
+            audio.stop(outgoingAnthem)
             lastReservedChannel = incomingAnthem
             audio.stop(lastReservedChannel)
-            -- audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1, onComplete=function(event)
-            --     print("finished streaming anthem on channel " .. event.channel)
-            -- end})
+            audio.setVolume( .5, { channel = lastReservedChannel } )
+            audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1, onComplete=function(event)
+                print("finished streaming anthem on channel " .. event.channel)
+            end})
         end
-    	audio.setVolume( .5, { channel = 1 } )
-    	audio.setVolume( .5, { channel = 2 } )
-        audio.fadeOut( { channel=outgoingAnthem, time=500 } )
         timer.performWithDelay ((timeVar * timeVarMultiplier)/2, listener)
     end
+
+    local function offsetIncomingAnthemWithFade(outgoingAnthem, incomingAnthem)
+        audio.fadeOut( { channel=outgoingAnthem, time=500 } )
+        lastReservedChannel = incomingAnthem
+        audio.stop(lastReservedChannel)
+        audio.setVolume( .5, { channel = lastReservedChannel } )
+        audioReservedChannels[lastReservedChannel] = audio.play(music, {channel=lastReservedChannel, loops=-1, fadein=500})
+    end
+
 
     if countriesCompleted ~= 0 then
         if lastReservedChannel ~= nil then
             if lastReservedChannel == 1 then
-                offsetIncomingAnthem(1, 2)
+                offsetIncomingAnthemWithFade(1, 2)
             elseif lastReservedChannel == 2 then
-                offsetIncomingAnthem(2, 1)
+                offsetIncomingAnthemWithFade(2, 1)
             end
         end
     else
@@ -1821,16 +1826,19 @@ display.setDefault("textureWrapX", "repeat")
                 audio.stop(lastReservedChannel)
                 lastReservedChannel = 2
                 audio.stop(lastReservedChannel)
+                audio.setVolume( .5, { channel = lastReservedChannel } )
                 audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
             elseif lastReservedChannel == 2 then
                 audio.stop(lastReservedChannel)
                 lastReservedChannel = 1
                 audio.stop(lastReservedChannel)
+                audio.setVolume( .5, { channel = lastReservedChannel } )
                 audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
             end
         else
             lastReservedChannel = 1
             audio.stop(lastReservedChannel)
+            audio.setVolume( .5, { channel = lastReservedChannel } )
             audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
         end
     end

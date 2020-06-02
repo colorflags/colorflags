@@ -60,7 +60,6 @@ local fwBtn
 local canSkip = false
 local currentObject
 local touchInsideBtn = false
-local isBtnAnim = false
 
 local gotoDeath = false    --for testing purposes. if true, go to GameOver screen.
 local state = 1
@@ -377,41 +376,23 @@ end
 local function doFunction(e)
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
-            e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or
-            e.y > currentObject.contentBounds.yMax then
-
-            if(isBtnAnim) then
-                if currentObject.name == "fwBtn" then
-                    currentObject:setSequence("fwBtn")
-                elseif currentObject.name == "xBtn" then
-                    currentObject:setSequence("xBtn")
-                end
-            else
-                if currentObject.name == "fwBtn" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "xBtn" then
-                    currentObject:setFrame(1)
-                end
+        e.x > currentObject.contentBounds.xMax or
+        e.y < currentObject.contentBounds.yMin or
+        e.y > currentObject.contentBounds.yMax then
+            if currentObject.name == "fwBtn" then
+                currentObject:setFrame(1)
+            elseif currentObject.name == "xBtn" then
+                currentObject:setFrame(1)
             end
             -- redundant ??
             -- currentObject:setFrame(1)
             touchInsideBtn = false
         else
             if touchInsideBtn == false then
-                if(isBtnAnim) then
-                    if currentObject.name == "fwBtn" then
-                        currentObject:setSequence("fwBtn_anim")
-                    elseif currentObject.name == "xBtn" then
-                        currentObject:setSequence("xBtn_anim")
-                    end
-                    currentObject:play()
-                else
-                    if currentObject.name == "fwBtn" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "xBtn" then
-                        currentObject:setFrame(2)
-                    end
+                if currentObject.name == "fwBtn" then
+                    currentObject:setFrame(2)
+                elseif currentObject.name == "xBtn" then
+                    currentObject:setFrame(2)
                 end
             end
             touchInsideBtn = true

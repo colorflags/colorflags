@@ -145,11 +145,13 @@ if lastReservedChannel ~= nil then
 			audio.stop(lastReservedChannel)
 			lastReservedChannel = 2
 			audio.stop(lastReservedChannel)
+	        audio.setVolume( .75, { channel = lastReservedChannel } )
 			audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
 		elseif lastReservedChannel == 2 then
 			audio.stop(lastReservedChannel)
 			lastReservedChannel = 1
 			audio.stop(lastReservedChannel)
+	        audio.setVolume( .75, { channel = lastReservedChannel } )
 			audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
 		end
 		lastUsedMusic = "musicMenu"
@@ -157,6 +159,7 @@ if lastReservedChannel ~= nil then
 else
 	lastReservedChannel = 1
 	audio.stop(lastReservedChannel)
+    audio.setVolume( .75, { channel = lastReservedChannel } )
 	audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
 	lastUsedMusic = "musicMenu"
 end
@@ -173,7 +176,6 @@ local btnsGroup
 local currentObject
 local isLoading = false
 local touchInsideBtn = false
-local isBtnAnim = false
 
 -- local btnsPlayGame
 -- local btnsPlayGameSheetCoords = require("lua-sheets.btns_playgame")
@@ -267,24 +269,14 @@ local function doFunction(e)
 		e.x > currentObject.contentBounds.xMax or
 		e.y < currentObject.contentBounds.yMin or
 		e.y > currentObject.contentBounds.yMax then
-
-			if(isBtnAnim) then
-				if currentObject.name == "playgame" then
-					currentObject:setSequence("playgame")
-				elseif currentObject.name == "options" then
-					currentObject:setSequence("options")
-				elseif currentObject.name == "about" then
-					currentObject:setSequence("about")
-				end
-			else
-				if currentObject.name == "playgame" then
-					currentObject:setFrame(1)
-				elseif currentObject.name == "options" then
-					currentObject:setFrame(1)
-				elseif currentObject.name == "about" then
-					currentObject:setFrame(1)
-				end
+			if currentObject.name == "playgame" then
+				currentObject:setFrame(1)
+			elseif currentObject.name == "options" then
+				currentObject:setFrame(1)
+			elseif currentObject.name == "about" then
+				currentObject:setFrame(1)
 			end
+
 			-- currentObject:setFrame(2)
 			-- SAM: wtf. how is this working? do some testing.
 			if(touchInsideBtn == true) then
@@ -302,23 +294,12 @@ local function doFunction(e)
 				-- currentObject.xScale = 1.01
 				-- currentObject.yScale = 1.01
 
-				if(isBtnAnim) then
-					if currentObject.name == "pg" then
-						currentObject:setSequence("playgame_anim")
-					elseif currentObject.name == "opt" then
-						currentObject:setSequence("options_anim")
-					elseif currentObject.name == "abt" then
-						currentObject:setSequence("about_anim")
-					end
-					currentObject:play()
-				else
-					if currentObject.name == "playgame" then
-						currentObject:setFrame(2)
-					elseif currentObject.name == "options" then
-						currentObject:setFrame(2)
-					elseif currentObject.name == "about" then
-						currentObject:setFrame(2)
-					end
+				if currentObject.name == "playgame" then
+					currentObject:setFrame(2)
+				elseif currentObject.name == "options" then
+					currentObject:setFrame(2)
+				elseif currentObject.name == "about" then
+					currentObject:setFrame(2)
 				end
 			end
 			touchInsideBtn = true
@@ -512,7 +493,6 @@ function scene:focusMenu()
 	btnsPlayGame.yScale = 1
 	isLoading = false
 	touchInsideBtn = false
-	isBtnAnim = false
 end
 
 function scene:show( event )

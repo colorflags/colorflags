@@ -7,6 +7,11 @@ local scene = composer.newScene()
 local pGet = ssk.persist.get
 local pSet = ssk.persist.set
 
+local game_W = display.actualContentWidth -- Get the width of the screen
+local game_H = display.actualContentHeight -- Get the height of the screen
+
+--[[
+NICE TRY
 local spine = require "spine-corona.spine"
 
 local _lastTime = 0
@@ -122,6 +127,7 @@ end
 
 M.load()
 startAnim()
+]]--
 
 music=nil
 bobby=nil
@@ -132,17 +138,20 @@ if lastReservedChannel ~= nil then
         audio.stop(lastReservedChannel)
         lastReservedChannel = 2
         audio.stop(lastReservedChannel)
+        audio.setVolume( .75, { channel = lastReservedChannel } )
         audioReservedChannels[lastReservedChannel] = audio.play( musicGameOver, {channel=lastReservedChannel,loops=-1} )
     elseif lastReservedChannel == 2 then
         audio.stop(lastReservedChannel)
         lastReservedChannel = 1
         audio.stop(lastReservedChannel)
+        audio.setVolume( .75, { channel = lastReservedChannel } )
         audioReservedChannels[lastReservedChannel] = audio.play( musicGameOver, {channel=lastReservedChannel,loops=-1} )
     end
     lastUsedMusic = "musicGameOver"
 else
     lastReservedChannel = 1
     audio.stop(lastReservedChannel)
+    audio.setVolume( .75, { channel = lastReservedChannel } )
     audioReservedChannels[lastReservedChannel] = audio.play( musicGameOver, {channel=lastReservedChannel,loops=-1} )
     lastUsedMusic = "musicGameOver"
 end
@@ -155,9 +164,19 @@ local scoreTextDesc
 local highScore
 local gameScore
 
+local brickPlatformBtm
+local brickPlatformTop
+local brickPlatformSheetCoords = require("lua-sheets.pale_brick_platform")
+local brickPlatformSheet = graphics.newImageSheet("images/pale_brick_platform.png", brickPlatformSheetCoords:getSheet())
+
 local cloudsBG1
+local cloudsBG1SheetCoords = require("lua-sheets.just_clouds_bg")
+local cloudsBG1Sheet = graphics.newImageSheet("images/just_clouds_bg.png", cloudsBG1SheetCoords:getSheet())
 local cloudsBG2
+local cloudsBG3
 local cloudsFG1
+local cloudsFG1SheetCoords = require("lua-sheets.just_clouds_fg")
+local cloudsFG1Sheet = graphics.newImageSheet("images/just_clouds_fg.png", cloudsFG1SheetCoords:getSheet())
 local cloudsFG2
 
 local bg
@@ -169,13 +188,14 @@ local cloud2
 local cloud3
 local cloud4
 local flagPole1
+local flagPole1SheetCoords = require("lua-sheets.flagpole_big")
+local flagPole1Sheet = graphics.newImageSheet("images/flagpole_big.png", flagPole1SheetCoords:getSheet())
 local flagPole2
+local flagPole2SheetCoords = require("lua-sheets.flagpole_big")
+local flagPole2Sheet = graphics.newImageSheet("images/flagpole_big.png", flagPole2SheetCoords:getSheet())
 local flagPole3
-local flagPole4
-local flagPole5
-local flagPole6
-local flagPole7
-local flagPole8
+local flagPole3SheetCoords = require("lua-sheets.flagpole_big")
+local flagPole3Sheet = graphics.newImageSheet("images/flagpole_big.png", flagPole3SheetCoords:getSheet())
 local menuAgain
 local menuQuit
 
@@ -204,60 +224,6 @@ local cloudFadeTransition2
 local currentObject
 local isLoading = false
 local touchInsideBtn = false
-local isBtnAnim = false
-
--- for randomFlags1-8
--- local flagX = {20, 98, 69, 500, 525, 100, 480, 534}
-
--- SAM: make into a nicer function. break up this array into 2 arrays each containing 3 random flags Big, Med, Big. improve the randomFlag naming scheme
-local flagPoleSpacingSpacing = math.random(42,119)
-local flagPoleSpacingSpacingMiddleOffset = function()
-    local offset = math.random(20)
-    if math.random() > .5 then
-        offset = -offset
-    end
-    return offset
-end
-
-local flagX = {
-    (_W/4),
-    (_W/4) + (flagPoleSpacingSpacing/2) + flagPoleSpacingSpacingMiddleOffset(),
-    (_W/4) + flagPoleSpacingSpacing,
-    (_W/4)*3,
-    (_W/4)*3 + 50,
-    (_W/4)*3 + 100,
-}
-local flagSetX = {}
-
-local function makeFlagXArray(start)
-    local offsetArray = {}
-    local flagPoleSpacingSpacing = math.random(100,120)
-    local flagPoleSpacingSpacingMiddleOffset = function()
-        local offset = math.random(20)
-        if math.random() > .5 then
-            offset = -offset
-        end
-        return offset
-    end
-
-    offsetArray = {
-        start - (flagPoleSpacingSpacing/2),
-        start + flagPoleSpacingSpacingMiddleOffset(),
-        start + (flagPoleSpacingSpacing/2)
-    }
-
-    return offsetArray
-end
-
-local flagSet1HorizontalPositions = makeFlagXArray((_W/4)-50) -- -44
-local flagSet2HorizontalPositions = makeFlagXArray((_W-(_W/4))+50) -- +44
-
-local menuSeq = {
-    { name = "normalRun", start=1, count=2, time=800 },
-    { name = "quit", frames={3,4}, time=500 },
-    { name = "share", frames={5,6}, time=500 },
-
-}
 
 local btnsAgain
 local btnsAgainSheetCoords = require("lua-sheets.btns_again_giga")
@@ -266,22 +232,6 @@ local btnsAgainSheet = graphics.newImageSheet("images/btns_again_giga.png", btns
 local btnsQuit
 local btnsQuitSheetCoords = require("lua-sheets.btns_quit_giga")
 local btnsQuitSheet = graphics.newImageSheet("images/btns_quit_giga.png", btnsQuitSheetCoords:getSheet())
-
-function niceTryPop(event)
-    local thisAnimation = event.target
-    if (thisAnimation.frame == 1) then
-        thisAnimation.alpha = .9
-    elseif (thisAnimation.frame == 3) then
-        thisAnimation.alpha=1
-    elseif ( event.phase == "loop" ) then
-        thisAnimation.alpha = .3
-    end
-end
-
-local menuSpriteCoords = require("lua-sheets.btns-gameover")
-local menuAgainSheet = graphics.newImageSheet( "images/btns-gameover.png", menuSpriteCoords:getSheet() )
-local menuShareSheet = graphics.newImageSheet( "images/btns-gameover.png", menuSpriteCoords:getSheet() )
-local menuQuitSheet = graphics.newImageSheet( "images/btns-gameover.png", menuSpriteCoords:getSheet() )
 
 local flagWave40Coords = require("lua-sheets.flagwave40")
 local flagWave40Sheet = graphics.newImageSheet( "images/flagwave40.png", flagWave40Coords:getSheet() )
@@ -293,111 +243,31 @@ local flagWave34Coords = require("lua-sheets.flagwave34")
 local flagWave34Sheet = graphics.newImageSheet( "images/flagwave34.png", flagWave34Coords:getSheet() )
 
 function selectRandomFlags()
-
     local worldFlags = {
-        1,
-        7,
-        13,
-        19,
-        25,
-        31,
-        37,
-        43,
-        49,
-        55,
-        61,
-        67,
-        73,
-        79,
-        85,
-        91,
-        97,
-        103,
-        109,
-        115,
-        121,
-        127,
-        133,
-        139,
-        145,
-        151,
-        157,
-        163,
-        169,
-        175,
-        181,
-        187,
-        193,
-        199,
-        205,
-        211,
-        217,
-        223,
-        229,
-        235,
-        241,
-        247,
-        253,
-        259,
-        265,
-        271,
-        277,
-        283,
-        289,
-        313,
-        319,
-        325
+        1, 7, 13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79, 85, 91, 97, 103, 109, 115, 121, 127, 133, 139, 145, 151, 157, 163, 169, 175, 181, 187, 193, 199, 205, 211, 217, 223, 229, 235, 241, 247, 253, 259, 265, 271, 277, 283, 289, 313, 319, 325
     }
-
     local function shuffle(t)
         local iterations = #t
         local j
-
         for i = iterations, 2, -1 do
             j = math.random(i)
             t[i], t[j] = t[j], t[i]
         end
     end
     shuffle(worldFlags)
-
     for i=1, 6 do
-        local randomFlagSeq={
-            {name="randomflagseq1",frames={worldFlags[i],(worldFlags[i]+1),(worldFlags[i]+2),(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4),(worldFlags[i]+3), (worldFlags[i]+2), (worldFlags[i]+1)},time=860},
-            {name="randomflagseq2",frames={worldFlags[i]+3,(worldFlags[i]+2),(worldFlags[i]+1),(worldFlags[i]+2),(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4)},time=1021},
-            {name="randomflagseq3",frames={worldFlags[i]+4,(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4),(worldFlags[i]+3),(worldFlags[i]+2),(worldFlags[i]+1)},time=820 },
-            {name="randomflagseq4",frames={worldFlags[i]+5,(worldFlags[i]+4),(worldFlags[i]+3),(worldFlags[i]+2),(worldFlags[i]+1),(worldFlags[i]),(worldFlags[i]+1),(worldFlags[i]+2)},time=902},
-            {name="randomflagseq5",frames={worldFlags[i]+2,(worldFlags[i]+3),(worldFlags[i]+4),(worldFlags[i]+5),(worldFlags[i]+4),(worldFlags[i]+3),(worldFlags[i]+2),(worldFlags[i]+1)},time=896}
-        }
         randomFlagSequenceArray[i] = {
             {
                 name="randomflagseq1",
                 frames={
-                    worldFlags[i],
-                    worldFlags[i]+1,
-                    worldFlags[i]+2,
-                    worldFlags[i]+3,
-                    worldFlags[i]+4,
-                    worldFlags[i]+5,
-                    worldFlags[i]+4,
-                    worldFlags[i]+3,
-                    worldFlags[i]+2,
-                    worldFlags[i]+1
+                    worldFlags[i], worldFlags[i]+1, worldFlags[i]+2, worldFlags[i]+3, worldFlags[i]+4, worldFlags[i]+5, worldFlags[i]+4, worldFlags[i]+3, worldFlags[i]+2, worldFlags[i]+1
                 },
                 time=1800
             },
             {
                 name="randomflagseq2",
                 frames={
-                    worldFlags[i]+3,
-                    worldFlags[i]+4,
-                    worldFlags[i]+5,
-                    worldFlags[i]+4,
-                    worldFlags[i]+3,
-                    worldFlags[i]+2,
-                    worldFlags[i]+1,
-                    worldFlags[i],
-                    worldFlags[i]+1,
-                    worldFlags[i]+2
+                    worldFlags[i]+3, worldFlags[i]+4, worldFlags[i]+5, worldFlags[i]+4, worldFlags[i]+3, worldFlags[i]+2, worldFlags[i]+1, worldFlags[i], worldFlags[i]+1, worldFlags[i]+2
                 },
                 time=1800
             }
@@ -410,54 +280,6 @@ function selectRandomFlags()
         print(flagFrames .. "\n")
         ]]--
     end
-end
-
-function setUpRandomFlags()
-    -- Big Flag
-    randomFlag1 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[1])
-    randomFlag1.x = flagSet1HorizontalPositions[1]+21 -- SAM: +21 refers to flagwave sprite width
-    randomFlag1.y = (_H - killScreen.height) - 57
-    randomFlag1:setSequence("randomflagseq1")
-    randomFlag1:play()
-
-    -- Med Flag
-    randomFlag2 = display.newSprite(flagWave34Sheet, randomFlagSequenceArray[2])
-    randomFlag2.x = flagSet1HorizontalPositions[2] + 18
-    randomFlag2.y = (_H - killScreen.height) - 64
-    randomFlag2:setSequence("randomflagseq2")
-    randomFlag2:toBack()
-    randomFlag2.alpha = 0.65
-    randomFlag2:play()
-
-    -- Big Flag
-    randomFlag3 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[3])
-    randomFlag3.x = flagSet1HorizontalPositions[3] + 21
-    randomFlag3.y = (_H - killScreen.height) - 57
-    randomFlag3:setSequence("randomflagseq1")
-    randomFlag3:play()
-
-    -- Big Flag
-    randomFlag4 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[4])
-    randomFlag4.x = flagSet2HorizontalPositions[1] + 21
-    randomFlag4.y = (_H - killScreen.height) - 57
-    randomFlag4:setSequence("randomflagseq1")
-    randomFlag4:play()
-
-    -- Med Flag
-    randomFlag5 = display.newSprite(flagWave34Sheet, randomFlagSequenceArray[5])
-    randomFlag5.x = flagSet2HorizontalPositions[2] + 18
-    randomFlag5.y = (_H - killScreen.height) - 63
-    randomFlag5:setSequence("randomflagseq2")
-    randomFlag5:toBack()
-    randomFlag5.alpha = 0.65
-    randomFlag5:play()
-
-    -- Big Flag
-    randomFlag6 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[6])
-    randomFlag6.x = flagSet2HorizontalPositions[3] + 21
-    randomFlag6.y = (_H - killScreen.height) - 57
-    randomFlag6:setSequence("randomflagseq1")
-    randomFlag6:play()
 end
 
 -- SAM: needs work
@@ -481,9 +303,9 @@ local function myTouchListener( event )
 
             local gotoo = currentObject.gotoScene
             if gotoo == "start" and event.target == btnsPlayGame then
-                composer.showOverlay( gotoo, { isModal= true})
+                composer.showOverlay( gotoo, { isModal= true })
             else
-                composer.gotoScene ( gotoo, { effect = "crossFade", time = 1000 } )
+                composer.gotoScene ( gotoo, { effect = defaultTransition } )
             end
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
@@ -502,24 +324,12 @@ local function doFunction(e)
         e.x > currentObject.contentBounds.xMax or
         e.y < currentObject.contentBounds.yMin or
         e.y > currentObject.contentBounds.yMax then
-
-            -- DELETE isBtnAnim handling
-            if(isBtnAnim) then
-                if currentObject.name == "again" then
-                    currentObject:setSequence("again")
-                elseif currentObject.name == "share" then
-                    currentObject:setSequence("share")
-                elseif currentObject.name == "quit" then
-                    currentObject:setSequence("quit")
-                end
-            else
-                if currentObject.name == "again" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "share" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "quit" then
-                    currentObject:setFrame(1)
-                end
+            if currentObject.name == "again" then
+                currentObject:setFrame(1)
+            elseif currentObject.name == "share" then
+                currentObject:setFrame(1)
+            elseif currentObject.name == "quit" then
+                currentObject:setFrame(1)
             end
             -- currentObject:setFrame(2)
             -- SAM: wtf. how is this working? do some testing.
@@ -537,24 +347,12 @@ local function doFunction(e)
                 currentObject.yScale = 1
                 -- currentObject.xScale = 1.01
                 -- currentObject.yScale = 1.01
-
-                if(isBtnAnim) then
-                    if currentObject.name == "again" then
-                        currentObject:setSequence("again_anim")
-                    elseif currentObject.name == "share" then
-                        currentObject:setSequence("share_anim")
-                    elseif currentObject.name == "quit" then
-                        currentObject:setSequence("quit_anim")
-                    end
-                    currentObject:play()
-                else
-                    if currentObject.name == "again" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "share" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "quit" then
-                        currentObject:setFrame(2)
-                    end
+                if currentObject.name == "again" then
+                    currentObject:setFrame(2)
+                elseif currentObject.name == "share" then
+                    currentObject:setFrame(2)
+                elseif currentObject.name == "quit" then
+                    currentObject:setFrame(2)
                 end
             end
             touchInsideBtn = true
@@ -562,25 +360,35 @@ local function doFunction(e)
     end
 end
 
-local function scrollCloudsBG(self, event)
-    if self.x < -284 then -- 477
-        self.x = _W/2+566 -- 480
-    else
-        self.x = self.x - self.speed
-    end
-end
+local scrollSpeedBG = 1
+local scrollSpeedFG = 0.5
 
-local function scrollCloudsFG(self, event)
-    -- transition.to( self, { time=4000, y=200, transition=easing.continuousLoop } )
-    if self.x < -284 then -- 477
-        self.x = _W/2+568 -- 480
-    else
-        self.x = self.x - self.speed
+local function moveClouds(event)
+    cloudsBG1.x = cloudsBG1.x - scrollSpeedBG
+    cloudsBG2.x = cloudsBG2.x - scrollSpeedBG
+    cloudsBG3.x = cloudsBG3.x - scrollSpeedBG
+    cloudsFG1.x = cloudsFG1.x - scrollSpeedFG
+    cloudsFG2.x = cloudsFG2.x - scrollSpeedFG
+
+    if cloudsBG1.x < 0 - cloudsBG1.width then
+        cloudsBG1:translate(cloudsBG1.width*3, 0)
+    end
+    if cloudsBG2.x < 0 - cloudsBG1.width then
+        cloudsBG2:translate(cloudsBG1.width*3, 0)
+    end
+    if cloudsBG3.x < 0 - cloudsBG1.width then
+        cloudsBG3:translate(cloudsBG1.width*3, 0)
+    end
+    if cloudsFG1.x < 0 - cloudsFG1.width then
+        cloudsFG1:translate(cloudsFG2.width*2, 0)
+    end
+    if cloudsFG2.x < 0 - cloudsFG2.width then
+        cloudsFG2:translate(cloudsFG1.width*2, 0)
     end
 end
 
 local function cloudCirculate(self)
-    local myPusa=self.name
+    local myPusa = self.name
     self:toFront( )
     if myPusa == "cloudsFG1" then
         FG1Transition4= transition.to(self, {time=200, y=self.y-2, onComplete=function()
@@ -616,6 +424,8 @@ local function cloudFade(self)
 end
 
 function scene:create(e)
+    selectRandomFlags()
+
     bg = display.newRect(_W/2, _H/2, _W, _H)
     bg:setFillColor(0,0,0)
 
@@ -633,6 +443,7 @@ function scene:create(e)
     killScreen.anchorY=1
     killScreen.x=_W/2
     killScreen.y=_H
+    killScreen.alpha =0
 
     killScreen.fill.effect = "filter.linearWipe"
 
@@ -665,7 +476,7 @@ function scene:create(e)
     scoreText.anchorY = 0
     scoreTextGroup:insert(scoreText)
     scoreTextGroup.x = scoreTextGroupAnchorX
-    scoreTextGroup.y = _H - scoreTextGroup.height - 10
+    scoreTextGroup.y = _H/3 - scoreTextGroup.height - 10
 
     local function shiftScoreTextAnchorGroup()
         local ax = 0.5
@@ -691,56 +502,44 @@ function scene:create(e)
     end
 --    shiftScoreTextAnchorGroup()
 
-    flagPole1 = display.newImage( "images/flagpole-102_2.png", 18,142)
+    brickPlatformBtm = display.newSprite( brickPlatformSheet, {frames={1}} )
+    brickPlatformBtm.x = _W/2
+    brickPlatformBtm.anchorY = 1
+    brickPlatformBtm.y = _H
+
+    brickPlatformTop = display.newSprite( brickPlatformSheet, {frames={2}} )
+    brickPlatformTop.x = _W/2
+    brickPlatformTop.anchorY = 1
+    brickPlatformTop.y = _H - brickPlatformBtm.height
+
+    flagPole1 = display.newSprite( flagPole1Sheet, {frames={1}} )
     flagPole1.anchorX=0.5
     flagPole1.anchorY=1
     flagPole1.name="flagPole1" -- SAM: is flagPole1.name ever used?
-    flagPole1.x=flagSet1HorizontalPositions[1]
-    flagPole1.y= _H - killScreen.height + 16
+    flagPole1.x= brickPlatformBtm.x  - (brickPlatformBtm.width / 3)
+    flagPole1.y= brickPlatformBtm.y - brickPlatformBtm.height
 
-    flagPole2 = display.newImage( "images/flagpole-90_2.png", 18,110)
+    flagPole2 = display.newSprite( flagPole2Sheet, {frames={1}} )
     flagPole2.anchorX=0.5
     flagPole2.anchorY=1
     flagPole2.name="flagPole2"
-    flagPole2.x=flagSet1HorizontalPositions[2]
-    flagPole2.y= _H - killScreen.height
-    flagPole2.alpha=0.30
+    flagPole2.x= brickPlatformBtm.x
+    flagPole2.y= brickPlatformTop.y - brickPlatformTop.height
+    flagPole2.alpha=0.65
 
-    flagPole3 = display.newImage( "images/flagpole-102_2.png", 18,142)
+    flagPole3 = display.newSprite( flagPole3Sheet, {frames={1}} )
     flagPole3.anchorX=0.5
     flagPole3.anchorY=1
     flagPole3.name="flagPole3"
-    flagPole3.x=flagSet1HorizontalPositions[3]
-    flagPole3.y= _H - killScreen.height + 16
-
-    flagPole4 = display.newImage( "images/flagpole-102_2.png", 18,142)
-    flagPole4.anchorX=0.5
-    flagPole4.anchorY=1
-    flagPole4.name="flagPole4"
-    flagPole4.x=flagSet2HorizontalPositions[1]
-    flagPole4.y= _H - killScreen.height + 16
-
-    flagPole5 = display.newImage( "images/flagpole-90_2.png", 18,110)
-    flagPole5.anchorX=0.5
-    flagPole5.anchorY=1
-    flagPole5.name="flagPole5"
-    flagPole5.x=flagSet2HorizontalPositions[2]
-    flagPole5.y= _H - killScreen.height
-    flagPole5.alpha=0.30
-
-    flagPole6 = display.newImage( "images/flagpole-102_2.png", 18,142)
-    flagPole6.anchorX=0.5
-    flagPole6.anchorY=1
-    flagPole6.name="flagPole6"
-    flagPole6.x=flagSet2HorizontalPositions[3]
-    flagPole6.y= _H - killScreen.height + 16
+    flagPole3.x= brickPlatformBtm.x  + (brickPlatformBtm.width / 3)
+    flagPole3.y= brickPlatformBtm.y - brickPlatformBtm.height
 
     btnsAgain = display.newSprite( btnsAgainSheet, {frames={1,2}} ) -- use btnsSeq
     btnsAgain.isHitTestMasked = false
     btnsAgain.name = "again"
     btnsAgain.anchorY = .5
     btnsAgain.x=88
-    btnsAgain.y=_H-offsetY
+    btnsAgain.y=_H/2
     btnsAgain:setFrame(1)
     btnsAgain.alpha=0
     btnsAgain.gotoScene="game"
@@ -752,77 +551,94 @@ function scene:create(e)
     btnsQuit.name = "quit"
     btnsQuit.anchorY = .5
     btnsQuit.x=_W-69
-    btnsQuit.y=_H-offsetY
+    btnsQuit.y=_H/2
     btnsQuit:setFrame(1)
     btnsQuit.alpha=0
     btnsQuit.gotoScene="menu"
     -- btnsQuit:scale(.8,.8)
     transition.to( btnsQuit, {time = 200, alpha=1})
 
-    selectRandomFlags()
-    setUpRandomFlags()
+    randomFlag1 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[1])
+    randomFlag1.x = flagPole1.x + 20
+    randomFlag1.y = (_H - flagPole1.height) + 20
+    randomFlag1:setSequence("randomflagseq1")
+    randomFlag1:play()
+
+    randomFlag2 = display.newSprite(flagWave34Sheet, randomFlagSequenceArray[2])
+    randomFlag2.x = flagPole2.x + 17
+    randomFlag2.y = (_H - flagPole2.height) + 10
+    randomFlag2:setSequence("randomflagseq2")
+    randomFlag2:toBack()
+    randomFlag2.alpha = 0.65
+    randomFlag2:play()
+
+    randomFlag3 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[3])
+    randomFlag3.x = flagPole3.x + 20
+    randomFlag3.y = (_H - flagPole3.height) + 20
+    randomFlag3:setSequence("randomflagseq3")
+    randomFlag3:play()
+
     -- bg:toBack()
 
-    cloudsBG1 = display.newImage( "images/clouds_bg_2.png", 568, 320 )
-    cloudsBG1.name="cloudsBG1"
-    cloudsBG1.alpha=.1
-    cloudsBG1.x=_W/2
-    cloudsBG1.y=_H/2
-    cloudsBG1.speed = 1
-    cloudsBG1:toBack()
 
-    cloudsBG2 = display.newImage( "images/clouds_bg_2.png", 568, 320 )
-    cloudsBG2.name="cloudsBG2"
-    cloudsBG2.alpha=.1
-    -- cloudsBG2 = display.newRect( 0,0,568,320 )
-    -- cloudsBG2:setFillColor(1.0, 1.0, 0.0)
+    cloudsBG1 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
+    cloudsBG1.name = "cloudsBG1"
+    -- cloudsBG1.alpha = .5
+    cloudsBG1.anchorX = 0
+    cloudsBG1.anchorY = 1
+    cloudsBG1.x = 0
+    cloudsBG1.y = _H
+    cloudsBG1:toBack()
+    print( display.pixelHeight / display.actualContentHeight )
+
+    cloudsBG2 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
+    cloudsBG2.name = "cloudsBG2"
     -- cloudsBG2.alpha = .5
-    cloudsBG2.x=_W/2+568
-    cloudsBG2.y=_H/2
-    cloudsBG2.speed = 1
+    cloudsBG2.anchorX = 0
+    cloudsBG2.anchorY = 1
+    cloudsBG2.x = cloudsBG1.width
+    cloudsBG2.y = _H
     cloudsBG2:toBack()
+
+    cloudsBG3 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
+    cloudsBG3.name = "cloudsBG3"
+    -- cloudsBG3.alpha = .5
+    cloudsBG3.anchorX = 0
+    cloudsBG3.anchorY = 1
+    cloudsBG3.x = cloudsBG1.width + cloudsBG2.width
+    cloudsBG3.y = _H
+    cloudsBG3:toBack()
 
     offsetCloudFG = 20
 
-    cloudsFG1 = display.newImage( "images/clouds_fg4_large.png", 568, 350 )
+    cloudsFG1 = display.newSprite( cloudsFG1Sheet, {frames={1}} )
     cloudsFG1.name="cloudsFG1"
     -- cloudsFG1:setFillColor( 1, 1, 0 )
-    cloudsFG1.x=_W/2-(offsetCloudFG)
-    cloudsFG1.y=_H/2
-    cloudsFG1.speed = 2
-    cloudsFG1.alpha=0
-    cloudsFG2 = display.newImage( "images/clouds_fg4_large.png", 568, 350 )
+    -- cloudsFG1.alpha=0
+    cloudsFG1.anchorX = 0
+    cloudsFG1.x = 0
+    cloudsFG1.y = _H/2
+
+    cloudsFG2 = display.newSprite( cloudsFG1Sheet, {frames={1}} )
     cloudsFG2.name="cloudsFG2"
     -- cloudsFG2:setFillColor( 1, 1, 0 )
-    cloudsFG2.x=_W/2+(_W-offsetCloudFG)
-    cloudsFG2.y=_H/2
-    cloudsFG2.speed = 2
-    cloudsFG2.alpha=0
+    -- cloudsFG2.alpha=0
+    cloudsFG2.anchorX = 0
+    cloudsFG2.x = cloudsFG1.width
+    cloudsFG2.y = _H/2
 
-
-    -- ISSUES WITH THESE RECYCLING (JUMPING TO BEHIND ONE ANOTHER) IMAGES FOR:
-    --   1. SIMULATOR, NON IPHONE 5
-    --   2. ON DEVICES THEMSELVES (INCLUDING IPHONE 5)
-
-    cloudsBG1.enterFrame = scrollCloudsBG
-    Runtime:addEventListener("enterFrame", cloudsBG1)
-    cloudsBG2.enterFrame = scrollCloudsBG
-    Runtime:addEventListener("enterFrame", cloudsBG2)
-
-    cloudsFG1.enterFrame = scrollCloudsFG
-    Runtime:addEventListener("enterFrame", cloudsFG1)
-    cloudsFG2.enterFrame = scrollCloudsFG
-    Runtime:addEventListener("enterFrame", cloudsFG2)
+    Runtime:addEventListener("enterFrame", moveClouds)
 
     cloudCirculate(cloudsFG1)
     cloudCirculate(cloudsFG2)
 
-    cloudFade(cloudsBG1)
-    cloudFade(cloudsBG2)
+    -- cloudFade(cloudsBG1)
+    -- cloudFade(cloudsBG2)
 
-    M.skeleton.group:toBack()
-    M.skeleton.group.alpha = 0
-    transition.to( M.skeleton.group, { time=1000, delay=10, alpha=1.0 } )
+    -- M.skeleton.group:toBack()
+    -- M.skeleton.group.alpha = 0
+    -- transition.to( M.skeleton.group, { time=1000, delay=10, alpha=1.0 } )
+
     bg:toBack()
 end
 
@@ -838,8 +654,6 @@ function scene:show(e)
     elseif e.phase== "did" then
         btnsAgain:addEventListener( "touch", myTouchListener )
         btnsAgain:addEventListener( "touch", doFunction )
---        btnsShare:addEventListener( "touch", myTouchListener )
---        btnsShare:addEventListener( "touch", doFunction )
         btnsQuit:addEventListener( "touch", myTouchListener )
         btnsQuit:addEventListener( "touch", doFunction )
     end
@@ -847,10 +661,7 @@ end
 
 function scene:hide(e)
     if e.phase == "will" then
-        Runtime:removeEventListener("enterFrame", cloudsBG1)
-        Runtime:removeEventListener("enterFrame", cloudsBG2)
-        Runtime:removeEventListener("enterFrame", cloudsFG1)
-        Runtime:removeEventListener("enterFrame", cloudsFG2)
+        Runtime:removeEventListener("enterFrame", moveClouds)
         transition.cancel(cloudFadeTransition1)
         transition.cancel(cloudFadeTransition2)
         transition.cancel(FG1Transition1)
@@ -864,9 +675,6 @@ function scene:hide(e)
         display.remove(randomFlag1)
         display.remove(randomFlag2)
         display.remove(randomFlag3)
-        display.remove(randomFlag4)
-        display.remove(randomFlag5)
-        display.remove(randomFlag6)
         display.remove(title)
         display.remove(highScoreText)
 
@@ -875,20 +683,21 @@ function scene:hide(e)
         display.remove(scoreTextGroup)
 
         display.remove(killScreen)
+        display.remove(brickPlatformBtm)
+        display.remove(brickPlatformTop)
         display.remove(cloudsBG1)
         display.remove(cloudsBG2)
+        display.remove(cloudsBG3)
         display.remove(cloudsFG1)
         display.remove(cloudsFG2)
         display.remove(flagPole1)
         display.remove(flagPole2)
         display.remove(flagPole3)
-        display.remove(flagPole4)
-        display.remove(flagPole5)
-        display.remove(flagPole6)
 
-        display.remove(M.skeleton.group)
+        -- display.remove(M.skeleton.group)
         display.remove(btnsAgain)
         display.remove(btnsQuit)
+
         btnsAgain:removeEventListener( "touch", myTouchListener )
         btnsAgain:removeEventListener( "touch", doFunction )
         btnsQuit:removeEventListener( "touch", myTouchListener )
@@ -898,7 +707,7 @@ function scene:hide(e)
 end
 
 function scene:destroy(e)
-    stopAnim()
+    -- stopAnim()
 end
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )

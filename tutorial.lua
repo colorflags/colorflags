@@ -25,7 +25,6 @@ local btnsRightArrowSheet = graphics.newImageSheet("images/btns_right_arrow.png"
 
 local currentObject
 local touchInsideBtn = false
-local isBtnAnim = false
 
 -- New
 -- SAM: add a variable so that setSequence() can be set more easily. Unnecessary if statements
@@ -71,49 +70,27 @@ end
 local function doFunction(e)
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
-            e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or
-            e.y > currentObject.contentBounds.yMax then
-
-            if(isBtnAnim) then
-                if currentObject.name == "btnsLeftArrow" then
-                    currentObject:setSequence("btnsLeftArrow") -- these are the same
-                elseif currentObject.name == "btnsRightArrow" then
-                    currentObject:setSequence("btnsRightArrow") -- these are the same
-                elseif currentObject.name == "btnsX" then
-                    currentObject:setSequence("btnsX")
-                end
-            else
-                if currentObject.name == "btnsLeftArrow" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "btnsRightArrow" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "btnsX" then
-                    currentObject:setFrame(1)
-                end
+        e.x > currentObject.contentBounds.xMax or
+        e.y < currentObject.contentBounds.yMin or
+        e.y > currentObject.contentBounds.yMax then
+            if currentObject.name == "btnsLeftArrow" then
+                currentObject:setFrame(1)
+            elseif currentObject.name == "btnsRightArrow" then
+                currentObject:setFrame(1)
+            elseif currentObject.name == "btnsX" then
+                currentObject:setFrame(1)
             end
             -- redundant ??
             -- currentObject:setFrame(1)
             touchInsideBtn = false
         else
             if touchInsideBtn == false then
-                if(isBtnAnim) then
-                    if currentObject.name == "btnsLeftArrow" then
-                        currentObject:setSequence("btnsLeftArrow_anim") -- these are the same
-                    elseif currentObject.name == "btnsRightArrow" then
-                        currentObject:setSequence("btnsRightArrow_anim") -- these are the same
-                    elseif currentObject.name == "btnsX" then
-                        currentObject:setSequence("btnsX_anim")
-                    end
-                    currentObject:play()
-                else
-                    if currentObject.name == "btnsLeftArrow" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "btnsRightArrow" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "btnsX" then
-                        currentObject:setFrame(2)
-                    end
+                if currentObject.name == "btnsLeftArrow" then
+                    currentObject:setFrame(2)
+                elseif currentObject.name == "btnsRightArrow" then
+                    currentObject:setFrame(2)
+                elseif currentObject.name == "btnsX" then
+                    currentObject:setFrame(2)
                 end
             end
             touchInsideBtn = true

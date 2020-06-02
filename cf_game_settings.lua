@@ -127,7 +127,7 @@ CFGameSettings = class(function(c)
         printedName = "Cyprus",
         code = "ogw",
         colors = {
-            o = CFColor(216,217,3),
+            o = CFColor(216,117,3),
             g = CFColor(47,71,18),
             w = CFColor(255,255,255)
         },

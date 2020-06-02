@@ -1,6 +1,6 @@
 
 -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
--- http://docs.coronalabs.com/api/library/display/newSprite.html 
+-- http://docs.coronalabs.com/api/library/display/newSprite.html
 
 local CreateText = require("cf_text")
 
@@ -17,7 +17,6 @@ local fwBtn
 local canQuit=false
 local currentObject
 local touchInsideBtn = false
-local isBtnAnim = false
 
 local infoPic
 local info
@@ -64,7 +63,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("xBtn3"),
             btnsSheetCoords:getFrameIndex("xBtn5")
         },
-        time = 500 
+        time = 500
     },
     {
         name = "xBtn_anim",
@@ -74,7 +73,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("xBtn4"),
             btnsSheetCoords:getFrameIndex("xBtn5")
         },
-        time = 500 
+        time = 500
     },
     {
         name = "fwBtn",
@@ -82,7 +81,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("backArrowBtn3"),
             btnsSheetCoords:getFrameIndex("backArrowBtn5")
         },
-        time = 500 
+        time = 500
     },
     {
         name = "fwBtn_anim",
@@ -92,7 +91,7 @@ local btnsSeq = {
             btnsSheetCoords:getFrameIndex("backArrowBtn4"),
             btnsSheetCoords:getFrameIndex("backArrowBtn5")
         },
-        time = 500 
+        time = 500
     }
 }
 
@@ -125,38 +124,38 @@ local nationalFlagsSeq = {
     { name="india", sheet=nationalFlags1Sheet, frames={22} },
     { name="indonesia", sheet=nationalFlags1Sheet, frames={23} },
     { name="ireland", sheet=nationalFlags1Sheet, frames={24} },
-    { name="israel", sheet=nationalFlags2Sheet, frames={1} },  
+    { name="israel", sheet=nationalFlags2Sheet, frames={1} },
     { name="italy", sheet=nationalFlags2Sheet, frames={2} },
     { name="japan", sheet=nationalFlags2Sheet, frames={3} },
     { name="lithuania", sheet=nationalFlags2Sheet, frames={4} },
-    { name="luxembourg", sheet=nationalFlags2Sheet, frames={5} },   
-    { name="malaysia", sheet=nationalFlags2Sheet, frames={6} },   
-    { name="malta", sheet=nationalFlags2Sheet, frames={7} },   
-    { name="mexico", sheet=nationalFlags2Sheet, frames={8} }, 
-    { name="netherlands", sheet=nationalFlags2Sheet, frames={9} }, 
+    { name="luxembourg", sheet=nationalFlags2Sheet, frames={5} },
+    { name="malaysia", sheet=nationalFlags2Sheet, frames={6} },
+    { name="malta", sheet=nationalFlags2Sheet, frames={7} },
+    { name="mexico", sheet=nationalFlags2Sheet, frames={8} },
+    { name="netherlands", sheet=nationalFlags2Sheet, frames={9} },
     { name="newzealand", sheet=nationalFlags2Sheet, frames={10} },
     { name="norway", sheet=nationalFlags2Sheet, frames={11} },
     { name="philippines", sheet=nationalFlags2Sheet, frames={12} },
     { name="poland", sheet=nationalFlags2Sheet, frames={13} },
-    { name="portugal", sheet=nationalFlags2Sheet, frames={14} },   
-    { name="russia", sheet=nationalFlags2Sheet, frames={16} },    
-    { name="sanmarino", sheet=nationalFlags2Sheet, frames={17} },    
-    { name="singapore", sheet=nationalFlags2Sheet, frames={18} },    
-    { name="slovakia", sheet=nationalFlags2Sheet, frames={19} },    
-    { name="slovenia", sheet=nationalFlags2Sheet, frames={20} },        
-    { name="southafrica", sheet=nationalFlags2Sheet, frames={21} },    
-    { name="southkorea", sheet=nationalFlags2Sheet, frames={22} },    
-    { name="spain", sheet=nationalFlags2Sheet, frames={23} },    
-    { name="sriLanka", sheet=nationalFlags2Sheet, frames={24} },    
-    { name="sweden", sheet=nationalFlags3Sheet, frames={1} }, 
-    { name="switzerland", sheet=nationalFlags3Sheet, frames={2} }, 
+    { name="portugal", sheet=nationalFlags2Sheet, frames={14} },
+    { name="russia", sheet=nationalFlags2Sheet, frames={16} },
+    { name="sanmarino", sheet=nationalFlags2Sheet, frames={17} },
+    { name="singapore", sheet=nationalFlags2Sheet, frames={18} },
+    { name="slovakia", sheet=nationalFlags2Sheet, frames={19} },
+    { name="slovenia", sheet=nationalFlags2Sheet, frames={20} },
+    { name="southafrica", sheet=nationalFlags2Sheet, frames={21} },
+    { name="southkorea", sheet=nationalFlags2Sheet, frames={22} },
+    { name="spain", sheet=nationalFlags2Sheet, frames={23} },
+    { name="sriLanka", sheet=nationalFlags2Sheet, frames={24} },
+    { name="sweden", sheet=nationalFlags3Sheet, frames={1} },
+    { name="switzerland", sheet=nationalFlags3Sheet, frames={2} },
     -- SAM: Taiwan flag out of order in sprite/atlas because originally named Republic of China
-    { name="taiwan", sheet=nationalFlags2Sheet, frames={15} }, 
-    { name="thailand", sheet=nationalFlags3Sheet, frames={3} }, 
-    { name="turkey", sheet=nationalFlags3Sheet, frames={4} }, 
-    { name="unitedarabemirates", sheet=nationalFlags3Sheet, frames={5} }, 
-    { name="unitedkingdom", sheet=nationalFlags3Sheet, frames={6} }, 
-    { name="unitedstates", sheet=nationalFlags3Sheet, frames={7} } 
+    { name="taiwan", sheet=nationalFlags2Sheet, frames={15} },
+    { name="thailand", sheet=nationalFlags3Sheet, frames={3} },
+    { name="turkey", sheet=nationalFlags3Sheet, frames={4} },
+    { name="unitedarabemirates", sheet=nationalFlags3Sheet, frames={5} },
+    { name="unitedkingdom", sheet=nationalFlags3Sheet, frames={6} },
+    { name="unitedstates", sheet=nationalFlags3Sheet, frames={7} }
 }
 
 local piece = display.newImage( "images/australia259x229.png", 529,229)
@@ -176,11 +175,11 @@ local background = display.newRect(0,0,580,320)
 local function myTouchListener(event)
     currentObject = event.target
     display.getCurrentStage():setFocus(currentObject)
-    print(currentObject.name) 
+    print(currentObject.name)
     if event.phase == "began" then
-        print("touch ON. inside")          
+        print("touch ON. inside")
     elseif event.phase == "ended" or event.phase == "cancelled" then
-        
+
         -- setSequence() below redundant ?? Isn't this handled in the doFunction()
         if currentObject.name == "fwBtn" then
             currentObject:setSequence("fwBtn")
@@ -188,11 +187,11 @@ local function myTouchListener(event)
             currentObject:setSequence("xBtn")
         end
 
-        if touchInsideBtn == true and canQuit == true then 
+        if touchInsideBtn == true and canQuit == true then
 
             print("touch OFF. inside")
             -- composer.removeScene("start")
-            
+
             if(currentObject.name == "xBtn") then
                 composer.gotoScene ( "menu", { effect = defaultTransition } )
             elseif(currentObject.name == "fwBtn") then
@@ -202,51 +201,33 @@ local function myTouchListener(event)
         elseif touchInsideBtn == false then
             -- print("touch OFF outside")
         end
-        
+
         currentObject = nil
         display.getCurrentStage():setFocus(nil)
         touchInsideBtn = false
     end
 end
- 
+
 local function doFunction(e)
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
-            e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or 
-            e.y > currentObject.contentBounds.yMax then 
-            
-            if(isBtnAnim) then
-                if currentObject.name == "fwBtn" then
-                    currentObject:setSequence("fwBtn")
-                elseif currentObject.name == "xBtn" then
-                    currentObject:setSequence("xBtn")
-                end
-            else 
-                if currentObject.name == "fwBtn" then
-                    currentObject:setFrame(1)
-                elseif currentObject.name == "xBtn" then
-                    currentObject:setFrame(1)
-                end
+        e.x > currentObject.contentBounds.xMax or
+        e.y < currentObject.contentBounds.yMin or
+        e.y > currentObject.contentBounds.yMax then
+            if currentObject.name == "fwBtn" then
+                currentObject:setFrame(1)
+            elseif currentObject.name == "xBtn" then
+                currentObject:setFrame(1)
             end
             -- redundant ??
             -- currentObject:setFrame(1)
             touchInsideBtn = false
         else
             if touchInsideBtn == false then
-                if(isBtnAnim) then
-                    if currentObject.name == "fwBtn" then
-                        currentObject:setSequence("fwBtn_anim")
-                    elseif currentObject.name == "xBtn" then
-                        currentObject:setSequence("xBtn_anim")
-                    end
-                    currentObject:play()
-                else
-                    if currentObject.name == "fwBtn" then
-                        currentObject:setFrame(2)
-                    elseif currentObject.name == "xBtn" then
-                        currentObject:setFrame(2)
-                    end
+                if currentObject.name == "fwBtn" then
+                    currentObject:setFrame(2)
+                elseif currentObject.name == "xBtn" then
+                    currentObject:setFrame(2)
                 end
             end
             touchInsideBtn = true
@@ -255,25 +236,25 @@ local function doFunction(e)
 end
 
 local function finishScale()
-  transition.to( xBtn, { time=250, alpha=1 }) 
-  transition.to( fwBtn, { time=250, alpha=1 }) 
+  transition.to( xBtn, { time=250, alpha=1 })
+  transition.to( fwBtn, { time=250, alpha=1 })
   xBtn:toFront()
-  fwBtn:toFront()   
+  fwBtn:toFront()
   canQuit=true
 end
 
 local function infoAppear()
    transition.to(infoPic, {time=500, alpha=1})
-end  
+end
 
 local function deleteText()
 display.remove(CountryText)
- end 
+ end
 
 local function countryScale()
-   countryTimer=transition.to( countryText, { time=500, alpha=0 }) 
+   countryTimer=transition.to( countryText, { time=500, alpha=0 })
    timer.performWithDelay(500,deleteText,1)
-end 
+end
 
 
 local function countries(test)
@@ -281,12 +262,12 @@ local function countries(test)
     country = CFGameSettings:getItemByID(e)
     print("country : ", e)
     print(country.name)
-    
+
     -- SAM: what is this? not needed anymore?
     code = country.code
-   
+
     info="images/infoBrazil.png"
-    
+
     flagGroup = display.newGroup()
     flagGroup.x = (_W/2)/2.5
     flagGroup.y = _H/2
@@ -301,7 +282,7 @@ local function countries(test)
     blurBox:setFillColor(1, 1, 1)
     blurBox.anchorX = 0.5
     blurBox.anchorY = 0.5
-    
+
     blurBox.fill.effect = "generator.radialGradient"
 
     blurBox.fill.effect.color1 = { 0, 0, 0, .25}
@@ -318,37 +299,37 @@ local function countries(test)
         r3= country.colors.r.b
         print(r1,r2,r3)
     end
-    if(country.colors.w) then 
+    if(country.colors.w) then
         w1= country.colors.w.r
         w2= country.colors.w.g
         w3= country.colors.w.b
         print(w1,w2,w3)
     end
-    if(country.colors.y) then 
+    if(country.colors.y) then
         y1= country.colors.y.r
         y2= country.colors.y.g
         y3= country.colors.y.b
         print(y1,y2,y3)
     end
-    if(country.colors.g) then 
+    if(country.colors.g) then
         g1= country.colors.g.r
         g2= country.colors.g.g
         g3= country.colors.g.b
         print(g1,g2,g3)
-    end 
-    if(country.colors.b) then 
+    end
+    if(country.colors.b) then
         b1= country.colors.b.r
         b2= country.colors.b.g
         b3= country.colors.b.b
         print(b1,b2,b3)
     end
-    if(country.colors.o) then 
+    if(country.colors.o) then
         o1= country.colors.o.r
         o2= country.colors.o.g
         o3= country.colors.o.b
         print(o1,o2,o3)
     end
-    if(country.colors.k) then 
+    if(country.colors.k) then
         k1= country.colors.k.r
         k2= country.colors.k.g
         k3= country.colors.k.b
@@ -357,19 +338,19 @@ local function countries(test)
 
     xCoord=350
     yCoord=442
-    
+
     -- if check.. when first flag appear. there will be no music. !!!
     audio.stop( bobby )
     music = audio.loadStream( "anthems/" .. country.name .. ".mp3" )
     bobby = audio.play(music,{loops=-1})
-    
+
     piece = display.newImage( "images/andorra104x102.png", 529,229)
 
     --flagGroup.width=200
     --flagGroup.height=100
 end
 
-local function newFlag() 
+local function newFlag()
             music=nil
             lastRoll=tempRoll
             while thisRoll==lastRoll do
@@ -384,57 +365,57 @@ local function newFlag()
             infoPic = display.newImage(info,165,77)
             infoPic.x = _W/6
             infoPic.y = _H/2
-            infoPic.alpha=0   
-            timer.performWithDelay(2000,infoAppear,1 )        
-          end  
+            infoPic.alpha=0
+            timer.performWithDelay(2000,infoAppear,1 )
+          end
 
           countryText = display.newText(country, _W/2, _H/2, native.systemFont, 50)
           countryText.anchorX=0.5
           countryText.anchorY=0.5
           countryText:setFillColor( 0, 0, 0 )
           countryText:toFront()
-   
+
           timer.performWithDelay(2000,countryScale,1)
           piece.x=-xCoord+_W/2+map.x
           piece.y=-yCoord+_H/2+map.y
           piece.alpha=1
-          
+
           flagGroup.alpha=1
 
            --flagGroup:scale(0,0)
 
-          pieceTimer=transition.to( piece, { time=1500, x=_W/2, y=_H/2 }) 
-          mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })                     
-          flagScaleTimer=transition.to( flagGroup, { time=1500, xScale=.2, yScale=.2 , onComplete=finishScale})   
+          pieceTimer=transition.to( piece, { time=1500, x=_W/2, y=_H/2 })
+          mapTimer=transition.to( map, { time=1500, x=xCoord, y=yCoord })
+          flagScaleTimer=transition.to( flagGroup, { time=1500, xScale=.2, yScale=.2 , onComplete=finishScale})
 
-          flagGroup:toFront()       
-end    
+          flagGroup:toFront()
+end
 
-local function removeFlag()         
+local function removeFlag()
               flagGroup:removeSelf()
-              flagGroup = nil  
-end            
+              flagGroup = nil
+end
 
 local function readyObject(e)
 
-  if setTheFlag==true then     --START A NEW FLAG 
-    transition.to( xBtn, { time=250, alpha=0 }) 
-    transition.to( fwBtn, { time=250, alpha=0 }) 
+  if setTheFlag==true then     --START A NEW FLAG
+    transition.to( xBtn, { time=250, alpha=0 })
+    transition.to( fwBtn, { time=250, alpha=0 })
 
   canQuit=false
   transition.to( piece, { time=490, alpha=0,onComplete=killPiece})
     setTheFlag=false
 
-  
+
     if infoMode == true then
-     infoTimer=transition.to(infoPic, {time=500, alpha=0}) 
+     infoTimer=transition.to(infoPic, {time=500, alpha=0})
     end
 
     flagRemoveTimer=transition.to( flag, { time=500, alpha=0, onComplete=removeFlag   })    --remove flag
     newFlagTimer=timer.performWithDelay(600,newFlag)
 
   end
-end    
+end
 
 local function setupVariables()
       map = display.newImage( "images/world.png", 2048,1038)
@@ -442,10 +423,10 @@ local function setupVariables()
       map.anchorX=0.5
       map.anchorY=0.5
       map.name="map"
-      map.x=0 ;map.y=0;       
+      map.x=0 ;map.y=0;
             map:toBack()
-      background:toBack() 
-      xBtn.alpha=0 ; fwBtn.alpha=0     
+      background:toBack()
+      xBtn.alpha=0 ; fwBtn.alpha=0
 end
 
 
@@ -466,8 +447,8 @@ function scene:create(e)
     fwBtn.anchorX=0
     fwBtn.anchorY=0
     fwBtn.x = _W - margins
-    fwBtn.y = _H - fwBtn.height - margins 
-    
+    fwBtn.y = _H - fwBtn.height - margins
+
     xBtn = display.newSprite(btnsSheet, btnsSeq)
     xBtn:setSequence("xBtn")
     xBtn.type = "xBtn"
@@ -491,8 +472,8 @@ function scene:show(e)
       countryPicker()
       random = math.randomseed( os.time() )
     elseif (e.phase == "did") then
-   --    system.activate( "multitouch" )  
-      Runtime:addEventListener("enterFrame", readyObject)  
+   --    system.activate( "multitouch" )
+      Runtime:addEventListener("enterFrame", readyObject)
     --   setTimer=timer.performWithDelay(20000, setFlag, 0)
      --  timer.performWithDelay(15000, checkMemory,0)
       newFlag()
@@ -521,7 +502,7 @@ function scene:hide(e)
     print("quit")
     Runtime:removeEventListener("enterFrame", readyObject)
 
-    composer.removeScene("cruise",false) 
+    composer.removeScene("cruise",false)
   end
 end
 
@@ -534,4 +515,4 @@ scene:addEventListener( "show"  , scene)
 scene:addEventListener( "hide"  , scene)
 scene:addEventListener( "destroy"  , scene)
 -----------------------------------------------------------------------------------------
-return scene    
+return scene

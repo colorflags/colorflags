@@ -13,7 +13,6 @@ local facebookBtn
 local canQuit = true
 local currentObject
 local touchInsideBtn = false
-local isBtnAnim = false
 
 local fontTable = {}
 local tempFont
@@ -58,33 +57,19 @@ end
 local function doFunction(e)
     if currentObject ~= nil then
         if e.x < currentObject.contentBounds.xMin or
-            e.x > currentObject.contentBounds.xMax or
-            e.y < currentObject.contentBounds.yMin or
-            e.y > currentObject.contentBounds.yMax then
-
-            if(isBtnAnim) then
-                if currentObject.name == "btnsLeftArrow" then
-                    currentObject:setSequence("btnsLeftArrow")
-                end
-            else
-                if currentObject.name == "btnsLeftArrow" then
-                    currentObject:setFrame(1)
-                end
+        e.x > currentObject.contentBounds.xMax or
+        e.y < currentObject.contentBounds.yMin or
+        e.y > currentObject.contentBounds.yMax then
+            if currentObject.name == "btnsLeftArrow" then
+                currentObject:setFrame(1)
             end
             -- redundant ??
             -- currentObject:setFrame(1)
             touchInsideBtn = false
         else
             if touchInsideBtn == false then
-                if(isBtnAnim) then
-                    if currentObject.name == "btnsLeftArrow" then
-                        currentObject:setSequence("btnsLeftArrow_anim")
-                    end
-                    currentObject:play()
-                else
-                    if currentObject.name == "btnsLeftArrow" then
-                        currentObject:setFrame(2)
-                    end
+                if currentObject.name == "btnsLeftArrow" then
+                    currentObject:setFrame(2)
                 end
             end
             touchInsideBtn = true
