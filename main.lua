@@ -19,7 +19,6 @@ _G.ssk.init({})
 ssk.persist.setDefault( "score.json", "highScore", 0 )
 ssk.persist.setDefault( "scone.json", "bought_extra_content", false )
 
-
 _G.platform = system.getInfo( "platform" )
 if platform == "android" then
 	local function onResize( event )
@@ -169,7 +168,7 @@ function runMain()
 	elseif showSplash==false then
 	        display.remove(splash1)
 	    display.remove(splash2)
-	     composer.gotoScene( "gameover", {effect = defaultTransition})
+	     composer.gotoScene( "game", {effect = defaultTransition})
 	end
 end
 runMain()

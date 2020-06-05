@@ -57,6 +57,7 @@ local gameMechanics = {}
 gameMechanics.playCountryDuration = 30000 -- default 30000
 gameMechanics.transitionToCountryDuration = 2000
 gameMechanics.firstPaletteDelay = 10
+gameMechanics.firstPalette = true
 gameMechanics.growSpeedIndependance = false
 gameMechanics.countriesSpawned = 0
 gameMechanics.overrideFlag = false
@@ -66,9 +67,9 @@ gameMechanics.mode = 1
 
 -- FPS
 if fps == 30 then
-    gameMechanics.paletteSpawnDelay = 85
+    gameMechanics.paletteSpawnDelay = 170 -- 85
 else
-    gameMechanics.paletteSpawnDelay = 42.5
+    gameMechanics.paletteSpawnDelay = 85
 end
 
 local lightningCount = 1
@@ -119,7 +120,6 @@ local timerSpeed
 local flag2Timer
 local finalChallenge = false
 local count = 1
-local firstPalette = true
 local setTheFlag = false
 local xCoord = 0
 local yCoord = 0
@@ -138,10 +138,7 @@ local resetSpawnTimer
 local flag3Timer
 
 ------------------------------------------------------------------------------------------------------
--- TELL MIKE
 -- SAM: declaring these variables first, assigning functions to them later. That way they can be called in any function regardless of how far down it is in the file.
--- https://forums.coronalabs.com/topic/65415-addeventlistener-listener-cannot-be-nil-nil/
-
 local setCountryParameters
 local newCountry
 local moveObject
@@ -830,8 +827,8 @@ resetSpawnTable = function()
     end
     spawnTable = {}
     count = 1
-    -- same as countriesCompleted counted?
-    firstPalette = true
+    -- SAM: merge with countriesCompleted counted?
+    gameMechanics.firstPalette = true
     currentColor = nil    --reset bonus score gameMechanics.modes for new flag
     previousColor = nil
 
@@ -1842,8 +1839,6 @@ display.setDefault("textureWrapX", "repeat")
             audioReservedChannels[lastReservedChannel] = audio.play(music, {channel = lastReservedChannel, loops=-1} )
         end
     end
-
-
 end
 
 local function killBars()
@@ -2074,20 +2069,19 @@ moveObject = function(e)
     end
 end
 
--- SAM: rename this, calls newFlag and resets the palettes
+-- SAM: rename this, calls newFlag(), resets the palettes, and a whole lot more
 -- READYOBJ: readyObject
 readyObject = function(firstCountry)
     if firstCountry then
         gameMechanics.countriesSpawned = gameMechanics.countriesSpawned + 1
-        print("first country AKA countriesSpawned: " .. gameMechanics.countriesSpawned)
         setCountryParameters()
         setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
         return
     end
 
-    -- SAM: added 3rd OR (firstPalette == true) condition
+    -- SAM: added 3rd OR (gameMechanics.firstPalette == true) condition
     -- print("new spacing determined when " .. paceRect.x .. " > " .. 85)
-    if paceRect.x > gameMechanics.paletteSpawnDelay * 2 or gameMechanics.overrideFlag == true or firstPalette == true then
+    if paceRect.x > gameMechanics.paletteSpawnDelay or gameMechanics.overrideFlag == true or gameMechanics.firstPalette == true then
         paceRect.x = 0
         if setTheFlag == true then
             if gameMechanics.overrideFlag == true then
@@ -2148,9 +2142,9 @@ readyObject = function(firstCountry)
             -- timer.performWithDelay((timeVar * timeVarMultiplier) * 2, createPalette, 1)
             createPalette()
 
-            if firstPalette == true then
-                firstPalette = false
-            elseif firstPalette == false then
+            if gameMechanics.firstPalette == true then
+                gameMechanics.firstPalette = false
+            elseif gameMechanics.firstPalette == false then
                 if gameMechanics.mode == 1 or gameMechanics.mode == 2 then
                     if spawnTable[count] ~= 0 then
                         --isGrown means colorPalletes are full size scale=1
@@ -2297,7 +2291,6 @@ end
 ------------------------------------------------------------------------------------------------------------------
 
 function scene:create(e)
-
     --SAM: determine objects to be managed by scene:create()
     w1 = 1;w2 = 1;w3 = 1
     k1 = 0;k2 = 0;k3 = 0
@@ -2342,224 +2335,217 @@ function scene:create(e)
     water = display.newRect( display.contentCenterX, display.contentCenterY, game_W, game_H ) -- IMPORTANT, must be set to game_W / game_H, which change according to immerstiveSticky mode
 
     display.setDefault( "textureWrapX", "repeat" )
-        display.setDefault( "textureWrapY", "repeat" )
-            water.alpha = 1
+    display.setDefault( "textureWrapY", "repeat" )
+    water.alpha = 1
 
-            water.fill = { type = "image", filename = "images/water.png"}
-            water.fill.scaleX = 32/display.actualContentWidth
-            water.fill.scaleY = 32/display.actualContentHeight
+    water.fill = { type = "image", filename = "images/water.png"}
+    water.fill.scaleX = 32/display.actualContentWidth
+    water.fill.scaleY = 32/display.actualContentHeight
 
-            display.setDefault( "textureWrapX", "clampToEdge" )
-            display.setDefault( "textureWrapY", "clampToEdge" )
+    display.setDefault( "textureWrapX", "clampToEdge" )
+    display.setDefault( "textureWrapY", "clampToEdge" )
 
-            water.texOffsetX = 0
-            water.texOffsetY = 0
-            water.lastT = system.getTimer()
-            water.rateX = 1
-            water.rateY = -1
+    water.texOffsetX = 0
+    water.texOffsetY = 0
+    water.lastT = system.getTimer()
+    water.rateX = 1
+    water.rateY = -1
 
-            function water.enterFrame( self )
-                local curT 	= system.getTimer()
-                local dt 	= curT - self.lastT
-                self.lastT 	= curT
+    function water.enterFrame( self )
+        local curT 	= system.getTimer()
+        local dt 	= curT - self.lastT
+        self.lastT 	= curT
 
-                local dOffsetX = dt * self.rateX / 20000
-                local dOffsetY = dt * self.rateY / 50000
+        local dOffsetX = dt * self.rateX / 20000
+        local dOffsetY = dt * self.rateY / 50000
 
-                self.texOffsetX = self.texOffsetX + dOffsetX
-                self.texOffsetY = self.texOffsetY + dOffsetY
+        self.texOffsetX = self.texOffsetX + dOffsetX
+        self.texOffsetY = self.texOffsetY + dOffsetY
 
-                --
-                -- Keep values in bounds [-1, 1]
-                --
-                if( dOffsetX >= 0 ) then
-                    while(self.texOffsetX > 1) do
-                        self.texOffsetX = self.texOffsetX - 2
-                    end
-                else
-                    while(self.texOffsetX < -1) do
-                        self.texOffsetX = self.texOffsetX + 2
-                    end
-                end
-                if( dOffsetY >= 0 ) then
-                    while(self.texOffsetY > 1) do
-                        self.texOffsetY = self.texOffsetY - 2
-                    end
-                else
-                    while(self.texOffsetY < -1) do
-                        self.texOffsetY = self.texOffsetY + 2
-                    end
-                end
-
-                self.fill.x = self.texOffsetX
-                self.fill.y = self.texOffsetY
+        --
+        -- Keep values in bounds [-1, 1]
+        --
+        if( dOffsetX >= 0 ) then
+            while(self.texOffsetX > 1) do
+                self.texOffsetX = self.texOffsetX - 2
             end
-
-            Runtime:addEventListener( "enterFrame", water )
-            waterGroup:insert(water)
-            self.view:insert(waterGroup)
-
-            -- rename?
-            local waterMask = graphics.newMask("images/map_mask_2018.png")
-            waterGroup:setMask(waterMask)
-            waterGroup.maskX = display.contentCenterX
-            waterGroup.maskY = display.contentCenterY
-            -- waterGroup.maskX = game_W/2
-            -- waterGroup.maskY = game_H/2
-
-            -- do this math one time in this function, reuse
-            if platform == "ios" then
-                waterGroup.maskScaleX = 1.10
-                waterGroup.maskScaleY = 1.01
-            elseif platform == "android" then
-
-                -- SAM: immersiveSticky, on newer androids
-                -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
-                -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
-                waterGroup.maskScaleX = 1.5
-
-                -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
-                local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
-                -- alignMask will be 1.23
-                -- print(alignMask)
-                waterGroup.maskScaleY = alignMask
+        else
+            while(self.texOffsetX < -1) do
+                self.texOffsetX = self.texOffsetX + 2
             end
-
-            -- ['@1x'] = {2031, 851},
-            -- ['@2x'] = {4062, 1702},
-            -- ['@4x'] = {8124, 3404}
-
-            mapDimensions = CFGameScaleComponents:getItemByID(1)
-
-            testWidth = mapDimensions.dimensions['@1x'].width
-            testHeight = mapDimensions.dimensions['@1x'].height
-
-            mapGroup = display.newGroup()
-            fapGroup = display.newGroup()
-            map = display.newImageRect("images/worldmap_2017_300.png", 8191, 4084)
-            map.anchorX = 0
-            map.anchorY = 0
-            map.name = "map"
-            map.x = 0
-            map.y = 0
-            fapGroup:insert(map)
-            mapGroup:insert(fapGroup)
-            mapGroup.x = _W/2
-            mapGroup.y = _H/2
-            mapGroup.xScale = 1 * zoomMultiplier
-            mapGroup.yScale = 1 * zoomMultiplier
-
-            newGroup = display.newGroup()
-            newGroup:insert(mapGroup)
-            self.view:insert(newGroup)
-            -- mapMask = graphics.newMask("images/map_mask_2018.png")
-
-            newGroup:setMask(waterMask)
-            newGroup.maskX = display.contentCenterX
-            newGroup.maskY = display.contentCenterY
-            -- newGroup.maskX = game_W/2
-            -- newGroup.maskY = game_H/2
-
-            -- do this math one time in this function, reuse
-            if platform == "ios" then
-                newGroup.maskScaleX = 1.10
-                newGroup.maskScaleY = 1.01
-            elseif platform == "android" then
-
-                -- SAM: immersiveSticky, on newer androids
-                -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
-                -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
-                newGroup.maskScaleX = 1.5
-
-                -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
-                local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
-                -- alignMask will be 1.23
-                -- print(alignMask)
-                newGroup.maskScaleY = alignMask
+        end
+        if( dOffsetY >= 0 ) then
+            while(self.texOffsetY > 1) do
+                self.texOffsetY = self.texOffsetY - 2
             end
+        else
+            while(self.texOffsetY < -1) do
+                self.texOffsetY = self.texOffsetY + 2
+            end
+        end
 
-            newGroup.alpha = 0
+        self.fill.x = self.texOffsetX
+        self.fill.y = self.texOffsetY
+    end
 
-            -- mapGroup:setMask(mapMask)
-            -- mapGroup.maskScaleY = 1.01
-            -- mapGroup.maskX = _W/2
-            -- mapGroup.maskY = _H/2
+    Runtime:addEventListener( "enterFrame", water )
+    waterGroup:insert(water)
+    self.view:insert(waterGroup)
 
+    -- rename?
+    local waterMask = graphics.newMask("images/map_mask_2018.png")
+    waterGroup:setMask(waterMask)
+    waterGroup.maskX = display.contentCenterX
+    waterGroup.maskY = display.contentCenterY
+    -- waterGroup.maskX = game_W/2
+    -- waterGroup.maskY = game_H/2
 
+    -- do this math one time in this function, reuse
+    if platform == "ios" then
+        waterGroup.maskScaleX = 1.10
+        waterGroup.maskScaleY = 1.01
+    elseif platform == "android" then
 
-            -- flag.anchorX = 0.5 ; flag.anchorY = 0.5
-            --
-            -- flag.width = 500
-            -- flag.height = 333
-            -- flag.xScale = .2
-            -- flag.yScale = .2 * .7
-            -- flag.anchorX = 1
-            -- flag.anchorY = 0.5
-            --
-            -- flag.x = _W
-            -- flag.y = _H/2
+        -- SAM: immersiveSticky, on newer androids
+        -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
+        -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
+        waterGroup.maskScaleX = 1.5
 
-            flagFrameOptions = {
-                x = _W,
-                y = _H/2,
-                width = 500,
-                height = 333,
-                xScale = .2,
-                yScale = .2 * .7,
-                anchorX = 1,
-                anchorY = .5,
-                flagPadding = 1,
-                flagOffset = .5
-            }
+        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+        -- alignMask will be 1.23
+        -- print(alignMask)
+        waterGroup.maskScaleY = alignMask
+    end
 
-            -- rename flagFrame to flagFrame
-            flagFrame = display.newRect(
-            flagFrameOptions.x,
-            flagFrameOptions.y,
-            flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding,
-            flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding
-        )
+    -- ['@1x'] = {2031, 851},
+    -- ['@2x'] = {4062, 1702},
+    -- ['@4x'] = {8124, 3404}
 
-        flagFrame.anchorX = flagFrameOptions.anchorX
-        flagFrame.anchorY = flagFrameOptions.anchorY
-        flagFrame:setFillColor(0, 0, 0)
+    mapDimensions = CFGameScaleComponents:getItemByID(1)
 
-        -- flagFrameAnchorX and flagFrameAnchorY are derived from flagFrameOptions (used by flagFrame) to place GUI objects pertaining and bound to flag area
-        -- flagFrameAnchorX and flagFrameAnchorY set to the top-left corner of this flag area (flag, flagFrame, and lightningIcons)
-        local flagFrameAnchorX = flagFrameOptions.x - ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) - 12) -- 12 to offset an extra amount from left-side of the flagFrame
+    testWidth = mapDimensions.dimensions['@1x'].width
+    testHeight = mapDimensions.dimensions['@1x'].height
 
-        local flagFrameAnchorY = (flagFrameOptions.y - ((flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding) / 2) - 6)
-        local lightningIconPaddingLeft = ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) / 5) -- 5 in this case, represents the # of lightningIcons
-        -- local lightningIconPaddingBottom
+    mapGroup = display.newGroup()
+    fapGroup = display.newGroup()
+    map = display.newImageRect("images/worldmap_2017_300.png", 8191, 4084)
+    map.anchorX = 0
+    map.anchorY = 0
+    map.name = "map"
+    map.x = 0
+    map.y = 0
+    fapGroup:insert(map)
+    mapGroup:insert(fapGroup)
+    mapGroup.x = _W/2
+    mapGroup.y = _H/2
+    mapGroup.xScale = 1 * zoomMultiplier
+    mapGroup.yScale = 1 * zoomMultiplier
 
-        lightningIcon1 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-        lightningIcon1.x = flagFrameAnchorX
-        lightningIcon1.y = flagFrameAnchorY
+    newGroup = display.newGroup()
+    newGroup:insert(mapGroup)
+    self.view:insert(newGroup)
+    -- mapMask = graphics.newMask("images/map_mask_2018.png")
 
-        lightningIcon2 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-        lightningIcon2.x = flagFrameAnchorX + (lightningIconPaddingLeft)
-        lightningIcon2.y = flagFrameAnchorY
+    newGroup:setMask(waterMask)
+    newGroup.maskX = display.contentCenterX
+    newGroup.maskY = display.contentCenterY
+    -- newGroup.maskX = game_W/2
+    -- newGroup.maskY = game_H/2
 
-        lightningIcon3 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-        lightningIcon3.x = flagFrameAnchorX + (lightningIconPaddingLeft * 2)
-        lightningIcon3.y = flagFrameAnchorY
+    -- do this math one time in this function, reuse
+    if platform == "ios" then
+        newGroup.maskScaleX = 1.10
+        newGroup.maskScaleY = 1.01
+    elseif platform == "android" then
 
-        lightningIcon4 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-        lightningIcon4.x = flagFrameAnchorX + (lightningIconPaddingLeft * 3)
-        lightningIcon4.y = flagFrameAnchorY
+        -- SAM: immersiveSticky, on newer androids
+        -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
+        -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
+        newGroup.maskScaleX = 1.5
 
-        lightningIcon5 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
-        lightningIcon5.x = flagFrameAnchorX + (lightningIconPaddingLeft * 4)
-        lightningIcon5.y = flagFrameAnchorY
+        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+        -- alignMask will be 1.23
+        -- print(alignMask)
+        newGroup.maskScaleY = alignMask
+    end
 
-        lightningIcon1.alpha = .2
-        lightningIcon2.alpha = .2
-        lightningIcon3.alpha = .2
-        lightningIcon4.alpha = .2
-        lightningIcon5.alpha = .2
+    newGroup.alpha = 0
 
-        --[[
-        -- jitterCameraPosition to add/enhance position derived from distanceFromCamera
+    -- mapGroup:setMask(mapMask)
+    -- mapGroup.maskScaleY = 1.01
+    -- mapGroup.maskX = _W/2
+    -- mapGroup.maskY = _H/2
+
+    -- flag.anchorX = 0.5 ; flag.anchorY = 0.5
+    --
+    -- flag.width = 500
+    -- flag.height = 333
+    -- flag.xScale = .2
+    -- flag.yScale = .2 * .7
+    -- flag.anchorX = 1
+    -- flag.anchorY = 0.5
+    --
+    -- flag.x = _W
+    -- flag.y = _H/2
+
+    flagFrameOptions = {
+        x = _W,
+        y = _H/2,
+        width = 500,
+        height = 333,
+        xScale = .2,
+        yScale = .2 * .7,
+        anchorX = 1,
+        anchorY = .5,
+        flagPadding = 1,
+        flagOffset = .5
+    }
+
+    -- rename flagFrame to flagFrame
+    flagFrame = display.newRect(flagFrameOptions.x, flagFrameOptions.y, flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding, flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding)
+    flagFrame.anchorX = flagFrameOptions.anchorX
+    flagFrame.anchorY = flagFrameOptions.anchorY
+    flagFrame:setFillColor(0, 0, 0)
+
+    -- flagFrameAnchorX and flagFrameAnchorY are derived from flagFrameOptions (used by flagFrame) to place GUI objects pertaining and bound to flag area
+    -- flagFrameAnchorX and flagFrameAnchorY set to the top-left corner of this flag area (flag, flagFrame, and lightningIcons)
+    local flagFrameAnchorX = flagFrameOptions.x - ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) - 12) -- 12 to offset an extra amount from left-side of the flagFrame
+
+    local flagFrameAnchorY = (flagFrameOptions.y - ((flagFrameOptions.height * flagFrameOptions.yScale + flagFrameOptions.flagPadding) / 2) - 6)
+    local lightningIconPaddingLeft = ((flagFrameOptions.width * flagFrameOptions.xScale + flagFrameOptions.flagPadding) / 5) -- 5 in this case, represents the # of lightningIcons
+    -- local lightningIconPaddingBottom
+
+    lightningIcon1 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon1.x = flagFrameAnchorX
+    lightningIcon1.y = flagFrameAnchorY
+
+    lightningIcon2 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon2.x = flagFrameAnchorX + (lightningIconPaddingLeft)
+    lightningIcon2.y = flagFrameAnchorY
+
+    lightningIcon3 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon3.x = flagFrameAnchorX + (lightningIconPaddingLeft * 2)
+    lightningIcon3.y = flagFrameAnchorY
+
+    lightningIcon4 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon4.x = flagFrameAnchorX + (lightningIconPaddingLeft * 3)
+    lightningIcon4.y = flagFrameAnchorY
+
+    lightningIcon5 = display.newSprite(lightningIconsSheet, {frames={math.random(5)}})
+    lightningIcon5.x = flagFrameAnchorX + (lightningIconPaddingLeft * 4)
+    lightningIcon5.y = flagFrameAnchorY
+
+    lightningIcon1.alpha = .2
+    lightningIcon2.alpha = .2
+    lightningIcon3.alpha = .2
+    lightningIcon4.alpha = .2
+    lightningIcon5.alpha = .2
+
+    --[[
+    -- jitterCameraPosition to add/enhance position derived from distanceFromCamera
+    local function jitterEvent( event )
         jitterCameraPosition.target = display.newCircle(_W/2, _H/2, 20)
         jitterCameraPosition.target:setFillColor(0)
         jitterCameraPosition.target.anchorX = .5
