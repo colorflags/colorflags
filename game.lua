@@ -14,12 +14,36 @@ local game_H = display.actualContentHeight -- Get the height of the screen
 -- audio stuff
 local music
 local bobby
-
--- SAM: SFXShortL to sfxShortL
-local SFXShortL = audio.loadSound( "sfx/shortL.wav" )
-local SFXShortR = audio.loadSound( "sfx/shortR.wav" )
-local SFXPaletteHit = audio.loadSound( "sfx/puff-attempt.wav" )
-local offsetPaletteDeathSFX = 20
+local SFXArray = {}
+SFXArray.poof = {
+    audio.loadSound("sfx/a1.wav"),
+    audio.loadSound("sfx/a2.wav"),
+    audio.loadSound("sfx/a3.wav"),
+    audio.loadSound("sfx/a4.wav"),
+    audio.loadSound("sfx/a5.wav"),
+    audio.loadSound("sfx/a6.wav"),
+    audio.loadSound("sfx/a7.wav"),
+    audio.loadSound("sfx/a8.wav"),
+    audio.loadSound("sfx/a9.wav"),
+    audio.loadSound("sfx/a10.wav"),
+    audio.loadSound("sfx/b1.wav"),
+    audio.loadSound("sfx/b2.wav"),
+    audio.loadSound("sfx/b3.wav"),
+    audio.loadSound("sfx/b4.wav"),
+    audio.loadSound("sfx/b5.wav"),
+    audio.loadSound("sfx/b6.wav"),
+    audio.loadSound("sfx/b7.wav"),
+    audio.loadSound("sfx/b8.wav"),
+    audio.loadSound("sfx/b9.wav")
+}
+SFXArray.poofSize = table.maxn(SFXArray.poof)
+SFXArray.lightning = {
+    audio.loadSound("sfx/l1.wav"),
+    audio.loadSound("sfx/l2.wav"),
+    audio.loadSound("sfx/l3.wav"),
+    audio.loadSound("sfx/l4.wav")
+}
+SFXArray.lightningSize = table.maxn(SFXArray.lightning)
 
 --effects createPalette()
 cornersArray = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
@@ -73,6 +97,7 @@ else
 end
 
 local lightningCount = 1
+local lightningKillCount = 0
 
 local score = 0
 local numDeaths = 0
@@ -1307,6 +1332,9 @@ local function lightningButton(flagTouchEvent)
                 end
             end
         end
+        if lineTableCount > 0 then
+            audio.play( SFXArray.lightning[math.random(1, SFXArray.lightningSize)] )
+        end
     end
     lightningIcons()
 end
@@ -2178,14 +2206,9 @@ function objTouch(self, e)
     if e.phase == "began" and e.target.isPaletteActive == true then
         -- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isTopLeft)
 
-        local playPaletteDeathR = audio.play( SFXPaletteHit, { onComplete=function(event)
-            print(event.channel)
-        end })
+        audio.play( SFXArray.poof[math.random(1, SFXArray.poofSize)] )
 
         if lookupCode(code, e.target) == 0 then   --You are Dead --color does not match
-            -- HOOKSOUND
-            -- local pHit = audio.play( SFXPaletteHit )
-
             -- SAM: bonusText activity
             if bonusText ~= nil then
                 bonusText:removeSelf()
@@ -2225,8 +2248,6 @@ function objTouch(self, e)
             e.target.isPaletteActive = false
             --You are Alive
         else
-            -- HOOKSOUND
-            -- local pHit = audio.play( SFXPaletteHit )
             e.target.isPaletteActive = false
             if e.target.isGrown == false then
                 e.target:removeSelf()
