@@ -383,6 +383,161 @@ canvasObj.y = display.contentCenterY
 local circ
 local mask
 
+-- MAX: start refactor
+
+--- Config start
+local Config = {
+    debug = {
+        godMode = false
+    },
+    fps = 30,
+    levelsArray = levelsArray
+}
+
+function Config:create (o)
+    if o.fps ~= nil then
+        self.fps = o.fps
+    end
+    return self
+end
+--- Config end
+
+--- Controller start
+Controller = {
+    config = nil,
+    state = nil,
+    ui = nil
+}
+
+function Controller:create (o)
+    if o.config == nil then
+        error("config parameter is required")
+    end
+    self.config = o.config
+    if o.state == nil then
+        error("state parameter is required")
+    end
+    self.state = o.state
+    if o.ui == nil then
+        error("ui parameter is required")
+    end
+    self.ui = o.ui
+    return self
+end
+
+function Controller:enterFrame (e) --- replacement for moveObject
+    if not self.state.countriesSpawned then
+        self:readyObject1()
+    end
+end
+
+function Controller:readyObject1 () --- replacement for readyObject(1)
+    print("[Controller:enterFrame] spawning a country")
+    self.state.countriesSpawned = true
+    --- setCountryParameters()
+    if not self.config.debug.godSpeed and not self.state.overrideFlag and self.state.countriesCompleted > 0 then
+        self:speedUp()
+    end
+end
+
+function Controller:speedUp () --- replacement for speedUp
+    if self.state.levelsIndex ~= #self.config.levelsArray then
+        self.state.levelsIndex = self.state.levelsIndex + 1
+        self.state.speed = self.config.levelsArray[self.state.levelsIndex].speed
+        self.state.timeVar = self.config.levelsArray[self.state.levelsIndex].timeVar
+        self.ui.scoreboard.speedText.text = self.config.levelsArray[self.state.levelsIndex].speed
+        self.ui.scoreboard.speedText:toFront()
+    end
+end
+--- Controller end
+
+--- State start
+State = {
+    countriesCompleted = 0,
+    countriesSpawned = false,
+    levelsIndex = 0,
+    overrideFlag = false,
+    speed = 0,
+    timeVar = 0
+}
+
+function State:create (o)
+    if o.countriesSpawned ~= nil then
+        self.countriesSpawned = o.countriesSpawned
+    end
+    return self
+end
+
+function State:getSpeed ()
+    return self.speed
+end
+
+function State:getSpeedWithFpsMultiplier (fps)
+    if fps == 30 then
+        return self:speed()
+    else
+        return self:speed() / 2
+    end
+end
+--- State end
+
+--- UI components start
+
+---- UI root component start
+UI = {
+    scoreboard = nil
+}
+
+function UI:create (o)
+    if o.scoreboard == nil then
+        error("scoreboard parameter is required")
+    end
+    self.scoreboard = o.scoreboard
+    return self
+end
+---- UI root component end
+
+---- UI scoreboard start
+UIScoreboard = {
+    speedText = nil,
+    speedTextDesc = nil,
+    speedTextGroup = nil
+}
+
+----- UIScoreboard:create{
+-----    scoreboardColor = ...,
+-----    speedTextGroupAnchorX = ...
+-----    speedTextGroupAnchorY = ...
+----- }
+function UIScoreboard:create (o)
+    self.speedTextGroup = display.newGroup()
+
+    self.speedTextDesc = display.newEmbossedText("speed:", o.speedTextGroupAnchorX, o.speedTextGroupAnchorY, "PTMono-Bold", 12)
+    self.speedTextDesc:setFillColor(.2, .9, .4)
+    self.speedTextDesc:setEmbossColor(o.scoreboardColor)
+    self.speedTextDesc.anchorX = 0
+    self.speedTextDesc.anchorY = 1
+    self.speedTextGroup:insert(self.speedTextDesc)
+
+    self.speedText = display.newEmbossedText("???", o.speedTextGroupAnchorX + (self.speedTextDesc.width/2), o.speedTextGroupAnchorY, "PTMono-Bold", 18)
+    self.speedText:setFillColor(.2, .9, .4)
+    self.speedText:setEmbossColor(o.scoreboardColor)
+    self.speedText.anchorY = 0
+    self.speedTextGroup:insert(self.speedText)
+    return self
+end
+---- UI scoreboard end
+
+--- UI components end
+
+--- Global scene variables start
+local controller
+local state
+local ui
+--- Global scene variables end
+
+-- MAX: end refactor
+
 --SAM: is this needed?
 local function myImplodeListener(event)
     local thisSprite = event.target
@@ -2042,6 +2197,7 @@ end
 -- READYOBJ: moveObject
 moveObject = function(e)
     -- print("from moveObject: " .. paceRect.x)
+
     if gameMechanics.countriesSpawned == 0 then
         readyObject(1)
         return
@@ -2597,6 +2753,25 @@ function scene:create(e)
     paceRect.isMoving = false
     paceRect.alpha = 0.6
     setupScoreboard()
+
+    --MAX: create scene controller, state and ui
+    config = Config:create{}
+    state = State:create{}
+    ui = UI:create{
+        scoreboard = UIScoreboard:create{
+            scoreboardColor = {
+                highlight = {r = 1, g = 1, b = 1},
+                shadow = {r = 0, g = 0, b = 0}
+            },
+            speedTextGroupAnchorX = _W/2,
+            speedTextGroupAnchorY = _H/2
+        }
+    }
+    controller = Controller:create{
+        config = config,
+        ui = ui,
+        state = state
+    }
 end
 
 function scene:show(e)
@@ -2609,6 +2784,9 @@ function scene:show(e)
         -- READYOBJ: START
 
         Runtime:addEventListener("enterFrame", moveObject)
+
+        --- Runtime:addEventListener("enterFrame", function() controller:enterFrame() end)
+
         system.activate("multitouch")
 
         -- setCountryParameters()
