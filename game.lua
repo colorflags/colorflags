@@ -400,6 +400,14 @@ function Config:create (o)
     end
     return self
 end
+
+function Config:getPaletteSpawnDelay ()
+    if self.fps == 30 then
+        return 170
+    else
+        return 85
+    end
+end
 --- Config end
 
 --- Controller start
@@ -428,33 +436,46 @@ end
 function Controller:enterFrame (e) --- replacement for moveObject
     if not self.state.countriesSpawned then
         self:readyObject1()
+    else
+        self:readyObject0()
+    end
+end
+
+function Controller:incrementCountriesCompleted()
+    self.state.countriesCompleted = self.state.countriesCompleted + 1
+end
+
+function Controller:readyObject0 () --- replacement for readyObject()
+    if self.ui.pace.rect.x > self.config.getPaletteSpawnDelay() or self.state.firstPalette then
+        self.ui.pace.rect.x = 0
     end
 end
 
 function Controller:readyObject1 () --- replacement for readyObject(1)
-    print("[Controller:enterFrame] spawning a country")
+    print("[Controller:readyObject1] spawning a country")
     self.state.countriesSpawned = true
     --- setCountryParameters()
     if not self.config.debug.godSpeed and not self.state.overrideFlag and self.state.countriesCompleted > 0 then
+        print("[Controller:enterFrame] speeding up")
         self:speedUp()
     end
 end
 
 function Controller:speedUp () --- replacement for speedUp
-    if self.state.levelsIndex ~= #self.config.levelsArray then
-        self.state.levelsIndex = self.state.levelsIndex + 1
-        self.state.speed = self.config.levelsArray[self.state.levelsIndex].speed
-        self.state.timeVar = self.config.levelsArray[self.state.levelsIndex].timeVar
-        self.ui.scoreboard.speedText.text = self.config.levelsArray[self.state.levelsIndex].speed
-        self.ui.scoreboard.speedText:toFront()
+    print("[Controller:speedUp] trying to speed up")
+    if self.state:trySpeedUp() then
+        print("[Controller:speedUp] sped up, changing text")
+        self.ui.scoreboard:changeSpeedText(self.state:getSpeed())
     end
 end
 --- Controller end
 
 --- State start
 State = {
+    config = {},
     countriesCompleted = 0,
     countriesSpawned = false,
+    firstPalette = true,
     levelsIndex = 0,
     overrideFlag = false,
     speed = 0,
@@ -462,6 +483,9 @@ State = {
 }
 
 function State:create (o)
+    if o.config ~= nil then
+        self.config = o.config
+    end
     if o.countriesSpawned ~= nil then
         self.countriesSpawned = o.countriesSpawned
     end
@@ -479,12 +503,26 @@ function State:getSpeedWithFpsMultiplier (fps)
         return self:speed() / 2
     end
 end
+
+function State:trySpeedUp ()
+    print("[State:trySpeedUp] comparing current levels index to levels array length")
+    if self.levelsIndex ~= #self.config.levelsArray then
+        print("[State:trySpeedUp] increasing levels index")
+        self.levelsIndex = self.levelsIndex + 1
+        self.speed = self.config.levelsArray[self.levelsIndex].speed
+        self.timeVar = self.config.levelsArray[self.levelsIndex].timeVar
+        return true
+    else
+        return false
+    end
+end
 --- State end
 
 --- UI components start
 
 ---- UI root component start
 UI = {
+    paceRect = nil,
     scoreboard = nil
 }
 
@@ -496,6 +534,25 @@ function UI:create (o)
     return self
 end
 ---- UI root component end
+
+---- UI pace rect start
+UIPaceRect = {
+    paceRect = nil
+}
+
+function UIPaceRect:create (o)
+    self.paceRect = display.newRoundedRect(0, 0, 80, 6, 3)
+    self.paceRect:setFillColor(1, 1, 1)
+    self.paceRect.anchorX = 0
+    self.paceRect.anchorY = 1
+    self.paceRect.x = 0
+    self.paceRect.y = o.y
+    self.paceRect.isTopLeft = false
+    self.paceRect.isMoving = false
+    self.paceRect.alpha = 0.6
+end
+
+---- UI pace rect end
 
 ---- UI scoreboard start
 UIScoreboard = {
@@ -525,6 +582,11 @@ function UIScoreboard:create (o)
     self.speedText.anchorY = 0
     self.speedTextGroup:insert(self.speedText)
     return self
+end
+
+function UIScoreboard:changeSpeedText(speed)
+    self.speedText:toFront()
+    self.speedText.text = speed
 end
 ---- UI scoreboard end
 
@@ -1655,6 +1717,8 @@ setCountryParameters = function(restartCountry)
     -- don't increase speed every new country, change modes or randomize modes.
     if debugOptions.godSpeed == false and gameMechanics.overrideFlag == false and countriesCompleted > 0 then
         speedUp()
+        --- MAX: hook
+        --- controller:speedUp()
     end
 
     -- wrap in a function.. this can all be in the speedUp() function?
@@ -2056,6 +2120,7 @@ finishScale = function()
 
     countriesCompleted = countriesCompleted + 1
     -- print("end of finishScale() function")
+    controller:incrementCountriesCompleted()
 end
 
 -- PALETTES: initializes palettes, sets color and corner params. Calls spawnPalette()
@@ -2266,6 +2331,7 @@ readyObject = function(firstCountry)
     -- SAM: added 3rd OR (gameMechanics.firstPalette == true) condition
     -- print("new spacing determined when " .. paceRect.x .. " > " .. 85)
     if paceRect.x > gameMechanics.paletteSpawnDelay or gameMechanics.overrideFlag == true or gameMechanics.firstPalette == true then
+        --- MAX: resume from here
         paceRect.x = 0
         if setTheFlag == true then
             if gameMechanics.overrideFlag == true then
@@ -2756,8 +2822,13 @@ function scene:create(e)
 
     --MAX: create scene controller, state and ui
     config = Config:create{}
-    state = State:create{}
+    state = State:create{
+        config = config
+    }
     ui = UI:create{
+        paceRect = UIPaceRect:create{
+            y = _H - (gameMechanics.heightModeTop*2)
+        },
         scoreboard = UIScoreboard:create{
             scoreboardColor = {
                 highlight = {r = 1, g = 1, b = 1},
@@ -2785,6 +2856,7 @@ function scene:show(e)
 
         Runtime:addEventListener("enterFrame", moveObject)
 
+        --- MAX: hook
         --- Runtime:addEventListener("enterFrame", function() controller:enterFrame() end)
 
         system.activate("multitouch")
