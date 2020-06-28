@@ -436,7 +436,10 @@ end
 function Controller:enterFrame (e) --- replacement for moveObject
     if not self.state.countriesSpawned then
         self:readyObject1()
-    else
+    else if self.ui.paceRect.isMoving == true then
+        self.ui.paceRect.x = self.ui.paceRect.x + self.state:getSpeedWithFpsMultiplier()
+        end
+        --reset PaceRect, call readyObjects() to create a new palette or flag
         self:readyObject0()
     end
 end
@@ -446,8 +449,17 @@ function Controller:incrementCountriesCompleted()
 end
 
 function Controller:readyObject0 () --- replacement for readyObject()
+    print("[Controller:readyObject1] checking if pace rect position is past palette spawn delay or if it's the first palette")
     if self.ui.pace.rect.x > self.config.getPaletteSpawnDelay() or self.state.firstPalette then
         self.ui.pace.rect.x = 0
+        print("[Controller:readyObject1] resetting pace rect")
+        self.ui.pace.rect.x = 0
+
+        print("[Controller:readyObject1] checking if setTheFlag is true")
+        if self.state.setTheFlag == true then
+            self.state.setTheFlag = false
+            self.ui.pace.rect.isMoving = false
+        end
     end
 end
 
@@ -456,7 +468,7 @@ function Controller:readyObject1 () --- replacement for readyObject(1)
     self.state.countriesSpawned = true
     --- setCountryParameters()
     if not self.config.debug.godSpeed and not self.state.overrideFlag and self.state.countriesCompleted > 0 then
-        print("[Controller:enterFrame] speeding up")
+        print("[Controller:readyObject1] speeding up")
         self:speedUp()
     end
 end
@@ -476,8 +488,11 @@ State = {
     countriesCompleted = 0,
     countriesSpawned = false,
     firstPalette = true,
+    flagTimer = nil,
     levelsIndex = 0,
     overrideFlag = false,
+    playCountryDuration = 30000,
+    setTheFlag = false,
     speed = 0,
     timeVar = 0
 }
@@ -502,6 +517,15 @@ function State:getSpeedWithFpsMultiplier (fps)
     else
         return self:speed() / 2
     end
+end
+
+function State:restartFlagTimer ()
+    timer.cancel(self.flagTimer)
+    self:startFlagTimer()
+end
+
+function State:startFlagTimer ()
+    flagTimer = timer.performWithDelay(self.playCountryDuration, function () setTheFlag = true end, 1)
 end
 
 function State:trySpeedUp ()
@@ -2350,6 +2374,7 @@ readyObject = function(firstCountry)
 
                 resetSpawnTable()
                 setCountryParameters(1)
+
                 timer.cancel(setFlagTimer)
                 setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
             else
@@ -2388,6 +2413,9 @@ readyObject = function(firstCountry)
                 ]]--
             end
         else
+            -- MAX: new flag (same as country) is not needed,
+            --      create palettes
+
             -- print(timeVar * timeVarMultiplier)
             -- timer.performWithDelay((timeVar * timeVarMultiplier) * 2, createPalette, 1)
             createPalette()
