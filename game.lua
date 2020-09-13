@@ -2447,14 +2447,7 @@ readyObject = function(firstCountry)
                 setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
             end
         else
-<<<<<<< HEAD
-=======
-            -- MAX: new flag (same as country) is not needed,
-            --      create palettes
 
-            -- print(timeVar * timeVarMultiplier)
-            -- timer.performWithDelay((timeVar * timeVarMultiplier) * 2, createPalette, 1)
->>>>>>> ffc793381ee3c8e859614c98cdffcc4da1329c0c
             createPalette()
             if gameMechanics.firstPalette == true then
                 gameMechanics.firstPalette = false
