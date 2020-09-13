@@ -1952,7 +1952,6 @@ finishScale = function()
 
     countriesCompleted = countriesCompleted + 1
     -- print("end of finishScale() function")
-    controller:incrementCountriesCompleted()
 end
 
 -- PALETTES: initializes palettes, sets color and corner params. Calls spawnPalette()
