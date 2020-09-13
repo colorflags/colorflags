@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:ebd65932ef58bfcff06a627c54d09176:a4e6ea7200e29063f70c1d328272fd3f:d07d3cd58454e6083b919315200c979d$
+-- $TexturePacker:SmartUpdate:80265eb9c12636816c78f0cd6d4336c1:99d27d2c8f7f960f8d0e76cc28daf0ce:d07d3cd58454e6083b919315200c979d$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -16,16 +16,16 @@ SheetInfo.sheet =
     
         {
             -- flagpole_big
-            x=0,
-            y=0,
+            x=8,
+            y=8,
             width=52,
             height=568,
 
         },
     },
     
-    sheetContentWidth = 52,
-    sheetContentHeight = 568
+    sheetContentWidth = 68,
+    sheetContentHeight = 584
 }
 
 SheetInfo.frameIndex =

@@ -75,24 +75,6 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	return { skeleton = skeleton, state = animationState }
 end
 
-local function animationPop2()
-    transition.to( M.skeleton.group, { time=1250, alpha=1, onComplete=
-        function()
-            transition.to( M.skeleton.group, { time=1850, alpha=.9})
-        end
-    })
-end
-
-local tm
-local function listenerA( event )
-	animationPop2()
-end
-local function listener( event )
-    animationPop2()
-	tm = timer.performWithDelay( 9420, listenerA, 0 )
-end
-timer.performWithDelay(2600, listener)
-
 local function playAnim(event)
 	local currentTime = event.time / 3000
 	local delta = currentTime - _lastTime
@@ -108,6 +90,7 @@ local function playAnim(event)
 end;
 
 local function startAnim()
+	M.skeleton.group.alpha = 0.85
     Runtime:addEventListener("enterFrame", playAnim);
 	M.state:setAnimationByName(1, "cf_forward", false)
 end;
@@ -118,7 +101,7 @@ end;
 
 function M.load()
 	-- local lastTime = 0
-	result = loadSkeleton("colorflags-spine.atlas", "colorflags-spine.json", _W/2, _H/3 , 0.5, "animation")
+	result = loadSkeleton("colorflags-spine.atlas", "colorflags-spine.json", _W/2, _H/2.8 , 0.5, "animation")
 	-- local skeleton = result.skeleton;
 	-- local state = result.state;
     -- local spineData = Skeleton.load("res/game/dice/skeleton", centerX + 120, centerY - 200, 0.5, "shake");
@@ -145,13 +128,13 @@ if lastReservedChannel ~= nil then
 			audio.stop(lastReservedChannel)
 			lastReservedChannel = 2
 			audio.stop(lastReservedChannel)
-	        audio.setVolume( .75, { channel = lastReservedChannel } )
+	        audio.setVolume( .5, { channel = lastReservedChannel } )
 			audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
 		elseif lastReservedChannel == 2 then
 			audio.stop(lastReservedChannel)
 			lastReservedChannel = 1
 			audio.stop(lastReservedChannel)
-	        audio.setVolume( .75, { channel = lastReservedChannel } )
+	        audio.setVolume( .5, { channel = lastReservedChannel } )
 			audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
 		end
 		lastUsedMusic = "musicMenu"
@@ -159,7 +142,7 @@ if lastReservedChannel ~= nil then
 else
 	lastReservedChannel = 1
 	audio.stop(lastReservedChannel)
-    audio.setVolume( .75, { channel = lastReservedChannel } )
+    audio.setVolume( .5, { channel = lastReservedChannel } )
 	audioReservedChannels[lastReservedChannel] = audio.play( musicMenu, {channel=lastReservedChannel,loops=-1} )
 	lastUsedMusic = "musicMenu"
 end
@@ -247,11 +230,15 @@ local function myTouchListener( event )
 			isLoading = true
 			print("going to..")
 			local gotoo = currentObject.gotoScene
+			composer.gotoScene ( gotoo, { effect = defaultTransition } )
+			--[[
 			if gotoo == "start" and event.target == btnsPlayGame then
+				-- use for bringing up start overlay
 				composer.showOverlay( gotoo, { isModal = true, params = { menuBtnsGroup = btnsGroup } })
 			else
 				composer.gotoScene ( gotoo, { effect = defaultTransition } )
 			end
+			]]--
 		elseif touchInsideBtn == false then
 			-- print("touch OFF outside")
 		end
@@ -307,14 +294,14 @@ local function doFunction(e)
 	end
 end
 
+-- DELETE?
 local function prepareMenu()
-	titleLogo.alpha=1
 	transition.to(btnsPlayGame, {time=0,alpha=.98})
 	transition.to(btnsOptions, {time=0,alpha=.98})
 	transition.to(btnsAbout, {time=0,alpha=.98})
 end
 
-
+-- DELETE?
 function addFunction()
 	btnsPlayGame.alpha=1
 	btnsOptions.alpha=1
@@ -324,7 +311,7 @@ function addFunction()
 	-- btnsAbout:addEventListener("touch",doFunction)
 end
 
--- MIKE: are we going to use this removeFunction() ??
+-- DELETE?
 function removeFunction()
 	btnsPlayGame.alpha=0
 	btnsOptions.alpha=0
@@ -333,12 +320,6 @@ function removeFunction()
 	-- btnsOptions:removeEventListener("touch",doFunction)
 	-- btnsAbout:removeEventListener("touch",doFunction)
 end
-
---local function checkMemory(e)
--- collectgarbage();
--- print("Memory usage " .. collectgarbage("count"));
---  print("Texture memory usage " .. system.getInfo("textureMemoryUsed")/1024/1024 .. "MB")
---end
 
 local function spriteListener( event )
 	local thisSprite = event.target  -- "event.target" references the sprite
@@ -371,8 +352,16 @@ function scene:create( event )
 	local sceneGroup=self.view
 	print("a")
 
+	local paint = {
+	    type = "gradient",
+	    color1 = { .6, .6, .6, 1 },
+	    color2 = { .2, .2, .2, 1 },
+	    direction = "down"
+	}
+
 	whiteBackground = display.newRect( _W/2, _H/2, _W, _H )
-	whiteBackground:setFillColor(1, 1, 1)
+	whiteBackground.fill = paint
+	-- whiteBackground:setFillColor(.5, .5, .5)
 
 	titleLogo = display.newImageRect( "images/menu_background.png", _W, _H )
 	titleLogo.anchorX=0.5
@@ -412,9 +401,8 @@ function scene:create( event )
 	colorFlagsAnimBack = display.newSprite( sheet, sequenceData )
 	colorFlagsAnimBack:scale(0.5, 0.5)
 	colorFlagsAnimBack.x = _W/2
-	colorFlagsAnimBack.y = _H/3 - 50
-	colorFlagsAnimBack.blendMode = "multiply"
-	colorFlagsAnimBack:setFillColor(1, 1, 1, .5)
+	colorFlagsAnimBack.y = _H/2.8 - 50
+	colorFlagsAnimBack:setFillColor(1, 1, 1, .2)
 
 	-- rename
 	local offsetStartBtns = _H/2
@@ -432,7 +420,8 @@ function scene:create( event )
 			time = 500
 		},
 	}
-    btnsGroup = display.newGroup()
+
+	btnsGroup = display.newGroup()
 
 	btnsPlayGame = display.newSprite( btnsPlayGameGigaSheet, {frames={1,2}} ) -- use btnsSeq
 	btnsPlayGame.name = "playgame"
@@ -442,8 +431,8 @@ function scene:create( event )
 --	btnsPlayGame.y = offsetStartBtns
 	btnsPlayGame:setSequence( "playgame" )
 	btnsPlayGame:setFrame(1)
-	--  btnsPlayGame.alpha=0.98
-	btnsPlayGame.gotoScene="start"
+	 btnsPlayGame.alpha=0.9
+	btnsPlayGame.gotoScene="game"
 	--  btnsPlayGame:scale(.8,.8)
     btnsGroup:insert(btnsPlayGame)
 
@@ -457,7 +446,7 @@ function scene:create( event )
 	btnsOptions.y = btnSpacing
 	-- btnsOptions:setSequence("options")
 	btnsOptions:setFrame(1)
-	--  btnsOptions.alpha=.98
+	 btnsOptions.alpha=.9
 	btnsOptions.gotoScene = "options"
 	--  btnsOptions:scale(.8,.8)
     btnsGroup:insert(btnsOptions)
@@ -470,7 +459,7 @@ function scene:create( event )
 	btnsAbout.y = btnSpacing*2
 	-- btnsAbout:setSequence("about")
 	btnsAbout:setFrame(1)
-	--  btnsAbout.alpha=0.98
+	 btnsAbout.alpha=0.9
 	btnsAbout.gotoScene = "about"
 	--  btnsAbout:scale(.8,.8)
     btnsGroup:insert(btnsAbout)

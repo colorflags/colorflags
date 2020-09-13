@@ -1,3 +1,4 @@
+require("cf_color")
 display.setDefault("textureWrapX", "clampToEdge")
 display.setDefault("textureWrapY", "clampToEdge")
 
@@ -138,20 +139,20 @@ if lastReservedChannel ~= nil then
         audio.stop(lastReservedChannel)
         lastReservedChannel = 2
         audio.stop(lastReservedChannel)
-        audio.setVolume( .75, { channel = lastReservedChannel } )
+        audio.setVolume( .5, { channel = lastReservedChannel } )
         audioReservedChannels[lastReservedChannel] = audio.play( musicGameOver, {channel=lastReservedChannel,loops=-1} )
     elseif lastReservedChannel == 2 then
         audio.stop(lastReservedChannel)
         lastReservedChannel = 1
         audio.stop(lastReservedChannel)
-        audio.setVolume( .75, { channel = lastReservedChannel } )
+        audio.setVolume( .5, { channel = lastReservedChannel } )
         audioReservedChannels[lastReservedChannel] = audio.play( musicGameOver, {channel=lastReservedChannel,loops=-1} )
     end
     lastUsedMusic = "musicGameOver"
 else
     lastReservedChannel = 1
     audio.stop(lastReservedChannel)
-    audio.setVolume( .75, { channel = lastReservedChannel } )
+    audio.setVolume( .5, { channel = lastReservedChannel } )
     audioReservedChannels[lastReservedChannel] = audio.play( musicGameOver, {channel=lastReservedChannel,loops=-1} )
     lastUsedMusic = "musicGameOver"
 end
@@ -334,8 +335,8 @@ local function doFunction(e)
             -- currentObject:setFrame(2)
             -- SAM: wtf. how is this working? do some testing.
             if(touchInsideBtn == true) then
-                currentObject.xScale = 1
-                currentObject.yScale = 1
+                currentObject.xScale = .8
+                currentObject.yScale = .8
                 print("finger down, outside button: ", currentObject.name)
             end
             touchInsideBtn = false
@@ -343,8 +344,8 @@ local function doFunction(e)
             if touchInsideBtn == false then
                 print("finger down, inside button: ", currentObject.name)
 
-                currentObject.xScale = 1
-                currentObject.yScale = 1
+                currentObject.xScale = .8
+                currentObject.yScale = .8
                 -- currentObject.xScale = 1.01
                 -- currentObject.yScale = 1.01
                 if currentObject.name == "again" then
@@ -364,26 +365,26 @@ local scrollSpeedBG = 1
 local scrollSpeedFG = 0.5
 
 local function moveClouds(event)
-    cloudsBG1.x = cloudsBG1.x - scrollSpeedBG
-    cloudsBG2.x = cloudsBG2.x - scrollSpeedBG
-    cloudsBG3.x = cloudsBG3.x - scrollSpeedBG
-    cloudsFG1.x = cloudsFG1.x - scrollSpeedFG
-    cloudsFG2.x = cloudsFG2.x - scrollSpeedFG
+    cloudsBG1.x = cloudsBG1.x + scrollSpeedBG
+    cloudsBG2.x = cloudsBG2.x + scrollSpeedBG
+    cloudsBG3.x = cloudsBG3.x + scrollSpeedBG
+    cloudsFG1.x = cloudsFG1.x + scrollSpeedFG
+    cloudsFG2.x = cloudsFG2.x + scrollSpeedFG
 
-    if cloudsBG1.x < 0 - cloudsBG1.width then
-        cloudsBG1:translate(cloudsBG1.width*3, 0)
+    if cloudsBG1.x > 0 + cloudsBG1.width then
+        cloudsBG1:translate(-cloudsBG1.width*3, 0)
     end
-    if cloudsBG2.x < 0 - cloudsBG1.width then
-        cloudsBG2:translate(cloudsBG1.width*3, 0)
+    if cloudsBG2.x > 0 + cloudsBG1.width then
+        cloudsBG2:translate(-cloudsBG1.width*3, 0)
     end
-    if cloudsBG3.x < 0 - cloudsBG1.width then
-        cloudsBG3:translate(cloudsBG1.width*3, 0)
+    if cloudsBG3.x > 0 + cloudsBG1.width then
+        cloudsBG3:translate(-cloudsBG1.width*3, 0)
     end
-    if cloudsFG1.x < 0 - cloudsFG1.width then
-        cloudsFG1:translate(cloudsFG2.width*2, 0)
+    if cloudsFG1.x > 0 + cloudsFG1.width then
+        cloudsFG1:translate(-cloudsFG2.width*2, 0)
     end
-    if cloudsFG2.x < 0 - cloudsFG2.width then
-        cloudsFG2:translate(cloudsFG1.width*2, 0)
+    if cloudsFG2.x > 0 + cloudsFG2.width then
+        cloudsFG2:translate(-cloudsFG1.width*2, 0)
     end
 end
 
@@ -453,6 +454,75 @@ function scene:create(e)
 
     local offsetY = _H/4 - 50
 
+    brickPlatformBtm = display.newSprite( brickPlatformSheet, {frames={1}} )
+    brickPlatformBtm.x = _W - (_W / 2)
+    brickPlatformBtm.anchorY = 1
+    brickPlatformBtm.y = _H
+
+    brickPlatformTop = display.newSprite( brickPlatformSheet, {frames={2}} )
+    brickPlatformTop.x = _W - (_W / 2)
+    brickPlatformTop.anchorY = 1
+    brickPlatformTop.y = _H - brickPlatformBtm.height
+
+    flagPole1 = display.newSprite( flagPole1Sheet, {frames={1}} )
+    flagPole1.anchorX=0.5
+    flagPole1.anchorY=1
+    flagPole1.name="flagPole1" -- SAM: is flagPole1.name ever used?
+    flagPole1.x= brickPlatformBtm.x  - (brickPlatformBtm.width / 3)
+    flagPole1.y= brickPlatformBtm.y - brickPlatformBtm.height
+
+    flagPole2 = display.newSprite( flagPole2Sheet, {frames={1}} )
+    flagPole2.anchorX=0.5
+    flagPole2.anchorY=1
+    flagPole2.name="flagPole2"
+    flagPole2.x= brickPlatformBtm.x - 3
+    flagPole2.y= brickPlatformTop.y - brickPlatformTop.height
+    flagPole2.alpha=0.65
+
+    flagPole3 = display.newSprite( flagPole3Sheet, {frames={1}} )
+    flagPole3.anchorX=0.5
+    flagPole3.anchorY=1
+    flagPole3.name="flagPole3"
+    flagPole3.x= brickPlatformBtm.x  + (brickPlatformBtm.width / 3)
+    flagPole3.y= brickPlatformBtm.y - brickPlatformBtm.height
+
+    randomFlag1 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[1])
+    randomFlag1.x = flagPole1.x + 20
+    randomFlag1.y = (_H - flagPole1.height) + 20
+    randomFlag1:setSequence("randomflagseq1")
+    randomFlag1:play()
+
+    randomFlag2 = display.newSprite(flagWave34Sheet, randomFlagSequenceArray[2])
+    randomFlag2.x = flagPole2.x + 17
+    randomFlag2.y = (_H - flagPole2.height) + 10
+    randomFlag2:setSequence("randomflagseq2")
+    randomFlag2:toBack()
+    randomFlag2.alpha = 0.80
+    randomFlag2:toFront()
+    randomFlag2:play()
+
+
+    randomFlag3 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[3])
+    randomFlag3.x = flagPole3.x + 20
+    randomFlag3.y = (_H - flagPole3.height) + 20
+    randomFlag3:setSequence("randomflagseq3")
+    randomFlag3:play()
+
+    local colorFillArray = CFColor(78, 173, 34)
+    local colorShadowArray = CFColor(96, 212, 42)
+    local scoreboardColor = { colorFillArray.r, colorFillArray.g, colorFillArray.b }
+    local scoreboardEmbossColor = {
+        highlight = { r = 0, g = 0, b = 0 },
+        shadow = { r = colorShadowArray.r, g = colorShadowArray.g, b = colorShadowArray.b }
+    }
+
+    -- old color
+    scoreboardColor = { 1, .9, .4 }
+    scoreboardEmbossColor = {
+        highlight = { r = 0, g = 0, b = 0 },
+        shadow = { r = 1, g = 1, b = 1 }
+    }
+
     local scoreboardOffsetFromLeft = _W/2+20
     local scoreboardOffsetFromEachOther = 60
     local scoreboardOffsetIncDecBtns = 1.2
@@ -462,21 +532,20 @@ function scene:create(e)
 
     -- SAM: rotate scoreTextGroup
     scoreTextGroup = display.newGroup()
-    scoreTextDesc = display.newEmbossedText("your score:", 0, 0, "PTMono-Bold", 20)
-    scoreTextDesc:setFillColor( 1, .9, .4)
-    scoreTextDesc:setEmbossColor(embossColor)
+    scoreTextDesc = display.newEmbossedText("your score", 0, 0, "ChaparralPro-SemiboldIt", 22)
+    scoreTextDesc:setFillColor(unpack(scoreboardColor))
+    scoreTextDesc:setEmbossColor(scoreboardEmbossColor)
     scoreTextDesc.anchorX = 0.5
-    scoreTextDesc.anchorY = 0
+    scoreTextDesc.anchorY = 1
     scoreTextGroup:insert(scoreTextDesc)
 
-    scoreText = display.newEmbossedText(pGet( "score.json", "highScore" ), 0, 0 + scoreTextDesc.height, "PTMono-Bold", 34)
-    scoreText:setFillColor( 1, .9, .4)
-    scoreText:setEmbossColor(embossColor)
-    scoreText.anchorX = 0.5
+    scoreText = display.newEmbossedText(pGet( "score.json", "highScore" ), 0, 0 + scoreTextDesc.y, "ChaparralPro-Bold", 45)
+    scoreText:setFillColor(unpack(scoreboardColor))
+    scoreText:setEmbossColor(scoreboardEmbossColor)
     scoreText.anchorY = 0
     scoreTextGroup:insert(scoreText)
-    scoreTextGroup.x = scoreTextGroupAnchorX
-    scoreTextGroup.y = _H/3 - scoreTextGroup.height - 10
+    scoreTextGroup.x = _W / 2
+    scoreTextGroup.y = 0 + (scoreTextGroup.height/2)
 
     local function shiftScoreTextAnchorGroup()
         local ax = 0.5
@@ -500,86 +569,37 @@ function scene:create(e)
             end })
         end })
     end
---    shiftScoreTextAnchorGroup()
+    --    shiftScoreTextAnchorGroup()
 
-    brickPlatformBtm = display.newSprite( brickPlatformSheet, {frames={1}} )
-    brickPlatformBtm.x = _W/2
-    brickPlatformBtm.anchorY = 1
-    brickPlatformBtm.y = _H
-
-    brickPlatformTop = display.newSprite( brickPlatformSheet, {frames={2}} )
-    brickPlatformTop.x = _W/2
-    brickPlatformTop.anchorY = 1
-    brickPlatformTop.y = _H - brickPlatformBtm.height
-
-    flagPole1 = display.newSprite( flagPole1Sheet, {frames={1}} )
-    flagPole1.anchorX=0.5
-    flagPole1.anchorY=1
-    flagPole1.name="flagPole1" -- SAM: is flagPole1.name ever used?
-    flagPole1.x= brickPlatformBtm.x  - (brickPlatformBtm.width / 3)
-    flagPole1.y= brickPlatformBtm.y - brickPlatformBtm.height
-
-    flagPole2 = display.newSprite( flagPole2Sheet, {frames={1}} )
-    flagPole2.anchorX=0.5
-    flagPole2.anchorY=1
-    flagPole2.name="flagPole2"
-    flagPole2.x= brickPlatformBtm.x
-    flagPole2.y= brickPlatformTop.y - brickPlatformTop.height
-    flagPole2.alpha=0.65
-
-    flagPole3 = display.newSprite( flagPole3Sheet, {frames={1}} )
-    flagPole3.anchorX=0.5
-    flagPole3.anchorY=1
-    flagPole3.name="flagPole3"
-    flagPole3.x= brickPlatformBtm.x  + (brickPlatformBtm.width / 3)
-    flagPole3.y= brickPlatformBtm.y - brickPlatformBtm.height
-
-    btnsAgain = display.newSprite( btnsAgainSheet, {frames={1,2}} ) -- use btnsSeq
-    btnsAgain.isHitTestMasked = false
-    btnsAgain.name = "again"
-    btnsAgain.anchorY = .5
-    btnsAgain.x=88
-    btnsAgain.y=_H/2
-    btnsAgain:setFrame(1)
-    btnsAgain.alpha=0
-    btnsAgain.gotoScene="game"
-    -- btnsAgain:scale(.8,.8)
-    transition.to( btnsAgain, {time = 200, alpha=1})
+    local btnAnchorY = _H - (brickPlatformBtm.height+brickPlatformBtm.height) + 14
 
     btnsQuit = display.newSprite( btnsQuitSheet, {frames={1,2}} ) -- use btnsSeq
     btnsQuit.isHitTestMasked = false
     btnsQuit.name = "quit"
-    btnsQuit.anchorY = .5
-    btnsQuit.x=_W-69
-    btnsQuit.y=_H/2
+    btnsQuit.anchorX = 1
+    btnsQuit.anchorY = 1
+    btnsQuit.x= brickPlatformBtm.x - 20
+    btnsQuit.y= btnAnchorY
     btnsQuit:setFrame(1)
     btnsQuit.alpha=0
     btnsQuit.gotoScene="menu"
-    -- btnsQuit:scale(.8,.8)
-    transition.to( btnsQuit, {time = 200, alpha=1})
+    btnsQuit:scale(.8,.8)
+    btnsQuit:rotate(-4)
+    transition.to( btnsQuit, {time = 200, alpha=.9})
 
-    randomFlag1 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[1])
-    randomFlag1.x = flagPole1.x + 20
-    randomFlag1.y = (_H - flagPole1.height) + 20
-    randomFlag1:setSequence("randomflagseq1")
-    randomFlag1:play()
-
-    randomFlag2 = display.newSprite(flagWave34Sheet, randomFlagSequenceArray[2])
-    randomFlag2.x = flagPole2.x + 17
-    randomFlag2.y = (_H - flagPole2.height) + 10
-    randomFlag2:setSequence("randomflagseq2")
-    randomFlag2:toBack()
-    randomFlag2.alpha = 0.65
-    randomFlag2:play()
-
-    randomFlag3 = display.newSprite(flagWave40Sheet, randomFlagSequenceArray[3])
-    randomFlag3.x = flagPole3.x + 20
-    randomFlag3.y = (_H - flagPole3.height) + 20
-    randomFlag3:setSequence("randomflagseq3")
-    randomFlag3:play()
-
-    -- bg:toBack()
-
+    btnsAgain = display.newSprite( btnsAgainSheet, {frames={1,2}} ) -- use btnsSeq
+    btnsAgain.isHitTestMasked = false
+    btnsAgain.name = "again"
+    btnsAgain.anchorX = 0
+    btnsAgain.anchorY = 1
+    btnsAgain.x= brickPlatformBtm.x + 6
+    btnsAgain.y= btnAnchorY + 3
+    btnsAgain:setFrame(1)
+    btnsAgain.alpha=0
+    btnsAgain.gotoScene="game"
+    btnsAgain:scale(.8,.8)
+    btnsAgain:rotate(2)
+    transition.to( btnsAgain, {time = 200, alpha=.9})
 
     cloudsBG1 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
     cloudsBG1.name = "cloudsBG1"
@@ -596,7 +616,7 @@ function scene:create(e)
     -- cloudsBG2.alpha = .5
     cloudsBG2.anchorX = 0
     cloudsBG2.anchorY = 1
-    cloudsBG2.x = cloudsBG1.width
+    cloudsBG2.x = 0 - cloudsBG1.width
     cloudsBG2.y = _H
     cloudsBG2:toBack()
 
@@ -605,7 +625,7 @@ function scene:create(e)
     -- cloudsBG3.alpha = .5
     cloudsBG3.anchorX = 0
     cloudsBG3.anchorY = 1
-    cloudsBG3.x = cloudsBG1.width + cloudsBG2.width
+    cloudsBG3.x = 0 - (cloudsBG1.width + cloudsBG2.width)
     cloudsBG3.y = _H
     cloudsBG3:toBack()
 

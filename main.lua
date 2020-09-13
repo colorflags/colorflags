@@ -27,8 +27,6 @@ if platform == "android" then
 	Runtime:addEventListener( "resize", onResize )
 end
 
-
-
 function runMain()
 	print("pixelHeight: " .. display.pixelHeight, "pixelWidth: " .. display.pixelWidth)
 
@@ -155,7 +153,6 @@ function runMain()
 	    end
 	    if listener then
 	    	btn:addEventListener(tapOrTouch,listener)
-
 	    end
 	    if group then
 	    	group:insert(btn)

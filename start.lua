@@ -135,21 +135,31 @@ end
 
 function scene:create( event )
     local sceneGroup=self.view
-     catchAll=display.newRect(0,0,_W,_H)
-     catchAll.alpha=0.8
+     catchAll=display.newRect( 0, 0, _W, _H )
      catchAll.anchorX=0
      catchAll.anchorY=0
+     catchAll.isHitTestable = true
+     catchAll.alpha=0
 
      local menuBtnsGroup = event.params.menuBtnsGroup
+
     -- rename
     local offsetStartBtns = _H/2
 
+	local paint = {
+	    type = "gradient",
+	    color1 = { .6, .6, .6, 1 },
+	    color2 = { .2, .2, .2, 1 },
+	    direction = "down"
+	}
+
     background=display.newRoundedRect(50, 50, _W/2, 0, 20)
-    background:setFillColor(120/255,115/255,115/255)
-    --background:setStrokeColor( 25/255, 1 ,20/255 )
-    --background.strokeWidth = 5
+    background:setFillColor(.45,.4,.4)
+    background:setStrokeColor( 0, 0, 0 )
+    background.strokeWidth = 1
     background.x=_W/2
     background.alpha=0
+    background.fill = paint
     transition.to( background, {time = 200, alpha=1})
 
     local btnsGroup = display.newGroup()
@@ -164,7 +174,7 @@ function scene:create( event )
     btnsStart.alpha=0
     btnsStart.gotoScene="game"
     -- btnsStart:scale(.8,.8)
-    transition.to( btnsStart, {time = 200, alpha=1})
+    transition.to( btnsStart, {time = 200, alpha=.9})
     btnsGroup:insert(btnsStart)
 
     local btnSpacing = btnsStart.height + 4
@@ -180,7 +190,7 @@ function scene:create( event )
     btnsCruise.alpha=0
     btnsCruise.gotoScene="cruise"
     -- btnsCruise:scale(.8,.8)
-    transition.to( btnsCruise, {time = 200, alpha=1})
+    transition.to( btnsCruise, {time = 200, alpha=.9})
     btnsGroup:insert(btnsCruise)
 
     btnsTutorial = display.newSprite(btnsTutorialGigaSheet, {frames={1,2}} )
@@ -194,7 +204,7 @@ function scene:create( event )
     btnsTutorial.alpha=0
     btnsTutorial.gotoScene="tutorial"
     -- btnsTutorial:scale(.8,.8)
-    transition.to( btnsTutorial, {time = 200, alpha=1})
+    transition.to( btnsTutorial, {time = 200, alpha=.9})
     btnsGroup:insert(btnsTutorial)
     btnsGroup.y = _H - btnsGroup.height
 
@@ -213,15 +223,10 @@ function scene:create( event )
     catchAll:toBack()
     sceneGroup:insert(catchAll)
     sceneGroup:insert(background)
-    -- sceneGroup:insert(btnsStart)
-    -- sceneGroup:insert(btnsTutorial)
-    -- sceneGroup:insert(btnsCruise)
 
     phaseGroup:insert(catchAll)
     phaseGroup:insert(background)
-    -- phaseGroup:insert(btnsStart)
-    -- phaseGroup:insert(btnsTutorial)
-    -- phaseGroup:insert(btnsCruise)
+
     phaseGroup:insert(btnsGroup)
     phaseGroup:toFront()
 end

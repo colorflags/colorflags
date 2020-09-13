@@ -1,6 +1,6 @@
 -- http://forums.coronalabs.com/topic/53926-sounds-audio-and-memory-leaks/?hl=audio
 -- http://docs.coronalabs.com/api/library/display/newSprite.html
-local CFText = require("cf_text")
+require("cf_color")
 local composer = require("composer")
 local cameraEvent = require("cameraevent")
 local scene = composer.newScene()
@@ -173,7 +173,7 @@ local resetSpawnTable
 local setFlag
 local delayPace
 local finishScale
-local onOptionsTap
+local onOptionsTouch
 local speedUp
 ------------------------------------------------------------------------------------------------------
 
@@ -191,7 +191,7 @@ local lightningIcon5
 local lightningScore = 0
 local lightningMultiplier = 1
 local line
---SAM: what is paceRect used for
+
 local paceRect
 local map
 local mapGroup
@@ -359,6 +359,7 @@ local countryFillSheetCoords = require("lua-sheets.country_fill_mask")
 local countryFillSheet = graphics.newImageSheet("images/country_fill_mask.png", countryFillSheetCoords:getSheet())
 local countryFill
 
+local whiteBackground
 local paletteBarSheetCoords = require("lua-sheets.palette_bar")
 local paletteBarSheet = graphics.newImageSheet("images/palette_bar.png", paletteBarSheetCoords:getSheet())
 local paletteBarTop
@@ -400,122 +401,136 @@ local function round(val, n)
     end
 end
 
--- READYOBJ: onOptionsTap
-onOptionsTap = function(event)
-    local optionName = event.target.name
-    if optionName == "speedDecrease" or optionName == "speedIncrease" then
-        if flag ~= nil and debugOptions.godSpeed == true then
-            if optionName == "speedIncrease" then
-                speedUp()
-            elseif optionName == "speedDecrease" then
-                speedDown()
-            end
-
-            -- wrap in a function.. this can all be in the speedUp() function?
-            -- if fps == 30 then
-            --     speed = levelsArray[levelsIndex].speed
-            -- else
-            --     speed = levelsArray[levelsIndex].speed / 2
-            -- end
-            --
-            -- timeVar = levelsArray[levelsIndex].timeVar
-            -- speedText.text = levelsIndex
-            -- speedText:toFront()
-        end
-    elseif optionName == "modeDecrease" or optionName == "modeIncrease" then
-        if flag ~= nil and debugOptions.godCycle == true then
-            if optionName == "modeDecrease" then
-                if gameMechanics.mode > 1 then
-                    gameMechanics.mode = gameMechanics.mode - 1
-                else
-                    gameMechanics.mode = 3
-                end
-            elseif optionName == "modeIncrease" then
-                if gameMechanics.mode < 3 then
-                    gameMechanics.mode = gameMechanics.mode + 1
-                else
-                    gameMechanics.mode = 1
+-- READYOBJ: onOptionsTouch
+onOptionsTouch = function(event)
+    if event.phase == "began" then
+        local optionName = event.target.name
+        if optionName == "speedDecrease" or optionName == "speedIncrease" then
+            if flag ~= nil and debugOptions.godSpeed == true then
+                if optionName == "speedIncrease" then
+                    speedUp()
+                elseif optionName == "speedDecrease" then
+                    speedDown()
                 end
             end
-            -- print("gameMechanics.mode set in onOptionsTap(): " .. gameMechanics.mode)
-            -- SAM: rename gameMechanics.mode to mode
-            modeText.text = gameMechanics.mode
+        elseif optionName == "modeDecrease" or optionName == "modeIncrease" then
+            if flag ~= nil and debugOptions.godCycle == true then
+                if optionName == "modeDecrease" then
+                    if gameMechanics.mode > 1 then
+                        gameMechanics.mode = gameMechanics.mode - 1
+                    else
+                        gameMechanics.mode = 3
+                    end
+                elseif optionName == "modeIncrease" then
+                    if gameMechanics.mode < 3 then
+                        gameMechanics.mode = gameMechanics.mode + 1
+                    else
+                        gameMechanics.mode = 1
+                    end
+                end
+                -- print("gameMechanics.mode set in onOptionsTouch(): " .. gameMechanics.mode)
+                -- SAM: rename gameMechanics.mode to mode
+                modeText.text = gameMechanics.mode
 
-            timer.cancel(setFlagTimer)
-            setFlag()
-            gameMechanics.overrideFlag = true
-        end
-    elseif optionName == "gameDebugGod" then
-        if debugOptions.god == false then
-            debugOptions.god = true
-            gameDebugGodBtnSym.text = "X"
-        else
-            debugOptions.god = false
-            gameDebugGodBtnSym.text = ""
-        end
-        pSet( "score.json", "debugPanelStoredValues" , { debugOptions.god, debugOptions.godSpeed, debugOptions.godCycle } )
-    elseif optionName == "gameDebugSpeed" then
-        if debugOptions.godSpeed == false then
-            debugOptions.godSpeed = true
-            gameDebugSpeedBtnSym.text = "X"
-        else
-            debugOptions.godSpeed = false
-            gameDebugSpeedBtnSym.text = ""
-        end
-        print("godspeed", debugOptions.godSpeed)
-        pSet( "score.json", "debugPanelStoredValues" , { debugOptions.god, debugOptions.godSpeed, debugOptions.godCycle } )
-    elseif optionName == "gameDebugCycle" then
-        if debugOptions.godCycle == false then
-            debugOptions.godCycle = true
-            gameDebugCycleBtnSym.text = "X"
-        else
-            debugOptions.godCycle = false
-            gameDebugCycleBtnSym.text = ""
-        end
-        pSet( "score.json", "debugPanelStoredValues" , { debugOptions.god, debugOptions.godSpeed, debugOptions.godCycle } )
-    elseif optionName == "gameDebugPanel" then
-        if debugOptions.debugPanel == false then
-            debugOptions.debugPanel = true
-
-            -- read saved debugPanel values
-            local debugPanelValues = pGet( "score.json", "debugPanelStoredValues" )
-            if debugPanelValues[1] == true then
+                timer.cancel(setFlagTimer)
+                setFlag()
+                gameMechanics.overrideFlag = true
+            end
+        elseif optionName == "gameDebugGod" then
+            if debugOptions.god == false then
                 debugOptions.god = true
                 gameDebugGodBtnSym.text = "X"
+            else
+                debugOptions.god = false
+                gameDebugGodBtnSym.text = ""
             end
-
-            if debugPanelValues[2] == true then
+            pSet( "score.json", "debugPanelStoredValues" , { debugOptions.god, debugOptions.godSpeed, debugOptions.godCycle } )
+        elseif optionName == "gameDebugSpeed" then
+            if debugOptions.godSpeed == false then
                 debugOptions.godSpeed = true
                 gameDebugSpeedBtnSym.text = "X"
-            end
 
-            if debugPanelValues[3] == true then
+                speedDecreaseBtnGroup.alpha = 1
+                speedIncreaseBtnGroup.alpha = 1
+            else
+                debugOptions.godSpeed = false
+                gameDebugSpeedBtnSym.text = ""
+
+                speedDecreaseBtnGroup.alpha = 0
+                speedIncreaseBtnGroup.alpha = 0
+            end
+            print("godspeed", debugOptions.godSpeed)
+            pSet( "score.json", "debugPanelStoredValues" , { debugOptions.god, debugOptions.godSpeed, debugOptions.godCycle } )
+        elseif optionName == "gameDebugCycle" then
+            if debugOptions.godCycle == false then
                 debugOptions.godCycle = true
                 gameDebugCycleBtnSym.text = "X"
+
+                modeDecreaseBtnGroup.alpha = 1
+                modeIncreaseBtnGroup.alpha = 1
+            else
+                debugOptions.godCycle = false
+                gameDebugCycleBtnSym.text = ""
+
+                modeDecreaseBtnGroup.alpha = 0
+                modeIncreaseBtnGroup.alpha = 0
             end
+            pSet( "score.json", "debugPanelStoredValues" , { debugOptions.god, debugOptions.godSpeed, debugOptions.godCycle } )
+        elseif optionName == "gameDebugPanel" then
+            if debugOptions.debugPanel == false then
+                debugOptions.debugPanel = true
 
-            gameDebugGroup.alpha = 1
-            gameDebugPanelInner.alpha = 1
-            gameDebugPanelOuter.alpha = 1
-            paceRect.alpha = 0.6
+                -- read saved debugPanel values
+                local debugPanelValues = pGet( "score.json", "debugPanelStoredValues" )
+                if debugPanelValues[1] == true then
+                    debugOptions.god = true
+                    gameDebugGodBtnSym.text = "X"
+                end
 
-            print("open panel")
-        else
-            debugOptions.debugPanel = false
+                if debugPanelValues[2] == true then
+                    debugOptions.godSpeed = true
+                    gameDebugSpeedBtnSym.text = "X"
 
-            -- disable god, godSpeed, godCycle
-            debugOptions.god = false
-            debugOptions.godSpeed = false
-            debugOptions.godCycle = false
+                    speedDecreaseBtnGroup.alpha = 1
+                    speedIncreaseBtnGroup.alpha = 1
+                end
 
-            gameDebugGroup.alpha = 0
-            gameDebugPanelInner.alpha = 0
-            gameDebugPanelOuter.alpha = 0
-            paceRect.alpha = 0
-            print("close panel")
+                if debugPanelValues[3] == true then
+                    debugOptions.godCycle = true
+                    gameDebugCycleBtnSym.text = "X"
+
+                    modeDecreaseBtnGroup.alpha = 1
+                    modeIncreaseBtnGroup.alpha = 1
+                end
+
+                gameDebugGroup.alpha = 1
+                gameDebugPanelInner.alpha = 1
+                gameDebugPanelOuter.alpha = 1
+                paceRect.alpha = 0.6
+
+                print("open panel")
+            else
+                debugOptions.debugPanel = false
+
+                -- disable god, godSpeed, godCycle
+                debugOptions.god = false
+                debugOptions.godSpeed = false
+                debugOptions.godCycle = false
+
+                speedDecreaseBtnGroup.alpha = 0
+                speedIncreaseBtnGroup.alpha = 0
+                modeDecreaseBtnGroup.alpha = 0
+                modeIncreaseBtnGroup.alpha = 0
+
+                gameDebugGroup.alpha = 0
+                gameDebugPanelInner.alpha = 0
+                gameDebugPanelOuter.alpha = 0
+                paceRect.alpha = 0
+                print("close panel")
+            end
         end
+        return true
     end
-    return true
 end
 
 -- DELETE
@@ -554,32 +569,61 @@ if platform == "android" then
     Runtime:addEventListener( "resize", onResize )
 end
 
+-- create a function to handle all of the system events
+local onSystemEvent = function( event )
+    if event.type == "applicationStart" then
+        print("start")
+    elseif event.type == "applicationExit" then
+        print("exit")
+    elseif event.type == "applicationSuspend" then
+        print("applicationSuspend called")
+        paceRect.isMoving = false
+        transition.pause()
+        timer.pause( setFlagTimer )
+        for i = 1, #spawnTable do
+            if spawnTable[i] ~= 0 then
+                spawnTable[i].isPaletteActive = false
+            end
+        end
+        composer.showOverlay( "pauseoverlay", { effect = "fade", isModal = true } )
+    elseif event.type == "applicationResume" then
+        print("resume")
+    end
+end
+Runtime:addEventListener( "system", onSystemEvent )
+
 local function setupScoreboard()
 
-    local scoreboardColor = {
-        highlight = {r = 1, g = 1, b = 1},
-        shadow = {r = 0, g = 0, b = 0}
+    local colorFillArray = CFColor(78, 173, 34)
+    local colorShadowArray = CFColor(96, 212, 42)
+    local scoreboardColor = { colorFillArray.r, colorFillArray.g, colorFillArray.b }
+    -- scoreboardColor = { .2, .9, .4 }
+    local scoreboardEmbossColor = {
+        highlight = { r = 0, g = 0, b = 0 },
+        shadow = { r = colorShadowArray.r, g = colorShadowArray.g, b = colorShadowArray.b }
     }
+    local scoreboardFont = "ChaparralPro-SemiboldIt"
+    -- local scoreboardFont2 = "ChaparralPro-Bold"
 
     local scoreboardOffsetFromLeft = 14
-    local scoreboardOffsetFromEachOther = 60
+    local scoreboardOffsetFromEachOther = 70
     local scoreboardOffsetIncDecBtns = 1.2
 
     local scoreTextGroupAnchorX = scoreboardOffsetFromLeft
     local scoreTextGroupAnchorY = _H/2
 
     scoreTextGroup = display.newGroup()
-    scoreTextDesc = display.newEmbossedText("score:", scoreTextGroupAnchorX, scoreTextGroupAnchorY, "PTMono-Bold", 12)
-    scoreTextDesc:setFillColor(.2, .9, .4)
-    scoreTextDesc:setEmbossColor(scoreboardColor)
+    scoreTextDesc = display.newEmbossedText("score", scoreTextGroupAnchorX, scoreTextGroupAnchorY, scoreboardFont, 22)
+    scoreTextDesc:setFillColor(unpack(scoreboardColor))
+    scoreTextDesc:setEmbossColor(scoreboardEmbossColor)
     scoreTextDesc.anchorX = 0
     scoreTextDesc.anchorY = 1
     scoreTextGroup:insert(scoreTextDesc)
 
-    scoreText = display.newEmbossedText(score, scoreTextGroupAnchorX + (scoreTextDesc.width/2), scoreTextGroupAnchorY, "PTMono-Bold", 18)
-    scoreText:setFillColor(.2, .9, .4)
-    scoreText:setEmbossColor(scoreboardColor)
-    scoreText.anchorY = 0
+    scoreText = display.newEmbossedText(score, scoreTextGroupAnchorX + (scoreTextDesc.width/2), scoreTextGroupAnchorY + scoreTextDesc.height, scoreboardFont, 30)
+    scoreText:setFillColor(unpack(scoreboardColor))
+    scoreText:setEmbossColor(scoreboardEmbossColor)
+    scoreText.anchorY = 1
     scoreTextGroup:insert(scoreText)
 
     local speedTextGroupAnchorX = scoreboardOffsetFromLeft + scoreboardOffsetFromEachOther
@@ -587,190 +631,185 @@ local function setupScoreboard()
 
     speedTextGroup = display.newGroup()
 
-    speedTextDesc = display.newEmbossedText("speed:", speedTextGroupAnchorX, speedTextGroupAnchorY, "PTMono-Bold", 12)
-    speedTextDesc:setFillColor(.2, .9, .4)
-    speedTextDesc:setEmbossColor(scoreboardColor)
+    speedTextDesc = display.newEmbossedText("speed", speedTextGroupAnchorX, speedTextGroupAnchorY, scoreboardFont, 22)
+    speedTextDesc:setFillColor(unpack(scoreboardColor))
+    speedTextDesc:setEmbossColor(scoreboardEmbossColor)
     speedTextDesc.anchorX = 0
     speedTextDesc.anchorY = 1
     speedTextGroup:insert(speedTextDesc)
-
-    speedText = display.newEmbossedText("???", speedTextGroupAnchorX + (speedTextDesc.width/2), speedTextGroupAnchorY, "PTMono-Bold", 18)
-    speedText:setFillColor(.2, .9, .4)
-    speedText:setEmbossColor(scoreboardColor)
-    speedText.anchorY = 0
+    speedTextDesc:toBack()
+    speedText = display.newEmbossedText("???", speedTextGroupAnchorX + (speedTextDesc.width/2), speedTextGroupAnchorY + speedTextDesc.height, scoreboardFont, 30)
+    speedText:setFillColor(unpack(scoreboardColor))
+    speedText:setEmbossColor(scoreboardEmbossColor)
+    speedText.anchorY = 1
     speedTextGroup:insert(speedText)
+
 
     speedDecreaseBtnGroup = display.newGroup()
     speedDecreaseBtnGroup.name = "speedDecrease"
-    speedDecreaseBtnFill = display.newRoundedRect(speedDecreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) - 11, speedTextGroupAnchorY - speedTextDesc.height * scoreboardOffsetIncDecBtns, 16, 16, 1)
+    speedDecreaseBtnFill = display.newRoundedRect(speedDecreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) - 11, speedTextGroupAnchorY - speedTextDesc.height * scoreboardOffsetIncDecBtns, 20, 20, 0)
     speedDecreaseBtnFill:setFillColor(.4, .4, .4)
     speedDecreaseBtnFill.anchorY = 1
-    speedDecreaseBtnSym = display.newText(speedDecreaseBtnGroup, "-", speedDecreaseBtnFill.x, speedDecreaseBtnFill.y - (speedDecreaseBtnFill.height/2), "PTMono-Bold", 14)
+    speedDecreaseBtnSym = display.newText(speedDecreaseBtnGroup, "-", speedDecreaseBtnFill.x, speedDecreaseBtnFill.y - (speedDecreaseBtnFill.height/2), "PTMono-Bold", 18)
     speedDecreaseBtnSym.anchorX = .5
     speedDecreaseBtnSym.anchorY = .5
     speedTextGroup:insert(speedDecreaseBtnGroup)
-    speedDecreaseBtnGroup:addEventListener("tap", onOptionsTap)
+    speedDecreaseBtnGroup.alpha = 0
+    speedDecreaseBtnGroup:addEventListener("touch", onOptionsTouch)
 
     speedIncreaseBtnGroup = display.newGroup()
     speedIncreaseBtnGroup.name = "speedIncrease"
-    speedIncreaseBtnFill = display.newRoundedRect(speedIncreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) + 11, speedTextGroupAnchorY - speedTextDesc.height * scoreboardOffsetIncDecBtns, 16, 16, 1)
+    speedIncreaseBtnFill = display.newRoundedRect(speedIncreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) + 11, speedTextGroupAnchorY - speedTextDesc.height * scoreboardOffsetIncDecBtns, 20, 20, 0)
     speedIncreaseBtnFill:setFillColor(.4, .4, .4)
     speedIncreaseBtnFill.anchorY = 1
-    speedIncreaseBtnSym = display.newText(speedIncreaseBtnGroup, "+", speedIncreaseBtnFill.x, speedIncreaseBtnFill.y - (speedIncreaseBtnFill.height/2), "PTMono-Bold", 14)
+    speedIncreaseBtnSym = display.newText(speedIncreaseBtnGroup, "+", speedIncreaseBtnFill.x, speedIncreaseBtnFill.y - (speedIncreaseBtnFill.height/2), "PTMono-Bold", 18)
     speedIncreaseBtnSym.anchorX = .5
     speedIncreaseBtnSym.anchorY = .5
     speedTextGroup:insert(speedIncreaseBtnGroup)
-    speedIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
+    speedIncreaseBtnGroup.alpha = 0
+    speedIncreaseBtnGroup:addEventListener("touch", onOptionsTouch)
 
     local modeTextGroupAnchorX = scoreboardOffsetFromLeft + (scoreboardOffsetFromEachOther*2)
     local modeTextGroupAnchorY = _H/2
 
     modeTextGroup = display.newGroup()
-    modeTextDesc = display.newEmbossedText("mode:", modeTextGroupAnchorX, modeTextGroupAnchorY, "PTMono-Bold", 12)
-    modeTextDesc:setFillColor(.2, .9, .4)
-    modeTextDesc:setEmbossColor(scoreboardColor)
+    modeTextDesc = display.newEmbossedText("mode", modeTextGroupAnchorX, modeTextGroupAnchorY, scoreboardFont, 22)
+    modeTextDesc:setFillColor(unpack(scoreboardColor))
+    modeTextDesc:setEmbossColor(scoreboardEmbossColor)
     modeTextDesc.anchorX = 0
     modeTextDesc.anchorY = 1
     modeTextGroup:insert(modeTextDesc)
 
-    modeText = display.newEmbossedText("???", modeTextGroupAnchorX + (modeTextDesc.width/2), modeTextGroupAnchorY, "PTMono-Bold", 18)
-    modeText:setFillColor(.2, .9, .4)
-    modeText:setEmbossColor(scoreboardColor)
-    modeText.anchorY = 0
+    modeText = display.newEmbossedText("???", modeTextGroupAnchorX + (modeTextDesc.width/2), modeTextGroupAnchorY + modeTextDesc.height, scoreboardFont, 30)
+    modeText:setFillColor(unpack(scoreboardColor))
+    modeText:setEmbossColor(scoreboardEmbossColor)
+    modeText.anchorY = 1
     modeTextGroup:insert(modeText)
 
     modeDecreaseBtnGroup = display.newGroup()
     modeDecreaseBtnGroup.name = "modeDecrease"
-    modeDecreaseBtnFill = display.newRoundedRect(modeDecreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) - 11, modeTextGroupAnchorY - modeTextDesc.height * scoreboardOffsetIncDecBtns, 16, 16, 1)
+    modeDecreaseBtnFill = display.newRoundedRect(modeDecreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) - 11, modeTextGroupAnchorY - modeTextDesc.height * scoreboardOffsetIncDecBtns, 20, 20, 0)
     modeDecreaseBtnFill:setFillColor(.4, .4, .4)
     modeDecreaseBtnFill.anchorY = 1
-    modeDecreaseBtnSym = display.newText(modeDecreaseBtnGroup, "-", modeDecreaseBtnFill.x, modeDecreaseBtnFill.y - (modeDecreaseBtnFill.height/2), "PTMono-Bold", 14)
+    modeDecreaseBtnSym = display.newText(modeDecreaseBtnGroup, "-", modeDecreaseBtnFill.x, modeDecreaseBtnFill.y - (modeDecreaseBtnFill.height/2), "PTMono-Bold", 18)
     modeDecreaseBtnSym.anchorX = .5
     modeDecreaseBtnSym.anchorY = .5
     modeTextGroup:insert(modeDecreaseBtnGroup)
-    modeDecreaseBtnGroup:addEventListener("tap", onOptionsTap)
+    modeDecreaseBtnGroup.alpha = 0
+    modeDecreaseBtnGroup:addEventListener("touch", onOptionsTouch)
 
     modeIncreaseBtnGroup = display.newGroup()
     modeIncreaseBtnGroup.name = "modeIncrease"
-    modeIncreaseBtnFill = display.newRoundedRect(modeIncreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) + 11, modeTextGroupAnchorY - modeTextDesc.height * scoreboardOffsetIncDecBtns, 16, 16, 1)
+    modeIncreaseBtnFill = display.newRoundedRect(modeIncreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) + 11, modeTextGroupAnchorY - modeTextDesc.height * scoreboardOffsetIncDecBtns, 20, 20, 0)
     modeIncreaseBtnFill:setFillColor(.4, .4, .4)
     modeIncreaseBtnFill.anchorY = 1
-    modeIncreaseBtnSym = display.newText(modeIncreaseBtnGroup, "+", modeIncreaseBtnFill.x, modeIncreaseBtnFill.y - (modeIncreaseBtnFill.height/2), "PTMono-Bold", 14)
+    modeIncreaseBtnSym = display.newText(modeIncreaseBtnGroup, "+", modeIncreaseBtnFill.x, modeIncreaseBtnFill.y - (modeIncreaseBtnFill.height/2), "PTMono-Bold", 18)
     modeIncreaseBtnSym.anchorX = .5
     modeIncreaseBtnSym.anchorY = .5
     modeTextGroup:insert(modeIncreaseBtnGroup)
-    modeIncreaseBtnGroup:addEventListener("tap", onOptionsTap)
-
-    gameDebugPanelToggle = display.newEmbossedText("debug >", modeTextGroupAnchorX + (modeTextDesc.width/2), _H/2 + modeTextGroup.height, "PTMono-Bold", 12)
-    gameDebugPanelToggle.name = "gameDebugPanel"
-    gameDebugPanelToggle:setFillColor(.2, .9, .4)
-    gameDebugPanelToggle:setEmbossColor(scoreboardColor)
-    gameDebugPanelToggle.anchorY = 0
-    gameDebugPanelToggle:addEventListener("tap", onOptionsTap)
-
-    -- ##### ##### ##### ##### ##### #####
+    modeIncreaseBtnGroup.alpha = 0
+    modeIncreaseBtnGroup:addEventListener("touch", onOptionsTouch)
 
     gameDebugGroup = display.newGroup()
 
-    local gameDebugGroupAnchorY = gameDebugPanelToggle.y + 10
-    local gameDebugGroupOffset = 10
-    gameDebugSpeedBtnGroup = display.newGroup()
-    gameDebugSpeedBtnGroup.name = "gameDebugSpeed"
+    local gameDebugGroupAnchorY = gameMechanics.heightModeLow - 70
+    local newScoreboardOffsetFromEachOther = 40
+    gameDebugPanelToggle = display.newEmbossedText("debug >", scoreTextDesc.x + scoreTextDesc.width/2, gameDebugGroupAnchorY, "ChaparralPro-SemiboldIt", 22)
+    gameDebugPanelToggle.name = "gameDebugPanel"
+    gameDebugPanelToggle:setFillColor(unpack(scoreboardColor))
+    gameDebugPanelToggle:setEmbossColor(scoreboardEmbossColor)
+    gameDebugPanelToggle.anchorX = 0.5
+    gameDebugPanelToggle.anchorY = 1
+    gameDebugPanelToggle:addEventListener("touch", onOptionsTouch)
 
-    local textParams =
-    {
-        text = "speed?",
-        x = _W/2,
-        y = gameDebugGroupAnchorY,
-        font = "PTMono-Bold",
-        fontSize = 12,
-        align = "center"
-    }
-
-    gameDebugSpeedBtnDesc = display.newEmbossedText(textParams)
-    gameDebugSpeedBtnDesc:setFillColor(.2, .9, .4)
-    gameDebugSpeedBtnDesc:setEmbossColor(scoreboardColor)
-    gameDebugSpeedBtnDesc.anchorX = .5
-    gameDebugSpeedBtnDesc.anchorY = 0
-    gameDebugGroup:insert(gameDebugSpeedBtnDesc)
-
-    gameDebugSpeedBtnFill = display.newRoundedRect(gameDebugSpeedBtnGroup, _W/2, gameDebugGroupAnchorY, 20, 20, 1)
-    gameDebugSpeedBtnFill:setFillColor(.2, .2, .2)
-    gameDebugSpeedBtnFill.anchorY = 1
-    gameDebugSpeedBtnSym = display.newText(gameDebugSpeedBtnGroup, "", gameDebugSpeedBtnFill.x, gameDebugSpeedBtnFill.y - (gameDebugSpeedBtnFill.height/2), "PTMono-Bold", 20)
-    if debugOptions.godSpeed == true then
-        gameDebugSpeedBtnSym.text = "X"
-    end
-    gameDebugSpeedBtnGroup:addEventListener("tap", onOptionsTap)
-    gameDebugGroup:insert(gameDebugSpeedBtnGroup)
-
-    local gameDebugGodAnchorX = _W/2 - scoreboardOffsetFromEachOther
-
+    local gameDebugGodAnchorX = speedTextDesc.x
     gameDebugGodBtnGroup = display.newGroup()
     gameDebugGodBtnGroup.name = "gameDebugGod"
-
-    textParams =
+    local textParams =
     {
         text = "god?",
         x = gameDebugGodAnchorX,
         y = gameDebugGroupAnchorY,
         font = "PTMono-Bold",
-        fontSize = 12,
+        fontSize = 8,
         align = "center"
     }
     gameDebugGodBtnDesc = display.newEmbossedText(textParams)
-    gameDebugGodBtnDesc:setFillColor(.2, .9, .4)
-    gameDebugGodBtnDesc:setEmbossColor(scoreboardColor)
+    gameDebugGodBtnDesc:setFillColor(unpack(scoreboardColor))
+    gameDebugGodBtnDesc:setEmbossColor(scoreboardEmbossColor)
     gameDebugGodBtnDesc.anchorX = .5
     gameDebugGodBtnDesc.anchorY = 0
     gameDebugGroup:insert(gameDebugGodBtnDesc)
-
-    gameDebugGodBtnFill = display.newRoundedRect(gameDebugGodBtnGroup, gameDebugGodAnchorX, gameDebugGroupAnchorY, 20, 20, 1)
+    gameDebugGodBtnFill = display.newRoundedRect(gameDebugGodBtnGroup, gameDebugGodAnchorX, gameDebugGroupAnchorY, 30, 30, 0)
     gameDebugGodBtnFill:setFillColor(.2, .2, .2)
     gameDebugGodBtnFill.anchorY = 1
-    gameDebugGodBtnSym = display.newText(gameDebugGodBtnGroup, "", gameDebugGodBtnFill.x, gameDebugGodBtnFill.y - (gameDebugGodBtnFill.height/2), "PTMono-Bold", 20)
+    gameDebugGodBtnSym = display.newText(gameDebugGodBtnGroup, "", gameDebugGodBtnFill.x, gameDebugGodBtnFill.y - (gameDebugGodBtnFill.height/2), "PTMono-Bold", 30)
     if debugOptions.god == true then
         gameDebugGodBtnSym.text = "X"
     end
-    gameDebugGodBtnGroup:addEventListener("tap", onOptionsTap)
+    gameDebugGodBtnGroup:addEventListener("touch", onOptionsTouch)
     gameDebugGroup:insert(gameDebugGodBtnGroup)
 
-    local gameDebugCycleAnchorX = _W/2 + scoreboardOffsetFromEachOther
+    local gameDebugSpeedAnchorX = gameDebugGodAnchorX + newScoreboardOffsetFromEachOther
+    gameDebugSpeedBtnGroup = display.newGroup()
+    gameDebugSpeedBtnGroup.name = "gameDebugSpeed"
+    textParams =
+    {
+        text = "speed?",
+        x = gameDebugSpeedAnchorX,
+        y = gameDebugGroupAnchorY,
+        font = "PTMono-Bold",
+        fontSize = 8,
+        align = "center"
+    }
+    gameDebugSpeedBtnDesc = display.newEmbossedText(textParams)
+    gameDebugSpeedBtnDesc:setFillColor(unpack(scoreboardColor))
+    gameDebugSpeedBtnDesc:setEmbossColor(scoreboardEmbossColor)
+    gameDebugSpeedBtnDesc.anchorX = .5
+    gameDebugSpeedBtnDesc.anchorY = 0
+    gameDebugGroup:insert(gameDebugSpeedBtnDesc)
+    gameDebugSpeedBtnFill = display.newRoundedRect(gameDebugSpeedBtnGroup, gameDebugSpeedAnchorX, gameDebugGroupAnchorY, 30, 30, 0)
+    gameDebugSpeedBtnFill:setFillColor(.2, .2, .2)
+    gameDebugSpeedBtnFill.anchorY = 1
+    gameDebugSpeedBtnSym = display.newText(gameDebugSpeedBtnGroup, "", gameDebugSpeedBtnFill.x, gameDebugSpeedBtnFill.y - (gameDebugSpeedBtnFill.height/2), "PTMono-Bold", 30)
+    if debugOptions.godSpeed == true then
+        gameDebugSpeedBtnSym.text = "X"
+    end
+    gameDebugSpeedBtnGroup:addEventListener("touch", onOptionsTouch)
+    gameDebugGroup:insert(gameDebugSpeedBtnGroup)
 
+    local gameDebugCycleAnchorX = gameDebugSpeedAnchorX + newScoreboardOffsetFromEachOther
     gameDebugCycleBtnGroup = display.newGroup()
     gameDebugCycleBtnGroup.name = "gameDebugCycle"
-
     textParams =
     {
         text = "modes?",
         x = gameDebugCycleAnchorX,
         y = gameDebugGroupAnchorY,
         font = "PTMono-Bold",
-        fontSize = 12,
+        fontSize = 8,
         align = "center"
     }
-
     gameDebugCycleBtnDesc = display.newEmbossedText(textParams)
-    gameDebugCycleBtnDesc:setFillColor(.2, .9, .4)
-    gameDebugCycleBtnDesc:setEmbossColor(scoreboardColor)
+    gameDebugCycleBtnDesc:setFillColor(unpack(scoreboardColor))
+    gameDebugCycleBtnDesc:setEmbossColor(scoreboardEmbossColor)
     gameDebugCycleBtnDesc.anchorX = .5
     gameDebugCycleBtnDesc.anchorY = 0
     gameDebugGroup:insert(gameDebugCycleBtnDesc)
-
-    gameDebugCycleBtnFill = display.newRoundedRect(gameDebugCycleBtnGroup, gameDebugCycleAnchorX, gameDebugGroupAnchorY, 20, 20, 1)
+    gameDebugCycleBtnFill = display.newRoundedRect(gameDebugCycleBtnGroup, gameDebugCycleAnchorX, gameDebugGroupAnchorY, 30, 30, 0)
     gameDebugCycleBtnFill:setFillColor(.2, .2, .2)
     gameDebugCycleBtnFill.anchorY = 1
-    gameDebugCycleBtnSym = display.newText(gameDebugCycleBtnGroup, "", gameDebugCycleBtnFill.x, gameDebugCycleBtnFill.y - (gameDebugCycleBtnFill.height/2), "PTMono-Bold", 20)
+    gameDebugCycleBtnSym = display.newText(gameDebugCycleBtnGroup, "", gameDebugCycleBtnFill.x, gameDebugCycleBtnFill.y - (gameDebugCycleBtnFill.height/2), "PTMono-Bold", 30)
     if debugOptions.godCycle == true then
         gameDebugCycleBtnSym.text = "X"
     end
-    gameDebugCycleBtnGroup:addEventListener("tap", onOptionsTap)
+    gameDebugCycleBtnGroup:addEventListener("touch", onOptionsTouch)
     gameDebugGroup:insert(gameDebugCycleBtnGroup)
 
-    gameDebugPanelInner = display.newRoundedRect(_W/2, gameDebugGroupAnchorY - 4, gameDebugGroup.width+24, gameDebugGroup.height, 2)
+    gameDebugPanelInner = display.newRoundedRect(gameDebugSpeedAnchorX, gameDebugGroupAnchorY - 10, gameDebugGroup.width + 10, gameDebugGroup.height, 0)
     gameDebugPanelInner:setFillColor(.7, .2, .4)
     gameDebugGroup:insert(gameDebugPanelInner)
-    gameDebugPanelOuter = display.newRoundedRect(_W/2, gameDebugGroupAnchorY - 4, gameDebugGroup.width+4, gameDebugGroup.height + 4, 2)
+    gameDebugPanelOuter = display.newRoundedRect(gameDebugSpeedAnchorX, gameDebugGroupAnchorY - 10, gameDebugGroup.width + 2, gameDebugGroup.height + 1, 1)
     gameDebugPanelOuter:setFillColor(.8, .6, .1)
     gameDebugGroup:insert(gameDebugPanelOuter)
     gameDebugPanelInner:toBack()
@@ -787,11 +826,17 @@ local function setupScoreboard()
         if debugPanelValues[2] == true then
             debugOptions.godSpeed = true
             gameDebugSpeedBtnSym.text = "X"
+
+            speedDecreaseBtnGroup.alpha = 1
+            speedIncreaseBtnGroup.alpha = 1
         end
 
         if debugPanelValues[3] == true then
             debugOptions.godCycle = true
             gameDebugCycleBtnSym.text = "X"
+
+            modeDecreaseBtnGroup.alpha = 1
+            modeIncreaseBtnGroup.alpha = 1
         end
 
         gameDebugGroup.alpha = 1
@@ -800,6 +845,11 @@ local function setupScoreboard()
         paceRect.alpha = 0.6
         print("start game with debug panel")
     else
+        speedDecreaseBtnGroup.alpha = 0
+        speedIncreaseBtnGroup.alpha = 0
+        modeDecreaseBtnGroup.alpha = 0
+        modeIncreaseBtnGroup.alpha = 0
+
         gameDebugGroup.alpha = 0
         gameDebugPanelInner.alpha = 0
         gameDebugPanelOuter.alpha = 0
@@ -1002,7 +1052,7 @@ local function boundaryElimination(e)
     for i = 1, #spawnTable do
         --junk paletts go away
         if spawnTable[i] ~= 0 and spawnTable[i].dead ~= true then
-            spawnTable[i].PaletteActive = false
+            spawnTable[i].isPaletteActive = false
             spawnTable[i]:removeEventListener("touch", objTouch)
             transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
             --Pallets player lost with.  Fling them at the screen
@@ -1168,6 +1218,7 @@ local function spawnPalette(params)
     object.type = params.type
 
     -- print("created" .. object.myName)
+
     if gameMechanics.mode == 1 then
         if object.corner == "TopRight" then
             object.x = game_W - 40
@@ -1314,10 +1365,9 @@ local function lightningButton(flagTouchEvent)
     if lightningCount > 0 and flagTouchEvent and paceRect.isMoving == true then
         lineTable = {}
         lineTableCount = 0
-        lightningCount = lightningCount - 1
         transition.to(flag, {time = 30, rotation = -10, onComplete = flagRotate1})
         for i = 1, #spawnTable do
-            if spawnTable[i] ~= 0 and spawnTable[i] ~= nil and spawnTable[i].isGrown == true then
+            if spawnTable[i] ~= 0 and spawnTable[i] ~= nil then
                 if lookupCode(code, spawnTable[i]) == 1 then  --colors match
                     spawnTable[i].isPaletteActive = false
                     spawnTable[i].isGrown = false
@@ -1334,6 +1384,7 @@ local function lightningButton(flagTouchEvent)
         end
         if lineTableCount > 0 then
             audio.play( SFXArray.lightning[math.random(1, SFXArray.lightningSize)] )
+            lightningCount = lightningCount - 1
         end
     end
     lightningIcons()
@@ -1598,11 +1649,11 @@ newCountry = function()
     local options
     options = {
         text = country.printedName,
-        x = flagFrame.x - (flagFrame.width / 2) ,
-        y = flagFrame.y + 24,
+        x = flagFrame.x - flagFrame.width / 2,
+        y = flagFrame.y + flagFrame.height / 2,
         width = flagFrame.width,
         font = "fonts/kefa.fnt",
-        fontSize = 18,
+        fontSize = 22,
         align = "left",
     }
 
@@ -1753,8 +1804,8 @@ display.setDefault("textureWrapX", "repeat")
     flag.y = _H/2
     flag.width = 500
     flag.height = 333
-    flag.xScale = .2
-    flag.yScale = .2 * .7
+    flag.xScale = .3
+    flag.yScale = .3 * .7
     flag.anchorX = 1
     flag.anchorY = 0.5
 
@@ -2054,42 +2105,42 @@ moveObject = function(e)
         end
         --reset PaceRect, call readyObjects() to create a new palette or flag
         readyObject()
-    end
 
-    -- PALETTES: movement and direction of color palettes
-    if gameMechanics.mode == 1 then
-        if #spawnTable > 0 then
-            for i = 1, #spawnTable do
-                --isGrown means is palette full size
-                if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
-                    if spawnTable[i].corner == "TopRight" then
-                        spawnTable[i].x = spawnTable[i].x - speed
-                    elseif spawnTable[i].corner == "BottomLeft" then
-                        spawnTable[i].x = spawnTable[i].x + speed
+        -- PALETTES: movement and direction of color palettes
+        if gameMechanics.mode == 1 then
+            if #spawnTable > 0 then
+                for i = 1, #spawnTable do
+                    --isGrown means is palette full size
+                    if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
+                        if spawnTable[i].corner == "TopRight" then
+                            spawnTable[i].x = spawnTable[i].x - speed
+                        elseif spawnTable[i].corner == "BottomLeft" then
+                            spawnTable[i].x = spawnTable[i].x + speed
+                        end
                     end
                 end
             end
-        end
-    elseif gameMechanics.mode == 2 then
-        if #spawnTable > 0 then
-            for i = 1, #spawnTable do
-                if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
-                    if spawnTable[i].corner == "TopLeft" then
-                        spawnTable[i].x = spawnTable[i].x + speed
-                    elseif spawnTable[i].corner == "BottomRight" then
-                        spawnTable[i].x = spawnTable[i].x - speed
+        elseif gameMechanics.mode == 2 then
+            if #spawnTable > 0 then
+                for i = 1, #spawnTable do
+                    if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
+                        if spawnTable[i].corner == "TopLeft" then
+                            spawnTable[i].x = spawnTable[i].x + speed
+                        elseif spawnTable[i].corner == "BottomRight" then
+                            spawnTable[i].x = spawnTable[i].x - speed
+                        end
                     end
                 end
             end
-        end
-    elseif gameMechanics.mode == 3 then
-        if #spawnTable > 0 then
-            for i = 1, #spawnTable do
-                if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
-                    if spawnTable[i].corner == "TopLeft" or spawnTable[i].corner == "BottomLeft" then
-                        spawnTable[i].x = spawnTable[i].x - speed
-                    elseif spawnTable[i].corner == "TopRight" or spawnTable[i].corner == "BottomRight" then
-                        spawnTable[i].x = spawnTable[i].x + speed
+        elseif gameMechanics.mode == 3 then
+            if #spawnTable > 0 then
+                for i = 1, #spawnTable do
+                    if spawnTable[i] ~= 0 and spawnTable[i].isGrown == true then
+                        if spawnTable[i].corner == "TopLeft" or spawnTable[i].corner == "BottomLeft" then
+                            spawnTable[i].x = spawnTable[i].x - speed
+                        elseif spawnTable[i].corner == "TopRight" or spawnTable[i].corner == "BottomRight" then
+                            spawnTable[i].x = spawnTable[i].x + speed
+                        end
                     end
                 end
             end
@@ -2141,35 +2192,15 @@ readyObject = function(firstCountry)
                 for i = 1, #spawnTable do
                     if spawnTable[i] ~= 0 then
                         removePalette(spawnTable[i])
-
-                        -- MIKE: animations
-                        -- spawnTable[i].isGrown = false
-                        -- spawnTable[i].isPaletteActive = false
-                        -- transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
                     end
                 end
-
-                -- MIKE: putting a delay on this was causing a crash when testing.
-                -- flag3Timer = transition.to(flag, {time = 500, alpha = 0, onComplete = removeFlag})
-
                 resetSpawnTable()
                 setCountryParameters()
                 timer.cancel(setFlagTimer)
                 setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
-
-                -- MIKE: old timers, trying to make time between flags consistent
-                --[[
-                killBarsTimer = timer.performWithDelay(500, killBars)
-                resetSpawnTimer = timer.performWithDelay(540, resetSpawnTable)
-                -- SAM: flag timers - calls newFlag()
-                newFlagTimer = timer.performWithDelay(600, setCountryParameters)
-                ]]--
             end
         else
-            -- print(timeVar * timeVarMultiplier)
-            -- timer.performWithDelay((timeVar * timeVarMultiplier) * 2, createPalette, 1)
             createPalette()
-
             if gameMechanics.firstPalette == true then
                 gameMechanics.firstPalette = false
             elseif gameMechanics.firstPalette == false then
@@ -2320,9 +2351,21 @@ function scene:create(e)
     y1 = 1;y2 = 1;y3 = 0
     g1 = 0;g2 = .4;g3 = 0
     b1 = 0;b2 = 0;b3 = 1
+	local paint = {
+	    type = "gradient",
+	    color1 = { .6, .6, .6, 1 },
+	    color2 = { .2, .2, .2, 1 },
+	    direction = "down"
+	}
 
+	whiteBackground = display.newRect( _W/2, _H/2, _W, _H )
+	whiteBackground.fill = paint
+    whiteBackground.alpha = 0
+    self.view:insert(whiteBackground)
     paletteBarTop = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_top")}} )
     paletteBarBtm = display.newSprite( paletteBarSheet , {frames={paletteBarSheetCoords:getFrameIndex("palette_bar_btm")}} )
+    paletteBarTop.alpha = 1
+    paletteBarBtm.alpha = 1
     self.view:insert(paletteBarTop)
     self.view:insert(paletteBarBtm)
 
@@ -2516,8 +2559,8 @@ function scene:create(e)
         y = _H/2,
         width = 500,
         height = 333,
-        xScale = .2,
-        yScale = .2 * .7,
+        xScale = .3,
+        yScale = .3 * .7,
         anchorX = 1,
         anchorY = .5,
         flagPadding = 1,
@@ -2596,7 +2639,33 @@ function scene:create(e)
     paceRect.isTopLeft = false
     paceRect.isMoving = false
     paceRect.alpha = 0.6
+
     setupScoreboard()
+end
+
+function scene:focusGame()
+	print("re-focus game.lua")
+    paceRect.isMoving = true
+    transition.resume()
+    timer.resume( setFlagTimer )
+    for i = 1, #spawnTable do
+        if spawnTable[i] ~= 0 then
+            spawnTable[i].isPaletteActive = true
+        end
+    end
+end
+
+function scene:focusGameAndQuit()
+    -- Death Palette Animation
+    for i = 1, #spawnTable do
+        if spawnTable[i] ~= 0 then
+            spawnTable[i]:removeEventListener("touch", objTouch)
+            transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
+        end
+    end
+    Runtime:removeEventListener("enterFrame", boundaryCheck)
+    Runtime:removeEventListener("enterFrame", moveObject)
+    composer.gotoScene("menu")
 end
 
 function scene:show(e)
@@ -2604,6 +2673,7 @@ function scene:show(e)
         -- print("SHOWWILL")
 
     elseif (e.phase == "did") then
+        print("did")
         Runtime:addEventListener("enterFrame", boundaryCheck)
 
         -- READYOBJ: START
@@ -2661,6 +2731,8 @@ function scene:hide(e)
         end
         Runtime:removeEventListener("enterFrame", boundaryCheck)
         Runtime:removeEventListener("enterFrame", moveObject)
+        Runtime:removeEventListener( "system", onSystemEvent )
+        Runtime:removeEventListener( "resize", onResize )
         composer.removeScene("game", false)
     end
 end
