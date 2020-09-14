@@ -44,6 +44,9 @@ SFXArray.lightning = {
     audio.loadSound("sfx/l4.wav")
 }
 SFXArray.lightningSize = table.maxn(SFXArray.lightning)
+SFXArray.lightningFail = {
+    audio.loadSound("sfx/lightningfail1.wav")
+}
 
 --effects createPalette()
 cornersArray = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
@@ -1362,10 +1365,10 @@ end
 local function lightningButton(flagTouchEvent)
     -- what happend when you use lightning and no matching palettes are on-screen?
     print(flagTouchEvent)
+    transition.to(flag, {time = 30, rotation = -10, onComplete = flagRotate1})
     if lightningCount > 0 and flagTouchEvent and paceRect.isMoving == true then
         lineTable = {}
         lineTableCount = 0
-        transition.to(flag, {time = 30, rotation = -10, onComplete = flagRotate1})
         for i = 1, #spawnTable do
             if spawnTable[i] ~= 0 and spawnTable[i] ~= nil then
                 if lookupCode(code, spawnTable[i]) == 1 then  --colors match
@@ -1384,8 +1387,13 @@ local function lightningButton(flagTouchEvent)
         end
         if lineTableCount > 0 then
             audio.play( SFXArray.lightning[math.random(1, SFXArray.lightningSize)] )
-            lightningCount = lightningCount - 1
+
+        else
+            audio.play( SFXArray.lightningFail[1] )
         end
+        lightningCount = lightningCount - 1
+    else
+        audio.play( SFXArray.lightningFail[1] )
     end
     lightningIcons()
 end
