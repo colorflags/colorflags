@@ -120,46 +120,6 @@ function runMain()
 	  print("Texture memory usage " .. system.getInfo("textureMemoryUsed")/1024/1024 .. "MB")
 	end
 
-	-- SAM: what is this?
-	function playSound(audioObj,chn)
-		local chnUsed
-		if audioCanPlay then
-			chnUsed = audio.play(audioObj,{channel=chn})
-	    end
-	    return chnUsed
-	end
-
-	function makeTextButton(txt,x,y,opts)
-		local options  = opts or {}
-
-	    if environment=="simulator" then
-	      fontFace = options.fontFace or "Helvetica"
-	    elseif environment=="device" then
-	      fontFace = options.fontFace or "federalescort3d"
-	    end
-
-	    local fontSize = options.fontSize or 24
-	    local fontColor= options.fontColor or {255,255,255}
-	    local param=options.param
-	    local tapOrTouch=options.tapOrTouch or "tap"
-	    local listener=options.listener
-	    local group=options.group
-	    local btn=display.newEmbossedText(txt,0,0,fontFace,fontSize)
-	    btn:setFillColor(fontColor[1],fontColor[2],fontColor[3])
-	    btn.x=x or _W/2
-	    btn.y=y or _H/2
-	    if param then
-	    	btn.param=param
-	    end
-	    if listener then
-	    	btn:addEventListener(tapOrTouch,listener)
-	    end
-	    if group then
-	    	group:insert(btn)
-	    end
-	    return btn
-	end
-
 	if showSplash==true then
 	    timer.performWithDelay(1000,fadeSplash,1)
 	elseif showSplash==false then

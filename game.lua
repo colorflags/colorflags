@@ -85,12 +85,13 @@ gameMechanics.playCountryDuration = 30000 -- default 30000
 gameMechanics.transitionToCountryDuration = 2000
 gameMechanics.firstPaletteDelay = 10
 gameMechanics.firstPalette = true
-gameMechanics.growSpeedIndependance = false
+gameMechanics.growSpeedIndependance = true
 gameMechanics.countriesSpawned = 0
 gameMechanics.overrideFlag = false
 gameMechanics.heightModeTop = 35
 gameMechanics.heightModeLow = _H - 35
 gameMechanics.mode = 1
+gameMechanics.pauseOverlay = false
 
 -- FPS
 if fps == 30 then
@@ -115,22 +116,14 @@ local timeVarMultiplier = 0.5
 
 local levelsArray
 levelsArray = {
-    {speed=0.50, timeVar=5900},
-    {speed=0.55, timeVar=5400},
-    {speed=0.60, timeVar=4950},
-    {speed=0.65, timeVar=4450},
-    {speed=0.70, timeVar=4400},
-    {speed=0.75, timeVar=4200},
-
-    {speed=0.80, timeVar=4000},
-    {speed=0.85, timeVar=3800},
-    {speed=0.90, timeVar=3600},
-    {speed=0.95, timeVar=3400},
-    {speed=1.00, timeVar=3200},
-    {speed=1.05, timeVar=3000},
-    {speed=1.10, timeVar=2800},
-    {speed=1.15, timeVar=2600},
-    {speed=1.20, timeVar=2400}
+    -- {speed=0.50, timeVar=5900},
+    {speed=1.20, timeVar=2400},
+    {speed=1.25, timeVar=2200},
+    {speed=1.30, timeVar=2000},
+    {speed=1.35, timeVar=1800},
+    {speed=1.40, timeVar=1600},
+    {speed=1.45, timeVar=1400},
+    {speed=1.50, timeVar=1200}
 }
 
 -- checks if game just started
@@ -406,7 +399,7 @@ end
 
 -- READYOBJ: onOptionsTouch
 onOptionsTouch = function(event)
-    if event.phase == "began" then
+    if event.phase == "began" and gameMechanics.pauseOverlay == false then
         local optionName = event.target.name
         if optionName == "speedDecrease" or optionName == "speedIncrease" then
             if flag ~= nil and debugOptions.godSpeed == true then
@@ -580,14 +573,10 @@ local onSystemEvent = function( event )
         print("exit")
     elseif event.type == "applicationSuspend" then
         print("applicationSuspend called")
+        gameMechanics.pauseOverlay = true
         paceRect.isMoving = false
         transition.pause()
         timer.pause( setFlagTimer )
-        for i = 1, #spawnTable do
-            if spawnTable[i] ~= 0 then
-                spawnTable[i].isPaletteActive = false
-            end
-        end
         composer.showOverlay( "pauseoverlay", { effect = "fade", isModal = true } )
     elseif event.type == "applicationResume" then
         print("resume")
@@ -605,8 +594,11 @@ local function setupScoreboard()
         highlight = { r = 0, g = 0, b = 0 },
         shadow = { r = colorShadowArray.r, g = colorShadowArray.g, b = colorShadowArray.b }
     }
-    local scoreboardFont = "ChaparralPro-SemiboldIt"
-    -- local scoreboardFont2 = "ChaparralPro-Bold"
+
+    local scoreboardFont = "fonts/ChaparralPro-SemiboldIt.otf"
+    local debugFont = "fonts/PTMono-Bold.ttf"
+    -- local scoreboardFont = "ChaparralPro-SemiboldIt"
+    -- local debugFont = "PTMono-Bold"
 
     local scoreboardOffsetFromLeft = 14
     local scoreboardOffsetFromEachOther = 70
@@ -653,7 +645,7 @@ local function setupScoreboard()
     speedDecreaseBtnFill = display.newRoundedRect(speedDecreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) - 11, speedTextGroupAnchorY - speedTextDesc.height * scoreboardOffsetIncDecBtns, 20, 20, 0)
     speedDecreaseBtnFill:setFillColor(.4, .4, .4)
     speedDecreaseBtnFill.anchorY = 1
-    speedDecreaseBtnSym = display.newText(speedDecreaseBtnGroup, "-", speedDecreaseBtnFill.x, speedDecreaseBtnFill.y - (speedDecreaseBtnFill.height/2), "PTMono-Bold", 18)
+    speedDecreaseBtnSym = display.newText(speedDecreaseBtnGroup, "-", speedDecreaseBtnFill.x, speedDecreaseBtnFill.y - (speedDecreaseBtnFill.height/2), debugFont, 18)
     speedDecreaseBtnSym.anchorX = .5
     speedDecreaseBtnSym.anchorY = .5
     speedTextGroup:insert(speedDecreaseBtnGroup)
@@ -665,7 +657,7 @@ local function setupScoreboard()
     speedIncreaseBtnFill = display.newRoundedRect(speedIncreaseBtnGroup, speedTextGroupAnchorX + (speedTextDesc.width/2) + 11, speedTextGroupAnchorY - speedTextDesc.height * scoreboardOffsetIncDecBtns, 20, 20, 0)
     speedIncreaseBtnFill:setFillColor(.4, .4, .4)
     speedIncreaseBtnFill.anchorY = 1
-    speedIncreaseBtnSym = display.newText(speedIncreaseBtnGroup, "+", speedIncreaseBtnFill.x, speedIncreaseBtnFill.y - (speedIncreaseBtnFill.height/2), "PTMono-Bold", 18)
+    speedIncreaseBtnSym = display.newText(speedIncreaseBtnGroup, "+", speedIncreaseBtnFill.x, speedIncreaseBtnFill.y - (speedIncreaseBtnFill.height/2), debugFont, 18)
     speedIncreaseBtnSym.anchorX = .5
     speedIncreaseBtnSym.anchorY = .5
     speedTextGroup:insert(speedIncreaseBtnGroup)
@@ -694,7 +686,7 @@ local function setupScoreboard()
     modeDecreaseBtnFill = display.newRoundedRect(modeDecreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) - 11, modeTextGroupAnchorY - modeTextDesc.height * scoreboardOffsetIncDecBtns, 20, 20, 0)
     modeDecreaseBtnFill:setFillColor(.4, .4, .4)
     modeDecreaseBtnFill.anchorY = 1
-    modeDecreaseBtnSym = display.newText(modeDecreaseBtnGroup, "-", modeDecreaseBtnFill.x, modeDecreaseBtnFill.y - (modeDecreaseBtnFill.height/2), "PTMono-Bold", 18)
+    modeDecreaseBtnSym = display.newText(modeDecreaseBtnGroup, "-", modeDecreaseBtnFill.x, modeDecreaseBtnFill.y - (modeDecreaseBtnFill.height/2), debugFont, 18)
     modeDecreaseBtnSym.anchorX = .5
     modeDecreaseBtnSym.anchorY = .5
     modeTextGroup:insert(modeDecreaseBtnGroup)
@@ -706,7 +698,7 @@ local function setupScoreboard()
     modeIncreaseBtnFill = display.newRoundedRect(modeIncreaseBtnGroup, modeTextGroupAnchorX + (modeTextDesc.width/2) + 11, modeTextGroupAnchorY - modeTextDesc.height * scoreboardOffsetIncDecBtns, 20, 20, 0)
     modeIncreaseBtnFill:setFillColor(.4, .4, .4)
     modeIncreaseBtnFill.anchorY = 1
-    modeIncreaseBtnSym = display.newText(modeIncreaseBtnGroup, "+", modeIncreaseBtnFill.x, modeIncreaseBtnFill.y - (modeIncreaseBtnFill.height/2), "PTMono-Bold", 18)
+    modeIncreaseBtnSym = display.newText(modeIncreaseBtnGroup, "+", modeIncreaseBtnFill.x, modeIncreaseBtnFill.y - (modeIncreaseBtnFill.height/2), debugFont, 18)
     modeIncreaseBtnSym.anchorX = .5
     modeIncreaseBtnSym.anchorY = .5
     modeTextGroup:insert(modeIncreaseBtnGroup)
@@ -717,7 +709,7 @@ local function setupScoreboard()
 
     local gameDebugGroupAnchorY = gameMechanics.heightModeLow - 70
     local newScoreboardOffsetFromEachOther = 40
-    gameDebugPanelToggle = display.newEmbossedText("debug >", scoreTextDesc.x + scoreTextDesc.width/2, gameDebugGroupAnchorY, "ChaparralPro-SemiboldIt", 22)
+    gameDebugPanelToggle = display.newEmbossedText("debug >", scoreTextDesc.x + scoreTextDesc.width/2, gameDebugGroupAnchorY, scoreboardFont, 22)
     gameDebugPanelToggle.name = "gameDebugPanel"
     gameDebugPanelToggle:setFillColor(unpack(scoreboardColor))
     gameDebugPanelToggle:setEmbossColor(scoreboardEmbossColor)
@@ -733,7 +725,7 @@ local function setupScoreboard()
         text = "god?",
         x = gameDebugGodAnchorX,
         y = gameDebugGroupAnchorY,
-        font = "PTMono-Bold",
+        font = debugFont,
         fontSize = 8,
         align = "center"
     }
@@ -746,7 +738,7 @@ local function setupScoreboard()
     gameDebugGodBtnFill = display.newRoundedRect(gameDebugGodBtnGroup, gameDebugGodAnchorX, gameDebugGroupAnchorY, 30, 30, 0)
     gameDebugGodBtnFill:setFillColor(.2, .2, .2)
     gameDebugGodBtnFill.anchorY = 1
-    gameDebugGodBtnSym = display.newText(gameDebugGodBtnGroup, "", gameDebugGodBtnFill.x, gameDebugGodBtnFill.y - (gameDebugGodBtnFill.height/2), "PTMono-Bold", 30)
+    gameDebugGodBtnSym = display.newText(gameDebugGodBtnGroup, "", gameDebugGodBtnFill.x, gameDebugGodBtnFill.y - (gameDebugGodBtnFill.height/2), debugFont, 30)
     if debugOptions.god == true then
         gameDebugGodBtnSym.text = "X"
     end
@@ -761,7 +753,7 @@ local function setupScoreboard()
         text = "speed?",
         x = gameDebugSpeedAnchorX,
         y = gameDebugGroupAnchorY,
-        font = "PTMono-Bold",
+        font = debugFont,
         fontSize = 8,
         align = "center"
     }
@@ -774,7 +766,7 @@ local function setupScoreboard()
     gameDebugSpeedBtnFill = display.newRoundedRect(gameDebugSpeedBtnGroup, gameDebugSpeedAnchorX, gameDebugGroupAnchorY, 30, 30, 0)
     gameDebugSpeedBtnFill:setFillColor(.2, .2, .2)
     gameDebugSpeedBtnFill.anchorY = 1
-    gameDebugSpeedBtnSym = display.newText(gameDebugSpeedBtnGroup, "", gameDebugSpeedBtnFill.x, gameDebugSpeedBtnFill.y - (gameDebugSpeedBtnFill.height/2), "PTMono-Bold", 30)
+    gameDebugSpeedBtnSym = display.newText(gameDebugSpeedBtnGroup, "", gameDebugSpeedBtnFill.x, gameDebugSpeedBtnFill.y - (gameDebugSpeedBtnFill.height/2), debugFont, 30)
     if debugOptions.godSpeed == true then
         gameDebugSpeedBtnSym.text = "X"
     end
@@ -789,7 +781,7 @@ local function setupScoreboard()
         text = "modes?",
         x = gameDebugCycleAnchorX,
         y = gameDebugGroupAnchorY,
-        font = "PTMono-Bold",
+        font = debugFont,
         fontSize = 8,
         align = "center"
     }
@@ -802,7 +794,7 @@ local function setupScoreboard()
     gameDebugCycleBtnFill = display.newRoundedRect(gameDebugCycleBtnGroup, gameDebugCycleAnchorX, gameDebugGroupAnchorY, 30, 30, 0)
     gameDebugCycleBtnFill:setFillColor(.2, .2, .2)
     gameDebugCycleBtnFill.anchorY = 1
-    gameDebugCycleBtnSym = display.newText(gameDebugCycleBtnGroup, "", gameDebugCycleBtnFill.x, gameDebugCycleBtnFill.y - (gameDebugCycleBtnFill.height/2), "PTMono-Bold", 30)
+    gameDebugCycleBtnSym = display.newText(gameDebugCycleBtnGroup, "", gameDebugCycleBtnFill.x, gameDebugCycleBtnFill.y - (gameDebugCycleBtnFill.height/2), debugFont, 30)
     if debugOptions.godCycle == true then
         gameDebugCycleBtnSym.text = "X"
     end
@@ -880,7 +872,7 @@ speedUp = function()
 end
 
 speedDown = function()
-    if levelsIndex ~= #levelsArray then
+    if levelsIndex ~= 1 then
         levelsIndex = levelsIndex - 1
         if fps == 30 then
             speed = levelsArray[levelsIndex].speed
@@ -1192,11 +1184,9 @@ end
 
 local function paletteGrow(self)
     if gameMechanics.growSpeedIndependance == true then
-        transition.to(self, {time = 200, xScale = 1, yScale = 1})
+        transition.to(self, {time = 1200, alpha = 1, xScale = 1, yScale = 1})
     else
-        -- SAM: originally timeVar * timeVarMultiplier
-        transition.to(self, {time = timeVar * timeVarMultiplier, xScale = 1, yScale = 1})
-        -- transition.to(self, {time = timeVar, xScale = 1, yScale = 1})
+        transition.to(self, {time = timeVar * timeVarMultiplier, alpha = 1, xScale = 1, yScale = 1})
     end
 end
 
@@ -1219,6 +1209,13 @@ local function spawnPalette(params)
     object.isBottomLeft = params.isBottomLeft
     object.corner = params.corner
     object.type = params.type
+    object.alpha = 0
+
+    object.touch = objTouch
+    object:addEventListener("touch", object)
+    --object:addEventListener("enterFrame", moveObject)
+    object.objTable[object.index] = object --Insert the object into the table at the specified index
+    object:scale(0, 0)
 
     -- print("created" .. object.myName)
 
@@ -1289,18 +1286,17 @@ local function spawnPalette(params)
         object.L2 = b2
         object.L3 = b3
     end
-    object.touch = objTouch
-    object:addEventListener("touch", object)
-    --object:addEventListener("enterFrame", moveObject)
-    object.objTable[object.index] = object --Insert the object into the table at the specified index
-    object:scale(0, 0)
 
     --new pallets are being scaled to full size as they appear
     if gameMechanics.mode == 1 or gameMechanics.mode == 2 then
         if object.index == 1 or object.index == 2 then
-            transition.to(object, {time = timeVar * timeVarMultiplier, xScale = .01, yScale = .01, onComplete = paletteGrow})
+            -- paletteGrow(object)
+            -- SAM: using transition.to and then calling paletteGrow is redundant!?
+            transition.to(object, {time = 1200, onComplete = paletteGrow})
         else
-            transition.to(object, {time = timeVar * timeVarMultiplier, xScale = .01, yScale = .01, onComplete = paletteGrow})
+            -- paletteGrow(object)
+            -- SAM: using transition.to and then calling paletteGrow is redundant!?
+            transition.to(object, {time = 1200, onComplete = paletteGrow})
             if spawnTable[object.index - 2] ~= 0 then
                 spawnTable[object.index - 2]:toFront()
             end
@@ -1362,40 +1358,40 @@ local function flagRotate1()
     transition.to(flag, {time = 40, rotation = 10, onComplete = flagRotate2})
 end
 
-local function lightningButton(flagTouchEvent)
-    -- what happend when you use lightning and no matching palettes are on-screen?
-    print(flagTouchEvent)
-    transition.to(flag, {time = 30, rotation = -10, onComplete = flagRotate1})
-    if lightningCount > 0 and flagTouchEvent and paceRect.isMoving == true then
-        lineTable = {}
-        lineTableCount = 0
-        for i = 1, #spawnTable do
-            if spawnTable[i] ~= 0 and spawnTable[i] ~= nil then
-                if lookupCode(code, spawnTable[i]) == 1 then  --colors match
-                    spawnTable[i].isPaletteActive = false
-                    spawnTable[i].isGrown = false
-                    lineTableCount = lineTableCount + 1
-                    line = display.newLine(spawnTable[i].x, spawnTable[i].y, _W / 2, _H / 2)
-                    line:setStrokeColor(spawnTable[i].L1, spawnTable[i].L2, spawnTable[i].L3)
-                    line.strokeWidth = 6
-                    line:toFront()
-                    lineTable[lineTableCount] = line
-                    transition.to(line, {time = 300, xScale = 0.01, yScale = 0.01, onComplete = removeLine})
-                    lightningStrike(spawnTable[i])
+local function lightningButton(event)
+    if event.phase == "began" and gameMechanics.pauseOverlay == false then
+        transition.to(flag, {time = 30, rotation = -10, onComplete = flagRotate1})
+        if lightningCount > 0 and paceRect.isMoving == true then
+            lineTable = {}
+            lineTableCount = 0
+            for i = 1, #spawnTable do
+                if spawnTable[i] ~= 0 and spawnTable[i] ~= nil then
+                    if lookupCode(code, spawnTable[i]) == 1 then  --colors match
+                        if spawnTable[i].isGrown == true then
+                            lineTableCount = lineTableCount + 1
+                            line = display.newLine(spawnTable[i].x, spawnTable[i].y, _W / 2, _H / 2)
+                            line:setStrokeColor(spawnTable[i].L1, spawnTable[i].L2, spawnTable[i].L3)
+                            line.strokeWidth = 6
+                            line:toFront()
+                            lineTable[lineTableCount] = line
+                            transition.to(line, {time = 300, xScale = 0.01, yScale = 0.01, onComplete = removeLine})
+                            lightningStrike(spawnTable[i])
+                        end
+                    end
                 end
             end
-        end
-        if lineTableCount > 0 then
-            audio.play( SFXArray.lightning[math.random(1, SFXArray.lightningSize)] )
+            if lineTableCount > 0 then
+                audio.play( SFXArray.lightning[math.random(1, SFXArray.lightningSize)] )
 
+            else
+                audio.play( SFXArray.lightningFail[1] )
+            end
+            lightningCount = lightningCount - 1
         else
             audio.play( SFXArray.lightningFail[1] )
         end
-        lightningCount = lightningCount - 1
-    else
-        audio.play( SFXArray.lightningFail[1] )
+        lightningIcons()
     end
-    lightningIcons()
 end
 
 local function trackLightningScore()
@@ -1421,17 +1417,8 @@ end
 end
 
 function lightningStrike(self)
-    --You are Alive
-    if self.isGrown == false then
-        self:removeSelf()
-        spawnTable[self.index] = 0
-    else
-        if self.x < 1 or self.x > _W - 1 then
-            transition.to(self, {time = 100, rotation = 0, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
-        else
-            transition.to(self, {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
-        end
-    end
+    self:removeSelf()
+    spawnTable[self.index] = 0
     currentColor = self.type
     --bonus score
     if currentColor == previousColor then
@@ -1824,7 +1811,7 @@ display.setDefault("textureWrapX", "repeat")
     lightningIcon4:toFront()
     lightningIcon5:toFront()
 
-    flag:addEventListener("tap", lightningButton)
+    flag:addEventListener("touch", lightningButton)
     lightningIcons()
 
     code = country.code
@@ -1939,7 +1926,7 @@ local function countryTrace()
 end
 
 local function removeFlag()
-    flag:removeEventListener("tap", lightningButton)
+    flag:removeEventListener("touch", lightningButton)
     flag:removeSelf()
     flag = nil
 end
@@ -2210,21 +2197,19 @@ readyObject = function(firstCountry)
                 setFlagTimer = timer.performWithDelay(gameMechanics.playCountryDuration, setFlag, 1)
             end
         else
-
             createPalette()
             if gameMechanics.firstPalette == true then
                 gameMechanics.firstPalette = false
             elseif gameMechanics.firstPalette == false then
                 if gameMechanics.mode == 1 or gameMechanics.mode == 2 then
                     if spawnTable[count] ~= 0 then
-                        --isGrown means colorPalletes are full size scale=1
                         spawnTable[count].isGrown = true
                     end
                     if spawnTable[count + 1] ~= 0 then
                         spawnTable[count + 1].isGrown = true
                     end
                     count = count + 2
-                elseif gameMechanics.mode == 3 then --SAM: this should be gameMechanics.mode == 3
+                elseif gameMechanics.mode == 3 then
                     if spawnTable[count] ~= 0 then
                         spawnTable[count].isGrown = true
                     end
@@ -2245,7 +2230,7 @@ readyObject = function(firstCountry)
 end
 
 function objTouch(self, e)
-    if e.phase == "began" and e.target.isPaletteActive == true then
+    if e.phase == "began" and e.target.isPaletteActive == true and gameMechanics.pauseOverlay == false then
         -- animatePaletteDestroy(spawnTable[self.index].x, spawnTable[self.index].y, spawnTable[self.index].isTopLeft)
 
         audio.play( SFXArray.poof[math.random(1, SFXArray.poofSize)] )
@@ -2291,16 +2276,7 @@ function objTouch(self, e)
             --You are Alive
         else
             e.target.isPaletteActive = false
-            if e.target.isGrown == false then
-                e.target:removeSelf()
-                spawnTable[e.target.index] = 0
-            else
-                if self.x < 1 or self.x > _W - 1 then
-                    transition.to(e.target, {time = 100, rotation = 0, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
-                else
-                    transition.to(e.target, {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
-                end
-            end
+            transition.to(e.target, {time = 200, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
             currentColor = e.target.type
             --BONUS SCORE
             if currentColor == previousColor then
@@ -2656,14 +2632,10 @@ end
 
 function scene:focusGame()
 	print("re-focus game.lua")
+    gameMechanics.pauseOverlay = false
     paceRect.isMoving = true
     transition.resume()
     timer.resume( setFlagTimer )
-    for i = 1, #spawnTable do
-        if spawnTable[i] ~= 0 then
-            spawnTable[i].isPaletteActive = true
-        end
-    end
 end
 
 function scene:focusGameAndQuit()
@@ -2671,7 +2643,7 @@ function scene:focusGameAndQuit()
     for i = 1, #spawnTable do
         if spawnTable[i] ~= 0 then
             spawnTable[i]:removeEventListener("touch", objTouch)
-            transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
+            transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, x = _W/2, y = _H/2, onComplete = removePalette})
         end
     end
     Runtime:removeEventListener("enterFrame", boundaryCheck)
@@ -2746,6 +2718,7 @@ function scene:hide(e)
         Runtime:removeEventListener( "system", onSystemEvent )
         Runtime:removeEventListener( "resize", onResize )
         composer.removeScene("game", false)
+        system.deactivate("multitouch")
     end
 end
 
