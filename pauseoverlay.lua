@@ -53,8 +53,18 @@ local function doFunction(e)
         e.x > currentObject.contentBounds.xMax or
         e.y < currentObject.contentBounds.yMin or
         e.y > currentObject.contentBounds.yMax then
+            if touchInsideBtn == true then
+                currentObject.xScale = 1
+                currentObject.yScale = 1
+                print("finger down, outside button: ", currentObject.name)
+            end
             touchInsideBtn = false
         else
+            if touchInsideBtn == false then
+                currentObject.xScale = 1.05
+                currentObject.yScale = 1.05
+                print("finger down, outside button: ", currentObject.name)
+            end
             touchInsideBtn = true
         end
     end
@@ -127,13 +137,15 @@ function scene:create( event )
         shadow = { r = colorShadowArray.r, g = colorShadowArray.g, b = colorShadowArray.b }
     }
 
-    btnsResume = display.newEmbossedText("Resume", _W/2, background.y - (background.height/4), "ChaparralPro-SemiboldIt", 22)
+    local font = "fonts/ChaparralPro-SemiboldIt.otf"
+
+    btnsResume = display.newEmbossedText("Resume", _W/2, background.y - (background.height/4), font, 22)
     btnsResume:setFillColor(unpack(scoreboardColor))
     btnsResume:setEmbossColor(scoreboardEmbossColor)
     btnsResume.anchorY = 0
     btnsGroup:insert(btnsResume)
 
-    btnsQuit = display.newEmbossedText("Quit", _W/2, btnsResume.y, "ChaparralPro-SemiboldIt", 22)
+    btnsQuit = display.newEmbossedText("Quit", _W/2, btnsResume.y, font, 22)
     btnsQuit:setFillColor(unpack(scoreboardColor))
     btnsQuit:setEmbossColor(scoreboardEmbossColor)
     btnsQuit.y = btnsQuit.y + 22

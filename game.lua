@@ -124,6 +124,8 @@ levelsArray = {
     {speed=1.40, timeVar=1600},
     {speed=1.45, timeVar=1400},
     {speed=1.50, timeVar=1200}
+
+    -- start at 2!?
 }
 
 -- checks if game just started
@@ -573,11 +575,13 @@ local onSystemEvent = function( event )
         print("exit")
     elseif event.type == "applicationSuspend" then
         print("applicationSuspend called")
-        gameMechanics.pauseOverlay = true
-        paceRect.isMoving = false
-        transition.pause()
-        timer.pause( setFlagTimer )
-        composer.showOverlay( "pauseoverlay", { effect = "fade", isModal = true } )
+        if gameMechanics.pauseOverlay == false then
+            gameMechanics.pauseOverlay = true
+            paceRect.isMoving = false
+            transition.pause()
+            timer.pause( setFlagTimer )
+            composer.showOverlay( "pauseoverlay", { effect = "fade", isModal = true } )
+        end
     elseif event.type == "applicationResume" then
         print("resume")
     end
@@ -984,6 +988,10 @@ local function lookupCode(code, spawn)
         end
     elseif code == "ryk" then
         if spawn.type == "red" or spawn.type == "yellow" or spawn.type == "black" then
+            return 1
+        end
+    elseif code == "rwk" then
+        if spawn.type == "red" or spawn.type == "white" or spawn.type == "black" then
             return 1
         end
     elseif code == "ogw" then
@@ -1638,7 +1646,7 @@ newCountry = function()
 
     -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
     local randomCountry = math.random(CFGameSettings:getLength())
-    country = CFGameSettings:getItemByID(randomCountry)
+    country = CFGameSettings:getItemByID(14)
 
     local subGroup = display.newGroup()
     local options
@@ -2631,11 +2639,13 @@ function scene:create(e)
 end
 
 function scene:focusGame()
-	print("re-focus game.lua")
-    gameMechanics.pauseOverlay = false
-    paceRect.isMoving = true
-    transition.resume()
-    timer.resume( setFlagTimer )
+    timer.performWithDelay( 300, function()
+        gameMechanics.pauseOverlay = false
+        paceRect.isMoving = true
+        transition.resume()
+        timer.resume( setFlagTimer )
+    end )
+
 end
 
 function scene:focusGameAndQuit()

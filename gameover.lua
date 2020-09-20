@@ -219,6 +219,10 @@ local FG2Transition1
 local FG2Transition2
 local FG2Transition3
 local FG2Transition4
+local FG3Transition1
+local FG3Transition2
+local FG3Transition3
+local FG3Transition4
 local cloudFadeTransition1
 local cloudFadeTransition2
 
@@ -335,8 +339,8 @@ local function doFunction(e)
             -- currentObject:setFrame(2)
             -- SAM: wtf. how is this working? do some testing.
             if(touchInsideBtn == true) then
-                currentObject.xScale = .8
-                currentObject.yScale = .8
+                -- currentObject.xScale = .8
+                -- currentObject.yScale = .8
                 print("finger down, outside button: ", currentObject.name)
             end
             touchInsideBtn = false
@@ -344,8 +348,8 @@ local function doFunction(e)
             if touchInsideBtn == false then
                 print("finger down, inside button: ", currentObject.name)
 
-                currentObject.xScale = .8
-                currentObject.yScale = .8
+                -- currentObject.xScale = .8
+                -- currentObject.yScale = .8
                 -- currentObject.xScale = 1.01
                 -- currentObject.yScale = 1.01
                 if currentObject.name == "again" then
@@ -371,20 +375,20 @@ local function moveClouds(event)
     cloudsFG1.x = cloudsFG1.x + scrollSpeedFG
     cloudsFG2.x = cloudsFG2.x + scrollSpeedFG
 
-    if cloudsBG1.x > 0 + cloudsBG1.width then
+    if cloudsBG1.x > _W then
         cloudsBG1:translate(-cloudsBG1.width*3, 0)
     end
-    if cloudsBG2.x > 0 + cloudsBG1.width then
+    if cloudsBG2.x > _W then
         cloudsBG2:translate(-cloudsBG1.width*3, 0)
     end
-    if cloudsBG3.x > 0 + cloudsBG1.width then
+    if cloudsBG3.x > _W then
         cloudsBG3:translate(-cloudsBG1.width*3, 0)
     end
-    if cloudsFG1.x > 0 + cloudsFG1.width then
-        cloudsFG1:translate(-cloudsFG2.width*2, 0)
+    if cloudsFG1.x > _W then
+        cloudsFG1:translate(-cloudsFG1.width*4, 0)
     end
-    if cloudsFG2.x > 0 + cloudsFG2.width then
-        cloudsFG2:translate(-cloudsFG1.width*2, 0)
+    if cloudsFG2.x > _W then
+        cloudsFG2:translate(-cloudsFG1.width*4, 0)
     end
 end
 
@@ -530,16 +534,18 @@ function scene:create(e)
     local scoreTextGroupAnchorX = scoreboardOffsetFromLeft
     local scoreTextGroupAnchorY = 18
 
+    local font = "fonts/ChaparralPro-SemiboldIt.otf"
+
     -- SAM: rotate scoreTextGroup
     scoreTextGroup = display.newGroup()
-    scoreTextDesc = display.newEmbossedText("your score", 0, 0, "ChaparralPro-SemiboldIt", 22)
+    scoreTextDesc = display.newEmbossedText("your score", 0, 0, font, 22)
     scoreTextDesc:setFillColor(unpack(scoreboardColor))
     scoreTextDesc:setEmbossColor(scoreboardEmbossColor)
     scoreTextDesc.anchorX = 0.5
     scoreTextDesc.anchorY = 1
     scoreTextGroup:insert(scoreTextDesc)
 
-    scoreText = display.newEmbossedText(pGet( "score.json", "highScore" ), 0, 0 + scoreTextDesc.y, "ChaparralPro-Bold", 45)
+    scoreText = display.newEmbossedText(pGet( "score.json", "highScore" ), 0, 0 + scoreTextDesc.y, font, 45)
     scoreText:setFillColor(unpack(scoreboardColor))
     scoreText:setEmbossColor(scoreboardEmbossColor)
     scoreText.anchorY = 0
@@ -583,7 +589,7 @@ function scene:create(e)
     btnsQuit:setFrame(1)
     btnsQuit.alpha=0
     btnsQuit.gotoScene="menu"
-    btnsQuit:scale(.8,.8)
+    btnsQuit:scale(1,1)
     btnsQuit:rotate(-4)
     transition.to( btnsQuit, {time = 200, alpha=.9})
 
@@ -597,35 +603,34 @@ function scene:create(e)
     btnsAgain:setFrame(1)
     btnsAgain.alpha=0
     btnsAgain.gotoScene="game"
-    btnsAgain:scale(.8,.8)
+    btnsAgain:scale(1,1)
     btnsAgain:rotate(2)
     transition.to( btnsAgain, {time = 200, alpha=.9})
 
     cloudsBG1 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
     cloudsBG1.name = "cloudsBG1"
-    -- cloudsBG1.alpha = .5
+    -- cloudsBG1.alpha = 0.5
     cloudsBG1.anchorX = 0
     cloudsBG1.anchorY = 1
-    cloudsBG1.x = 0
+    cloudsBG1.x = _W - cloudsBG1.width
     cloudsBG1.y = _H
     cloudsBG1:toBack()
-    print( display.pixelHeight / display.actualContentHeight )
 
     cloudsBG2 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
     cloudsBG2.name = "cloudsBG2"
-    -- cloudsBG2.alpha = .5
+    -- cloudsBG2.alpha = 0.5
     cloudsBG2.anchorX = 0
     cloudsBG2.anchorY = 1
-    cloudsBG2.x = 0 - cloudsBG1.width
+    cloudsBG2.x = cloudsBG1.x - cloudsBG1.width
     cloudsBG2.y = _H
     cloudsBG2:toBack()
 
     cloudsBG3 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
     cloudsBG3.name = "cloudsBG3"
-    -- cloudsBG3.alpha = .5
+    -- cloudsBG3.alpha = 0.5
     cloudsBG3.anchorX = 0
     cloudsBG3.anchorY = 1
-    cloudsBG3.x = 0 - (cloudsBG1.width + cloudsBG2.width)
+    cloudsBG3.x = cloudsBG2.x - cloudsBG1.width
     cloudsBG3.y = _H
     cloudsBG3:toBack()
 
@@ -636,7 +641,7 @@ function scene:create(e)
     -- cloudsFG1:setFillColor( 1, 1, 0 )
     -- cloudsFG1.alpha=0
     cloudsFG1.anchorX = 0
-    cloudsFG1.x = 0
+    cloudsFG1.x = 0 - cloudsFG1.width
     cloudsFG1.y = _H/2
 
     cloudsFG2 = display.newSprite( cloudsFG1Sheet, {frames={1}} )
@@ -644,13 +649,13 @@ function scene:create(e)
     -- cloudsFG2:setFillColor( 1, 1, 0 )
     -- cloudsFG2.alpha=0
     cloudsFG2.anchorX = 0
-    cloudsFG2.x = cloudsFG1.width
+    cloudsFG2.x = cloudsFG1.x - cloudsFG1.width * 2
     cloudsFG2.y = _H/2
 
     Runtime:addEventListener("enterFrame", moveClouds)
 
-    cloudCirculate(cloudsFG1)
-    cloudCirculate(cloudsFG2)
+    -- cloudCirculate(cloudsFG1)
+    -- cloudCirculate(cloudsFG2)
 
     -- cloudFade(cloudsBG1)
     -- cloudFade(cloudsBG2)
