@@ -137,7 +137,7 @@ function scene:create( event )
         shadow = { r = colorShadowArray.r, g = colorShadowArray.g, b = colorShadowArray.b }
     }
 
-    local font = "fonts/ChaparralPro-SemiboldIt.otf"
+    local font = "fonts/chaparralpro-semiboldit.otf"
 
     btnsResume = display.newEmbossedText("Resume", _W/2, background.y - (background.height/4), font, 22)
     btnsResume:setFillColor(unpack(scoreboardColor))

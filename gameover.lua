@@ -375,13 +375,13 @@ local function moveClouds(event)
     cloudsFG1.x = cloudsFG1.x + scrollSpeedFG
     cloudsFG2.x = cloudsFG2.x + scrollSpeedFG
 
-    if cloudsBG1.x > _W then
+    if cloudsBG1.x > _W + cloudsBG1.width then
         cloudsBG1:translate(-cloudsBG1.width*3, 0)
     end
-    if cloudsBG2.x > _W then
+    if cloudsBG2.x > _W + cloudsBG1.width then
         cloudsBG2:translate(-cloudsBG1.width*3, 0)
     end
-    if cloudsBG3.x > _W then
+    if cloudsBG3.x > _W + cloudsBG1.width then
         cloudsBG3:translate(-cloudsBG1.width*3, 0)
     end
     if cloudsFG1.x > _W then
@@ -610,28 +610,28 @@ function scene:create(e)
     cloudsBG1 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
     cloudsBG1.name = "cloudsBG1"
     -- cloudsBG1.alpha = 0.5
-    cloudsBG1.anchorX = 0
-    cloudsBG1.anchorY = 1
-    cloudsBG1.x = _W - cloudsBG1.width
-    cloudsBG1.y = _H
+    cloudsBG1.anchorX = 1
+    cloudsBG1.anchorY = 0
+    cloudsBG1.x = _W
+    cloudsBG1.y = 0
     cloudsBG1:toBack()
 
     cloudsBG2 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
     cloudsBG2.name = "cloudsBG2"
     -- cloudsBG2.alpha = 0.5
-    cloudsBG2.anchorX = 0
-    cloudsBG2.anchorY = 1
+    cloudsBG2.anchorX = 1
+    cloudsBG2.anchorY = 0
     cloudsBG2.x = cloudsBG1.x - cloudsBG1.width
-    cloudsBG2.y = _H
+    cloudsBG2.y = 0
     cloudsBG2:toBack()
 
     cloudsBG3 = display.newSprite( cloudsBG1Sheet, {frames={1}} )
     cloudsBG3.name = "cloudsBG3"
     -- cloudsBG3.alpha = 0.5
-    cloudsBG3.anchorX = 0
-    cloudsBG3.anchorY = 1
+    cloudsBG3.anchorX = 1
+    cloudsBG3.anchorY = 0
     cloudsBG3.x = cloudsBG2.x - cloudsBG1.width
-    cloudsBG3.y = _H
+    cloudsBG3.y = 0
     cloudsBG3:toBack()
 
     offsetCloudFG = 20
@@ -649,7 +649,7 @@ function scene:create(e)
     -- cloudsFG2:setFillColor( 1, 1, 0 )
     -- cloudsFG2.alpha=0
     cloudsFG2.anchorX = 0
-    cloudsFG2.x = cloudsFG1.x - cloudsFG1.width * 2
+    cloudsFG2.x = 0 - cloudsFG1.width * 2
     cloudsFG2.y = _H/2
 
     Runtime:addEventListener("enterFrame", moveClouds)

@@ -3,7 +3,7 @@
 -- A bitmap font loader/render for CoronaSDK
 
 local M = {}
-M.cache = {} -- cache for loaded fonts
+local cache = {} -- cache for loaded fonts
 
 
 -- If you use UTF-8 characters, you will need to add this plugin to your
@@ -128,10 +128,10 @@ function M.newText(options)
 
   -- load font if not in cache
   local fontFile = options.font or "default"
-  if not M.cache[fontFile] then
-    M.cache[fontFile] = loadFont(fontFile)
+  if not cache[fontFile] then
+    cache[fontFile] = loadFont(fontFile)
   end
-  instance.bitmapFont = M.cache[fontFile]
+  instance.bitmapFont = cache[fontFile]
 
   -- Brand-spanking new render code with scaling to fontSize,
   -- word wrapping to width and general performance and
@@ -211,7 +211,7 @@ function M.newText(options)
     if text then
       for letter in string.gmatch(text..'\n', '(.)') do
         if letter == '\n' then -- newline
-          x = 0; y = y + info.lineHeight
+          x, y = 0, y + info.lineHeight
         elseif font.chars[letter] then
           if tonumber(font.chars[letter].width) > 0 and tonumber(font.chars[letter].height) > 0 then
             local glyph = display.newImage(font.spritesheets[font.sprites[letter].spritesheet].sheet, font.sprites[letter].frame)

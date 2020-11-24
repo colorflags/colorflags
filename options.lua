@@ -23,8 +23,8 @@ local arialFont = "Arial Rounded MT Bold"
 local musicOff
 
 local btnsLeftArrow
-local btnsLeftArrowSheetCoords = require("lua-sheets.btns_left_arrow")
-local btnsLeftArrowSheet = graphics.newImageSheet("images/btns_left_arrow.png", btnsLeftArrowSheetCoords:getSheet())
+local btnsLeftArrowSheetCoords = require("lua-sheets.btns_arrow")
+local btnsLeftArrowSheet = graphics.newImageSheet("images/btns_arrow.png", btnsLeftArrowSheetCoords:getSheet())
 
 -- New
 local function myTouchListener(event)
@@ -66,7 +66,8 @@ local function doFunction(e)
         e.y < currentObject.contentBounds.yMin or
         e.y > currentObject.contentBounds.yMax then
             if currentObject.name == "btnsLeftArrow" then
-                currentObject:setFrame(1)
+                currentObject.xScale = 1
+                currentObject.yScale = 1
             end
             -- redundant ??
             -- currentObject:setFrame(1)
@@ -74,7 +75,8 @@ local function doFunction(e)
         else
             if touchInsideBtn == false then
                 if currentObject.name == "btnsLeftArrow" then
-                    currentObject:setFrame(2)
+                    currentObject.xScale = 1.05
+                    currentObject.yScale = 1.05
                 end
             end
             touchInsideBtn = true
@@ -144,10 +146,10 @@ function scene:create( event )
 
 	btnsLeftArrow = display.newSprite( btnsLeftArrowSheet, {frames={1,2}} )
     btnsLeftArrow.name = "btnsLeftArrow"
-    btnsLeftArrow.anchorX = 0
-    btnsLeftArrow.anchorY = 1
-    btnsLeftArrow.x = 0 + margins
-    btnsLeftArrow.y = _H - btnsLeftArrow.y - margins
+    btnsLeftArrow.anchorX = 0.5
+    btnsLeftArrow.anchorY = 0.5
+    btnsLeftArrow.x = _W/2
+    btnsLeftArrow.y = _H - 35
 	btnsLeftArrow.gotoScene = "menu"
     -- btnsLeftArrow:setFillColor(0.98, 0.42, 0.98)
 

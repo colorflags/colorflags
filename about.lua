@@ -19,8 +19,8 @@ local tempFont
 local m
 
 local btnsLeftArrow
-local btnsLeftArrowSheetCoords = require("lua-sheets.btns_left_arrow")
-local btnsLeftArrowSheet = graphics.newImageSheet("images/btns_left_arrow.png", btnsLeftArrowSheetCoords:getSheet())
+local btnsLeftArrowSheetCoords = require("lua-sheets.btns_arrow")
+local btnsLeftArrowSheet = graphics.newImageSheet("images/btns_arrow.png", btnsLeftArrowSheetCoords:getSheet())
 
 local function myTouchListener(event)
     currentObject = event.target
@@ -61,7 +61,8 @@ local function doFunction(e)
         e.y < currentObject.contentBounds.yMin or
         e.y > currentObject.contentBounds.yMax then
             if currentObject.name == "btnsLeftArrow" then
-                currentObject:setFrame(1)
+                currentObject.xScale = 1
+                currentObject.yScale = 1
             end
             -- redundant ??
             -- currentObject:setFrame(1)
@@ -69,7 +70,8 @@ local function doFunction(e)
         else
             if touchInsideBtn == false then
                 if currentObject.name == "btnsLeftArrow" then
-                    currentObject:setFrame(2)
+                currentObject.xScale = 1.05
+                currentObject.yScale = 1.05
                 end
             end
             touchInsideBtn = true
@@ -102,12 +104,6 @@ local function urlColor(e)
 end
 
 function scene:create( event )
-    local margins = 6
-
-    mgBtn = display.newImage("images/MG80x80.png",5,5)
-    mgBtn.anchorX=0
-    mgBtn.anchorY=0
-
     local fontOptions
 
     fontOptions = {
@@ -171,23 +167,32 @@ function scene:create( event )
     }
     bmpText.colorFlagsGame = ponyfont.newText(fontOptions)
 
-    twitterBtn = display.newImage("images/twitter51x51.png",_W-40,_H-40)
-    twitterBtn.anchorX=0.5
-    twitterBtn.anchorY=0.5
-    facebookBtn = display.newImage("images/facebook50x50.png",_W-100,_H-40)
-    facebookBtn.anchorX=0.5
-    facebookBtn.anchorY=0.5
+    local margins = 6
+
+    -- mgBtn = display.newImage("images/mg80x80.png", _W-80, _H-80)
+    -- mgBtn.anchorX=0
+    -- mgBtn.anchorY=0
+
+    twitterBtn = display.newImage("images/twitter51x51.png", _W - 2, 0)
+    twitterBtn.anchorX = 1
+    twitterBtn.anchorY = 0
+    facebookBtn = display.newImage("images/facebook50x50.png", _W - twitterBtn.width - 4, 0)
+    facebookBtn.anchorX = 1
+    facebookBtn.anchorY = 0
+
+
+
 
 	btnsLeftArrow = display.newSprite( btnsLeftArrowSheet, {frames={1,2}} )
     btnsLeftArrow.name = "btnsLeftArrow"
-    btnsLeftArrow.anchorX = 0
-    btnsLeftArrow.anchorY = 1
-    btnsLeftArrow.x = 0 + margins
-    btnsLeftArrow.y = _H - btnsLeftArrow.y - margins
+    btnsLeftArrow.anchorX = 0.5
+    btnsLeftArrow.anchorY = 0.5
+    btnsLeftArrow.x = _W/2
+    btnsLeftArrow.y = _H - 35
 	btnsLeftArrow.gotoScene = "menu"
     -- btnsLeftArrow:setFillColor(0.98, 0.42, 0.98)
 
-    self.view:insert(mgBtn)
+    -- self.view:insert(mgBtn)
     self.view:insert(twitterBtn)
     self.view:insert(facebookBtn)
     self.view:insert(btnsLeftArrow)
@@ -204,7 +209,7 @@ function scene:show( event )
         bmpText.mageeGames:addEventListener("tap",urlMagee)
         bmpText.colorFlagsGame:addEventListener("tap",urlColor)
         facebookBtn:addEventListener("tap",urlFacebook)
-        mgBtn:addEventListener("tap",urlMG)
+        -- mgBtn:addEventListener("tap",urlMG)
     end
 end
 
@@ -223,7 +228,7 @@ function scene:hide( event )
         bmpText.mageeGames:removeEventListener("tap",urlMagee)
         bmpText.colorFlagsGame:removeEventListener("tap",urlColor)
         facebookBtn:addEventListener("tap",urlFacebook)
-        mgBtn:removeEventListener("tap",urlMG)
+        -- mgBtn:removeEventListener("tap",urlMG)
         composer.removeScene("about",true)
     end
 end

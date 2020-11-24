@@ -1,3 +1,4 @@
+require("cf_color")
 local composer=require("composer")
 local scene = composer.newScene()
 
@@ -470,6 +471,40 @@ function scene:create( event )
 	sceneGroup:insert(colorFlagsAnimBack)
     sceneGroup:insert(btnsGroup)
 	sceneGroup:insert(M.skeleton.group)
+
+	if _G.license == true then
+		local licenseGroup = display.newGroup()
+		local licenseFont = "fonts/ptmono-bold.ttf"
+
+		local colorFillArray = CFColor(0, 210, 240)
+		local colorFillArray2 = CFColor(136, 208, 223)
+
+		local licenseDesc = display.newText("licensed", 5, display.contentHeight + 3, licenseFont, 18)
+		licenseDesc:setFillColor(colorFillArray.r, colorFillArray.g, colorFillArray.b)
+		-- licenseDesc:setEmbossColor(licenseEmbossColor)
+		licenseDesc.anchorX = 0
+		licenseDesc.anchorY = 1
+		licenseDesc.xScale = 1.01
+		licenseDesc.yScale = 1.10
+		local licenseDesc2 = display.newText("licensed", 6, display.contentHeight + 2, licenseFont, 18)
+		licenseDesc2:setFillColor(colorFillArray2.r, colorFillArray2.g, colorFillArray2.b)
+		-- licenseDesc:setEmbossColor(licenseEmbossColor)
+		licenseDesc2.anchorX = 0
+		licenseDesc2.anchorY = 1
+
+		local licenseDot = display.newCircle( licenseDesc.x - 2, display.contentHeight - licenseDesc.height/2 + 3, 2 )
+		licenseDot:setFillColor(colorFillArray.r, colorFillArray.g, colorFillArray.b)
+		licenseDot.xScale = 1.01
+		licenseDot.yScale = 1.10
+		local licenseDot2 = display.newCircle( licenseDesc.x - 1, display.contentHeight - licenseDesc.height/2 + 3, 2 )
+		licenseDot2:setFillColor(colorFillArray2.r, colorFillArray2.g, colorFillArray2.b)
+
+		licenseGroup:insert(licenseDesc)
+		licenseGroup:insert(licenseDesc2)
+		licenseGroup:insert(licenseDot)
+		licenseGroup:insert(licenseDot2)
+		sceneGroup:insert(licenseGroup)
+	end
 
 	btnsPlayGame:addEventListener("touch",doFunction)
 	btnsOptions:addEventListener("touch",doFunction)

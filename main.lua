@@ -2,7 +2,7 @@ require("mobdebug").start()
 
 local composer=require("composer")
 
-utf8 = require( "plugin.utf8" )
+-- utf8 = require( "plugin.utf8" )
 ponyfont = require("ponyfont")
 
 require("ssk2.loadSSK")
@@ -13,11 +13,47 @@ CFGameSettings = CFGameSettings()
 CFGameScaleComponents = CFGameScaleComponents()
 CFGameSFX = CFGameSFX()
 
-display.setStatusBar( display.HiddenStatusBar )
-
+-- SAM: Uncomment and test!
 _G.ssk.init({})
 ssk.persist.setDefault( "score.json", "highScore", 0 )
 ssk.persist.setDefault( "scone.json", "bought_extra_content", false )
+
+-- SAM: delete?
+--_W = display.pixelWidth
+--_H = display.pixelHeight
+_G._W = display.contentWidth -- Get the width of the screen
+_G._H = display.contentHeight -- Get the height of the screen
+_G.fps = display.fps
+_G.scaleSuffix = display.imageSuffix
+_G.license = false
+-- print(scaleSuffix)
+-- print(display.safeActualContentWidth)
+print("width: " .. _W, "height: " .. _H)
+print("actualContentWidth: " .. display.actualContentWidth, "actualContentHeight: " .. display.actualContentHeight)
+
+display.setStatusBar( display.HiddenStatusBar )
+
+----- PERMISSIONS ------
+local function appPermissionsListener( event )
+    for k,v in pairs( event.grantedAppPermissions ) do
+        if ( v == "Storage" ) then
+            print( "Storage permission granted!" )
+        end
+    end
+end
+
+local options =
+{
+    appPermission = "Storage",
+    urgency = "Critical",
+    listener = appPermissionsListener,
+    rationaleTitle = "Storage access required",
+    rationaleDescription = "Storage access is required play Color Flags",
+    settingsRedirectTitle = "Alert",
+    settingsRedirectDescription = "Without the ability to write to storage, this app will not properly function. Please grant storage access within Settings."
+}
+native.showPopup( "requestAppPermission", options )
+----- END PERMISSIONS ------
 
 _G.platform = system.getInfo( "platform" )
 if platform == "android" then
@@ -44,33 +80,15 @@ function runMain()
 	-- For xcode console output
 	io.output():setvbuf( "no" )
 
-	--composer.gotoScene( "unitTestListing" )
-
-	-- SAM: delete?
-	--_W = display.pixelWidth
-	--_H = display.pixelHeight
-	_G._W = display.contentWidth -- Get the width of the screen
-	_G._H = display.contentHeight -- Get the height of the screen
-	_G.fps = display.fps
-	_G.scaleSuffix = display.imageSuffix
-	-- print(scaleSuffix)
-
-	-- print(display.safeActualContentWidth)
-
-	print("width: " .. _W, "height: " .. _H)
-
-	print("actualContentWidth: " .. display.actualContentWidth, "actualContentHeight: " .. display.actualContentHeight)
-
 	defaultTransition="crossFade"
 
 	overrideScore=true  --set true to test gameover.lua
-
-	local showSplash = false    --set false to skip mageegames splash
 
 	local fontFace
 	local backgrounImage=nil
 	local backgroundColor={255,255,255}
 
+	-- SAM: when building with sizeoverloadkey, audio.loadStream() failed to create stream
 	_G.musicMenu = audio.loadStream( "magee_music/magee_main.mp3" ) -- rename magee_main.mp3 to magee_menu.mp3
 	_G.musicGameOver = audio.loadStream( "magee_music/magee_gameover.mp3" )
 
@@ -85,32 +103,7 @@ function runMain()
 	-- SAM: what is this?
 	audioCanPlay=true
 
-	local splash1 = display.newImageRect( "images/MMG1.png", 580, 320 )
-	    splash1.anchorX=0.5
-	    splash1.anchorY=0.5
-	    splash1.x = _W/2
-	    splash1.y = _H/2
-	    splash1:toFront()
-
-	local splash2 = display.newImageRect( "images/MMG2.png", 580, 320 )
-	    splash2.anchorX=0.5
-	    splash2.anchorY=0.5
-	    splash2.x = _W/2
-	    splash2.y = _H/2
-	    splash2.alpha=0
-	    splash2:toFront()
-
-	local function eraseSplash()
-	    display.remove(splash1)
-	    display.remove(splash2)
-	 composer.gotoScene( "menu", {effect = defaultTransition} )
-	end
-
-	local function fadeSplash()
-	    check1=transition.to(splash2, {time=1500,alpha=1})
-	    timer.performWithDelay(2500,eraseSplash,1)
-	end
-
+	-- SAM: what's this?
 	--composer.recycleOnSceneChange = true
 
 	-- SAM: cool, test this out. Do we still need it?
@@ -120,12 +113,6 @@ function runMain()
 	  print("Texture memory usage " .. system.getInfo("textureMemoryUsed")/1024/1024 .. "MB")
 	end
 
-	if showSplash==true then
-	    timer.performWithDelay(1000,fadeSplash,1)
-	elseif showSplash==false then
-	        display.remove(splash1)
-	    display.remove(splash2)
-	     composer.gotoScene( "game", {effect = defaultTransition})
-	end
+	composer.gotoScene( "game", {effect = defaultTransition})
 end
 runMain()

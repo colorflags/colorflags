@@ -47,6 +47,9 @@ SFXArray.lightningSize = table.maxn(SFXArray.lightning)
 SFXArray.lightningFail = {
     audio.loadSound("sfx/lightningfail1.wav")
 }
+SFXArray.travel = {
+    audio.loadSound("sfx/travel.wav")
+}
 
 --effects createPalette()
 cornersArray = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
@@ -599,8 +602,8 @@ local function setupScoreboard()
         shadow = { r = colorShadowArray.r, g = colorShadowArray.g, b = colorShadowArray.b }
     }
 
-    local scoreboardFont = "fonts/ChaparralPro-SemiboldIt.otf"
-    local debugFont = "fonts/PTMono-Bold.ttf"
+    local scoreboardFont = "fonts/chaparralpro-semiboldit.otf"
+    local debugFont = "fonts/ptmono-bold.ttf"
     -- local scoreboardFont = "ChaparralPro-SemiboldIt"
     -- local debugFont = "PTMono-Bold"
 
@@ -1646,7 +1649,7 @@ newCountry = function()
 
     -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
     local randomCountry = math.random(CFGameSettings:getLength())
-    country = CFGameSettings:getItemByID(14)
+    country = CFGameSettings:getItemByID(randomCountry)
 
     local subGroup = display.newGroup()
     local options
@@ -1867,7 +1870,7 @@ display.setDefault("textureWrapX", "repeat")
         -- print(k1, k2, k3)
     end
 
-    music = audio.loadStream("anthems/" .. country.name .. ".wav")
+    music = audio.loadStream("anthems/" .. country.name .. ".mp3")
 
     local function offsetIncomingAnthem(outgoingAnthem, incomingAnthem)
         local function listener(event)
@@ -1883,11 +1886,16 @@ display.setDefault("textureWrapX", "repeat")
     end
 
     local function offsetIncomingAnthemWithFade(outgoingAnthem, incomingAnthem)
-        audio.fadeOut( { channel=outgoingAnthem, time=500 } )
+
+        audio.fadeOut( { channel=outgoingAnthem, time=2000 } )
         lastReservedChannel = incomingAnthem
         audio.stop(lastReservedChannel)
         audio.setVolume( .5, { channel = lastReservedChannel } )
-        audioReservedChannels[lastReservedChannel] = audio.play(music, {channel=lastReservedChannel, loops=-1, fadein=500})
+        audio.play( SFXArray.travel[1] )
+        timer.performWithDelay( 2000, function()
+            audioReservedChannels[lastReservedChannel] = audio.play(music, {channel=lastReservedChannel, loops=-1, fadein=1000})
+        end )
+
     end
 
 
@@ -2264,10 +2272,10 @@ function objTouch(self, e)
                     end
                     if spawnTable[i] ~= 0 and spawnTable[i] ~= e.target then
                         spawnTable[i]:removeEventListener("touch", objTouch)
-                        transition.to(spawnTable[i], {time = 500, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
+                        transition.to(spawnTable[i], {time = 200, rotation = 400, xScale = 0.01, yScale = 0.01, alpha = 1, onComplete = removePalette})
                     end
                 end
-                transition.to(e.target, {time = 700, rotation = 400, x = _W / 2, y = _H / 2, xScale = 8, yScale = 8, onComplete = endGame })
+                transition.to(e.target, {time = 400, rotation = 400, x = _W / 2, y = _H / 2, xScale = 8, yScale = 8, alpha = 1, onComplete = endGame })
                 numDeaths = 1
                 Runtime:removeEventListener("enterFrame", boundaryCheck)
 
@@ -2276,15 +2284,15 @@ function objTouch(self, e)
             end
             if e.target.isGrown == false then --if canceled
                 transition.cancel(self)
-                transition.to(e.target, {time = 500, rotation = 400, xScale = 5, yScale = 5, onComplete = removePalette })
+                transition.to(e.target, {time = 200, rotation = 400, xScale = 2, yScale = 2, alpha = 1, onComplete = removePalette })
             else --not cancelled
-                transition.to(e.target, {time = 500, rotation = 400, xScale = 5, yScale = 5, onComplete = removePalette })
+                transition.to(e.target, {time = 200, rotation = 400, xScale = 2, yScale = 2, alpha = 1, onComplete = removePalette })
             end
             e.target.isPaletteActive = false
             --You are Alive
         else
             e.target.isPaletteActive = false
-            transition.to(e.target, {time = 200, rotation = 400, xScale = 0.01, yScale = 0.01, onComplete = removePalette})
+            transition.to(e.target, {time = 200, rotation = 400, xScale = 0.01, yScale = 0.01, alpha = 1, onComplete = removePalette})
             currentColor = e.target.type
             --BONUS SCORE
             if currentColor == previousColor then
@@ -2517,7 +2525,7 @@ function scene:create(e)
         newGroup.maskScaleX = 1.10
         newGroup.maskScaleY = 1.01
     elseif platform == "android" then
-
+        -- SAM: CHECK CHECK CHECK
         -- SAM: immersiveSticky, on newer androids
         -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
         -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.

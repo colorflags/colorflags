@@ -1,11 +1,3 @@
--- SAM: Outdated? Do I still need this?
--- application = {
---    content = {
---       graphicsCompatibility = 1,  -- This turns on Graphics 1.0 Compatibility mode
---
---    },
--- }
-
 if string.sub(system.getInfo("model"),1,4) == "iPad" then
     application =
     {
@@ -37,7 +29,6 @@ elseif string.sub(system.getInfo("model"),1,2) == "iP" and display.pixelHeight >
     {
         content =
         {
-            -- SAM: AWESOME!
             fps = 60,
             width = 320,
             height = 568,
@@ -92,8 +83,6 @@ elseif display.pixelHeight / display.pixelWidth > 1.72 and display.pixelHeight /
     {
         content =
         {
-            -- width = display.pixelWidth/3,
-            -- height = display.pixelHeight/3,
             fps = 60,
             width = 360,
             height = 640,
@@ -112,8 +101,6 @@ elseif display.pixelHeight / display.pixelWidth >= 2 then
     {
         content =
         {
-            -- width = display.pixelWidth/3,
-            -- height = display.pixelHeight/3,
             fps = 60,
             width = 360,
             height = 720,
