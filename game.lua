@@ -5,6 +5,9 @@ local composer = require("composer")
 local cameraEvent = require("cameraevent")
 local scene = composer.newScene()
 
+local physics = require("physics")
+physics.start()
+
 local pGet = ssk.persist.get
 local pSet = ssk.persist.set
 
@@ -88,7 +91,7 @@ gameMechanics.playCountryDuration = 30000 -- default 30000
 gameMechanics.transitionToCountryDuration = 2000
 gameMechanics.firstPaletteDelay = 10
 gameMechanics.firstPalette = true
-gameMechanics.growSpeedIndependance = true
+gameMechanics.growSpeedIndependance = false
 gameMechanics.countriesSpawned = 0
 gameMechanics.overrideFlag = false
 gameMechanics.heightModeTop = 35
@@ -119,16 +122,9 @@ local timeVarMultiplier = 0.5
 
 local levelsArray
 levelsArray = {
-    -- {speed=0.50, timeVar=5900},
-    {speed=1.20, timeVar=2400},
-    {speed=1.25, timeVar=2200},
-    {speed=1.30, timeVar=2000},
-    {speed=1.35, timeVar=1800},
-    {speed=1.40, timeVar=1600},
-    {speed=1.45, timeVar=1400},
-    {speed=1.50, timeVar=1200}
-
-    -- start at 2!?
+    {speed=5.00, timeVar=800},
+    {speed=5.30, timeVar=775},
+    {speed=5.60, timeVar=750}
 }
 
 -- checks if game just started
@@ -197,6 +193,8 @@ local paceRect
 local map
 local mapGroup
 local waterGroup
+local splashGroup
+local splashVec
 local newGroup
 local zoomMultiplier = .3
 
@@ -259,8 +257,6 @@ local gameDebugGroup
 
 local gameDebugArray = {}
 gameDebugArray.gameDebugPanelToggle = nil
-gameDebugArray.gameDebugPanelInner = nil
-gameDebugArray.gameDebugPanelOuter = nil
 
 gameDebugArray.gameDebugGodBtnGroup = nil
 gameDebugArray.gameDebugGodBtnDesc = nil
@@ -505,10 +501,6 @@ onOptionsTouch = function(event)
                 end
 
                 gameDebugGroup.alpha = 1
-                gameDebugPanelInner.alpha = 1
-                gameDebugPanelOuter.alpha = 1
-                paceRect.alpha = 0.6
-
                 print("open panel")
             else
                 debugOptions.debugPanel = false
@@ -524,9 +516,6 @@ onOptionsTouch = function(event)
                 modeIncreaseBtnGroup.alpha = 0
 
                 gameDebugGroup.alpha = 0
-                gameDebugPanelInner.alpha = 0
-                gameDebugPanelOuter.alpha = 0
-                paceRect.alpha = 0
                 print("close panel")
             end
         end
@@ -607,7 +596,7 @@ local function setupScoreboard()
     -- local scoreboardFont = "ChaparralPro-SemiboldIt"
     -- local debugFont = "PTMono-Bold"
 
-    local scoreboardOffsetFromLeft = 14
+    local scoreboardOffsetFromLeft = display.safeScreenOriginX + 14
     local scoreboardOffsetFromEachOther = 70
     local scoreboardOffsetIncDecBtns = 1.2
 
@@ -808,15 +797,6 @@ local function setupScoreboard()
     gameDebugCycleBtnGroup:addEventListener("touch", onOptionsTouch)
     gameDebugGroup:insert(gameDebugCycleBtnGroup)
 
-    gameDebugPanelInner = display.newRoundedRect(gameDebugSpeedAnchorX, gameDebugGroupAnchorY - 10, gameDebugGroup.width + 10, gameDebugGroup.height, 0)
-    gameDebugPanelInner:setFillColor(.7, .2, .4)
-    gameDebugGroup:insert(gameDebugPanelInner)
-    gameDebugPanelOuter = display.newRoundedRect(gameDebugSpeedAnchorX, gameDebugGroupAnchorY - 10, gameDebugGroup.width + 2, gameDebugGroup.height + 1, 1)
-    gameDebugPanelOuter:setFillColor(.8, .6, .1)
-    gameDebugGroup:insert(gameDebugPanelOuter)
-    gameDebugPanelInner:toBack()
-    gameDebugPanelOuter:toBack()
-
     if debugOptions.debugPanel == true then
         -- read saved debugPanel values
         local debugPanelValues = pGet( "score.json", "debugPanelStoredValues" )
@@ -842,9 +822,7 @@ local function setupScoreboard()
         end
 
         gameDebugGroup.alpha = 1
-        gameDebugPanelInner.alpha = 1
-        gameDebugPanelOuter.alpha = 1
-        paceRect.alpha = 0.6
+
         print("start game with debug panel")
     else
         speedDecreaseBtnGroup.alpha = 0
@@ -853,9 +831,7 @@ local function setupScoreboard()
         modeIncreaseBtnGroup.alpha = 0
 
         gameDebugGroup.alpha = 0
-        gameDebugPanelInner.alpha = 0
-        gameDebugPanelOuter.alpha = 0
-        paceRect.alpha = 0
+
         print("start game with no debug panel")
     end
 end
@@ -1049,6 +1025,23 @@ local function removePalette(self)
     end
 end
 
+local function deadPalette(self)
+        splashGroup:insert(self)
+
+        self:setLinearVelocity( self.x, 0 )
+        self.isBodyActive = false
+
+        self:removeEventListener("touch", objTouch)
+        spawnTable[self.index] = 0
+        transition.to(self, {time = 2000, tag = "deadPalette", onComplete = function()
+                transition.to(self, {time = 500, tag = "deadPalette", transition = easing.inOutSine, alpha = 0, onComplete = function()
+                        self:removeSelf()
+                    end
+                })
+            end
+        })
+end
+
 local function removeText(text)
     text:removeSelf()
 end
@@ -1195,7 +1188,7 @@ end
 
 local function paletteGrow(self)
     if gameMechanics.growSpeedIndependance == true then
-        transition.to(self, {time = 1200, alpha = 1, xScale = 1, yScale = 1})
+        transition.to(self, {time = 400, alpha = 1, xScale = 1, yScale = 1})
     else
         transition.to(self, {time = timeVar * timeVarMultiplier, alpha = 1, xScale = 1, yScale = 1})
     end
@@ -1303,11 +1296,11 @@ local function spawnPalette(params)
         if object.index == 1 or object.index == 2 then
             -- paletteGrow(object)
             -- SAM: using transition.to and then calling paletteGrow is redundant!?
-            transition.to(object, {time = 1200, onComplete = paletteGrow})
+            transition.to(object, {time = 200, onComplete = paletteGrow})
         else
             -- paletteGrow(object)
             -- SAM: using transition.to and then calling paletteGrow is redundant!?
-            transition.to(object, {time = 1200, onComplete = paletteGrow})
+            transition.to(object, {time = 200, onComplete = paletteGrow})
             if spawnTable[object.index - 2] ~= 0 then
                 spawnTable[object.index - 2]:toFront()
             end
@@ -1649,7 +1642,7 @@ newCountry = function()
 
     -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
     local randomCountry = math.random(CFGameSettings:getLength())
-    country = CFGameSettings:getItemByID(randomCountry)
+    country = CFGameSettings:getItemByID(44)
 
     local subGroup = display.newGroup()
     local options
@@ -1870,7 +1863,7 @@ display.setDefault("textureWrapX", "repeat")
         -- print(k1, k2, k3)
     end
 
-    music = audio.loadStream("anthems/" .. country.name .. ".mp3")
+    music = audio.loadStream("anthems/" .. country.name .. ".wav")
 
     local function offsetIncomingAnthem(outgoingAnthem, incomingAnthem)
         local function listener(event)
@@ -2282,17 +2275,54 @@ function objTouch(self, e)
                 Runtime:removeEventListener("enterFrame", moveObject)
                 return
             end
-            if e.target.isGrown == false then --if canceled
+            if e.target.isGrown == false then
                 transition.cancel(self)
                 transition.to(e.target, {time = 200, rotation = 400, xScale = 2, yScale = 2, alpha = 1, onComplete = removePalette })
-            else --not cancelled
+            else
                 transition.to(e.target, {time = 200, rotation = 400, xScale = 2, yScale = 2, alpha = 1, onComplete = removePalette })
             end
             e.target.isPaletteActive = false
-            --You are Alive
         else
+            e.target:removeEventListener("touch", objTouch)
+            spawnTable[e.target.index] = 0
             e.target.isPaletteActive = false
-            transition.to(e.target, {time = 200, rotation = 400, xScale = 0.01, yScale = 0.01, alpha = 1, onComplete = removePalette})
+            physics.addBody(e.target, "dynamic", {density = 3, friction = .3, bounce = .2})
+            splashVec = _W/2-e.x
+            if gameMechanics.mode == 1 then
+                if e.target.corner == "BottomLeft" or e.target.corner == "BottomRight" then
+                    e.target.gravityScale = 10
+                    e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                else
+                    e.target.gravityScale = -10
+                    e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                end
+            elseif gameMechanics.mode == 2 then
+                if e.target.corner == "BottomLeft" or e.target.corner == "BottomRight" then
+                    e.target.gravityScale = 10
+                    e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                else
+                    e.target.gravityScale = -10
+                    e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                end
+            elseif gameMechanics.mode == 3 then
+                if e.target.corner == "BottomLeft" then
+                    e.target.gravityScale = 10
+                    e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                elseif e.target.corner == "BottomRight" then
+                    e.target.gravityScale = 10
+                    e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                elseif e.target.corner == "TopLeft" then
+                    e.target.gravityScale = -10
+                    e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                elseif e.target.corner == "TopRight" then
+                    e.target.gravityScale = -10
+                    e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                end
+            end
+            transition.to(e.target, {time = 200, onComplete = function()
+                    transition.to(e.target, {time = 250, rotation = 400, gravityScale=0, xScale=0.2, yScale = 0.2, onComplete = deadPalette})
+                end
+            })
             currentColor = e.target.type
             --BONUS SCORE
             if currentColor == previousColor then
@@ -2372,31 +2402,18 @@ function scene:create(e)
     self.view:insert(paletteBarTop)
     self.view:insert(paletteBarBtm)
 
-    if platform == "ios" then
-        paletteBarTop.x = _W/2 -- fix like for platform == "android"
-        paletteBarTop.y = 0
-        paletteBarTop.anchorX = .5
-        paletteBarTop.anchorY = 0
+    print("actualContentWidth from game.lua", display.actualContentWidth)
+    paletteBarTop.width = game_W
+    paletteBarTop.x = game_W/2
+    paletteBarTop.y = 0
+    paletteBarTop.anchorX = .5
+    paletteBarTop.anchorY = 0
 
-        paletteBarBtm.x = _W/2 -- fix like for platform == "android"
-        paletteBarBtm.y = _H -- fix like for platform == "android"
-        paletteBarBtm.anchorX = .5
-        paletteBarBtm.anchorY = 1
-    elseif platform == "android" then
-        -- paletteBarTop.width = display.actualContentWidth +
-        print("actualContentWidth from game.lua", display.actualContentWidth)
-        paletteBarTop.width = game_W
-        paletteBarTop.x = game_W/2
-        paletteBarTop.y = 0
-        paletteBarTop.anchorX = .5
-        paletteBarTop.anchorY = 0
-
-        paletteBarBtm.width = game_W
-        paletteBarBtm.x = game_W/2
-        paletteBarBtm.y = game_H
-        paletteBarBtm.anchorX = .5
-        paletteBarBtm.anchorY = 1
-    end
+    paletteBarBtm.width = game_W
+    paletteBarBtm.x = game_W/2
+    paletteBarBtm.y = game_H
+    paletteBarBtm.anchorX = .5
+    paletteBarBtm.anchorY = 1
 
     waterGroup = display.newGroup()
     water = display.newRect( display.contentCenterX, display.contentCenterY, game_W, game_H ) -- IMPORTANT, must be set to game_W / game_H, which change according to immerstiveSticky mode
@@ -2467,23 +2484,16 @@ function scene:create(e)
     -- waterGroup.maskX = game_W/2
     -- waterGroup.maskY = game_H/2
 
-    -- do this math one time in this function, reuse
-    if platform == "ios" then
-        waterGroup.maskScaleX = 1.10
-        waterGroup.maskScaleY = 1.01
-    elseif platform == "android" then
+    -- SAM: immersiveSticky, on newer androids
+    -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
+    -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
+    waterGroup.maskScaleX = 1.5
 
-        -- SAM: immersiveSticky, on newer androids
-        -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
-        -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
-        waterGroup.maskScaleX = 1.5
-
-        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
-        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
-        -- alignMask will be 1.23
-        -- print(alignMask)
-        waterGroup.maskScaleY = alignMask
-    end
+    -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+    local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+    -- alignMask will be 1.23
+    -- print(alignMask)
+    waterGroup.maskScaleY = alignMask
 
     -- ['@1x'] = {2031, 851},
     -- ['@2x'] = {4062, 1702},
@@ -2496,6 +2506,7 @@ function scene:create(e)
 
     mapGroup = display.newGroup()
     fapGroup = display.newGroup()
+    splashGroup = display.newGroup()
     map = display.newImageRect("images/worldmap_2017_300.png", 8191, 4084)
     map.anchorX = 0
     map.anchorY = 0
@@ -2511,6 +2522,7 @@ function scene:create(e)
 
     newGroup = display.newGroup()
     newGroup:insert(mapGroup)
+    newGroup:insert(splashGroup)
     self.view:insert(newGroup)
     -- mapMask = graphics.newMask("images/map_mask_2018.png")
 
@@ -2520,23 +2532,17 @@ function scene:create(e)
     -- newGroup.maskX = game_W/2
     -- newGroup.maskY = game_H/2
 
-    -- do this math one time in this function, reuse
-    if platform == "ios" then
-        newGroup.maskScaleX = 1.10
-        newGroup.maskScaleY = 1.01
-    elseif platform == "android" then
-        -- SAM: CHECK CHECK CHECK
-        -- SAM: immersiveSticky, on newer androids
-        -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
-        -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
-        newGroup.maskScaleX = 1.5
+    -- SAM: CHECK CHECK CHECK
+    -- SAM: immersiveSticky, on newer androids
+    -- helps when entering immersiveSticky mode (or allow hiding of nav bar).
+    -- water will always extend past screen edges and will resize the group past the display's width, hopefully across all android devices.
+    newGroup.maskScaleX = 1.5
 
-        -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
-        local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
-        -- alignMask will be 1.23
-        -- print(alignMask)
-        newGroup.maskScaleY = alignMask
-    end
+    -- divide (display.contentHeight + 35) by height of map_mask.png (waterMask)
+    local alignMask = round( (_H + gameMechanics.heightModeTop) / 320, 2)
+    -- alignMask will be 1.23
+    -- print(alignMask)
+    newGroup.maskScaleY = alignMask
 
     newGroup.alpha = 0
 
@@ -2641,7 +2647,7 @@ function scene:create(e)
     paceRect.y = _H - (gameMechanics.heightModeTop*2)
     paceRect.isTopLeft = false
     paceRect.isMoving = false
-    paceRect.alpha = 0.6
+    paceRect.alpha = 0
 
     setupScoreboard()
 end
@@ -2696,10 +2702,10 @@ function scene:hide(e)
     -- print("HIDE")
     if e.phase == "will" then
         -- important listeners and timers to be cancelled!
+        transition.cancel( "deadPalette" )
         transition.cancel( "moveNeedle" )
         timer.cancel(countryFillBounceTimer)
         Runtime:removeEventListener( "enterFrame", water )
-
         display.remove(background)
 
         display.remove(gameDebugGroup)

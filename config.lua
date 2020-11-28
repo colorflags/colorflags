@@ -1,142 +1,34 @@
-if string.sub(system.getInfo("model"),1,4) == "iPad" then
-    application =
-    {
-        content =
-        {
-            width = 360,
-            height = 480,
-            scale = "letterBox",
-            xAlign = "center",
-            yAlign = "center",
-            imageSuffix =
-            {
-                ["@2x"] = 1.5,
-                ["@4x"] = 3.0,
-            },
-        },
-        notification =
-        {
-            iphone = {
-                types = {
-                    "badge", "sound", "alert"
-                }
-            }
-        }
-    }
---iPhone 5 and up
-elseif string.sub(system.getInfo("model"),1,2) == "iP" and display.pixelHeight > 960 then
-    application =
-    {
-        content =
-        {
-            fps = 60,
-            width = 320,
-            height = 568,
-            scale = "letterBox",
-            xAlign = "center",
-            yAlign = "center",
-            imageSuffix =
-            {
-                ["@2x"] = 1.5, --iPhone 5 and iPhone6
-                ["@4x"] = 3.0, --iPhone 6 Plus and up
-            },
-        },
-        notification =
-        {
-            iphone = {
-                types = {
-                    "badge", "sound", "alert"
-                }
-            }
-        }
-    }
---iPhone 4
-elseif string.sub(system.getInfo("model"),1,2) == "iP" then
-    application =
-    {
-        content =
-        {
-            fps = 60,
-            width = 320,
-            height = 480,
-            scale = "letterBox",
-            xAlign = "center",
-            yAlign = "center",
-            imageSuffix =
-            {
-                ["@2x"] = 1.5, --iPhone 4
-                ["@4x"] = 3.0,
-            },
-        },
-        notification =
-        {
-            iphone = {
-                types = {
-                    "badge", "sound", "alert"
-                }
-            }
-        }
-    }
---Samsung Galaxy
-elseif display.pixelHeight / display.pixelWidth > 1.72 and display.pixelHeight / display.pixelWidth < 2 then
-    application =
-    {
-        content =
-        {
-            fps = 60,
-            width = 360,
-            height = 640,
-            scale = "letterBox",
-            xAlign = "center",
-            yAlign = "center",
-            imageSuffix =
-            {
-                ["@2x"] = 1.5, --Samsung Galaxy S3
-                ["@4x"] = 3, -- Samsung Galaxy S5
-            },
-        },
-    }
-elseif display.pixelHeight / display.pixelWidth >= 2 then
-    application =
-    {
-        content =
-        {
-            fps = 60,
-            width = 360,
-            height = 720,
-            scale = "letterBox",
-            xAlign = "center",
-            yAlign = "center",
-            imageSuffix =
-            {
-                ["@2x"] = 1.5, -- i don't know LOL
-                ["@4x"] = 3, -- OnePlus 5T
-            },
-        },
-    }
-else
-    application =
-    {
-        content =
-        {
-            width = 320,
-            height = 512,
-            scale = "letterBox",
-            xAlign = "center",
-            yAlign = "center",
-            imageSuffix =
-            {
-                ["@2x"] = 1.5,
-                ["@4x"] = 3.0,
-            },
-        },
-        notification =
-        {
-            iphone = {
-                types = {
-                    "badge", "sound", "alert"
-                }
-            }
-        }
-    }
+local w, h = display.pixelWidth, display.pixelHeight
+
+local modes = {1, 1.5, 2, 3, 4, 6, 8} -- Scaling factors to try
+local contentW, contentH = 320, 480   -- Minimal size your content can fit in
+
+-- Try each mode and find the best one
+local _w, _h, _m = w, h, 1
+for i = 1, #modes do
+    local m = modes[i]
+    local lw, lh = w / m, h / m
+    if lw < contentW or lh < contentH then
+        break
+    else
+        _w, _h, _m = lw, lh, m
+    end
 end
+-- If scaling is not pixel perfect (between 1 and 2) - use letterbox
+if _m < 2 then
+    local scale = math.max(contentW / w, contentH / h)
+    _w, _h = w * scale, h * scale
+end
+
+application = {
+    content = {
+        width = _w,
+        height = _h,
+        scale = 'letterbox',
+        fps = 60,
+        imageSuffix = {
+            ['@2x'] = 1.1,
+            ['@4x'] = 2.1,
+        }
+    }
+}

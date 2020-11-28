@@ -41,7 +41,7 @@ settings = {
 
     android =
     {
-        versionCode = "174",
+        versionCode = "175",
         usesExpansionFile = true,
     	usesPermissions = {
             "android.permission.INTERNET",
