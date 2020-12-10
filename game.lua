@@ -193,7 +193,10 @@ local paceRect
 local map
 local mapGroup
 local waterGroup
-local splashGroup
+local paletteTrashGroup
+local paletteTrashOnCountryGroup
+local splashType
+local splashFlagFrame
 local splashVec
 local newGroup
 local zoomMultiplier = .3
@@ -1026,13 +1029,33 @@ local function removePalette(self)
 end
 
 local function deadPalette(self)
-        splashGroup:insert(self)
+    -- SAM: temp fix. palette should be cleaned up before gameover.lua appears
+    if paceRect.isMoving == true then
+        paletteTrashGroup:insert(self)
 
         self:setLinearVelocity( self.x, 0 )
         self.isBodyActive = false
 
-        self:removeEventListener("touch", objTouch)
-        spawnTable[self.index] = 0
+        transition.to(self, {time = 8000, tag = "deadPalette", onComplete = function()
+                transition.to(self, {time = 500, tag = "deadPalette", transition = easing.inOutSine, alpha = 0, onComplete = function()
+                        self:removeSelf()
+                    end
+                })
+            end
+        })
+    else
+        self:removeSelf()
+    end
+end
+
+local function deadPaletteOnCountry(self)
+    -- SAM: temp fix. palette should be cleaned up before gameover.lua appears
+    if paceRect.isMoving == true then
+        paletteTrashOnCountryGroup:insert(self)
+
+        self:setLinearVelocity( self.x, 0 )
+        self.isBodyActive = false
+
         transition.to(self, {time = 2000, tag = "deadPalette", onComplete = function()
                 transition.to(self, {time = 500, tag = "deadPalette", transition = easing.inOutSine, alpha = 0, onComplete = function()
                         self:removeSelf()
@@ -1040,6 +1063,9 @@ local function deadPalette(self)
                 })
             end
         })
+    else
+        self:removeSelf()
+    end
 end
 
 local function removeText(text)
@@ -1642,7 +1668,7 @@ newCountry = function()
 
     -- SAM: change to countries? All country data is kept in here.. reference to cf_game_settings.lua
     local randomCountry = math.random(CFGameSettings:getLength())
-    country = CFGameSettings:getItemByID(44)
+    country = CFGameSettings:getItemByID(randomCountry)
 
     local subGroup = display.newGroup()
     local options
@@ -1817,6 +1843,8 @@ display.setDefault("textureWrapX", "repeat")
 
     flag:addEventListener("touch", lightningButton)
     lightningIcons()
+
+    paletteTrashGroup:toFront()
 
     code = country.code
 
@@ -2287,42 +2315,81 @@ function objTouch(self, e)
             spawnTable[e.target.index] = 0
             e.target.isPaletteActive = false
             physics.addBody(e.target, "dynamic", {density = 3, friction = .3, bounce = .2})
-            splashVec = _W/2-e.x
-            if gameMechanics.mode == 1 then
+            splashType = 3
+
+            if splashType == 1 then
+                -- easiest on the eyes
                 if e.target.corner == "BottomLeft" or e.target.corner == "BottomRight" then
                     e.target.gravityScale = 10
-                    e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                    e.target:applyLinearImpulse( 10, -500, e.x, e.y )
                 else
                     e.target.gravityScale = -10
-                    e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                    e.target:applyLinearImpulse( 10, 500, e.x, e.y )
                 end
-            elseif gameMechanics.mode == 2 then
+                transition.to(e.target, {time = 200, onComplete = function()
+                        transition.to(e.target, {time = 250, rotation = 400, gravityScale=0, xScale=0.2, yScale = 0.2, onComplete = deadPalette})
+                    end
+                })
+            elseif splashType == 2 then
+                -- SAM: study Solar2D box physics. Read and follow some tutorials
+                -- doesn't scale so well on iPhone X. Palettes overshoot the flagFrame
+                -- to work out.. palettes splashing on to flagframe. makes it harder to decifer country's target colors as the round proceeds
+                -- scew / distort flag, as palettes hit
+                -- lightning strikes from flag
+                splashFlagFrame = flagFrame.x
                 if e.target.corner == "BottomLeft" or e.target.corner == "BottomRight" then
                     e.target.gravityScale = 10
-                    e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                    e.target:applyLinearImpulse( splashFlagFrame, -400, e.x, e.y )
                 else
                     e.target.gravityScale = -10
-                    e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                    e.target:applyLinearImpulse( splashFlagFrame, 400, e.x, e.y )
                 end
-            elseif gameMechanics.mode == 3 then
-                if e.target.corner == "BottomLeft" then
-                    e.target.gravityScale = 10
-                    e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
-                elseif e.target.corner == "BottomRight" then
-                    e.target.gravityScale = 10
-                    e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
-                elseif e.target.corner == "TopLeft" then
-                    e.target.gravityScale = -10
-                    e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
-                elseif e.target.corner == "TopRight" then
-                    e.target.gravityScale = -10
-                    e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                transition.to(e.target, {time = 100, onComplete = function()
+                        transition.to(e.target, {time = 250, rotation = 400, gravityScale=0, xScale=0.2, yScale = 0.2, onComplete = deadPalette})
+                    end
+                })
+            elseif splashType == 3 then
+                -- SAM: zoom levels on MOST countries must be larger!
+                -- palettes splash to country, but often misses. animate or color the fxBG?? (drops of color coming from palette)
+                -- lightning strikes from flag
+                splashVec = _W/2-e.x
+                if gameMechanics.mode == 1 then
+                    if e.target.corner == "BottomLeft" or e.target.corner == "BottomRight" then
+                        e.target.gravityScale = 10
+                        e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                    else
+                        e.target.gravityScale = -10
+                        e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                    end
+                elseif gameMechanics.mode == 2 then
+                    if e.target.corner == "BottomLeft" or e.target.corner == "BottomRight" then
+                        e.target.gravityScale = 10
+                        e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                    else
+                        e.target.gravityScale = -10
+                        e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                    end
+                elseif gameMechanics.mode == 3 then
+                    if e.target.corner == "BottomLeft" then
+                        e.target.gravityScale = 10
+                        e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                    elseif e.target.corner == "BottomRight" then
+                        e.target.gravityScale = 10
+                        e.target:applyLinearImpulse( splashVec, -500, e.x, e.y )
+                    elseif e.target.corner == "TopLeft" then
+                        e.target.gravityScale = -10
+                        e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                    elseif e.target.corner == "TopRight" then
+                        e.target.gravityScale = -10
+                        e.target:applyLinearImpulse( splashVec, 500, e.x, e.y )
+                    end
                 end
+                transition.to(e.target, {time = 200, onComplete = function()
+                        transition.to(e.target, {time = 250, rotation = 400, gravityScale=0, xScale=0.2, yScale = 0.2, onComplete = deadPaletteOnCountry})
+                    end
+                })
             end
-            transition.to(e.target, {time = 200, onComplete = function()
-                    transition.to(e.target, {time = 250, rotation = 400, gravityScale=0, xScale=0.2, yScale = 0.2, onComplete = deadPalette})
-                end
-            })
+
             currentColor = e.target.type
             --BONUS SCORE
             if currentColor == previousColor then
@@ -2506,7 +2573,7 @@ function scene:create(e)
 
     mapGroup = display.newGroup()
     fapGroup = display.newGroup()
-    splashGroup = display.newGroup()
+    paletteTrashOnCountryGroup = display.newGroup()
     map = display.newImageRect("images/worldmap_2017_300.png", 8191, 4084)
     map.anchorX = 0
     map.anchorY = 0
@@ -2522,7 +2589,7 @@ function scene:create(e)
 
     newGroup = display.newGroup()
     newGroup:insert(mapGroup)
-    newGroup:insert(splashGroup)
+    newGroup:insert(paletteTrashOnCountryGroup)
     self.view:insert(newGroup)
     -- mapMask = graphics.newMask("images/map_mask_2018.png")
 
@@ -2616,6 +2683,8 @@ function scene:create(e)
     lightningIcon4.alpha = .2
     lightningIcon5.alpha = .2
 
+    paletteTrashGroup = display.newGroup()
+
     --[[
     -- jitterCameraPosition to add/enhance position derived from distanceFromCamera
     local function jitterEvent( event )
@@ -2702,6 +2771,8 @@ function scene:hide(e)
     -- print("HIDE")
     if e.phase == "will" then
         -- important listeners and timers to be cancelled!
+        display.remove(paletteTrashGroup)
+        display.remove(paletteTrashOnCountryGroup)
         transition.cancel( "deadPalette" )
         transition.cancel( "moveNeedle" )
         timer.cancel(countryFillBounceTimer)

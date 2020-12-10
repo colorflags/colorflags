@@ -42,7 +42,7 @@ settings = {
     android =
     {
         versionCode = "175",
-        usesExpansionFile = true,
+        --usesExpansionFile = true,
     	usesPermissions = {
             "android.permission.INTERNET",
             "android.permission.WRITE_EXTERNAL_STORAGE",
