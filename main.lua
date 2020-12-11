@@ -113,6 +113,6 @@ function runMain()
 	  print("Texture memory usage " .. system.getInfo("textureMemoryUsed")/1024/1024 .. "MB")
 	end
 
-	composer.gotoScene( "game", {effect = defaultTransition})
+	composer.gotoScene( "menu", {effect = defaultTransition})
 end
 runMain()
